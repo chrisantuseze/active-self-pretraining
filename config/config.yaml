@@ -1,0 +1,49 @@
+method: 0                       # 0 for SimCLR, 1 for MoCo
+
+# moco specific
+moco_dim: 128                   # feature dimension (default: 128)
+moco_k: 65536                   # queue size; number of negative keys (default: 65536)
+moco_m: 0.999                   # moco momentum of updating key encoder (default: 0.999)
+moco_t: 0.07                    # softmax temperature (default: 0.07)
+mlp: True                       # use mlp head
+aug_plus: True                  # use moco v2 data augmentation
+cos: True                       # use cosine lr schedule
+
+
+# distributed training
+nodes: 1
+gpus: 1                         # I recommend always assigning 1 GPU to 1 node
+nr: 0                           # machine nr. in node (0 -- nodes - 1)
+dataparallel: 0                 # Use DataParallel instead of DistributedDataParallel
+workers: 8
+dataset_dir: "./datasets"       # path to dataset
+
+# train options
+seed: 42                        # sacred handles automatic seeding when passed in the config
+batch_size: 128
+image_size: 224
+start_epoch: 0
+lr: 0.03                        # initial learning rate
+epochs: 100
+dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, and 2 for STL10. This needs to be expanded to include imagenet
+pretrain: True 
+momentum: 0.9                   # momentum of SGD solver
+resume: ""                      # path to latest checkpoint (default: none)
+
+# arch options
+resnet: "resnet18"
+projection_dim: 64              # "[...] to project the representation to a 128-dimensional latent space"
+
+# loss options
+optimizer: "Adam"               # or LARS (experimental)
+weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 10−6"
+temperature: 0.5                # see appendix B.7.: Optimal temperature under different batch sizes
+
+# reload options
+model_path: "save"              # set to the directory containing `checkpoint_##.tar` 
+epoch_num: 100                  # set to checkpoint number
+reload: False
+
+# logistic regression options
+logistic_batch_size: 256
+logistic_epochs: 500
