@@ -5,7 +5,7 @@ simclr pytorch repo
 '''
 
 import torch
-from simclr.modules import LARS
+from .lars import LARS
 
 
 def load_optimizer(args, model):
