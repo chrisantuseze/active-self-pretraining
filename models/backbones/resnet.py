@@ -1,7 +1,7 @@
 import torchvision
 
 
-def get_resnet(name, pretrained=False):
+def resnet_backbone(name, pretrained=False):
     resnets = {
         "resnet18": torchvision.models.resnet18(pretrained=pretrained),
         "resnet50": torchvision.models.resnet50(pretrained=pretrained),

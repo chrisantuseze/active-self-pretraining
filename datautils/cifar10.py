@@ -1,8 +1,8 @@
 import torch
 import torchvision
 from utils.method_enum import Method
-from models.simclr.transformation import TransformsSimCLR
-from models.moco.transformation import TransformsMoCo
+from models.methods.simclr.transformation import TransformsSimCLR
+from models.methods.moco.transformation import TransformsMoCo
 
 class CIFAR10():
     def __init__(self, args) -> None:
@@ -21,13 +21,13 @@ class CIFAR10():
         else:
             NotImplementedError
 
-        train_dataset = torchvision.datasets.CIFAR10(
+        dataset = torchvision.datasets.CIFAR10(
             self.dir,
             download=True,
             transform=transforms)
 
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset,
+        loader = torch.utils.data.DataLoader(
+            dataset,
             batch_size=self.batch_size,
             # shuffle=(train_sampler is None),
             drop_last=True,
@@ -35,5 +35,5 @@ class CIFAR10():
             # sampler=train_sampler,
         )
 
-        return train_loader
+        return loader
     

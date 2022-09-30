@@ -9,7 +9,6 @@ mlp: True                       # use mlp head
 aug_plus: True                  # use moco v2 data augmentation
 cos: True                       # use cosine lr schedule
 
-
 # distributed training
 nodes: 1
 gpus: 1                         # I recommend always assigning 1 GPU to 1 node
@@ -17,7 +16,7 @@ dataparallel: 0                 # Use DataParallel instead of DistributedDataPar
 workers: 8
 dataset_dir: "./datasets"       # path to dataset
 
-# train options
+# pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
 batch_size: 128
 image_size: 224
@@ -41,9 +40,16 @@ temperature: 0.5                # see appendix B.7.: Optimal temperature under d
 
 # reload options
 model_path: "save"              # set to the directory containing `checkpoint_##.tar` 
-epoch_num: 100                  # set to checkpoint number
+epoch_num: 0                    # set to checkpoint number
 reload: False                   # indicates whether to start the training from the checkpoint or not
 
 # logistic regression options
 logistic_batch_size: 256
 logistic_epochs: 500
+
+# finetuning options
+finetune: False
+finetune_batch_size: 128
+finetune_lr: 0.03                        # initial learning rate
+finetune_start_epoch: 0
+finetune_epochs: 10                      # this need to be increased

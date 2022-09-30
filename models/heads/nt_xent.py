@@ -1,7 +1,14 @@
+'''
+Adapted from 
+
+simclr pytorch repo
+'''
+
 import torch
 import torch.nn as nn
 import torch.distributed as dist
-from .gather import GatherLayer
+
+from models.methods.simclr.modules.gather import GatherLayer
 
 
 class NT_Xent(nn.Module):

@@ -1,8 +1,8 @@
 import torch
 import torchvision
 from utils.method_enum import Method
-from models.simclr.transformation import TransformsSimCLR
-from models.moco.transformation import TransformsMoCo
+from models.methods.simclr.transformation import TransformsSimCLR
+from models.methods.moco.transformation import TransformsMoCo
 
 class ImageNet():
     def __init__(self, args) -> None:
@@ -21,15 +21,15 @@ class ImageNet():
         else:
             NotImplementedError
 
-        train_dataset = torchvision.datasets.ImageFolder(
+        dataset = torchvision.datasets.ImageFolder(
             self.dir,
             transform=transforms)
 
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset,
+        loader = torch.utils.data.DataLoader(
+            dataset,
             batch_size=self.batch_size,
             drop_last=True,
         )
 
-        return train_loader
+        return loader
     

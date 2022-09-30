@@ -1,3 +1,9 @@
+'''
+Adapted from 
+
+simclr pytorch repo
+'''
+
 import torch.nn as nn
 from torchvision.models.resnet import Bottleneck, ResNet
 
