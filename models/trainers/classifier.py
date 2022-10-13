@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 from datautils.finetune_dataset import Finetune
 from models.heads.logloss_head import LogLossHead
-from utils.common import accuracy
+from utils.common import accuracy, load_saved_state
 
 
 class Classifier:
@@ -14,6 +14,12 @@ class Classifier:
         self.args = args
         self.model = LogLossHead(encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
+        self.optimizer = torch.optim.SGD(self.model.parameters(), self.args.lr,
+                                    momentum=self.args.momentum,
+                                    weight_decay=self.args.weight_decay)
+
+        self.criterion = nn.CrossEntropyLoss().to(self.args.device)
+        self.saved_state = load_saved_state(args, pretrain_level="3")
         self.init_weights(pretrained=pretrained)
 
     def init_weights(self, pretrained=None) -> None:
@@ -28,27 +34,25 @@ class Classifier:
         self.encoder.init_weights(pretrained=pretrained)
         # self.head.init_weights() @todo: Thoroughly check what this is and what it does
 
+        self.model.load_state_dict(self.state['model'])
+
+        # freeze layers and remove output
+
     def finetune(self) -> None:
         self.model = self.model.to(self.args.device)
 
-        optimizer = torch.optim.SGD(self.model.parameters(), self.args.lr,
-                                    momentum=self.args.momentum,
-                                    weight_decay=self.args.weight_decay)
-
-        criterion = nn.CrossEntropyLoss()
-
         """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-        scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+        scheduler = StepLR(self.optimizer, step_size=30, gamma=0.1)
 
         train_loader, val_loader = Finetune(self.args)
 
         for epoch in range(self.args.finetune_start_epoch, self.args.finetune_epochs):
 
             # train for one epoch
-            self.train_single_epoch(train_loader, self.model, criterion, optimizer, epoch)
+            self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer, epoch)
 
             # evaluate on validation set
-            self.validate(val_loader, self.model, criterion)
+            self.validate(val_loader, self.model, self.criterion)
             
             scheduler.step()
 
@@ -64,9 +68,8 @@ class Classifier:
         # end = time.time()
         for i, (images, target) in enumerate(train_loader):
 
-            if torch.cuda.is_available():
-                images = images.cuda(non_blocking=True)
-                target = target.cuda(non_blocking=True)
+            images = images.to(self.args.device)
+            target = target.to(self.args.device)
                 
             # compute output
             output = model(images)
@@ -86,9 +89,8 @@ class Classifier:
         with torch.no_grad():
             for i, (images, target) in enumerate(val_loader):
 
-                if torch.cuda.is_available():
-                    images = images.cuda(non_blocking=True)
-                    target = target.cuda(non_blocking=True)
+                images = images.to(self.args.device)
+                target = target.to(self.args.device)
 
                 # compute output
                 output = model(images)

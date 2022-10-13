@@ -17,6 +17,9 @@ class ImageNet():
 
         elif self.method == Method.MOCO.value:
             transforms = TransformsMoCo(self.image_size)
+
+        elif self.method == Method.SWAV.value:
+            NotImplementedError
         
         else:
             NotImplementedError

@@ -5,27 +5,28 @@ import torch
 from utils.method_enum import Method
 
 
-def save_model(args, model, optimizer):
+def save_state(args, model, optimizer, pretrain_level="1"):
     if args.method == Method.SIMCLR.value:
         prefix = "simclr"
+        optimizer_type = args.optimizer
     elif args.method == Method.MOCO.value:
         prefix = "moco"
+        optimizer_type = "moco"
     else:
         prefix = "swav"
 
-    out = os.path.join(args.model_path, "{}_checkpoint_{}.tar".format(prefix, args.current_epoch))
+    out = os.path.join(args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
-    # To save a DataParallel model generically, save the model.module.state_dict().
-    # This way, you have the flexibility to load the model any way you want to any device you want.
-    if isinstance(model, torch.nn.DataParallel):
-        torch.save(model.module.state_dict(), out)
-    else:
-        torch.save(model.state_dict(), out)
+    state = {
+        'model': model.state_dict(),
+        optimizer_type + '-optimizer': optimizer.state_dict()
+    }
+    torch.save(state, out)
 
     print("checkpoint saved at {}".format(out))
     args.resume = out
 
-def load_model(args, recent=True):
+def load_saved_state(args, recent=True, pretrain_level="1"):
     if args.method == Method.SIMCLR.value:
         prefix = "simclr"
     elif args.method == Method.MOCO.value:
@@ -34,10 +35,25 @@ def load_model(args, recent=True):
         prefix = "swav"
 
     model_fp = args.resume if recent and args.resume else os.path.join(
-            args.model_path, "{}_checkpoint_{}.tar".format(prefix, args.epoch_num)
+            args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.epoch_num)
         )
 
     return torch.load(model_fp, map_location=args.device.type)
+
+
+def simple_save_model(args, model, path):
+    state = {
+        'model': model.state_dict()
+    }
+
+    out = os.path.join(args.model_path, path)
+    torch.save(state, out)
+
+def simple_load_model(args, path):
+    out = os.path.join(args.model_path, path)
+    checkpoint = torch.load(out)
+
+    return checkpoint['model']
 
 def accuracy(pred, target, topk=1):
     assert isinstance(topk, (int, tuple))

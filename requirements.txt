@@ -1,4 +1,12 @@
+numpy
+pandas
+matplotlib
 torch
 torchvision
+tensorboard
 PyYAML
 datasets
+# opencv
+
+#conda install opencv
+#python -m pip install <package>

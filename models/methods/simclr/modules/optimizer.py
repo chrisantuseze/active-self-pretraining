@@ -5,12 +5,24 @@ simclr pytorch repo
 '''
 
 import torch
+
+from utils.method_enum import Method
 from .lars import LARS
 
 
-def load_optimizer(args, model):
+def load_optimizer(args, model, state):
 
     scheduler = None
+    if args.method == Method.MOCO.value:
+        # define loss function (criterion) and optimizer
+        optimizer = torch.optim.SGD(model.parameters(), args.lr,
+                                momentum=args.momentum,
+                                weight_decay=args.weight_decay)
+        
+        if args.reload:
+            optimizer.load_state_dict(state['moco-optimizer'])
+        return optimizer, scheduler
+
     if args.optimizer == "Adam":
         optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
 
@@ -32,4 +44,6 @@ def load_optimizer(args, model):
     else:
         raise NotImplementedError
 
+    if args.reload:
+            optimizer.load_state_dict(state[args.optimizer + '-optimizer'])
     return optimizer, scheduler

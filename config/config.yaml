@@ -24,13 +24,14 @@ lr: 0.03                        # initial learning rate
 start_epoch: 0
 epochs: 1                       # this need to be increased
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, and 2 for STL10. This needs to be expanded to include imagenet
-pretrain: True 
+first_pretrain: True 
+second_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
 
 # arch options
-resnet: "resnet18"
+resnet: "resnet50"
 projection_dim: 64              # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
@@ -50,6 +51,16 @@ logistic_epochs: 500
 # finetuning options
 finetune: False
 finetune_batch_size: 128
-finetune_lr: 0.03                        # initial learning rate
+finetune_lr: 0.03               # initial learning rate
 finetune_start_epoch: 0
-finetune_epochs: 10                      # this need to be increased
+finetune_epochs: 10             # this need to be increased
+
+# active learning options
+al_batches: 10
+al_batch_size: 64
+al_lr: 0.0
+do_al: True
+al_backbone: "resnet18"
+
+# target pretraining options
+target_dataset: 2               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART.

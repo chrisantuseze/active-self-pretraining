@@ -4,9 +4,9 @@ from utils.method_enum import Method
 from models.methods.simclr.transformation import TransformsSimCLR
 from models.methods.moco.transformation import TransformsMoCo
 
-class CIFAR10():
+class Sketch():
     def __init__(self, args) -> None:
-        self.dir = args.dataset_dir + "/cifar10"
+        self.dir = args.dataset_dir + "/imagenet"
         self.method = args.method
         self.image_size = args.image_size
         self.batch_size = args.batch_size
@@ -24,18 +24,14 @@ class CIFAR10():
         else:
             NotImplementedError
 
-        dataset = torchvision.datasets.CIFAR10(
+        dataset = torchvision.datasets.ImageFolder(
             self.dir,
-            download=True,
             transform=transforms)
 
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
-            # shuffle=(train_sampler is None),
             drop_last=True,
-            # num_workers=args.workers,
-            # sampler=train_sampler,
         )
 
         return loader

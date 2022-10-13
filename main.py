@@ -5,23 +5,28 @@ import torch
 import torch.nn as nn
 import torchvision
 import argparse
+
+import cv2
 from torch.utils.tensorboard import SummaryWriter
+from models.active_learning.pt4al.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
 
-from utils.common import load_model
-
 from utils.yaml_config_hook import yaml_config_hook
-from models.pretrainer import Pretrainer
-from models.classifier import Classifier
+from models.trainers.pretrainer import Pretrainer
+from models.trainers.classifier import Classifier
 
 def main():
     writer = SummaryWriter()
 
     encoder = resnet_backbone(args.resnet, pretrained=False)
 
-    if args.pretrain:
+    if args.first_pretrain:
         pretrainer = Pretrainer(args, writer)
-        pretrainer.pretrain(encoder)
+        pretrainer.first_pretrain(encoder)
+
+    if args.second_pretrain:
+        pretrainer = Pretrainer(args, writer)
+        pretrainer.second_pretrain(encoder)
 
     if args.finetune:
         classifier = Classifier(args, writer)

@@ -1,0 +1,18 @@
+- I need a way to tie an image to a label, but there is no label, so what do I do?
+- Can I assign an id to each image?
+
+- I could just create a list during eval and add each image (assign an id to it or use the image itself, which I think is better) with its loss.
+- Sort the loss in descending order
+- Create a little proxy model that would compute the top1k of the images sorted by their loss in decreasing order
+- When you eventually narrow down these images, save 90% of them in the disk so you don't have to go through the process again.
+
+- Things to check:
+- Can I use an already loaded image to train a proxy model?
+- Can I save these images in the disk and load it later when I want to do the secod pretraining?
+
+- The proxy model should use the weights from the first pretrain and it should operate on the target dataset. 
+
+- Have a proxy model which would be trained using samples (top1k) from the eval that was made using the batch from the target pretrain. 
+The weights of the trained proxy should be saved at each epoch and after all epochs, it should be used to evaluate the eval model that generates the top1k.
+This process repeats itself until the data budget is reached. These samples used in training the proxy is what is saved and eventually used for the 
+second pretraining

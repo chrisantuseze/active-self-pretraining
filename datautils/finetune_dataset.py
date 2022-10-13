@@ -4,7 +4,7 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 
 class Finetune():
-    def __init__(self, args) -> None:
+    def __init__(self, args, dataset) -> None:
         self.args = args
         self.dir = args.dataset_dir + "/finetune"
         self.image_size = args.image_size
