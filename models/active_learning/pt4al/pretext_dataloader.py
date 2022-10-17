@@ -1,9 +1,9 @@
 from email import utils
 import torch
 
-class PretextData(torch.utils.data.Dataset):
+class PretextDataset(torch.utils.data.Dataset):
     def __init__(self, img_loss_list) -> None:
-        super(PretextData, self).__init__()
+        super(PretextDataset, self).__init__()
         self.img_loss_list = img_loss_list
         self.images1, self.images2 = self.get_images(self.img_loss_list)
 
@@ -38,7 +38,7 @@ class PretextDataLoader():
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
             self.img_loss_list = self.img_loss_list[:new_data_size]
 
-        dataset = PretextData(self.img_loss_list)
+        dataset = PretextDataset(self.img_loss_list)
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
