@@ -14,12 +14,13 @@ class Classifier:
         self.args = args
         self.model = LogLossHead(encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
+        self.model = self.model.to(self.args.device)
         self.optimizer = torch.optim.SGD(self.model.parameters(), self.args.lr,
                                     momentum=self.args.momentum,
                                     weight_decay=self.args.weight_decay)
 
         self.criterion = nn.CrossEntropyLoss().to(self.args.device)
-        self.saved_state = load_saved_state(args, pretrain_level="3")
+        self.saved_state = load_saved_state(args, pretrain_level="2")
         self.init_weights(pretrained=pretrained)
 
     def init_weights(self, pretrained=None) -> None:

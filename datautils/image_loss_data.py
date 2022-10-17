@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 class Image_Loss:
     sort_index: int = field(init=False, repr=False)
 
-    image_1: str
-    image_2: str
+    image1: str
+    image2: str
     loss: int
 
     def __post_init__(self):

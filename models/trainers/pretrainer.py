@@ -1,14 +1,11 @@
 import torch
 import torch.nn as nn
+from datautils.target_pretrain_dataset import get_target_pretrain_ds
+from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
 from models.active_learning.pt4al.pretext_trainer import PretextTrainer
-from models.backbones.resnet import resnet_backbone
-from models.heads.nt_xent import NT_Xent
-from models.methods.moco.moco import MoCo
-from models.methods.simclr.simclr import SimCLR
 from models.methods.simclr.modules.optimizer import load_optimizer
-from models.utils.compute_loss import compute_loss
+from models.utils.commons import compute_loss, get_model_criterion
 from utils.common import load_saved_state, save_state
-from utils.method_enum import Method
 from datautils import dataset_enum, cifar10, imagenet
 from torch.utils.tensorboard import SummaryWriter
 
@@ -33,12 +30,12 @@ class Pretrainer:
             optimizer.step()
 
             if step % 50 == 0:
-                print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
+                print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss}")
 
-            self.writer.add_scalar("Loss/train_epoch", loss.item(), self.args.global_step)
+            self.writer.add_scalar("Loss/train_epoch", loss, self.args.global_step)
             self.args.global_step += 1
 
-            loss_epoch += loss.item()
+            loss_epoch += loss
         return loss_epoch
 
             # compute accuracy, display progress and other stuff
@@ -70,28 +67,9 @@ class Pretrainer:
 
 
     def first_pretrain(self, encoder) -> None:
-
         # initialize ResNet
         print("=> creating model '{}'".format(self.args.resnet))
-
-        n_features = encoder.fc.in_features  # get dimensions of fc layer
-
-        if self.args.method == Method.SIMCLR.value:
-            criterion = NT_Xent(self.args.batch_size, self.args.temperature, self.args.world_size)
-            model =  SimCLR(encoder, self.args.projection_dim, n_features)
-            print("using SIMCLR")
-            
-        elif self.args.method == Method.MOCO.value:
-            # define loss function (criterion) and optimizer
-            criterion = nn.CrossEntropyLoss().to(self.args.device)
-            model = MoCo(encoder, self.args.moco_dim, self.args.moco_k, self.args.moco_m, self.args.moco_t, self.args.mlp)
-            print("using MOCO")
-
-        elif self.args.method == Method.SWAV.value:
-            NotImplementedError
-
-        else:
-            NotImplementedError
+        model, criterion = get_model_criterion(self.args, encoder)
             
         state = None
         if self.args.reload:
@@ -113,9 +91,19 @@ class Pretrainer:
         self.base_pretrain(model, train_loader, criterion, optimizer, scheduler, pretrain_level="1")
 
 
-    def second_pretrain(self) -> None:
+    def second_pretrain(self, encoder) -> None:
         if self.args.do_al:
-            pretext = PretextTrainer(self.args)
-            pretext.do_active_learning()
+            pretext = PretextTrainer(self.args, encoder)
+            pretrain_data = pretext.do_active_learning()
+            loader = PretextDataLoader(pretrain_data).get_loader()
+        else:
+            loader = get_target_pretrain_ds(self.args).get_loader()
+        
+        model = encoder
+        state = load_saved_state(self.args, pretrain_level="1")
+        model.load_state_dict(state['model'])
+        model = model.to(self.args.device)
 
-        # continue with second pretraining
+        _, criterion = get_model_criterion(self.args, encoder)
+        optimizer, scheduler = load_optimizer(self.args, model, state)
+        self.base_pretrain(model, loader, criterion, optimizer, scheduler, pretrain_level="2")

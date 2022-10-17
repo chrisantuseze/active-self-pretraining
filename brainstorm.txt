@@ -8,7 +8,7 @@
 
 - Things to check:
 - Can I use an already loaded image to train a proxy model?
-- Can I save these images in the disk and load it later when I want to do the secod pretraining?
+- Can I save these images in the disk and load it later when I want to do the second pretraining?
 
 - The proxy model should use the weights from the first pretrain and it should operate on the target dataset. 
 

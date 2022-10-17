@@ -4,26 +4,28 @@ import torch.nn.functional as F
 from torch.optim import SGD, lr_scheduler
 import numpy as np
 
-from datautils.finetune_dataset import Finetune
 from datautils.image_loss_data import Image_Loss
 from datautils.target_pretrain_dataset import get_target_pretrain_ds
-
+from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
-from models.utils.compute_loss import compute_loss
+
+from models.utils.commons import compute_loss, get_model_criterion
 from utils.common import load_saved_state, simple_load_model, simple_save_model
-from utils.method_enum import Method
 
 class PretextTrainer():
-    def __init__(self, args) -> None:
+    def __init__(self, args, encoder) -> None:
         self.args = args
-        self.criterion = nn.CrossEntropyLoss().to(args.device)
         self.loss_gen_loader = None
         self.finetune_loader = None
+        self.encoder = encoder
+
+        self.proxy_model, self.criterion = get_model_criterion(args, self.encoder)
 
     def train_proxy(self, samples, model, optimizer):
 
         # convert samples to loader
-        loader = None
+        loader = PretextDataLoader(self.args, samples).get_loader()
+
         model.train()
         for epoch in range(100):
             print("Proxy epoch - {}".format(epoch))
@@ -35,15 +37,12 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                train_loss += loss.item()
+                train_loss += loss
                 # Show progress here
 
     def finetune(self, model, samples):
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
-        loader = Finetune(self.args, samples)
-
-        # sub5k = Loader2(is_train=False,  transform=transform_test, path_list=samples)
-        # ploader = torch.utils.data.DataLoader(sub5k, batch_size=1, shuffle=False, num_workers=2)
+        loader = PretextDataLoader(self.args, samples, finetune=True).get_loader()
 
         top1_scores = []
         model.eval()
@@ -61,56 +60,66 @@ class PretextTrainer():
                 top1_scores.append(probs[0][predicted.item()])
 
         idx = np.argsort(top1_scores)
-        samples = np.array(samples)
             
-        # Save this images for use during the target pretraining
+        # Save these images for use during the target pretraining
+        return samples[idx[:2000]]
 
     def make_batches(self):
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        model = self.encoder
         state = load_saved_state(self.args, pretrain_level="1")
-        encoder.load_state_dict(state['model'])
+        model.load_state_dict(state['model'])
+
+        #@TODO remember to remove this and uncomment the lines above
+        # encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        # model, self.criterion = get_model_criterion(self.args, encoder)
 
         loader = get_target_pretrain_ds(self.args).get_loader()
 
-        encoder.eval()
-
+        model.eval()
         image_loss = []
 
+        print("About to begin eval to make batches")
         with torch.no_grad():
             for _, (images, _) in enumerate(loader):
-                loss = compute_loss(self.args, images, encoder, self.criterion)
+                loss = compute_loss(self.args, images, model, self.criterion)
 
-                #TODO save this loss so it can be batched and used in the main task
+                print(f"Loss: {loss}")
+
                 image_loss.append(Image_Loss(images[0], images[1], loss))
 
-        
-        return None # So either return the data in batches or return it as a single batch
+        sorted_samples = sorted(image_loss, reverse=True)
+
+        return sorted_samples
 
     def do_active_learning(self):
-        proxy_model = resnet_backbone(self.args.al_backbone, pretrained=False)
-        proxy_model = proxy_model.to(self.args.device)
+        self.proxy_model = self.proxy_model.to(self.args.device)
 
-        optimizer = SGD(proxy_model.parameters(), lr=0.1,momentum=0.9, weight_decay=5e-4)
+        optimizer = SGD(self.proxy_model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
         scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
         image_loss = self.make_batches()
+        pretraining_sample_pool = []
 
         for batch in range(self.args.al_batches):
-            sample5000 = None # image_loss[] TODO Get 5000 per batch. This number is determined by the data budget that was made
+            sample6000 = image_loss[batch * 6000 : (batch + 1) * 6000]
 
             if batch > 0:
                 print('>> Getting previous checkpoint')
-                proxy_model.load_state_dict(simple_load_model(f'proxy_{batch-1}.pth'))
+                self.proxy_model.load_state_dict(simple_load_model(f'proxy_{batch-1}.pth'))
 
                 # sampling
-                sample4k = self.finetune(proxy_model, sample5000)
+                sample2k = self.finetune(self.proxy_model, sample6000)
             else:
-                # first iteration: sample 1k at even intervals
-                samples = np.array(samples)
-                sample4k = samples[[j*5 for j in range(1000)]]
+                # first iteration: sample 4k at even intervals
+                sample2k = sample6000[2000:]
 
-            self.train_proxy(sample4k, proxy_model, optimizer)
-            simple_save_model(self.args, proxy_model, f'proxy_{batch}.pth')
-            scheduler.step()
+            pretraining_sample_pool.extend(sample2k)
+
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                self.train_proxy(pretraining_sample_pool, self.proxy_model, optimizer)
+                simple_save_model(self.args, self.proxy_model, f'proxy_{batch}.pth')
+                scheduler.step()
+
+        return pretraining_sample_pool
 
             

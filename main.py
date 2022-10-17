@@ -6,7 +6,7 @@ import torch.nn as nn
 import torchvision
 import argparse
 
-import cv2
+# import cv2
 from torch.utils.tensorboard import SummaryWriter
 from models.active_learning.pt4al.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone

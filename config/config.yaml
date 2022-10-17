@@ -18,7 +18,7 @@ dataset_dir: "./datasets"       # path to dataset
 
 # pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
-batch_size: 128
+batch_size: 512                 # the default should be 128. However, should be varied until better performance is achieved
 image_size: 224
 lr: 0.03                        # initial learning rate
 start_epoch: 0
@@ -57,10 +57,11 @@ finetune_epochs: 10             # this need to be increased
 
 # active learning options
 al_batches: 10
-al_batch_size: 64
+al_batch_size: 128
 al_lr: 0.0
 do_al: True
 al_backbone: "resnet18"
+al_finetune_data_ratio: 1       # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 
 # target pretraining options
 target_dataset: 2               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART.

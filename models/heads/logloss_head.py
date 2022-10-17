@@ -38,8 +38,11 @@ class LogLossHead(nn.Module):
         if self.with_avg_pool:
             self.avg_pool = nn.AdaptiveAvgPool2d((1, 1))
 
-    
-        self.fc_cls = nn.Sequential([self.encoder.fc, nn.Linear(in_channels, num_classes)]) # not sure of this
+
+        # self.fc_cls = nn.Sequential([self.encoder.fc, nn.Linear(in_channels, num_classes)]) # not sure of this
+
+        self.encoder.fc = nn.Linear(in_channels, num_classes)
+        self.fc_cls = self.encoder
 
     # def init_weights(self, init_linear='normal', std=0.01, bias=0.):
     #     assert init_linear in ['normal', 'kaiming'], \
@@ -78,7 +81,7 @@ class LogLossHead(nn.Module):
                 "Tensor must has 4 dims, got: {}".format(x.dim())
             x = self.avg_pool(x)
 
-        x = x.view(x.size(0), -1)
+        x = x.view(x.size(0), -1) # this flattens the input before setting it in the FC layer
         cls_score = self.fc_cls(x)
 
         return cls_score
