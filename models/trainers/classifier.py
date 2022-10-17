@@ -2,17 +2,18 @@ import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 from datautils.finetune_dataset import Finetune
+from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
-from utils.common import accuracy, load_saved_state
+from utils.commons import accuracy, load_saved_state
 
 
 class Classifier:
     def __init__(self,
                 args,
-                encoder,
                 pretrained=None) -> None:
         self.args = args
-        self.model = LogLossHead(encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
+        self.encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        self.model = LogLossHead(self.encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
         self.model = self.model.to(self.args.device)
         self.optimizer = torch.optim.SGD(self.model.parameters(), self.args.lr,

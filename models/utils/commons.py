@@ -27,7 +27,7 @@ def compute_loss(args, images, model, criterion):
     else:
         NotImplementedError
 
-    return loss.item()
+    return loss
 
 def get_model_criterion(args, encoder):
     n_features = encoder.fc.in_features  # get dimensions of fc layer

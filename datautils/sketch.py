@@ -6,7 +6,7 @@ from models.methods.moco.transformation import TransformsMoCo
 
 class Sketch():
     def __init__(self, args) -> None:
-        self.dir = args.dataset_dir + "/imagenet"
+        self.dir = args.dataset_dir + "/sketch"
         self.method = args.method
         self.image_size = args.image_size
         self.batch_size = args.batch_size

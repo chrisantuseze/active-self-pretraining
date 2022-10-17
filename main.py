@@ -18,19 +18,17 @@ from models.trainers.classifier import Classifier
 def main():
     writer = SummaryWriter()
 
-    encoder = resnet_backbone(args.resnet, pretrained=False)
-
     if args.first_pretrain:
         pretrainer = Pretrainer(args, writer)
-        pretrainer.first_pretrain(encoder)
+        pretrainer.first_pretrain()
 
     if args.second_pretrain:
         pretrainer = Pretrainer(args, writer)
-        pretrainer.second_pretrain(encoder)
+        pretrainer.second_pretrain()
 
     if args.finetune:
         classifier = Classifier(args, writer)
-        classifier.train(encoder)
+        classifier.finetune()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SimCLR")

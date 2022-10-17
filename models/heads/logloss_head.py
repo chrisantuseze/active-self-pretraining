@@ -14,7 +14,7 @@ Adapted with modifications from
 import torch
 import torch.nn as nn
 
-from utils.common import accuracy
+from utils.commons import accuracy
 
 class LogLossHead(nn.Module):
     """Simplest classifier head, with only one fc layer.

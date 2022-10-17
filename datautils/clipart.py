@@ -6,7 +6,7 @@ from models.methods.moco.transformation import TransformsMoCo
 
 class Clipart():
     def __init__(self, args) -> None:
-        self.dir = args.dataset_dir + "/imagenet"
+        self.dir = args.dataset_dir + "/clipart"
         self.method = args.method
         self.image_size = args.image_size
         self.batch_size = args.batch_size

@@ -10,7 +10,7 @@ from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import compute_loss, get_model_criterion
-from utils.common import load_saved_state, simple_load_model, simple_save_model
+from utils.commons import load_saved_state, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, encoder) -> None:
@@ -27,7 +27,7 @@ class PretextTrainer():
         loader = PretextDataLoader(self.args, samples).get_loader()
 
         model.train()
-        for epoch in range(100):
+        for epoch in range(self.args.al_epochs):
             print("Proxy epoch - {}".format(epoch))
 
             for _, (images, _) in enumerate(loader):
@@ -37,7 +37,7 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                train_loss += loss
+                train_loss += loss.item()
                 # Show progress here
 
     def finetune(self, model, samples):
@@ -70,9 +70,10 @@ class PretextTrainer():
         model.load_state_dict(state['model'])
 
         #@TODO remember to remove this and uncomment the lines above
-        # encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        # encoder = resnet_backbone(self.args.al_backbone, pretrained=True)
         # model, self.criterion = get_model_criterion(self.args, encoder)
 
+        model = model.to(self.args.device)
         loader = get_target_pretrain_ds(self.args).get_loader()
 
         model.eval()
@@ -82,7 +83,8 @@ class PretextTrainer():
         with torch.no_grad():
             for _, (images, _) in enumerate(loader):
                 loss = compute_loss(self.args, images, model, self.criterion)
-
+                
+                loss = loss.item()
                 print(f"Loss: {loss}")
 
                 image_loss.append(Image_Loss(images[0], images[1], loss))
@@ -94,7 +96,7 @@ class PretextTrainer():
     def do_active_learning(self):
         self.proxy_model = self.proxy_model.to(self.args.device)
 
-        optimizer = SGD(self.proxy_model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+        optimizer = SGD(self.proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)
         scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
         image_loss = self.make_batches()

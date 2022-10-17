@@ -3,9 +3,10 @@ import torch.nn as nn
 from datautils.target_pretrain_dataset import get_target_pretrain_ds
 from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
 from models.active_learning.pt4al.pretext_trainer import PretextTrainer
+from models.backbones.resnet import resnet_backbone
 from models.methods.simclr.modules.optimizer import load_optimizer
 from models.utils.commons import compute_loss, get_model_criterion
-from utils.common import load_saved_state, save_state
+from utils.commons import load_saved_state, save_state
 from datautils import dataset_enum, cifar10, imagenet
 from torch.utils.tensorboard import SummaryWriter
 
@@ -29,6 +30,7 @@ class Pretrainer:
             loss.backward()
             optimizer.step()
 
+            loss = loss.item()
             if step % 50 == 0:
                 print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss}")
 
@@ -66,8 +68,9 @@ class Pretrainer:
         save_state(self.args, model, optimizer, pretrain_level)
 
 
-    def first_pretrain(self, encoder) -> None:
+    def first_pretrain(self) -> None:
         # initialize ResNet
+        encoder = resnet_backbone(self.args.resnet, pretrained=False)
         print("=> creating model '{}'".format(self.args.resnet))
         model, criterion = get_model_criterion(self.args, encoder)
             
@@ -91,7 +94,8 @@ class Pretrainer:
         self.base_pretrain(model, train_loader, criterion, optimizer, scheduler, pretrain_level="1")
 
 
-    def second_pretrain(self, encoder) -> None:
+    def second_pretrain(self) -> None:
+        encoder = resnet_backbone(self.args.resnet, pretrained=False)
         if self.args.do_al:
             pretext = PretextTrainer(self.args, encoder)
             pretrain_data = pretext.do_active_learning()
