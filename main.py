@@ -18,11 +18,11 @@ from models.trainers.classifier import Classifier
 def main():
     writer = SummaryWriter()
 
-    if args.first_pretrain:
+    if args.base_pretrain:
         pretrainer = Pretrainer(args, writer)
         pretrainer.first_pretrain()
 
-    if args.second_pretrain:
+    if args.target_pretrain:
         pretrainer = Pretrainer(args, writer)
         pretrainer.second_pretrain()
 

@@ -5,11 +5,11 @@ from models.methods.simclr.transformation import TransformsSimCLR
 from models.methods.moco.transformation import TransformsMoCo
 
 class UCMerced():
-    def __init__(self, args) -> None:
+    def __init__(self, args, isAL) -> None:
         self.dir = args.dataset_dir + "/UCMerced_LandUse"
         self.method = args.method
-        self.image_size = args.image_size
-        self.batch_size = args.batch_size
+        self.image_size = args.al_image_size if isAL else args.image_size
+        self.batch_size = args.al_batch_size if isAL else  args.batch_size
 
     def get_loader(self):
         if self.method == Method.SIMCLR.value:

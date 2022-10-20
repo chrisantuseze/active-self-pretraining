@@ -1,16 +1,16 @@
+
 import torch
-torch.cuda.empty_cache()
+from numba import cuda
 
-import gc
+def free_gpu_cache():
+    print("Initial GPU Usage")
 
-if __name__ == "__main__":
-#     list_ = [3, 4, 5, 1, 6, 7, 23, 56, 90]
-#     list_size = len(list_)
+    torch.cuda.empty_cache()
 
-#     new_size = int(0.7 * list_size)
-#     print(list_[:new_size])
+    cuda.select_device(0)
+    cuda.close()
+    cuda.select_device(0)
 
-    # del variables
-    gc.collect()
+    print("GPU Usage after emptying the cache")
 
-    print(torch.cuda.memory_summary(device=None, abbreviated=False))
+free_gpu_cache()                           
