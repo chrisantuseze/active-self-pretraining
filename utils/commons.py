@@ -77,9 +77,8 @@ def accuracy(pred, target, topk=1):
     return res[0] if return_single else res
 
 
-def save_image_loss(args, image_loss_list):
-    file_name = "image_loss.pkl"
-    out = os.path.join(args.model_path, file_name)
+def save_path_loss(args, filename, image_loss_list):
+    out = os.path.join(args.model_path, filename)
 
     try:
         with open(out, "wb") as file:
@@ -89,9 +88,8 @@ def save_image_loss(args, image_loss_list):
         print("File could not be opened for write operation")
 
 
-def load_image_loss(args):
-    file_name = "image_loss.pkl"
-    out = os.path.join(args.model_path, file_name)
+def load_path_loss(args, filename):
+    out = os.path.join(args.model_path, filename)
 
     try:
         with open(out, "rb") as file:

@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(description="Implementation of SwAV")
 #########################
 #### data parameters ####
 #########################
-parser.add_argument("--data_path", type=str, default="/path/to/imagenet",
+parser.add_argument("--data_path", type=str, default="/Users/chrisantuseze/Research/active-self-pretraining/datasets/imagenet",
                     help="path to dataset repository")
 parser.add_argument("--nmb_crops", type=int, default=[2], nargs="+",
                     help="list of number of crops (example: [2, 6])")
@@ -121,7 +121,7 @@ parser.add_argument("--seed", type=int, default=31, help="seed")
 def main():
     global args
     args = parser.parse_args()
-    init_distributed_mode(args)
+    # init_distributed_mode(args)
     fix_random_seeds(args.seed)
     logger, training_stats = initialize_exp(args, "epoch", "loss")
 
@@ -136,7 +136,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=args.batch_size,
-        num_workers=args.workers,
+        # num_workers=args.workers,
         pin_memory=True,
         drop_last=True
     )
@@ -151,7 +151,7 @@ def main():
     )
     
     # copy model to GPU
-    model = model.cuda()
+    # model = model.cuda()
     if args.rank == 0:
         logger.info(model)
     logger.info("Building model done.")
@@ -163,7 +163,6 @@ def main():
         momentum=0.9,
         weight_decay=args.wd,
     )
-    lr=optimizer.optim.param_groups[0]["lr"]
     warmup_lr_schedule = np.linspace(args.start_warmup, args.base_lr, len(train_loader) * args.warmup_epochs)
     iters = np.arange(len(train_loader) * (args.epochs - args.warmup_epochs))
     cosine_lr_schedule = np.array([args.final_lr + 0.5 * (args.base_lr - args.final_lr) * (1 + \
@@ -198,7 +197,7 @@ def main():
         logger.info("============ Starting epoch %i ... ============" % epoch)
 
         # set sampler
-        train_loader.sampler.set_epoch(epoch)
+        # train_loader.sampler.set_epoch(epoch)
 
         # optionally starts a queue
         if args.queue_length > 0 and epoch >= args.epoch_queue_starts and queue is None:
@@ -331,13 +330,13 @@ def distributed_sinkhorn(out):
 
     # make the matrix sums to 1
     sum_Q = torch.sum(Q)
-    dist.all_reduce(sum_Q)
+    # dist.all_reduce(sum_Q)
     Q /= sum_Q
 
     for it in range(args.sinkhorn_iterations):
         # normalize each row: total weight per prototype must be 1/K
         sum_of_rows = torch.sum(Q, dim=1, keepdim=True)
-        dist.all_reduce(sum_of_rows)
+        # dist.all_reduce(sum_of_rows)
         Q /= sum_of_rows
         Q /= K
 

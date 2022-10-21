@@ -8,7 +8,7 @@ import argparse
 
 # import cv2
 from torch.utils.tensorboard import SummaryWriter
-from models.active_learning.pt4al.pretext_trainer import PretextTrainer
+from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
 
 from utils.yaml_config_hook import yaml_config_hook

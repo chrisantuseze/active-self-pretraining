@@ -2,7 +2,7 @@ import torch
 import torchvision
 from utils.method_enum import Method
 from models.methods.simclr.transformation import TransformsSimCLR
-from models.methods.moco.transformation import TransformsMoCo
+from models.methods.moco.transformation.transformations import TransformsMoCo
 
 class CIFAR10():
     def __init__(self, args) -> None:

@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
-from datautils.target_pretrain_dataset import get_target_pretrain_ds
-from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
-from models.active_learning.pt4al.pretext_trainer import PretextTrainer
+from datautils.target_dataset import get_target_pretrain_ds
+from models.active_learning.pretext_dataloader import PretextDataLoader
+from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
 from models.methods.simclr.modules.optimizer import load_optimizer
 from models.utils.commons import compute_loss, get_model_criterion
-from utils.commons import load_saved_state, save_state
+from utils.commons import load_path_loss, load_saved_state, save_state
 from datautils import dataset_enum, cifar10, imagenet
 from torch.utils.tensorboard import SummaryWriter
 
@@ -97,9 +97,13 @@ class Pretrainer:
     def second_pretrain(self) -> None:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         if self.args.do_al:
-            pretext = PretextTrainer(self.args, encoder)
-            pretrain_data = pretext.do_active_learning()
-            loader = PretextDataLoader(pretrain_data).get_loader()
+
+            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
+            if pretrain_data is None:
+                pretext = PretextTrainer(self.args, encoder)
+                pretrain_data = pretext.do_active_learning()
+
+            loader = PretextDataLoader(self.args, pretrain_data).get_loader2(self.args.image_size)
         else:
             loader = get_target_pretrain_ds(self.args, isAL=False).get_loader()
         

@@ -16,3 +16,8 @@
 The weights of the trained proxy should be saved at each epoch and after all epochs, it should be used to evaluate the eval model that generates the top1k.
 This process repeats itself until the data budget is reached. These samples used in training the proxy is what is saved and eventually used for the 
 second pretraining
+
+
+
+image_loss.pkl should contain 30,000 images
+path_loss.pkl should contain 1000 images
