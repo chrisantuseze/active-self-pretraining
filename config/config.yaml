@@ -22,10 +22,10 @@ image_size: 224
 lr: 0.03                        # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
-base_epochs: 1                  # this needs to be increased to about 800??
+base_epochs: 5                  # this needs to be increased to about 800??
 target_epochs: 1                # this needs to be increased to about 800??
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, and 2 for STL10. This needs to be expanded to include imagenet
-base_pretrain: False 
+base_pretrain: True 
 target_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
@@ -42,7 +42,7 @@ temperature: 0.5                # see appendix B.7.: Optimal temperature under d
 
 # reload options
 model_path: "save"              # set to the directory containing `checkpoint_##.tar` 
-epoch_num: 1                    # set to checkpoint number
+epoch_num: 0                    # set to checkpoint number
 reload: False                   # indicates whether to start the training from the checkpoint or not
 
 # logistic regression options

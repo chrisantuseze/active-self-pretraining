@@ -36,7 +36,7 @@ class PretextDataLoader():
         self.finetune = finetune
         self.batch_size = args.al_batch_size
 
-    def get_loader2(self, image_size):
+    def get_loader(self, image_size):
         if self.finetune:
             data_size = len(self.img_loss_list)
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)

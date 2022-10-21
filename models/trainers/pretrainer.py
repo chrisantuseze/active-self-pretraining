@@ -40,7 +40,6 @@ class Pretrainer:
             loss_epoch += loss
         return loss_epoch
 
-            # compute accuracy, display progress and other stuff
 
     def base_pretrain(self, model, train_loader, criterion, optimizer, scheduler, pretrain_level="1") -> None:
         print("Training in progress, please wait...")
@@ -84,9 +83,11 @@ class Pretrainer:
 
         if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value:
             train_loader = imagenet.ImageNet(self.args).get_loader()
+            print("using ImageNet")
 
         elif self.args.dataset == dataset_enum.DatasetType.CIFAR10.value:
             train_loader = cifar10.CIFAR10(self.args).get_loader()
+            print("using CIFAR10")
 
         else:
             NotImplementedError
@@ -103,7 +104,7 @@ class Pretrainer:
                 pretext = PretextTrainer(self.args, encoder)
                 pretrain_data = pretext.do_active_learning()
 
-            loader = PretextDataLoader(self.args, pretrain_data).get_loader2(self.args.image_size)
+            loader = PretextDataLoader(self.args, pretrain_data).get_loader(self.args.image_size)
         else:
             loader = get_target_pretrain_ds(self.args, isAL=False).get_loader()
         

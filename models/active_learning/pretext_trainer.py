@@ -27,7 +27,7 @@ class PretextTrainer():
     def train_proxy(self, samples, model, optimizer, scheduler=None):
 
         # convert samples to loader
-        loader = PretextDataLoader(self.args, samples).get_loader2(self.args.al_image_size)
+        loader = PretextDataLoader(self.args, samples).get_loader(self.args.al_image_size)
         # loader = ImageNet(self.args, isAL=True).get_loader()
         print("Beginning training the proxy")
 
@@ -72,7 +72,7 @@ class PretextTrainer():
                 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
-        loader = PretextDataLoader(self.args, samples, finetune=True).get_loader2(self.args.al_image_size)
+        loader = PretextDataLoader(self.args, samples, finetune=True).get_loader(self.args.al_image_size)
 
         model.eval()
         _preds = []
@@ -86,16 +86,11 @@ class PretextTrainer():
 
                 _preds.append(self.get_predictions(outputs1, outputs2))
 
-                if step % 5 == 0:
+                if step % 50 == 0:
                     print(f"Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
-        # idx = np.argsort(top1_scores)
-            
-        # Save these images for use during the target pretraining
-        # samples = np.array(samples)
-        # return samples[idx[:200]] # this should be changed to 2000
-
+       
         return self.get_new_samples(preds, samples)
 
 
@@ -140,7 +135,7 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        return new_samples[:100]
+        return new_samples[:2000]
 
     def make_batches(self) -> List[PathLoss]:
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
@@ -162,7 +157,6 @@ class PretextTrainer():
         loader = get_target_pretrain_ds(self.args, isAL=True).get_loader()
 
         model.eval()
-        # image_loss = []
         pathloss = []
 
         print("About to begin eval to make batches")
@@ -180,14 +174,9 @@ class PretextTrainer():
                 if step % 50 == 0:
                     print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
-                # image_loss.append(Image_Loss(images[0], images[1], loss))
                 pathloss.append(PathLoss(path, loss))
                 count +=1
-                if count == 1000:
-                    break
-
         
-        # sorted_samples = sorted(image_loss, key=lambda x: x.loss, reverse=True) #sorted(image_loss, reverse=True)
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
         save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
 
@@ -211,7 +200,7 @@ class PretextTrainer():
         pretraining_sample_pool = []
 
         for batch in range(0, self.args.al_batches): # change the '1' to '0'
-            sample6000 = path_loss[batch * 800 : (batch + 1) * 800] # this should be changed to a size of 6000
+            sample6000 = path_loss[batch * 6000 : (batch + 1) * 6000] # this should be changed to a size of 6000
 
             if batch > 0:
                 print('>> Getting previous checkpoint for batch ', batch + 1)
@@ -221,7 +210,7 @@ class PretextTrainer():
                 sample2k = self.finetune(proxy_model, sample6000)
             else:
                 # first iteration: sample 4k at even intervals
-                sample2k = sample6000[:100] # this should be changed to a size of 2000
+                sample2k = sample6000[:2000] # this should be changed to a size of 2000
 
             pretraining_sample_pool.extend(sample2k)
 
