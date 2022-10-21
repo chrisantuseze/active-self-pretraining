@@ -16,7 +16,7 @@ import torchvision.transforms as transforms
 from PIL import ImageFilter
 import random
 
-class TransformsMoCo():
+class BaseTransformsMoCo():
     """
     A stochastic data augmentation module that transforms any given data example randomly
     resulting in two correlated views of the same example,
@@ -58,15 +58,15 @@ class TransformsMoCo():
             ]
         )
 
-    def __call__(self, x):
-        return self.train_transform(x)
+    def get_transform(self):
+        return  transforms.Compose(self.train_transform)
 
 
-class TwoCropsTransform:
+class TransformsMoCo:
     """Take two random crops of one image as the query and key."""
 
-    def __init__(self, base_transform):
-        self.base_transform = base_transform
+    def __init__(self, size, simclr_aug=True):
+        self.base_transform = BaseTransformsMoCo(size, simclr_aug).get_transform()
 
     def __call__(self, x):
         q = self.base_transform(x)

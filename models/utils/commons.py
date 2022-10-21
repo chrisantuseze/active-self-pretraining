@@ -1,4 +1,6 @@
 import torch.nn as nn
+import torch
+import gc
 
 from models.heads.nt_xent import NT_Xent
 from models.methods.moco.moco import MoCo
@@ -29,18 +31,18 @@ def compute_loss(args, images, model, criterion):
 
     return loss
 
-def get_model_criterion(args, encoder):
+def get_model_criterion(args, encoder, isAL=False):
     n_features = encoder.fc.in_features  # get dimensions of fc layer
 
     if args.method == Method.SIMCLR.value:
-        criterion = NT_Xent(args.batch_size, args.temperature, args.world_size)
+        criterion = NT_Xent(args.al_batch_size if isAL else args.batch_size, args.temperature, args.world_size)
         model = SimCLR(encoder, args.projection_dim, n_features)
         print("using SIMCLR")
         
     elif args.method == Method.MOCO.value:
         # define loss function (criterion) and optimizer
         criterion = nn.CrossEntropyLoss().to(args.device)
-        model = MoCo(encoder, args.moco_dim, args.moco_k, args.moco_m, args.moco_t, args.mlp)
+        model = MoCo(encoder, n_features, args.moco_dim, args.moco_k, args.moco_m, args.moco_t, args.mlp)
         print("using MOCO")
 
     elif args.method == Method.SWAV.value:
@@ -50,3 +52,9 @@ def get_model_criterion(args, encoder):
         NotImplementedError
 
     return model, criterion
+
+def free_mem(X, y):
+    del X
+    del y
+    gc.collect()
+    torch.cuda.empty_cache()

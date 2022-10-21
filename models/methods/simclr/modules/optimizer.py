@@ -23,8 +23,8 @@ def load_optimizer(args, model, state):
             optimizer.load_state_dict(state['moco-optimizer'])
         return optimizer, scheduler
 
-    if args.optimizer == "Adam":
-        optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
+    if args.optimizer == "Adam": #TODO Use a lr scheduler to vary the lr
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     elif args.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling

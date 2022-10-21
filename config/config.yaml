@@ -12,7 +12,6 @@ cos: True                       # use cosine lr schedule
 # distributed training
 nodes: 1
 gpus: 1                         # I recommend always assigning 1 GPU to 1 node
-dataparallel: 0                 # Use DataParallel instead of DistributedDataParallel
 workers: 8
 dataset_dir: "./datasets"       # path to dataset
 
@@ -20,13 +19,14 @@ dataset_dir: "./datasets"       # path to dataset
 seed: 42                        # sacred handles automatic seeding when passed in the config
 batch_size: 32                 # the default should be 128. However, should be varied until better performance is achieved
 image_size: 224
-lr: 0.03                        # initial learning rate
+lr: 0.03                        # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2
 current_epoch: 0
 start_epoch: 0
-epochs: 1                       # this needs to be increased
+base_epochs: 1                  # this needs to be increased to about 800??
+target_epochs: 1                # this needs to be increased to about 800??
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, and 2 for STL10. This needs to be expanded to include imagenet
-first_pretrain: False 
-second_pretrain: True 
+base_pretrain: False 
+target_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
@@ -37,7 +37,7 @@ projection_dim: 64              # "[...] to project the representation to a 128-
 
 # loss options
 optimizer: "Adam"               # or LARS (experimental)
-weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 10−6"
+weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 1.0e−6"
 temperature: 0.5                # see appendix B.7.: Optimal temperature under different batch sizes
 
 # reload options
@@ -51,19 +51,21 @@ logistic_epochs: 500
 
 # finetuning options
 finetune: False
-finetune_batch_size: 128
-finetune_lr: 0.03               # initial learning rate
+finetune_batch_size: 128        # this needs to be increased to 256
+finetune_lr: 0.001              # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2
 finetune_start_epoch: 0
-finetune_epochs: 10             # this need to be increased
+finetune_epochs: 10             # this needs to be increased to 90
+finetune_momentum: 0.9          # momentum of SGD solver
 
 # active learning options
 al_epochs: 10                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
 al_batches: 10
-al_batch_size: 4                # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having
+al_batch_size: 8                # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having
+al_image_size: 128
 al_lr: 0.1
 al_weight_decay: 5.0e-4
 do_al: True
-al_backbone: "resnet50"         # change this to resnet18
+al_backbone: "resnet18"         # change this to resnet18
 al_finetune_data_ratio: 1       # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 
 # target pretraining options

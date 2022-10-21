@@ -46,7 +46,7 @@ class Pretrainer:
         print("Training in progress, please wait...")
 
         resume_epoch = self.args.current_epoch if self.args.resume else int(self.args.epoch_num)
-        end_epoch = self.args.epochs - resume_epoch
+        end_epoch = self.args.base_epochs - resume_epoch
 
         for epoch in range(self.args.start_epoch, end_epoch):
             loss_epoch = self.train_single_epoch(model, train_loader, criterion, optimizer)
@@ -101,7 +101,7 @@ class Pretrainer:
             pretrain_data = pretext.do_active_learning()
             loader = PretextDataLoader(pretrain_data).get_loader()
         else:
-            loader = get_target_pretrain_ds(self.args).get_loader()
+            loader = get_target_pretrain_ds(self.args, isAL=False).get_loader()
         
         model = encoder
         state = load_saved_state(self.args, pretrain_level="1")

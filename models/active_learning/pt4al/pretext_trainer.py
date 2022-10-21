@@ -9,8 +9,8 @@ from datautils.target_pretrain_dataset import get_target_pretrain_ds
 from models.active_learning.pt4al.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import compute_loss, get_model_criterion
-from utils.commons import load_saved_state, simple_load_model, simple_save_model
+from models.utils.commons import compute_loss, free_mem, get_model_criterion
+from utils.commons import load_image_loss, load_saved_state, save_image_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, encoder) -> None:
@@ -25,18 +25,18 @@ class PretextTrainer():
 
         model.train()
         for epoch in range(self.args.al_epochs):
-            print("Proxy epoch - {}".format(epoch))
-
-            for _, (images, _) in enumerate(loader):
+            for step, (images, _) in enumerate(loader):
                 loss = compute_loss(self.args, images, model, self.criterion)
             
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-                train_loss += loss.item()
-                # Show progress here
+                loss = loss.item()
+                if step % 50 == 0:
+                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
+                
     def finetune(self, model, samples):
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
         loader = PretextDataLoader(self.args, samples, finetune=True).get_loader()
@@ -62,38 +62,57 @@ class PretextTrainer():
         return samples[idx[:2000]]
 
     def make_batches(self):
-        model, criterion = get_model_criterion(self.args, self.encoder)
-        state = load_saved_state(self.args, pretrain_level="1")
-        model.load_state_dict(state['model'], strict=False)
+        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
+        batch_size = self.args.al_batch_size
+        self.args.al_batch_size = 1
+
+        device = torch.device('cpu')
+
+        # model, criterion = get_model_criterion(self.args, self.encoder, isAL=True)
+        # state = load_saved_state(self.args, pretrain_level="1")
+        # model.load_state_dict(state['model'], strict=False)
 
         #@TODO remember to remove this and uncomment the lines above
-        # encoder = resnet_backbone(self.args.al_backbone, pretrained=True)
-        # model, self.criterion = get_model_criterion(self.args, encoder)
+        encoder = resnet_backbone(self.args.al_backbone, pretrained=True)
+        model, criterion = get_model_criterion(self.args, encoder, isAL=True)
+        criterion = nn.CrossEntropyLoss().to(device)
 
-        model = model.to(self.args.device)
-        loader = get_target_pretrain_ds(self.args).get_loader()
+        model = model.to(device)
+        loader = get_target_pretrain_ds(self.args, isAL=True).get_loader()
 
         model.eval()
         image_loss = []
 
         print("About to begin eval to make batches")
         with torch.no_grad():
-            for _, (images, _) in enumerate(loader):
-                loss = compute_loss(self.args, images, model, criterion)
+            for step, (images, _) in enumerate(loader):
+                images[0] = images[0].to(device)
+                images[1] = images[1].to(device)
+
+                # positive pair, with encoding
+                h_i, h_j, z_i, z_j = model(images[0], images[1])
+                loss = criterion(z_i, z_j)
                 
                 loss = loss.item()
-                print(f"Loss: {loss}")
+                if step % 50 == 0:
+                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 image_loss.append(Image_Loss(images[0], images[1], loss))
 
         sorted_samples = sorted(image_loss, reverse=True)
+        save_image_loss(self.args, sorted_samples)
+
+        self.args.al_batch_size = batch_size
 
         return sorted_samples
 
     def do_active_learning(self):
-        image_loss = self.make_batches()
+        image_loss = load_image_loss(self.args)
+        
+        if image_loss is None:
+            image_loss = self.make_batches()
 
-        proxy_model, self.criterion = get_model_criterion(self.args, self.encoder)
+        proxy_model, self.criterion = get_model_criterion(self.args, self.encoder, isAL=True)
         proxy_model = proxy_model.to(self.args.device)
 
         optimizer = SGD(proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)

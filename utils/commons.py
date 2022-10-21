@@ -2,6 +2,8 @@ import os
 from sys import prefix
 import torch
 
+import pickle
+
 from utils.method_enum import Method
 
 
@@ -73,3 +75,27 @@ def accuracy(pred, target, topk=1):
         correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
         res.append(correct_k.mul_(100.0 / pred.size(0)))
     return res[0] if return_single else res
+
+
+def save_image_loss(args, image_loss_list):
+    file_name = "image_loss.pkl"
+    out = os.path.join(args.model_path, file_name)
+
+    try:
+        with open(out, "wb") as file:
+            pickle.dump(image_loss_list, file)
+
+    except IOError:
+        print("File could not be opened for write operation")
+
+
+def load_image_loss(args):
+    file_name = "image_loss.pkl"
+    out = os.path.join(args.model_path, file_name)
+
+    try:
+        with open(out, "rb") as file:
+            return pickle.load(file)
+
+    except IOError:
+        return None
