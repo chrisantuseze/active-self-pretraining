@@ -17,14 +17,15 @@ dataset_dir: "./datasets"       # path to dataset
 
 # pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
-batch_size: 32                 # the default should be 128. However, should be varied until better performance is achieved
+batch_size: 32                  # the default should be 128. However, should be varied until better performance is achieved
 image_size: 224
-lr: 0.03                        # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
+base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
+target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 current_epoch: 0
 start_epoch: 0
-base_epochs: 5                  # this needs to be increased to about 800??
+base_epochs: 1                  # this needs to be increased to about 800??
 target_epochs: 1                # this needs to be increased to about 800??
-dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, and 2 for STL10. This needs to be expanded to include imagenet
+dataset: 0                      # dataset type. 0 for IMAGENET, 1 for CIFAR10.
 base_pretrain: True 
 target_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
@@ -56,6 +57,8 @@ finetune_lr: 0.001              # initial learning rate. This should be varied b
 finetune_start_epoch: 0
 finetune_epochs: 10             # this needs to be increased to 90
 finetune_momentum: 0.9          # momentum of SGD solver
+finetune_weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 1.0e−6"
+
 
 # active learning options
 al_epochs: 2                    # I would like to take 100 as the default, however for initial confirmation test, I would use 10

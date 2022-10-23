@@ -35,13 +35,18 @@ class Finetune():
             ]))
 
         train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=self.args.batch_size,
-        num_workers=self.args.workers, pin_memory=True)
+                            train_dataset, 
+                            batch_size=self.args.batch_size,
+                            shuffle=True,
+                            pin_memory=True
+                        )
 
         val_loader = torch.utils.data.DataLoader(
-            val_dataset, batch_size=self.args.batch_size, shuffle=False,
-            num_workers=self.args.workers, pin_memory=True)
-
+                        val_dataset, 
+                        batch_size=self.args.batch_size, 
+                        shuffle=False,
+                        pin_memory=True
+                    )
 
         return train_loader, val_loader
     

@@ -53,6 +53,32 @@ def get_model_criterion(args, encoder, isAL=False):
 
     return model, criterion
 
+def set_parameter_requires_grad(model, feature_extracting):
+    if feature_extracting:
+        for param in model.parameters():
+            param.requires_grad = False
+
+def get_params_to_update(model, feature_extract):
+    params_to_update = model.parameters()
+    print("Params to learn:")
+
+    if feature_extract:
+        params_to_update = []
+
+        for name, param in model.named_parameters():
+            if param.requires_grad == True:
+                params_to_update.append(param)
+                # print("\t",name)
+    else:
+        None
+        # no need to do anything, just update all the params
+
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad == True:
+        #         print("\t",name)
+
+    return params_to_update
+
 def free_mem(X, y):
     del X
     del y

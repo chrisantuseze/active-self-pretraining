@@ -10,12 +10,12 @@ from utils.method_enum import Method
 from .lars import LARS
 
 
-def load_optimizer(args, model, state):
+def load_optimizer(args, model, state, lr):
 
     scheduler = None
     if args.method == Method.MOCO.value:
         # define loss function (criterion) and optimizer
-        optimizer = torch.optim.SGD(model.parameters(), args.lr,
+        optimizer = torch.optim.SGD(model.parameters(), lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
         
@@ -24,7 +24,7 @@ def load_optimizer(args, model, state):
         return optimizer, scheduler
 
     if args.optimizer == "Adam": #TODO Use a lr scheduler to vary the lr
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     elif args.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling

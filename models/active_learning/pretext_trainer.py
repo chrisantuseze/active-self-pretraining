@@ -35,9 +35,9 @@ class PretextTrainer():
         for epoch in range(self.args.al_epochs):
             print(f"Epoch {epoch}")
             for step, (images) in enumerate(loader):
+                optimizer.zero_grad()
                 loss = compute_loss(self.args, images, model, self.criterion)
             
-                optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 

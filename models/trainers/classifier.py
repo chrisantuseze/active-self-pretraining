@@ -1,44 +1,42 @@
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
+import time
+import copy
+
 from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
-from utils.commons import accuracy, load_saved_state
+from models.utils.commons import get_params_to_update, set_parameter_requires_grad
+from utils.commons import accuracy, load_saved_state, simple_save_model
 
 
 class Classifier:
-    def __init__(self,
-                args,
-                pretrained=None) -> None:
+    def __init__(self, args, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
+
         self.args = args
-        self.encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        self.model = LogLossHead(self.encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
+        # self.model = LogLossHead(self.encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
+        self.model = resnet_backbone(self.args.resnet, pretrained=False)
+        state = load_saved_state(self.args, pretrain_level=pretrain_level)
+        self.model.load_state_dict(state['model'])
+
+        n_features = self.model.fc.in_features
+        self.model.fc = nn.Linear(n_features, num_classes)
         self.model = self.model.to(self.args.device)
-        self.optimizer = torch.optim.SGD(self.model.parameters(), self.args.lr,
-                                    momentum=self.args.momentum,
-                                    weight_decay=self.args.weight_decay)
+
+        self.model = self.model.to(self.args.device)
+
+        set_parameter_requires_grad(self.model, feature_extract=True)
+        params_to_update = get_params_to_update(self.model, feature_extract=True)
+
+        self.optimizer = torch.optim.SGD(
+                            params_to_update, 
+                            self.args.finetune_lr,
+                            momentum=self.args.finetune_momentum,
+                            weight_decay=self.args.finetune_weight_decay)
 
         self.criterion = nn.CrossEntropyLoss().to(self.args.device)
-        self.saved_state = load_saved_state(args, pretrain_level="2")
-        self.init_weights(pretrained=pretrained)
-
-    def init_weights(self, pretrained=None) -> None:
-        """Initialize the weights of model.
-
-        Args:
-            pretrained (str, optional): Path to pre-trained weights.
-                Default: None.
-        """
-        if pretrained is not None:
-            print('load model from: {}'.format(pretrained))
-        self.encoder.init_weights(pretrained=pretrained)
-        # self.head.init_weights() @todo: Thoroughly check what this is and what it does
-
-        self.model.load_state_dict(self.state['model'])
-
-        # freeze layers and remove output
 
     def finetune(self) -> None:
         self.model = self.model.to(self.args.device)
@@ -48,58 +46,97 @@ class Classifier:
 
         train_loader, val_loader = Finetune(self.args)
 
+        since = time.time()
+
+        val_acc_history = []
+
+        best_model_wts = copy.deepcopy(self.model.state_dict())
+        best_acc = 0.0
+
         for epoch in range(self.args.finetune_start_epoch, self.args.finetune_epochs):
+            print('Epoch {}/{}'.format(epoch, (self.args.finetune_start_epoch, self.args.finetune_epochs) - 1))
+            print('-' * 10)
 
             # train for one epoch
-            self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer, epoch)
+            self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
 
             # evaluate on validation set
-            self.validate(val_loader, self.model, self.criterion)
+            epoch_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc)
+            val_acc_history.append(epoch_acc)
             
             scheduler.step()
 
-            
-            # remember best acc@1 and save checkpoint
-            # is_best = acc1 > best_acc1
-            # best_acc1 = max(acc1, best_acc1)
+        time_elapsed = time.time() - since
+        print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        print('Best val Acc: {:4f}'.format(best_acc))
+
+        # load best model weights
+        self.model.load_state_dict(best_model_wts)
+        simple_save_model(self.args, self.model, 'classifier_{:4f}_acc.pth'.format(best_acc))
+
+        return self.model, val_acc_history
 
 
-    def train_single_epoch(self, train_loader, model, criterion, optimizer, epoch) -> None:
+    def train_single_epoch(self, train_loader, model, criterion, optimizer) -> None:
         model.train()
 
-        # end = time.time()
-        for i, (images, target) in enumerate(train_loader):
+        loss = 0.0
+        corrects = 0
 
+        for _, (images, targets) in enumerate(train_loader):
             images = images.to(self.args.device)
-            target = target.to(self.args.device)
-                
-            # compute output
-            output = model(images)
-            loss = criterion(output, target)
-
-            # measure accuracy and record loss
-            acc = accuracy(output, target)
-
+            targets = targets.to(self.args.device)
+            
             optimizer.zero_grad()
+
+            # compute output
+            outputs = model(images)
+            loss = criterion(outputs, targets)
+            _, preds = torch.max(outputs, 1)
+
             loss.backward()
             optimizer.step()
 
+            # statistics
+            loss += loss.item() * images.size(0)
+            corrects += torch.sum(preds == targets.data)
 
-    def validate(self, val_loader, model, criterion) -> None:    
+        epoch_loss, epoch_acc = self.accuracy(loss, corrects, train_loader)
+        print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+
+
+    def validate(self, val_loader, model, criterion, best_acc) -> None:    
         model.eval()
 
-        with torch.no_grad():
-            for i, (images, target) in enumerate(val_loader):
+        loss = 0.0
+        corrects = 0
 
+        with torch.no_grad():
+            for _, (images, targets) in enumerate(val_loader):
                 images = images.to(self.args.device)
-                target = target.to(self.args.device)
+                targets = targets.to(self.args.device)
 
                 # compute output
-                output = model(images)
-                loss = criterion(output, target)
+                outputs = model(images)
+                loss = criterion(outputs, targets)
+                _, preds = torch.max(outputs, 1)
 
-                # measure accuracy and record loss
-                acc = accuracy(output, target, topk=(1, 5))
+                # statistics
+                loss += loss.item() * images.size(0)
+                corrects += torch.sum(preds == targets.data)
 
-        return #top1.avg
+            epoch_loss, epoch_acc = self.accuracy(loss, corrects, val_loader)
+            print('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
+            # deep copy the model
+            if epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = copy.deepcopy(model.state_dict())
+
+        return epoch_acc, best_model_wts
+
+    def accuracy(self, loss, corrects, loader):
+        epoch_loss = loss / len(loader.dataset)
+        epoch_acc = corrects.double() / len(loader.dataset)
+
+        return epoch_loss, epoch_acc

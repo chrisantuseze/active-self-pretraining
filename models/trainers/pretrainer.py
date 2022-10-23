@@ -24,9 +24,9 @@ class Pretrainer:
         model.train()
 
         for step, (images, _) in enumerate(train_loader):
+            optimizer.zero_grad()
             loss = compute_loss(self.args, images, model, criterion)
 
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
@@ -41,7 +41,7 @@ class Pretrainer:
         return loss_epoch
 
 
-    def base_pretrain(self, model, train_loader, criterion, optimizer, scheduler, pretrain_level="1") -> None:
+    def base_pretrain(self, model, train_loader, criterion, optimizer, scheduler, lr, pretrain_level="1") -> None:
         print("Training in progress, please wait...")
 
         resume_epoch = self.args.current_epoch if self.args.resume else int(self.args.epoch_num)
@@ -58,9 +58,9 @@ class Pretrainer:
                 save_state(self.args, model, optimizer, pretrain_level)
 
             self.writer.add_scalar("Loss/train", loss_epoch / len(train_loader), epoch)
-            self.writer.add_scalar("Misc/learning_rate", self.args.lr, epoch)
+            self.writer.add_scalar("Misc/learning_rate", lr, epoch)
             print(
-                f"Epoch [{epoch + resume_epoch}/{end_epoch}]\t Loss: {loss_epoch / len(train_loader)}\t lr: {round(self.args.lr, 5)}"
+                f"Epoch [{epoch + resume_epoch}/{end_epoch}]\t Loss: {loss_epoch / len(train_loader)}\t lr: {round(lr, 5)}"
             )
             self.args.current_epoch += 1
 
@@ -79,7 +79,7 @@ class Pretrainer:
             model.load_state_dict(state['model'])
             
         model = model.to(self.args.device)
-        optimizer, scheduler = load_optimizer(self.args, model, state)
+        optimizer, scheduler = load_optimizer(self.args, model, state, self.args.base_lr)
 
         if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value:
             train_loader = imagenet.ImageNet(self.args).get_loader()
@@ -92,7 +92,7 @@ class Pretrainer:
         else:
             NotImplementedError
 
-        self.base_pretrain(model, train_loader, criterion, optimizer, scheduler, pretrain_level="1")
+        self.base_pretrain(model, train_loader, criterion, optimizer, scheduler, self.args.base_lr, pretrain_level="1")
 
 
     def second_pretrain(self) -> None:
@@ -114,5 +114,5 @@ class Pretrainer:
         model = model.to(self.args.device)
 
         _, criterion = get_model_criterion(self.args, encoder)
-        optimizer, scheduler = load_optimizer(self.args, model, state)
-        self.base_pretrain(model, loader, criterion, optimizer, scheduler, pretrain_level="2")
+        optimizer, scheduler = load_optimizer(self.args, model, state, self.args.target_lr)
+        self.base_pretrain(model, loader, criterion, optimizer, scheduler, self.args.target_lr, pretrain_level="2")
