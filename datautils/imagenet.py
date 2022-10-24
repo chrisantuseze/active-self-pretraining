@@ -41,5 +41,7 @@ class ImageNet():
             drop_last=True,
         )
 
+        print(f"The size of the ImageNet dataset is {len(dataset)} and the number of batches is ", loader.__len__())
+
         return loader
     

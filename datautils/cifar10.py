@@ -42,5 +42,7 @@ class CIFAR10():
             # sampler=train_sampler,
         )
 
+        print(f"The size of the Cifar10 dataset is {len(dataset)} and the number of batches is ", loader.__len__())
+
         return loader
     

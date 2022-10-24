@@ -85,12 +85,10 @@ class Pretrainer:
         optimizer, scheduler = load_optimizer(self.args, model, state, self.args.base_lr, self.args.base_epochs)
 
         if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value or self.args.dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
-            train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
-            print("using ImageNet")
+            train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         elif self.args.dataset == dataset_enum.DatasetType.CIFAR10.value:
-            train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
-            print("using CIFAR10")
+            train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         else:
             NotImplementedError
