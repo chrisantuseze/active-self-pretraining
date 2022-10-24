@@ -2,6 +2,8 @@ import torch
 from PIL import Image
 import glob
 from models.methods.simclr.transformation.transformations import TransformsSimCLR
+from models.utils.commons import get_params
+from models.utils.training_type_enum import TrainingType
 # import cv2
 
 
@@ -30,20 +32,24 @@ class PretextDataset(torch.utils.data.Dataset):
 
 
 class PretextDataLoader():
-    def __init__(self, args, img_loss_list, finetune=False) -> None:
+    def __init__(self, args, img_loss_list, training_type=TrainingType.ACTIVE_LEARNING) -> None:
         self.args = args
         self.img_loss_list = img_loss_list
-        self.finetune = finetune
-        self.batch_size = args.al_batch_size
 
-    def get_loader(self, image_size):
-        if self.finetune:
+        self.training_type = training_type
+
+        params = get_params(args, training_type)
+        self.image_size = params.image_size
+        self.batch_size = params.batch_size
+
+    def get_loader(self):
+        if self.training_type == TrainingType.FINETUNING:
             data_size = len(self.img_loss_list)
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
             self.img_loss_list = self.img_loss_list[:new_data_size]
 
-        transforms = TransformsSimCLR(image_size)
-        dataset = FinetuneLoader(self.args, self.img_loss_list, transforms, self.finetune)
+        transforms = TransformsSimCLR(self.image_size)
+        dataset = FinetuneLoader(self.args, self.img_loss_list, transforms)
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -54,12 +60,10 @@ class PretextDataLoader():
 
 
 class FinetuneLoader(torch.utils.data.Dataset):
-    def __init__(self, args, pathloss_list, transform, finetune=False) -> None:
+    def __init__(self, args, pathloss_list, transform) -> None:
         self.args = args
         self.pathloss_list = pathloss_list
         self.transform = transform
-        self.finetune = finetune
-        self.batch_size = args.al_batch_size
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -69,7 +73,7 @@ class FinetuneLoader(torch.utils.data.Dataset):
         img = Image.open(path)
         # img = Image.fromarray(img)
 
-        return self.transform.__call__(img)
+        return self.transform.__call__(img), path
 
     
 class MakeBatchLoader(torch.utils.data.Dataset):

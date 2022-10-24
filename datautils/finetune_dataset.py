@@ -3,12 +3,17 @@ import torch
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 
+from models.utils.commons import get_params
+from models.utils.training_type_enum import TrainingType
+
 class Finetune():
-    def __init__(self, args, dataset) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
         self.args = args
-        self.dir = args.dataset_dir + "/finetune"
-        self.image_size = args.image_size
-        self.batch_size = args.batch_size
+        self.dir = args.dataset_dir + dir
+        
+        params = get_params(args, training_type)
+        self.image_size = params.image_size
+        self.batch_size = params.batch_size
 
     def get_loader(self):
         traindir = os.path.join(self.dir, 'train')
@@ -36,14 +41,14 @@ class Finetune():
 
         train_loader = torch.utils.data.DataLoader(
                             train_dataset, 
-                            batch_size=self.args.batch_size,
+                            batch_size=self.batch_size,
                             shuffle=True,
                             pin_memory=True
                         )
 
         val_loader = torch.utils.data.DataLoader(
                         val_dataset, 
-                        batch_size=self.args.batch_size, 
+                        batch_size=self.batch_size, 
                         shuffle=False,
                         pin_memory=True
                     )

@@ -17,20 +17,26 @@ dataset_dir: "./datasets"       # path to dataset
 
 # pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
-batch_size: 32                  # the default should be 128. However, should be varied until better performance is achieved
-image_size: 224
+base_batch_size: 32             # the default should be 64. However, should be varied until better performance is achieved
+base_image_size: 224
 base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 current_epoch: 0
 start_epoch: 0
-base_epochs: 1                  # this needs to be increased to about 800??
-target_epochs: 1                # this needs to be increased to about 800??
-dataset: 0                      # dataset type. 0 for IMAGENET, 1 for CIFAR10.
-base_pretrain: True 
-target_pretrain: True 
+base_epochs: 100                # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+dataset: 5                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
+base_pretrain: False 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
+
+# target pretraining options
+target_dataset: 3               # 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART.
+target_batch_size: 16           # ensure that you get a non-fraction when you do len(dataset)/batch_size
+target_epochs: 100              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_image_size: 224
+target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
+target_pretrain: True 
+pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 # arch options
 resnet: "resnet50"
@@ -38,7 +44,7 @@ projection_dim: 64              # "[...] to project the representation to a 128-
 
 # loss options
 optimizer: "Adam"               # or LARS (experimental) If you use LARS, then the lr needs to be decayed
-weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 1.0e−6"
+weight_decay: 1.0e-4            # "optimized using LARS [...] and weight decay of 1.0e−4" try changing to 1.0e-6 to see the performance
 temperature: 0.5                # see appendix B.7.: Optimal temperature under different batch sizes
 
 # reload options
@@ -51,28 +57,28 @@ logistic_batch_size: 256
 logistic_epochs: 500
 
 # finetuning options
-finetune: False
-finetune_batch_size: 128        # this needs to be increased to 256
+finetune_dataset: 2             # 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART. Ideally this should be same as the target_dataset, however some datasets don't have the train folder
+finetune: True
+finetune_batch_size: 32         # this should be tested at 16 as well
 finetune_lr: 0.001              # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2
+finetune_image_size: 224
 finetune_start_epoch: 0
-finetune_epochs: 10             # this needs to be increased to 90
+finetune_epochs: 100            # this needs to be increased to 90
 finetune_momentum: 0.9          # momentum of SGD solver
 finetune_weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 1.0e−6"
 
 
 # active learning options
-al_epochs: 2                    # I would like to take 100 as the default, however for initial confirmation test, I would use 10
-al_batches: 2                   # the default should be kept at 10
+al_epochs: 20                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
+al_batches: 10                  # the default should be kept at 10
 al_batch_size: 8                # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_finetune_batch_size: 8       # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+
 al_image_size: 224
-al_lr: 0.1
+al_lr: 0.03
 al_weight_decay: 5.0e-4
 do_al: True
 al_backbone: "resnet18"         # change this to resnet18
 al_finetune_data_ratio: 1       # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 al_method: 0                    # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"
-
-# target pretraining options
-target_dataset: 3               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART.
-pretrain_path_loss_file: "pretrain_path_loss.pkl"

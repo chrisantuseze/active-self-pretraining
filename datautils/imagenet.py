@@ -1,18 +1,22 @@
 import torch
 import torchvision
+from models.utils.commons import get_params
+from models.utils.training_type_enum import TrainingType
 from utils.method_enum import Method
 from models.methods.simclr.transformation import TransformsSimCLR
 from models.methods.moco.transformation.transformations import TransformsMoCo
+from datautils.dataset_enum import DatasetType
+
 
 class ImageNet():
-    def __init__(self, args, isAL=False) -> None:
-        self.dir = args.dataset_dir + "/imagenet"
+    def __init__(self, args, training_type=TrainingType.BASE_PRETRAIN) -> None:
+        dir = "/imagenet" if args.dataset == DatasetType.IMAGENET.value else "/imagenet_lite"
+        self.dir = args.dataset_dir + dir
         self.method = args.method
-        # self.image_size = args.image_size
-        # self.batch_size = args.batch_size
-
-        self.image_size = args.al_image_size if isAL else args.image_size
-        self.batch_size = args.al_batch_size if isAL else args.batch_size
+        
+        params = get_params(args, training_type)
+        self.image_size = params.image_size
+        self.batch_size = params.batch_size
 
     def get_loader(self):
         if self.method == Method.SIMCLR.value:

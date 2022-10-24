@@ -1,15 +1,19 @@
 import torch
 import torchvision
+from models.utils.commons import get_params
+from models.utils.training_type_enum import TrainingType
 from utils.method_enum import Method
 from models.methods.simclr.transformation import TransformsSimCLR
 from models.methods.moco.transformation.transformations import TransformsMoCo
 
 class CIFAR10():
-    def __init__(self, args) -> None:
+    def __init__(self, args, training_type=TrainingType.BASE_PRETRAIN) -> None:
         self.dir = args.dataset_dir + "/cifar10"
         self.method = args.method
-        self.image_size = args.image_size
-        self.batch_size = args.batch_size
+
+        params = get_params(args, training_type)
+        self.image_size = params.image_size
+        self.batch_size = params.batch_size
 
     def get_loader(self):
         if self.method == Method.SIMCLR.value:

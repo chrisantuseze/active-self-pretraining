@@ -2,6 +2,8 @@ __pycache__
 runs/
 datasets/
 save/*.tar
+save/*.pth
+save/*.pkl
 *.tar
 build/
 dist/

@@ -10,7 +10,7 @@ from utils.method_enum import Method
 from .lars import LARS
 
 
-def load_optimizer(args, model, state, lr):
+def load_optimizer(args, model, state, lr, epochs):
 
     scheduler = None
     if args.method == Method.MOCO.value:
@@ -39,7 +39,7 @@ def load_optimizer(args, model, state, lr):
 
         # "decay the learning rate with the cosine decay schedule without restarts"
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, args.epochs, eta_min=0, last_epoch=-1
+            optimizer, epochs, eta_min=0, last_epoch=-1
         )
     else:
         raise NotImplementedError

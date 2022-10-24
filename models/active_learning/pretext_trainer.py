@@ -15,7 +15,8 @@ from models.active_learning.method_enum import Method
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import compute_loss, get_model_criterion
+from models.utils.commons import accuracy, compute_loss, compute_loss_for_al, get_model_criterion
+from models.utils.training_type_enum import TrainingType
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
@@ -27,26 +28,33 @@ class PretextTrainer():
     def train_proxy(self, samples, model, optimizer, scheduler=None):
 
         # convert samples to loader
-        loader = PretextDataLoader(self.args, samples).get_loader(self.args.al_image_size)
-        # loader = ImageNet(self.args, isAL=True).get_loader()
+        loader = PretextDataLoader(self.args, samples).get_loader()
         print("Beginning training the proxy")
 
         model.train()
         for epoch in range(self.args.al_epochs):
-            print(f"Epoch {epoch}")
-            for step, (images) in enumerate(loader):
+            print('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
+            print('-' * 10)
+
+            corrects = 0
+            train_loss = 0.0
+            for step, (images, _) in enumerate(loader):
                 optimizer.zero_grad()
-                loss = compute_loss(self.args, images, model, self.criterion)
+                loss, output1, output2 = compute_loss_for_al(self.args, images, model, self.criterion)
             
                 loss.backward()
                 optimizer.step()
 
-                loss = loss.item()
                 if step % 5 == 0:
-                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
+                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss.item()}")
 
             # scheduler.step()
+                # statistics
+                train_loss += loss.item() * images[0].size(0)
+                corrects += torch.sum(output1 == output2)
 
+            epoch_loss, epoch_acc = accuracy(train_loss, corrects, loader)
+            print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
     def rough_finetune(self, outputs1, outputs2):
         _, predicted1 = outputs1.max(1)
@@ -72,13 +80,13 @@ class PretextTrainer():
                 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
-        loader = PretextDataLoader(self.args, samples, finetune=True).get_loader(self.args.al_image_size)
+        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING).get_loader()
 
         model.eval()
         _preds = []
         print("Generating the top1 scores")
         with torch.no_grad():
-            for step, (images) in enumerate(loader):
+            for step, (images, _) in enumerate(loader):
                 images[0] = images[0].to(self.args.device)
                 images[1] = images[1].to(self.args.device)
 
@@ -144,7 +152,7 @@ class PretextTrainer():
 
         device = torch.device('cpu')
 
-        model, criterion = get_model_criterion(self.args, self.encoder, isAL=True)
+        model, criterion = get_model_criterion(self.args, self.encoder, training_type=TrainingType.ACTIVE_LEARNING)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -154,7 +162,7 @@ class PretextTrainer():
         criterion = nn.CrossEntropyLoss().to(device)
 
         model = model.to(device)
-        loader = get_target_pretrain_ds(self.args, isAL=True).get_loader()
+        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING).get_loader()
 
         model.eval()
         pathloss = []
@@ -191,7 +199,7 @@ class PretextTrainer():
             path_loss = self.make_batches()
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        proxy_model, self.criterion = get_model_criterion(self.args, encoder, isAL=True)
+        proxy_model, self.criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
         proxy_model = proxy_model.to(self.args.device)
 
         optimizer = SGD(proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)

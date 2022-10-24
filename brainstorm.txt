@@ -21,3 +21,5 @@ second pretraining
 
 image_loss.pkl should contain 30,000 images
 path_loss.pkl should contain 1000 images
+
+ensure you go through the official simclr code to ensure it correlates with yours

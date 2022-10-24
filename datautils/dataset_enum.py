@@ -6,3 +6,4 @@ class DatasetType(Enum):
     UCMERCED = 2
     SKETCH = 3
     CLIPART = 4
+    IMAGENET_LITE = 5
