@@ -23,8 +23,8 @@ base_lr: 0.03                   # initial learning rate. This should be varied b
 current_epoch: 0
 start_epoch: 0
 base_epochs: 100                # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-dataset: 5                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
-base_pretrain: False 
+dataset: 0                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
+base_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
