@@ -45,7 +45,7 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                if step % 5 == 0:
+                if step % 25 == 0:
                     print(f"Step [{step}/{len(loader)}]\t Loss: {loss.item()}")
 
             # scheduler.step()
@@ -179,7 +179,7 @@ class PretextTrainer():
                 loss = criterion(z_i, z_j)
                 
                 loss = loss.item()
-                if step % 50 == 0:
+                if step % 100 == 0:
                     print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))

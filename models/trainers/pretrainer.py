@@ -32,7 +32,7 @@ class Pretrainer:
             optimizer.step()
 
             loss = loss.item()
-            if step % 50 == 0:
+            if step % 100 == 0:
                 print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss}")
 
             self.writer.add_scalar("Loss/train_epoch", loss, self.args.global_step)
@@ -47,6 +47,7 @@ class Pretrainer:
         resume_epoch = self.args.current_epoch if self.args.resume else int(self.args.epoch_num)
         end_epoch = epochs - resume_epoch
 
+        best_epoch_loss = 0
         for epoch in range(self.args.start_epoch, end_epoch):
             print('\nEpoch {}/{}'.format(epoch, (end_epoch - self.args.start_epoch)))
             print('-' * 10)
@@ -57,8 +58,9 @@ class Pretrainer:
             if scheduler is not None:
                 scheduler.step()
 
-            # if epoch % 10 == 0:
-            #     save_state(self.args, model, optimizer, pretrain_level)
+            if loss_epoch > best_epoch_loss:
+                best_epoch_loss = loss_epoch
+                save_state(self.args, model, optimizer, pretrain_level)
 
             self.writer.add_scalar("Loss/train", loss_epoch / len(train_loader), epoch)
             self.writer.add_scalar("Misc/learning_rate", lr, epoch)
