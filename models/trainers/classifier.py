@@ -10,6 +10,7 @@ from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
 from models.utils.commons import accuracy, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
+from models.utils.early_stopping import EarlyStopping
 from utils.commons import load_saved_state, simple_save_model
 
 
@@ -75,18 +76,26 @@ class Classifier:
         best_model_wts = copy.deepcopy(self.model.state_dict())
         best_acc = 0.0
 
+        early_stopping = EarlyStopping(tolerance=5, min_delta=20)
+
         for epoch in range(self.args.finetune_start_epoch, self.args.finetune_epochs):
             print('\nEpoch {}/{}'.format(epoch, (self.args.finetune_epochs - self.args.finetune_start_epoch)))
             print('-' * 10)
 
             # train for one epoch
-            self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
+            train_loss, train_acc = self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
 
             # evaluate on validation set
-            epoch_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc)
-            val_acc_history.append(epoch_acc)
+            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc)
+            val_acc_history.append(val_acc)
             
             scheduler.step()
+
+            # early stopping
+            early_stopping(train_loss, val_loss)
+            if early_stopping.early_stop:
+                print("We are at epoch:", epoch)
+                break
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -126,6 +135,8 @@ class Classifier:
         epoch_loss, epoch_acc = accuracy(loss, corrects, train_loader)
         print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
+        return epoch_loss, epoch_acc
+
 
     def validate(self, val_loader, model, criterion, best_acc) -> None:    
         model.eval()
@@ -157,4 +168,4 @@ class Classifier:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
-        return epoch_acc, best_acc, best_model_wts
+        return epoch_loss, epoch_acc, best_acc, best_model_wts

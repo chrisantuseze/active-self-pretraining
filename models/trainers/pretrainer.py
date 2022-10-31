@@ -58,7 +58,7 @@ class Pretrainer:
             if scheduler is not None:
                 scheduler.step()
 
-            if loss_epoch > best_epoch_loss:
+            if loss_epoch < best_epoch_loss:
                 best_epoch_loss = loss_epoch
                 save_state(self.args, model, optimizer, pretrain_level)
 
