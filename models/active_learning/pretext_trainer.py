@@ -14,8 +14,10 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.method_enum import Method
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
+from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
+from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 
-from models.utils.commons import accuracy, compute_loss, compute_loss_for_al, get_model_criterion
+from models.utils.commons import accuracy, compute_loss_for_al, get_model_criterion
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
@@ -25,36 +27,35 @@ class PretextTrainer():
         self.encoder = encoder
         self.criterion = None
 
-    def train_proxy(self, samples, model, optimizer, scheduler=None):
+    def train_proxy(self, samples, model, rebuild_al_model=False):
 
         # convert samples to loader
         loader = PretextDataLoader(self.args, samples).get_loader()
         print("Beginning training the proxy")
 
-        model.train()
+        if self.args.method == Method.SIMCLR.value:
+            trainer = SimCLRTrainer(
+                self.args, model, loader, 
+                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
+                trainingType=TrainingType.ACTIVE_LEARNING)
+
+        elif self.args.method == Method.MYOW.value:
+            trainer = get_myow_trainer(
+                self.args, model, loader, 
+                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
+                trainingType=TrainingType.ACTIVE_LEARNING)
+
+        else:
+            NotImplementedError
+
+        model = trainer.model
+
         for epoch in range(self.args.al_epochs):
             print('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
             print('-' * 10)
 
-            corrects = 0
-            train_loss = 0.0
-            for step, (images, _) in enumerate(loader):
-                optimizer.zero_grad()
-                loss, output1, output2 = compute_loss_for_al(self.args, images, model, self.criterion)
-            
-                loss.backward()
-                optimizer.step()
-
-                if step % 25 == 0:
-                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss.item()}")
-
-            # scheduler.step()
-                # statistics
-                train_loss += loss.item() * images[0].size(0)
-                corrects += torch.sum(output1 == output2)
-
-            epoch_loss, epoch_acc = accuracy(train_loss, corrects, loader)
-            print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+            epoch_loss = trainer.train_epoch()
+            print('Train Loss: {:.4f}'.format(epoch_loss))
 
     def rough_finetune(self, outputs1, outputs2):
         _, predicted1 = outputs1.max(1)
@@ -199,13 +200,15 @@ class PretextTrainer():
             path_loss = self.make_batches()
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        proxy_model, self.criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
-        proxy_model = proxy_model.to(self.args.device)
+        proxy_model = encoder
+        # proxy_model, self.criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
+        # proxy_model = proxy_model.to(self.args.device)
 
-        optimizer = SGD(proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)
-        scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+        # optimizer = SGD(proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)
+        # scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
         pretraining_sample_pool = []
+        rebuild_al_model = True
 
         for batch in range(0, self.args.al_batches): # change the '1' to '0'
             sample6000 = path_loss[batch * 6000 : (batch + 1) * 6000] # this should be changed to a size of 6000
@@ -223,7 +226,11 @@ class PretextTrainer():
             pretraining_sample_pool.extend(sample2k)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                self.train_proxy(pretraining_sample_pool, proxy_model, optimizer, scheduler=None)
+                proxy_model = self.train_proxy(
+                    pretraining_sample_pool, 
+                    proxy_model, rebuild_al_model=rebuild_al_model)
+
+                rebuild_al_model=False
                 simple_save_model(self.args, proxy_model, f'proxy_{batch}.pth')
 
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)

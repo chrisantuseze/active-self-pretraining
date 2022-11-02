@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.distributed as dist
 
-from models.methods.simclr.modules.gather import GatherLayer
+from models.self_sup.simclr.modules.gather import GatherLayer
 
 
 class NT_Xent(nn.Module):

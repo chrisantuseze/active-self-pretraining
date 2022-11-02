@@ -1,9 +1,9 @@
 import torch
 import torchvision
+from torchvision.transforms import ToTensor, Compose
 
 from models.active_learning.pretext_dataloader import MakeBatchLoader
-from models.methods.moco.transformation.transformations import TransformsMoCo
-from models.methods.simclr.transformation import TransformsSimCLR
+from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from utils.method_enum import Method
@@ -29,12 +29,9 @@ class TargetDataset():
         if self.method == Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
 
-        elif self.method == Method.MOCO.value:
-            transforms = TransformsMoCo(self.image_size)
+        elif self.method == Method.MYOW.value:
+            transforms = Compose([ToTensor()])
 
-        elif self.method == Method.SWAV.value:
-            NotImplementedError
-        
         else:
             NotImplementedError
 

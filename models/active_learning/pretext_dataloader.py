@@ -1,9 +1,12 @@
 import torch
+from torchvision.transforms import ToTensor, Compose
+
 from PIL import Image
 import glob
-from models.methods.simclr.transformation.transformations import TransformsSimCLR
+from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
+from utils.method_enum import Method
 # import cv2
 
 
@@ -48,7 +51,15 @@ class PretextDataLoader():
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
             self.img_loss_list = self.img_loss_list[:new_data_size]
 
-        transforms = TransformsSimCLR(self.image_size)
+        if self.method == Method.SIMCLR.value:
+            transforms = TransformsSimCLR(self.image_size)
+
+        elif self.method == Method.MYOW.value:
+            transforms = Compose([ToTensor()])
+
+        else:
+            NotImplementedError
+
         dataset = FinetuneLoader(self.args, self.img_loss_list, transforms)
         loader = torch.utils.data.DataLoader(
             dataset,

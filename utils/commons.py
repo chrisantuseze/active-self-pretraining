@@ -11,11 +11,9 @@ def save_state(args, model, optimizer, pretrain_level="1"):
     if args.method == Method.SIMCLR.value:
         prefix = "simclr"
         optimizer_type = args.optimizer
-    elif args.method == Method.MOCO.value:
-        prefix = "moco"
-        optimizer_type = "moco"
     else:
-        prefix = "swav"
+        prefix = "myow"
+        optimizer_type = args.optimizer
 
     out = os.path.join(args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
@@ -31,10 +29,8 @@ def save_state(args, model, optimizer, pretrain_level="1"):
 def load_saved_state(args, recent=True, pretrain_level="1"):
     if args.method == Method.SIMCLR.value:
         prefix = "simclr"
-    elif args.method == Method.MOCO.value:
-        prefix = "moco"
     else:
-        prefix = "swav"
+        prefix = "myow"
 
     model_fp = args.resume if recent and args.resume else os.path.join(
             args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.epoch_num)

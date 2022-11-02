@@ -1,6 +1,7 @@
 import torch.nn as nn
 
-from models.methods.simclr.modules.identity import Identity
+from models.self_sup.simclr.modules.identity import Identity
+
 
 
 

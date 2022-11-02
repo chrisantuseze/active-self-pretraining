@@ -1,10 +1,11 @@
 import torch
 import torchvision
+from torchvision.transforms import ToTensor, Compose
+
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from utils.method_enum import Method
-from models.methods.simclr.transformation import TransformsSimCLR
-from models.methods.moco.transformation.transformations import TransformsMoCo
+from models.self_sup.simclr.transformation import TransformsSimCLR
 
 class CIFAR10():
     def __init__(self, args, training_type=TrainingType.BASE_PRETRAIN) -> None:
@@ -19,12 +20,9 @@ class CIFAR10():
         if self.method == Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
 
-        elif self.method == Method.MOCO.value:
-            transforms = TransformsMoCo(self.image_size)
+        elif self.method == Method.MYOW.value:
+            transforms = Compose([ToTensor()])
 
-        elif self.method == Method.SWAV.value:
-            NotImplementedError
-        
         else:
             NotImplementedError
 
@@ -36,10 +34,7 @@ class CIFAR10():
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
-            # shuffle=(train_sampler is None),
             drop_last=True,
-            # num_workers=args.workers,
-            # sampler=train_sampler,
         )
 
         print(f"The size of the Cifar10 dataset is {len(dataset)} and the number of batches is ", loader.__len__())

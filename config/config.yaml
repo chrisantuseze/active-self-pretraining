@@ -1,4 +1,4 @@
-method: 0                       # 0 for SimCLR, 1 for MoCo
+method: 1                       # 0 for SimCLR, 1 for MYOW
 
 # moco specific
 moco_dim: 128                   # feature dimension (default: 128)
@@ -23,7 +23,7 @@ base_lr: 0.03                   # initial learning rate. This should be varied b
 current_epoch: 0
 start_epoch: 0
 base_epochs: 50                 # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-dataset: 0                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
+dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
 base_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
@@ -32,14 +32,14 @@ global_step: 0
 # target pretraining options
 target_dataset: 4               # 2 for UCMERCED,  3 for SKETCH, and  4 for CLIPART.
 target_batch_size: 16           # ensure that you get a non-fraction when you do len(dataset)/batch_size
-target_epochs: 50              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 224
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 # arch options
-resnet: "resnet50"
+resnet: "resnet18"
 projection_dim: 64              # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
