@@ -7,7 +7,6 @@ simclr pytorch repo
 import torch
 from models.utils.training_type_enum import TrainingType
 
-from utils.method_enum import Method
 from .lars import LARS
 
 

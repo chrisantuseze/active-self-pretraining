@@ -12,7 +12,7 @@ from utils.commons import load_path_loss, load_saved_state, save_state
 from datautils import dataset_enum, cifar10, imagenet
 from torch.utils.tensorboard import SummaryWriter
 
-from utils.method_enum import Method
+from models.utils.ssl_method_enum import Method
 
 
 class Pretrainer:
@@ -78,16 +78,16 @@ class Pretrainer:
 
 
     def second_pretrain(self) -> None:
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
         if self.args.do_al:
 
             pretrain_data = None# load_path_loss(self.args, self.args.pretrain_path_loss_file)
             if pretrain_data is None:
-                pretext = PretextTrainer(self.args, encoder)
+                pretext = PretextTrainer(self.args)
                 pretrain_data = pretext.do_active_learning()
 
             loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
         else:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
 
+        encoder = resnet_backbone(self.args.resnet, pretrained=False)
         self.base_pretrain(encoder, loader, self.args.target_lr, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)

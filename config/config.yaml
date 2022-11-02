@@ -1,4 +1,4 @@
-method: 1                       # 0 for SimCLR, 1 for MYOW
+method: 0                       # 0 for SimCLR, 1 for MYOW
 
 # moco specific
 moco_dim: 128                   # feature dimension (default: 128)
@@ -24,7 +24,7 @@ current_epoch: 0
 start_epoch: 0
 base_epochs: 50                 # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
-base_pretrain: True 
+base_pretrain: False 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
@@ -39,7 +39,7 @@ target_pretrain: True
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 # arch options
-resnet: "resnet18"
+resnet: "resnet50"
 projection_dim: 64              # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
@@ -78,7 +78,6 @@ al_image_size: 224
 al_lr: 0.03
 al_weight_decay: 5.0e-4
 do_al: True
-al_backbone: "resnet18"         # change this to resnet18
 al_finetune_data_ratio: 1       # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 al_method: 0                    # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"

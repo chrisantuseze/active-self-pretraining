@@ -4,7 +4,7 @@ import torch
 
 import pickle
 
-from utils.method_enum import Method
+from models.utils.ssl_method_enum import Method
 
 
 def save_state(args, model, optimizer, pretrain_level="1"):

@@ -11,7 +11,7 @@ from datautils.image_loss_data import Image_Loss
 from datautils.imagenet import ImageNet
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.method_enum import Method
+from models.active_learning.al_method_enum import Method
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
@@ -19,12 +19,13 @@ from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 
 from models.utils.commons import accuracy, compute_loss_for_al, get_model_criterion
 from models.utils.training_type_enum import TrainingType
+from models.utils.ssl_method_enum import Method
+from models.active_learning.al_method_enum import Method as ssl_method
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
-    def __init__(self, args, encoder) -> None:
+    def __init__(self, args) -> None:
         self.args = args
-        self.encoder = encoder
         self.criterion = None
 
     def train_proxy(self, samples, model, rebuild_al_model=False):
@@ -33,13 +34,13 @@ class PretextTrainer():
         loader = PretextDataLoader(self.args, samples).get_loader()
         print("Beginning training the proxy")
 
-        if self.args.method == Method.SIMCLR.value:
+        if self.args.method == ssl_method.Method.SIMCLR.value:
             trainer = SimCLRTrainer(
                 self.args, model, loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
                 trainingType=TrainingType.ACTIVE_LEARNING)
 
-        elif self.args.method == Method.MYOW.value:
+        elif self.args.method == ssl_method.Method.MYOW.value:
             trainer = get_myow_trainer(
                 self.args, model, loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
@@ -146,14 +147,14 @@ class PretextTrainer():
 
         return new_samples[:2000]
 
-    def make_batches(self) -> List[PathLoss]:
+    def make_batches(self, encoder) -> List[PathLoss]:
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
         batch_size = self.args.al_batch_size
         self.args.al_batch_size = 1
 
         device = torch.device('cpu')
 
-        model, criterion = get_model_criterion(self.args, self.encoder, training_type=TrainingType.ACTIVE_LEARNING)
+        model, criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -194,13 +195,14 @@ class PretextTrainer():
         return sorted_samples
 
     def do_active_learning(self) -> List[PathLoss]:
+        encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        proxy_model = encoder
+
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         
         if path_loss is None:
-            path_loss = self.make_batches()
+            path_loss = self.make_batches(encoder)
 
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        proxy_model = encoder
         # proxy_model, self.criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
         # proxy_model = proxy_model.to(self.args.device)
 

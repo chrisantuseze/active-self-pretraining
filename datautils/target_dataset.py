@@ -6,7 +6,7 @@ from models.active_learning.pretext_dataloader import MakeBatchLoader
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
-from utils.method_enum import Method
+from models.utils.ssl_method_enum import Method
 
 from datautils import dataset_enum
 
@@ -14,6 +14,7 @@ class TargetDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
         self.dir = args.dataset_dir + dir
         self.method = args.method
+        self.training_type = training_type
         
         params = get_params(args, training_type)
         self.image_size = params.image_size
@@ -21,7 +22,7 @@ class TargetDataset():
 
     
     def get_dataset(self, transforms):
-        return MakeBatchLoader(self.image_size, self.dir, transforms) if self.isAL else torchvision.datasets.ImageFolder(
+        return MakeBatchLoader(self.image_size, self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
             self.dir,
             transform=transforms)
 

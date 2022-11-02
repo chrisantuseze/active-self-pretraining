@@ -4,7 +4,7 @@ from torchvision.transforms import ToTensor, Compose
 
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
-from utils.method_enum import Method
+from models.utils.ssl_method_enum import Method
 from models.self_sup.simclr.transformation import TransformsSimCLR
 
 class CIFAR10():

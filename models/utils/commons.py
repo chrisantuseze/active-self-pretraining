@@ -4,7 +4,7 @@ import gc
 
 from models.heads.nt_xent import NT_Xent
 from models.self_sup.simclr.simclr import SimCLR
-from utils.method_enum import Method
+from models.utils.ssl_method_enum import Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
