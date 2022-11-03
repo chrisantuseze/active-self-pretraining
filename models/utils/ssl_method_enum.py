@@ -1,5 +1,5 @@
 from enum import Enum
 
-class Method(Enum):
+class SSL_Method(Enum):
     SIMCLR = 0
     MYOW = 1

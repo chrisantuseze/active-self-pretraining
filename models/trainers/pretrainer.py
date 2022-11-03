@@ -12,7 +12,7 @@ from utils.commons import load_path_loss, load_saved_state, save_state
 from datautils import dataset_enum, cifar10, imagenet
 from torch.utils.tensorboard import SummaryWriter
 
-from models.utils.ssl_method_enum import Method
+from models.utils.ssl_method_enum import SSL_Method
 
 
 class Pretrainer:
@@ -31,10 +31,10 @@ class Pretrainer:
 
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"
         best_epoch_loss = 0
-        if self.args.method == Method.SIMCLR.value:
+        if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
 
-        elif self.args.method == Method.MYOW.value:
+        elif self.args.method == SSL_Method.MYOW.value:
             trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
 
         else:

@@ -4,11 +4,11 @@ import torch
 
 import pickle
 
-from models.utils.ssl_method_enum import Method
+from models.utils.ssl_method_enum import SSL_Method
 
 
 def save_state(args, model, optimizer, pretrain_level="1"):
-    if args.method == Method.SIMCLR.value:
+    if args.method == SSL_Method.SIMCLR.value:
         prefix = "simclr"
         optimizer_type = args.optimizer
     else:
@@ -27,7 +27,7 @@ def save_state(args, model, optimizer, pretrain_level="1"):
     args.resume = out
 
 def load_saved_state(args, recent=True, pretrain_level="1"):
-    if args.method == Method.SIMCLR.value:
+    if args.method == SSL_Method.SIMCLR.value:
         prefix = "simclr"
     else:
         prefix = "myow"

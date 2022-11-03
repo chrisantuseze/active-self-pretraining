@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim import SGD, lr_scheduler
 import numpy as np
-from typing import Optional, Tuple, List
+from typing import List
 
 import random
 
@@ -11,16 +10,15 @@ from datautils.image_loss_data import Image_Loss
 from datautils.imagenet import ImageNet
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.al_method_enum import Method
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 
-from models.utils.commons import accuracy, compute_loss_for_al, get_model_criterion
+from models.utils.commons import get_model_criterion
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import Method
-from models.active_learning.al_method_enum import Method as ssl_method
+from models.utils.ssl_method_enum import SSL_Method
+from models.active_learning.al_method_enum import AL_Method
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
@@ -34,13 +32,13 @@ class PretextTrainer():
         loader = PretextDataLoader(self.args, samples).get_loader()
         print("Beginning training the proxy")
 
-        if self.args.method == ssl_method.Method.SIMCLR.value:
+        if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(
                 self.args, model, loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
                 trainingType=TrainingType.ACTIVE_LEARNING)
 
-        elif self.args.method == ssl_method.Method.MYOW.value:
+        elif self.args.method == SSL_Method.MYOW.value:
             trainer = get_myow_trainer(
                 self.args, model, loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
@@ -123,11 +121,11 @@ class PretextTrainer():
             probs = preds.max(axis=1)
             indices = probs.argsort(axis=0)
 
-        elif self.args.al_method == Method.ENTROPY.value:
+        elif self.args.al_method == AL_Method.ENTROPY.value:
             entropy = (np.log(preds) * preds).sum(axis=1) * -1.
             indices = entropy.argsort(axis=0)[::-1]
 
-        elif self.args.al_method == Method.BOTH.value:
+        elif self.args.al_method == AL_Method.BOTH.value:
             probs = preds.max(axis=1)
             indices1 = probs.argsort(axis=0)
 

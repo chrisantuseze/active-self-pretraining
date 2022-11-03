@@ -4,7 +4,7 @@ import gc
 
 from models.heads.nt_xent import NT_Xent
 from models.self_sup.simclr.simclr import SimCLR
-from models.utils.ssl_method_enum import Method
+from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
@@ -13,7 +13,7 @@ def compute_loss(args, images, model, criterion):
     images[1] = images[1].to(args.device)
 
     loss = None
-    if args.method == Method.SIMCLR.value:
+    if args.method == SSL_Method.SIMCLR.value:
         # positive pair, with encoding
         h_i, h_j, z_i, z_j = model(images[0], images[1])
         loss = criterion(z_i, z_j)
@@ -28,7 +28,7 @@ def compute_loss_for_al(args, images, model, criterion):
     images[1] = images[1].to(args.device)
 
     loss, output1, output2 = None, None, None
-    if args.method == Method.SIMCLR.value:
+    if args.method == SSL_Method.SIMCLR.value:
         # positive pair, with encoding
         h_i, h_j, z_i, z_j = model(images[0], images[1])
         output1, output2 = z_i, z_j
@@ -43,7 +43,7 @@ def compute_loss_for_al(args, images, model, criterion):
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING):
     n_features = encoder.fc.in_features  # get dimensions of fc layer
 
-    if args.method == Method.SIMCLR.value:
+    if args.method == SSL_Method.SIMCLR.value:
 
         params = get_params(args, training_type)
         batch_size = params.batch_size

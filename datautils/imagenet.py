@@ -4,7 +4,7 @@ from torchvision.transforms import ToTensor, Compose
 
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import Method
+from models.utils.ssl_method_enum import SSL_Method
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from datautils.dataset_enum import DatasetType
 
@@ -20,10 +20,10 @@ class ImageNet():
         self.batch_size = params.batch_size
 
     def get_loader(self):
-        if self.method == Method.SIMCLR.value:
+        if self.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
 
-        elif self.method == Method.MYOW.value:
+        elif self.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])
 
         else:
