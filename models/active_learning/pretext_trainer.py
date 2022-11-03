@@ -117,7 +117,7 @@ class PretextTrainer():
             return preds2
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        if self.args.al_method == Method.LEAST_CONFIDENCE.value:
+        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
             probs = preds.max(axis=1)
             indices = probs.argsort(axis=0)
 
