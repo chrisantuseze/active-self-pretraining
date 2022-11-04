@@ -10,14 +10,3 @@ class PathLoss:
 
     def __post_init__(self):
         self.sort_index = self.loss
-
-
-# members = [
-#     Person(name='John', age=25),
-#     Person(name='Bob', age=35),
-#     Person(name='Alice', age=30)
-# ]
-
-# sorted_members = sorted(members)
-# for member in sorted_members:
-#     print(f'{member.name}(age={member.age})')

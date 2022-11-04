@@ -34,9 +34,9 @@ class Classifier:
             num_classes = 345
             self.dir = "/sketch"
 
-        elif args.finetune_dataset == DatasetType.UCMERCED.value:
-            num_classes = 21
-            self.dir = "/ucmerced"
+        elif args.finetune_dataset == DatasetType.CHEST_XRAY.value:
+            num_classes = 2
+            self.dir = "/chest_xray"
 
         elif args.finetune_dataset == DatasetType.IMAGENET.value:
             num_classes = 200

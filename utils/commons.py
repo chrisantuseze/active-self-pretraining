@@ -3,6 +3,7 @@ from sys import prefix
 import torch
 
 import pickle
+from PIL import Image
 
 from models.utils.ssl_method_enum import SSL_Method
 
@@ -93,3 +94,9 @@ def load_path_loss(args, filename):
 
     except IOError:
         return None
+
+def pil_loader(path):
+        # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
+        with open(path, 'rb') as f:
+            img = Image.open(f)
+            return img.convert('RGB')

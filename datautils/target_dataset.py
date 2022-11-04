@@ -43,14 +43,16 @@ class TargetDataset():
             batch_size=self.batch_size,
             drop_last=True,
         )
+        
+        print(f"The size of the dataset is {len(dataset)} and the number of batches is ", loader.__len__())
 
         return loader
     
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
-    if args.target_dataset == dataset_enum.DatasetType.UCMERCED.value:
-        print("using the UCMERCED dataset")
-        return TargetDataset(args, "/ucmerced", training_type)
+    if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
+        print("using the Chest X-Ray dataset")
+        return TargetDataset(args, "/chest_xray", training_type)
     
     elif args.target_dataset == dataset_enum.DatasetType.SKETCH.value:
         print("using the SKETCH dataset")

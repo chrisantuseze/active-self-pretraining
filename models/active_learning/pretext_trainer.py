@@ -6,7 +6,6 @@ from typing import List
 
 import random
 
-from datautils.image_loss_data import Image_Loss
 from datautils.imagenet import ImageNet
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
@@ -22,8 +21,9 @@ from models.active_learning.al_method_enum import AL_Method
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
-    def __init__(self, args) -> None:
+    def __init__(self, args, writer) -> None:
         self.args = args
+        self.writer = writer
         self.criterion = None
 
     def train_proxy(self, samples, model, rebuild_al_model=False):
@@ -34,20 +34,18 @@ class PretextTrainer():
 
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(
-                self.args, model, loader, 
+                args=self.args, writer=self.writer, encoder=model, train_loader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                trainingType=TrainingType.ACTIVE_LEARNING)
+                training_type=TrainingType.ACTIVE_LEARNING)
 
         elif self.args.method == SSL_Method.MYOW.value:
             trainer = get_myow_trainer(
-                self.args, model, loader, 
+                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
                 trainingType=TrainingType.ACTIVE_LEARNING)
 
         else:
             NotImplementedError
-
-        model = trainer.model
 
         for epoch in range(self.args.al_epochs):
             print('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
@@ -55,6 +53,8 @@ class PretextTrainer():
 
             epoch_loss = trainer.train_epoch()
             print('Train Loss: {:.4f}'.format(epoch_loss))
+
+        return trainer.model
 
     def rough_finetune(self, outputs1, outputs2):
         _, predicted1 = outputs1.max(1)
@@ -90,7 +90,7 @@ class PretextTrainer():
                 images[0] = images[0].to(self.args.device)
                 images[1] = images[1].to(self.args.device)
 
-                _, _, outputs1, outputs2  = model(images[0], images[1])
+                _, _, outputs1, outputs2 = model(images[0], images[1])
 
                 _preds.append(self.get_predictions(outputs1, outputs2))
 
@@ -143,16 +143,17 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        return new_samples[:2000]
+        return new_samples[:4000]
 
     def make_batches(self, encoder) -> List[PathLoss]:
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
         batch_size = self.args.al_batch_size
         self.args.al_batch_size = 1
 
-        device = torch.device('cpu')
+        device = self.args.device #torch.device('GPU')
 
-        model, criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
+        model = encoder
+        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -211,19 +212,20 @@ class PretextTrainer():
         rebuild_al_model = True
 
         for batch in range(0, self.args.al_batches): # change the '1' to '0'
-            sample6000 = path_loss[batch * 6000 : (batch + 1) * 6000] # this should be changed to a size of 6000
+            sample6400 = path_loss[batch * 6400 : (batch + 1) * 6400] # this should be changed to a size of 6000
 
             if batch > 0:
                 print('>> Getting previous checkpoint for batch ', batch + 1)
-                proxy_model.load_state_dict(simple_load_model(self.args, f'proxy_{batch-1}.pth'))
+                print(f"Its size is {len(path_loss)}")
+                proxy_model.load_state_dict(simple_load_model(self.args, f'proxy_{batch-1}.pth'), strict=False)
 
                 # sampling
-                sample2k = self.finetune(proxy_model, sample6000)
+                sample4k = self.finetune(proxy_model, sample6400)
             else:
                 # first iteration: sample 4k at even intervals
-                sample2k = sample6000[:2000] # this should be changed to a size of 2000
+                sample4k = sample6400[:4000] # this should be changed to a size of 2000
 
-            pretraining_sample_pool.extend(sample2k)
+            pretraining_sample_pool.extend(sample4k)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 proxy_model = self.train_proxy(

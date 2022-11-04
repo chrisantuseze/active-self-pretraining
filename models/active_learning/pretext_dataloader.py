@@ -5,8 +5,10 @@ from PIL import Image
 import glob
 from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
 from models.utils.commons import get_params
+from utils.commons import pil_loader
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
+from datautils.dataset_enum import DatasetType
 # import cv2
 
 
@@ -46,10 +48,10 @@ class PretextDataLoader():
         self.batch_size = params.batch_size
 
     def get_loader(self):
-        if self.training_type == TrainingType.FINETUNING:
+        if self.training_type == TrainingType.AL_FINETUNING:
             data_size = len(self.img_loss_list)
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
-            self.img_loss_list = self.img_loss_list[:new_data_size]
+            self.img_loss_list = self.img_loss_list[0:new_data_size]
 
         if self.args.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
@@ -81,7 +83,12 @@ class FinetuneLoader(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         path = self.pathloss_list[idx].path[0]
-        img = Image.open(path)
+        if self.args.target_dataset == DatasetType.CHEST_XRAY.value:
+            img = pil_loader(path)
+
+        else:
+            img = Image.open(path)
+
         # img = Image.fromarray(img)
 
         return self.transform.__call__(img), path
@@ -90,14 +97,24 @@ class FinetuneLoader(torch.utils.data.Dataset):
 class MakeBatchLoader(torch.utils.data.Dataset):
     def __init__(self, image_size, dir, transform=None):
         self.image_size = image_size
-        self.img_path = glob.glob(dir + '/*/*')
+        self.dir = dir
+
+        if self.dir == "./datasets/chest_xray":
+            self.img_path = glob.glob(dir + '/train/*/*')
+        else:
+            self.img_path = glob.glob(dir + '/*/*')
         self.transform = transform
 
     def __len__(self):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        img = Image.open(self.img_path[idx])
+        if self.dir == "./datasets/chest_xray":
+            img = pil_loader(self.img_path[idx])
+
+        else:
+            img = Image.open(self.img_path[idx])
+
         # img = Image.fromarray(img)
 
         x1, x2 = self.transform.__call__(img)

@@ -24,12 +24,9 @@ class Pretrainer:
         self.writer = writer
 
     def base_pretrain(self, encoder, train_loader, lr, epochs, trainingType) -> None:
-        print("Training in progress, please wait...")
-
-        resume_epoch = self.args.current_epoch if self.args.resume else int(self.args.epoch_num)
-        end_epoch = epochs - resume_epoch
-
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"
+        print(f"{trainingType.value} pretraining in progress, please wait...")
+
         best_epoch_loss = 0
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
@@ -43,8 +40,8 @@ class Pretrainer:
         model = trainer.model
         optimizer = trainer.optimizer
 
-        for epoch in range(self.args.start_epoch, end_epoch):
-            print('\nEpoch {}/{}'.format(epoch, (end_epoch - self.args.start_epoch)))
+        for epoch in range(self.args.start_epoch, epochs):
+            print('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
             print('-' * 10)
 
             epoch_loss = trainer.train_epoch()
@@ -80,9 +77,9 @@ class Pretrainer:
     def second_pretrain(self) -> None:
         if self.args.do_al:
 
-            pretrain_data = None# load_path_loss(self.args, self.args.pretrain_path_loss_file)
+            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
             if pretrain_data is None:
-                pretext = PretextTrainer(self.args)
+                pretext = PretextTrainer(self.args, self.writer)
                 pretrain_data = pretext.do_active_learning()
 
             loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()

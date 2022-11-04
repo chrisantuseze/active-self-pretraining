@@ -10,9 +10,9 @@ class Params:
     epochs: int
 
 class TrainingType(Enum):
-    BASE_PRETRAIN = 0
-    TARGET_PRETRAIN = 1
-    ACTIVE_LEARNING = 2
-    FINETUNING = 3
-    AL_FINETUNING = 4
+    BASE_PRETRAIN = "Base"
+    TARGET_PRETRAIN = "Target"
+    ACTIVE_LEARNING = "Active Learning"
+    FINETUNING = "Finetuning"
+    AL_FINETUNING = "AL Finetuning"
 

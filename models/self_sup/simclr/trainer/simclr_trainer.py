@@ -2,6 +2,7 @@ from models.self_sup.simclr.modules.optimizer import load_optimizer
 from models.utils.commons import get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_saved_state
+from models.heads.nt_xent import NT_Xent
 
 class SimCLRTrainer():
     def __init__(self, 
@@ -19,6 +20,7 @@ class SimCLRTrainer():
         state = None
         if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
             self.model = encoder
+            self.criterion = NT_Xent(self.args.al_batch_size, self.args.temperature, self.args.world_size)
 
         else:
             self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
