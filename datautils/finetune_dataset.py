@@ -14,7 +14,6 @@ class Finetune():
         self.dir = args.dataset_dir + dir
         
         params = get_params(args, training_type)
-        self.image_size = params.image_size
         self.batch_size = params.batch_size
 
 

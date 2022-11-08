@@ -1,14 +1,5 @@
 method: 0                       # 0 for SimCLR, 1 for MYOW
 
-# moco specific
-moco_dim: 128                   # feature dimension (default: 128)
-moco_k: 65536                   # queue size; number of negative keys (default: 65536)
-moco_m: 0.999                   # moco momentum of updating key encoder (default: 0.999)
-moco_t: 0.07                    # softmax temperature (default: 0.07)
-mlp: True                       # use mlp head
-aug_plus: True                  # use moco v2 data augmentation
-cos: True                       # use cosine lr schedule
-
 # distributed training
 nodes: 1
 gpus: 1                         # I recommend always assigning 1 GPU to 1 node
@@ -18,7 +9,7 @@ dataset_dir: "./datasets"       # path to dataset
 # pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
 base_batch_size: 16             # the default should be 64. However, should be varied until better performance is achieved
-base_image_size: 224
+base_image_size: 64
 base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
@@ -33,7 +24,7 @@ global_step: 0
 target_dataset: 3               # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CLIPART. UCMerced seems to be a bad dataset
 target_batch_size: 16           # ensure that you get a non-fraction when you do len(dataset)/batch_size
 target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 224
+target_image_size: 64
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
@@ -61,7 +52,7 @@ finetune_dataset: 3             # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CL
 finetune: True
 finetune_batch_size: 32         # this should be tested at 16 as well
 finetune_lr: 0.003              # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2
-finetune_image_size: 224
+finetune_image_size: 64
 finetune_start_epoch: 0
 finetune_epochs: 100            # this needs to be increased to 90
 finetune_momentum: 0.9          # momentum of SGD solver
@@ -74,7 +65,6 @@ al_batches: 10                # the default should be kept at 10
 al_batch_size: 32               # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 64      # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 
-al_image_size: 224
 al_lr: 0.03
 al_weight_decay: 5.0e-4
 do_al: True
