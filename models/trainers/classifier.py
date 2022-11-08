@@ -8,7 +8,8 @@ from datautils.dataset_enum import DatasetType
 from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
-from models.utils.commons import accuracy, get_params_to_update, set_parameter_requires_grad
+from models.self_sup.simclr.modules.optimizer import load_optimizer
+from models.utils.commons import accuracy, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
 from utils.commons import load_saved_state, simple_save_model, simple_load_model
@@ -64,18 +65,12 @@ class Classifier:
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
-        self.optimizer = torch.optim.SGD(
-                            params_to_update, 
-                            self.args.finetune_lr,
-                            momentum=self.args.finetune_momentum,
-                            weight_decay=self.args.finetune_weight_decay)
+        train_params = get_params(self.args, TrainingType.FINETUNING)
+        self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
 
         self.criterion = nn.CrossEntropyLoss().to(self.args.device)
 
     def finetune(self) -> None:
-        """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-        scheduler = StepLR(self.optimizer, step_size=30, gamma=0.1)
-
         train_loader, val_loader = Finetune(self.args, dir=self.dir, training_type=TrainingType.FINETUNING).get_loader()
 
         since = time.time()
@@ -87,8 +82,11 @@ class Classifier:
 
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
-        for epoch in range(self.args.finetune_start_epoch, self.args.finetune_epochs):
-            print('\nEpoch {}/{}'.format(epoch, (self.args.finetune_epochs - self.args.finetune_start_epoch)))
+        for epoch in range(self.args.finetune_epochs):
+            # Decay Learning Rate
+            self.scheduler.step()
+
+            print('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, round(self.scheduler.get_lr(), 5)))
             print('-' * 10)
 
             # train for one epoch
@@ -97,8 +95,6 @@ class Classifier:
             # evaluate on validation set
             val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
             val_acc_history.append(val_acc)
-            
-            scheduler.step()
 
             # early stopping
             early_stopping(train_loss, val_loss)

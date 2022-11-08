@@ -23,7 +23,7 @@ class Pretrainer:
         self.args = args
         self.writer = writer
 
-    def base_pretrain(self, encoder, train_loader, lr, epochs, trainingType) -> None:
+    def base_pretrain(self, encoder, train_loader, epochs, trainingType) -> None:
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"
         print(f"{trainingType.value} pretraining in progress, please wait...")
 
@@ -41,6 +41,9 @@ class Pretrainer:
         optimizer = trainer.optimizer
 
         for epoch in range(self.args.start_epoch, epochs):
+            # Decay Learning Rate
+            trainer.scheduler.step()
+            
             print('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
             print('-' * 10)
 
@@ -50,7 +53,7 @@ class Pretrainer:
                 best_epoch_loss = epoch_loss
                 save_state(self.args, model, optimizer, pretrain_level)
 
-            print(f"Epoch Loss: {epoch_loss / len(train_loader)}\t lr: {round(lr, 5)}")
+            print(f"Epoch Loss: {epoch_loss / len(train_loader)}\t lr: {round(trainer.scheduler.get_lr(), 5)}")
             print('-' * 10)
             self.args.current_epoch += 1
 
@@ -71,7 +74,7 @@ class Pretrainer:
         else:
             NotImplementedError
 
-        self.base_pretrain(encoder, train_loader, self.args.base_lr, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
 
     def second_pretrain(self) -> None:
@@ -87,4 +90,4 @@ class Pretrainer:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        self.base_pretrain(encoder, loader, self.args.target_lr, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
+        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)

@@ -1,3 +1,4 @@
+from sched import scheduler
 import numpy as np
 import torch
 import torch.distributed as dist
@@ -114,7 +115,7 @@ class MYOWTrainer(BYOLTrainer):
         else:
             params = self.model.parameters()
 
-        self.optimizer, _ = load_optimizer(self.args, params, state, self.train_params)
+        self.optimizer, self.scheduler = load_optimizer(self.args, params, state, self.train_params)
 
         self.loss = CosineLoss().to(self.device)
         self.symmetric_loss = symmetric_loss
@@ -167,6 +168,8 @@ class MYOWTrainer(BYOLTrainer):
             self.update_learning_rate(self.step)
             self.update_momentum(self.step)
             self.update_mined_loss_weight(self.step)
+
+            # Clear gradients w.r.t. parameters
             self.optimizer.zero_grad()
 
             inputs = self.prepare_views(inputs) # outputs view1 and view2 (pre-gpu-transform)
@@ -178,13 +181,16 @@ class MYOWTrainer(BYOLTrainer):
                 view1 = self.transform_1(view1)
                 view2 = self.transform_2(view2)
 
-            # forward
+            # Forward pass to get output/logits
             outputs = self.model({'online_view': view1, 'target_view':view2})
             weight = 1 / (1. + self.mined_loss_weight)
             if self.symmetric_loss:
                 weight /= 2.
+
+            # Calculate Loss: softmax --> cross entropy loss
             loss = weight * self.forward_loss(outputs['online_q'], outputs['target_z'])
 
+            # Getting gradients w.r.t. parameters
             if self.mined_loss_weight > 0 and not self.symmetric_loss:
                 with self.model.no_sync():
                     loss.backward()
@@ -240,6 +246,7 @@ class MYOWTrainer(BYOLTrainer):
                 loss = weight * self.forward_loss(outputs_mined['online_q_m'], outputs_mined['target_v'])
                 loss.backward()
 
+            # Updating parameters
             self.optimizer.step()
 
             # update moving average

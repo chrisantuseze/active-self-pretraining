@@ -8,6 +8,7 @@ class Params:
     image_size: int
     lr: int
     epochs: int
+    optimizer: str
 
 class TrainingType(Enum):
     BASE_PRETRAIN = "Base"

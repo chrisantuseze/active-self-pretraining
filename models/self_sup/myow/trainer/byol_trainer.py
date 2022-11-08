@@ -86,7 +86,7 @@ class BYOLTrainer():
         else:
             params = self.model.parameters()
 
-        self.optimizer, scheduler = load_optimizer(self.args, params, None, self.train_params)
+        self.optimizer, self.scheduler = load_optimizer(self.args, params, None, self.train_params)
 
         self.loss = CosineLoss().to(self.device)
         self.symmetric_loss = symmetric_loss

@@ -94,11 +94,41 @@ def get_params(args, training_type):
     target_image_size = args.target_image_size
 
     params = {
-        TrainingType.ACTIVE_LEARNING: Params(batch_size=args.al_batch_size, image_size=target_image_size, lr=args.al_lr, epochs=args.al_epochs),
-        TrainingType.AL_FINETUNING: Params(batch_size=args.al_finetune_batch_size, image_size=target_image_size, lr=args.al_lr, epochs=args.al_epochs),
-        TrainingType.BASE_PRETRAIN: Params(batch_size=args.base_batch_size, image_size=base_image_size, lr=args.base_lr, epochs=args.base_epochs),
-        TrainingType.TARGET_PRETRAIN: Params(batch_size=args.target_batch_size, image_size=target_image_size, lr=args.target_lr, epochs=args.target_epochs),
-        TrainingType.FINETUNING: Params(batch_size=args.finetune_batch_size, image_size=args.finetune_image_size, lr=args.finetune_lr, epochs=args.finetune_epochs),
+        TrainingType.ACTIVE_LEARNING: Params(
+            batch_size=args.al_batch_size, 
+            image_size=target_image_size, 
+            lr=args.al_lr, 
+            epochs=args.al_epochs,
+            optimizer=args.target_optimizer
+            ),
+        TrainingType.AL_FINETUNING: Params(
+            batch_size=args.al_finetune_batch_size, 
+            image_size=target_image_size, 
+            lr=args.al_lr, 
+            epochs=args.al_epochs,
+            optimizer=args.target_optimizer
+            ),
+        TrainingType.BASE_PRETRAIN: Params(
+            batch_size=args.base_batch_size, 
+            image_size=base_image_size, 
+            lr=args.base_lr, 
+            epochs=args.base_epochs,
+            optimizer=args.base_optimizer
+            ),
+        TrainingType.TARGET_PRETRAIN: Params(
+            batch_size=args.target_batch_size, 
+            image_size=target_image_size, 
+            lr=args.target_lr, 
+            epochs=args.target_epochs,
+            optimizer=args.target_optimizer
+            ),
+        TrainingType.FINETUNING: Params(
+            batch_size=args.finetune_batch_size, 
+            image_size=args.finetune_image_size, 
+            lr=args.finetune_lr, 
+            epochs=args.finetune_epochs,
+            optimizer=args.finetune_optimizer
+            ),
     }
     return params[training_type]
 

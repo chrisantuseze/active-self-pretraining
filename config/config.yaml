@@ -11,6 +11,7 @@ seed: 42                        # sacred handles automatic seeding when passed i
 base_batch_size: 16             # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
+base_optimizer: "Adam"           # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
 base_epochs: 50                 # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
@@ -26,6 +27,7 @@ target_batch_size: 16           # ensure that you get a non-fraction when you do
 target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 128
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
+target_optimizer: "SGD"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
@@ -34,7 +36,6 @@ resnet: "resnet50"
 projection_dim: 64              # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
-optimizer: "Adam"               # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 weight_decay: 1.0e-4            # "optimized using LARS [...] and weight decay of 1.0e−4" try changing to 1.0e-6 to see the performance
 temperature: 0.5                # see appendix B.7.: Optimal temperature under different batch sizes
 
@@ -48,8 +49,8 @@ finetune_dataset: 3             # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CL
 finetune: True
 finetune_batch_size: 32         # this should be tested at 16 as well
 finetune_lr: 0.003              # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2
+finetune_optimizer: "SGD"       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 finetune_image_size: 128
-finetune_start_epoch: 0
 finetune_epochs: 100            # this needs to be increased to 90
 finetune_momentum: 0.9          # momentum of SGD solver
 finetune_weight_decay: 1.0e-6            # "optimized using LARS [...] and weight decay of 1.0e−6"
