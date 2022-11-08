@@ -34,9 +34,9 @@ class Classifier:
             num_classes = 345
             self.dir = "/sketch"
 
-        elif args.finetune_dataset == DatasetType.CHEST_XRAY.value:
-            num_classes = 2
-            self.dir = "/chest_xray"
+        elif args.finetune_dataset == DatasetType.QUICKDRAW.value:
+            num_classes = 345
+            self.dir = "/quickdraw"
 
         elif args.finetune_dataset == DatasetType.UCMERCED.value:
             num_classes = 21
@@ -47,7 +47,7 @@ class Classifier:
             self.dir = "/imagenet"
 
         elif args.finetune_dataset == DatasetType.CIFAR10.value:
-            num_classes = 21
+            num_classes = 10
             self.dir = "/cifar10"
         
         else: 

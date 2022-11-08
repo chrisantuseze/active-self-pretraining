@@ -3,7 +3,7 @@ from enum import Enum
 class DatasetType(Enum):
     IMAGENET = 0
     CIFAR10 = 1
-    CHEST_XRAY = 2
+    QUICKDRAW = 2
     SKETCH = 3
     CLIPART = 4
     UCMERCED=5

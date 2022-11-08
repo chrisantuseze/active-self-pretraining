@@ -50,9 +50,9 @@ class TargetDataset():
     
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
-    if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
-        print("using the Chest X-Ray dataset")
-        return TargetDataset(args, "/chest_xray", training_type)
+    if args.target_dataset == dataset_enum.DatasetType.QUICKDRAW.value:
+        print("using the QUICKDRAW dataset")
+        return TargetDataset(args, "/quickdraw", training_type)
     
     elif args.target_dataset == dataset_enum.DatasetType.SKETCH.value:
         print("using the SKETCH dataset")

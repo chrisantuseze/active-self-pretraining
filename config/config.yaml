@@ -24,7 +24,7 @@ global_step: 0
 target_dataset: 3               # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CLIPART. UCMerced seems to be a bad dataset
 target_batch_size: 16           # ensure that you get a non-fraction when you do len(dataset)/batch_size
 target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 64
+target_image_size: 128
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
@@ -43,16 +43,12 @@ model_path: "save"              # set to the directory containing `checkpoint_##
 epoch_num: 50                    # set to checkpoint number
 reload: False                   # indicates whether to start the training from the checkpoint or not
 
-# logistic regression options
-logistic_batch_size: 256
-logistic_epochs: 500
-
 # finetuning options
 finetune_dataset: 3             # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CLIPART. Ideally this should be same as the target_dataset, however some datasets don't have the train folder
 finetune: True
 finetune_batch_size: 32         # this should be tested at 16 as well
 finetune_lr: 0.003              # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2
-finetune_image_size: 64
+finetune_image_size: 128
 finetune_start_epoch: 0
 finetune_epochs: 100            # this needs to be increased to 90
 finetune_momentum: 0.9          # momentum of SGD solver
