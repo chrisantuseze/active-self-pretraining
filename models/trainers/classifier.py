@@ -11,7 +11,7 @@ from models.heads.logloss_head import LogLossHead
 from models.utils.commons import accuracy, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
-from utils.commons import load_saved_state, simple_save_model
+from utils.commons import load_saved_state, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -38,6 +38,10 @@ class Classifier:
             num_classes = 2
             self.dir = "/chest_xray"
 
+        elif args.finetune_dataset == DatasetType.UCMERCED.value:
+            num_classes = 21
+            self.dir = "/ucmerced/images"
+
         elif args.finetune_dataset == DatasetType.IMAGENET.value:
             num_classes = 200
             self.dir = "/imagenet"
@@ -51,6 +55,11 @@ class Classifier:
 
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model.fc = nn.Linear(n_features, num_classes)
+
+        conti = True
+        if conti:
+            self.model.load_state_dict(simple_load_model(self.args, 'classifier_0.027774_acc.pth'), strict=False)
+
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
@@ -86,7 +95,7 @@ class Classifier:
             train_loss, train_acc = self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
 
             # evaluate on validation set
-            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc)
+            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
             val_acc_history.append(val_acc)
             
             scheduler.step()
@@ -99,7 +108,7 @@ class Classifier:
 
         time_elapsed = time.time() - since
         print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        print('Best val Acc: {:4f}'.format(best_acc))
+        print('Best val Acc: {:3f}'.format(best_acc * 100))
 
         # load best model weights
         self.model.load_state_dict(best_model_wts)
@@ -125,7 +134,7 @@ class Classifier:
             loss.backward()
             optimizer.step()
 
-            if step % 25 == 0:
+            if step % 250 == 0:
                 print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
@@ -138,7 +147,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, model, criterion, best_acc) -> None:    
+    def validate(self, val_loader, model, criterion, best_acc, best_model_wts) -> None:    
         model.eval()
 
         loss = 0.0
@@ -153,7 +162,7 @@ class Classifier:
                 loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
-                if step % 25 == 0:
+                if step % 150 == 0:
                     print(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics

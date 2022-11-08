@@ -6,4 +6,5 @@ class DatasetType(Enum):
     CHEST_XRAY = 2
     SKETCH = 3
     CLIPART = 4
-    IMAGENET_LITE = 5
+    UCMERCED=5
+    IMAGENET_LITE = 6

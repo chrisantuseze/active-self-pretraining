@@ -61,6 +61,10 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
     elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
         print("using the CLIPART dataset")
         return TargetDataset(args, "/clipart", training_type)
+
+    elif args.target_dataset == dataset_enum.DatasetType.UCMERCED.value:
+        print("using the UCMERCED dataset")
+        return TargetDataset(args, "/ucmerced/images", training_type)
     
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET.value:
         print("using the IMAGENET dataset")
