@@ -4,6 +4,7 @@ from torchvision.transforms import ToTensor, Compose
 
 from models.active_learning.pretext_dataloader import MakeBatchLoader
 from models.self_sup.simclr.transformation import TransformsSimCLR
+from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
@@ -30,11 +31,14 @@ class TargetDataset():
         if self.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
 
+        if self.method == SSL_Method.DCL.value:
+            transforms = TransformsDCL(self.image_size)
+
         elif self.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])
 
         else:
-            NotImplementedError
+            ValueError
 
         dataset = self.get_dataset(transforms)
 
@@ -71,4 +75,4 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
         return TargetDataset(args, "/imagenet", training_type)
 
     else:
-        NotImplementedError
+        ValueError

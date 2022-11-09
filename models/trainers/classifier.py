@@ -8,7 +8,7 @@ from datautils.dataset_enum import DatasetType
 from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
-from models.self_sup.simclr.modules.optimizer import load_optimizer
+from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping

@@ -4,7 +4,10 @@ import gc
 from datautils.dataset_enum import DatasetType
 
 from models.heads.nt_xent import NT_Xent
+from models.self_sup.simclr.loss.dcl_loss import DCL
+from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from models.self_sup.simclr.simclr import SimCLR
+from models.self_sup.simclr.simclr_v2 import SimCLRV2
 from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
@@ -42,16 +45,19 @@ def compute_loss_for_al(args, images, model, criterion):
     return loss, output1, output2
 
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING):
+    params = get_params(args, training_type)
     n_features = encoder.fc.in_features  # get dimensions of fc layer
 
     if args.method == SSL_Method.SIMCLR.value:
+        # criterion = NT_Xent(batch_size, args.temperature, args.world_size)
+        criterion = NTXentLoss(args)
 
-        params = get_params(args, training_type)
-        batch_size = params.batch_size
-
-        criterion = NT_Xent(batch_size, args.temperature, args.world_size)
         model = SimCLR(encoder, args.projection_dim, n_features)
         print("using SIMCLR")
+
+    elif args.method == SSL_Method.DC.value:
+        criterion = DCL(args)
+        model = SimCLRV2(n_features)
 
     else:
         NotImplementedError

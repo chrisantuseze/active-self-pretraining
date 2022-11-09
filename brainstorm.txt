@@ -23,3 +23,9 @@ image_loss.pkl should contain 30,000 images
 path_loss.pkl should contain 1000 images
 
 ensure you go through the official simclr code to ensure it correlates with yours
+
+TODO: 
+
+- Check out the Decoupled Contrastive Learning Loss paper and code for the proposed approach to improve accuracy even with small batch size and epochs
+- https://github.com/alibaba/EasyCV has a swav implementation that might work
+- https://github.com/HobbitLong/SupContrast has a good implementation of simclr

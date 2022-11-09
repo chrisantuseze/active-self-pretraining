@@ -6,9 +6,8 @@ simclr pytorch repo
 
 import torch
 import torch.nn as nn
-import torch.distributed as dist
 
-from models.self_sup.simclr.modules.gather import GatherLayer
+from models.self_sup.simclr.gather import GatherLayer
 
 
 class NT_Xent(nn.Module):

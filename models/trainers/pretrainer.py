@@ -7,6 +7,7 @@ from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.model.resnets import resnet_cifar
 from models.self_sup.myow.trainer.myow_trainer import MYOWTrainer, get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
+from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_path_loss, load_saved_state, save_state
 from datautils import dataset_enum, cifar10, imagenet
@@ -30,6 +31,9 @@ class Pretrainer:
         best_epoch_loss = 0
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
+
+        elif self.args.method == SSL_Method.DCL.value:
+            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
 
         elif self.args.method == SSL_Method.MYOW.value:
             trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)

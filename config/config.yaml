@@ -1,4 +1,4 @@
-method: 0                       # 0 for SimCLR, 1 for MYOW
+method: 1                       # 0 for SimCLR, 1 for DCL, 2 for MYOW
 
 # distributed training
 nodes: 1

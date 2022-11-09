@@ -12,7 +12,7 @@ from models.self_sup.myow.loss.cosine_loss import CosineLoss
 from models.self_sup.myow.model.byol import BYOL
 from models.self_sup.myow.model.mlp3 import MLP3
 
-from models.self_sup.simclr.modules.optimizer import load_optimizer
+from optim.optimizer import load_optimizer
 from models.utils.commons import get_params
 from utils.commons import load_saved_state
 

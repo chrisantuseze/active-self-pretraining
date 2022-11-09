@@ -9,7 +9,7 @@ from models.self_sup.myow.model import MYOW
 from models.self_sup.myow.model.mlp3 import MLP3
 from models.self_sup.myow.trainer.byol_trainer import BYOLTrainer
 from models.self_sup.myow.transformation.transformations import TransformsMYOW
-from models.self_sup.simclr.modules.optimizer import load_optimizer
+from optim.optimizer import load_optimizer
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_saved_state

@@ -9,25 +9,18 @@ with little modifications
 
 import torchvision.transforms as transforms
 
-class TransformsSimCLR():
-    """
-    A stochastic data augmentation module that transforms any given data example randomly
-    resulting in two correlated views of the same example,
-    denoted x ̃i and x ̃j, which we consider as a positive pair.
-    """
-    
+class TransformsDCL():
     def __init__(self, size):
-        s = 1
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+        normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
+                                     std=[0.2023, 0.1994, 0.2010])
 
         color_jitter = transforms.ColorJitter(
-            0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s
+           0.4, 0.4, 0.4, 0.1
         )
         self.train_transform = transforms.Compose(
             [
                 transforms.RandomResizedCrop(size=size),
-                transforms.RandomHorizontalFlip(),  # with 0.5 probability
+                transforms.RandomHorizontalFlip(p=0.5),  # with 0.5 probability
                 transforms.RandomApply([color_jitter], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
                 transforms.ToTensor(),
@@ -35,15 +28,15 @@ class TransformsSimCLR():
             ]
         )
 
+
         self.test_transform = transforms.Compose(
             [
-                transforms.Resize(size=size),
                 transforms.ToTensor(),
+                transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010])
             ]
         )
 
     def __call__(self, x):
-        # return self.train_transform(x), self.train_transform(x)
         return self.train_transform(x)
 
     def __call__test(self, x):

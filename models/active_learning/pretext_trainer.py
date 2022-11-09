@@ -6,13 +6,13 @@ from typing import List
 
 import random
 
-from datautils.imagenet import ImageNet
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
+from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 
 from models.utils.commons import get_model_criterion
 from models.utils.training_type_enum import TrainingType
@@ -34,7 +34,13 @@ class PretextTrainer():
 
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(
-                args=self.args, writer=self.writer, encoder=model, train_loader=loader, 
+                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
+                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
+                training_type=TrainingType.ACTIVE_LEARNING)
+
+        elif self.args.method == SSL_Method.DCL.value:
+            trainer = SimCLRTrainerV2(
+                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
                 training_type=TrainingType.ACTIVE_LEARNING)
 
@@ -45,7 +51,7 @@ class PretextTrainer():
                 trainingType=TrainingType.ACTIVE_LEARNING)
 
         else:
-            NotImplementedError
+            ValueError
 
         for epoch in range(self.args.al_epochs):
             print('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
@@ -82,19 +88,22 @@ class PretextTrainer():
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
         loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING).get_loader()
 
-        model.eval()
-        _preds = []
         print("Generating the top1 scores")
+        _preds = []
+        model.eval()
+
         with torch.no_grad():
-            for step, (images, _) in enumerate(loader):
-                images[0] = images[0].to(self.args.device)
-                images[1] = images[1].to(self.args.device)
+            for step, (image, _) in enumerate(loader):
+                # images[0] = images[0].to(self.args.device)
+                # images[1] = images[1].to(self.args.device)
 
-                _, _, outputs1, outputs2 = model(images[0], images[1])
+                # _, _, outputs1, outputs2 = model(images[0], images[1])
 
-                _preds.append(self.get_predictions(outputs1, outputs2))
+                image = image.to(self.args.device)
+                outputs = model(image)
+                _preds.append(self.get_predictions(outputs))
 
-                if step % 50 == 0:
+                if step % 100 == 0:
                     print(f"Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
@@ -102,19 +111,21 @@ class PretextTrainer():
         return self.get_new_samples(preds, samples)
 
 
-    def get_predictions(self, outputs1, outputs2):
-        dist1 = F.softmax(outputs1, dim=1)
-        preds1 = dist1.detach().cpu()
+    def get_predictions(self, outputs):
+        dist1 = F.softmax(outputs, dim=1)
+        preds = dist1.detach().cpu()
 
-        dist2 = F.softmax(outputs2, dim=1)
-        preds2 = dist2.detach().cpu()
+        # dist2 = F.softmax(outputs2, dim=1)
+        # preds2 = dist2.detach().cpu()
 
         # this is a hack since I don't know how else to handle it
-        randnum = random.randint(0, 1)
-        if randnum == 0:
-            return preds1
-        else:
-            return preds2
+        # randnum = random.randint(0, 1)
+        # if randnum == 0:
+        #     return preds1
+        # else:
+        #     return preds2
+
+        return preds
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
         if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
@@ -137,7 +148,7 @@ class PretextTrainer():
             indices = indices[: (len(indices)/2)]
 
         else:
-            raise NotImplementedError(f"'{self.args.al_method}' method doesn't exist")
+            raise ValueError(f"'{self.args.al_method}' method doesn't exist")
 
         new_samples = []
         for item in indices:
@@ -150,19 +161,15 @@ class PretextTrainer():
         batch_size = self.args.al_batch_size
         self.args.al_batch_size = 1
 
-        device = self.args.device #torch.device('GPU')
-
         model = encoder
         model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
-        #@TODO remember to remove this and uncomment the lines above
-        # encoder = resnet_backbone(self.args.al_backbone, pretrained=True)
-        # model, criterion = get_model_criterion(self.args, encoder, isAL=True)
-        criterion = nn.CrossEntropyLoss().to(device)
+        #TODO I see no reason why simclr should not use its loss function
+        # criterion = nn.CrossEntropyLoss().to(device)
 
-        model = model.to(device)
+        model = model.to(self.args.device)
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING).get_loader()
 
         model.eval()
@@ -171,13 +178,17 @@ class PretextTrainer():
         print("About to begin eval to make batches")
         count = 0
         with torch.no_grad():
-            for step, (images, path) in enumerate(loader):
-                images[0] = images[0].to(device)
-                images[1] = images[1].to(device)
+            for step, (image, path) in enumerate(loader):
+                # images[0] = images[0].to(device)
+                # images[1] = images[1].to(device)
 
                 # positive pair, with encoding
-                h_i, h_j, z_i, z_j = model(images[0], images[1])
-                loss = criterion(z_i, z_j)
+                # h_i, h_j, z_i, z_j = model(images[0], images[1])
+                # loss = criterion(z_i, z_j)
+
+                image = image.to(self.args.device)
+                output = model(image)
+                loss = criterion(output)
                 
                 loss = loss.item()
                 if step % 100 == 0:
@@ -198,15 +209,8 @@ class PretextTrainer():
         proxy_model = encoder
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
-        
         if path_loss is None:
             path_loss = self.make_batches(encoder)
-
-        # proxy_model, self.criterion = get_model_criterion(self.args, encoder, training_type=TrainingType.ACTIVE_LEARNING)
-        # proxy_model = proxy_model.to(self.args.device)
-
-        # optimizer = SGD(proxy_model.parameters(), lr=self.args.al_lr, momentum=0.9, weight_decay=self.args.al_weight_decay)
-        # scheduler = lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
         pretraining_sample_pool = []
         rebuild_al_model = True
@@ -222,8 +226,8 @@ class PretextTrainer():
                 # sampling
                 samplek = self.finetune(proxy_model, sample6400)
             else:
-                # first iteration: sample 4k at even intervals
-                samplek = sample6400[:5120] # this should be changed to a size of 2000
+                # first iteration: sample k at even intervals
+                samplek = sample6400[:5120]
 
             pretraining_sample_pool.extend(samplek)
 

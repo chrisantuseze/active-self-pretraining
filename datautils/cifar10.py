@@ -5,7 +5,8 @@ from torchvision.transforms import ToTensor, Compose
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
-from models.self_sup.simclr.transformation import TransformsSimCLR
+from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
+from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 
 class CIFAR10():
     def __init__(self, args, training_type=TrainingType.BASE_PRETRAIN) -> None:
@@ -19,6 +20,9 @@ class CIFAR10():
     def get_loader(self):
         if self.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
+
+        elif self.method == SSL_Method.DCL.value:
+            transforms = TransformsDCL(self.image_size)
 
         elif self.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])

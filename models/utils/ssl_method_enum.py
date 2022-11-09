@@ -2,4 +2,5 @@ from enum import Enum
 
 class SSL_Method(Enum):
     SIMCLR = 0
-    MYOW = 1
+    DCL = 1
+    MYOW = 2

@@ -1,9 +1,11 @@
 import torch
 from torchvision.transforms import ToTensor, Compose
-
+from typing import List
 from PIL import Image
 import glob
+from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
+from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.utils.commons import get_params
 from utils.commons import pil_loader
 from models.utils.training_type_enum import TrainingType
@@ -11,35 +13,10 @@ from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import DatasetType
 # import cv2
 
-
-class PretextDataset(torch.utils.data.Dataset):
-    def __init__(self, img_loss_list) -> None:
-        super(PretextDataset, self).__init__()
-        self.img_loss_list = img_loss_list
-        self.images1, self.images2 = self.get_images(self.img_loss_list)
-
-    def get_images(self, img_loss_list):
-        images1 = []
-        images2 = []
-
-        for image_loss in img_loss_list:
-            images1.append(image_loss.image1)
-            images2.append(image_loss.image2)
-
-        return images1, images2
-
-    def __len__(self):
-        return len(self.img_loss_list)
-
-    def __getitem__(self, idx):
-        image1, image2 = self.images1[idx], self.images2[idx]
-        return image1, image2
-
-
 class PretextDataLoader():
-    def __init__(self, args, img_loss_list, training_type=TrainingType.ACTIVE_LEARNING) -> None:
+    def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING) -> None:
         self.args = args
-        self.img_loss_list = img_loss_list
+        self.path_loss_list = path_loss_list
 
         self.training_type = training_type
 
@@ -49,12 +26,15 @@ class PretextDataLoader():
 
     def get_loader(self):
         if self.training_type == TrainingType.AL_FINETUNING:
-            data_size = len(self.img_loss_list)
+            data_size = len(self.path_loss_list)
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
-            self.img_loss_list = self.img_loss_list[0:new_data_size]
+            self.path_loss_list = self.path_loss_list[0:new_data_size]
 
         if self.args.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
+
+        elif self.method == SSL_Method.DCL.value:
+            transforms = TransformsDCL(self.image_size)
 
         elif self.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])
@@ -62,7 +42,7 @@ class PretextDataLoader():
         else:
             NotImplementedError
 
-        dataset = FinetuneLoader(self.args, self.img_loss_list, transforms)
+        dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.training_type == TrainingType.AL_FINETUNING)
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -72,11 +52,12 @@ class PretextDataLoader():
         return loader
 
 
-class FinetuneLoader(torch.utils.data.Dataset):
-    def __init__(self, args, pathloss_list, transform) -> None:
+class PretextDataset(torch.utils.data.Dataset):
+    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_finetune=False) -> None:
         self.args = args
         self.pathloss_list = pathloss_list
         self.transform = transform
+        self.is_finetune = is_finetune
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -90,6 +71,9 @@ class FinetuneLoader(torch.utils.data.Dataset):
             img = Image.open(path)
 
         # img = Image.fromarray(img)
+
+        if self.is_finetune:
+            return self.transform.__call__test(img), path
 
         return self.transform.__call__(img), path
 
@@ -115,7 +99,6 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         else:
             img = Image.open(self.img_path[idx])
 
-        # img = Image.fromarray(img)
-
-        x1, x2 = self.transform.__call__(img)
-        return [x1, x2], self.img_path[idx]
+        # x1, x2 = self.transform.__call__(img)
+        x = self.transform.__call__(img)
+        return x, self.img_path[idx]
