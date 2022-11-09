@@ -22,8 +22,6 @@ class DCL(object):
         """
         cross_view_distance = torch.mm(z1, z2.t())
         positive_loss = -torch.diag(cross_view_distance) / self.temperature
-        if self.weight_fn is not None:
-            positive_loss = positive_loss * self.weight_fn(z1, z2)
         neg_similarity = torch.cat((torch.mm(z1, z1.t()), cross_view_distance), dim=1) / self.temperature
         neg_mask = torch.eye(z1.size(0), device=z1.device).repeat(1, 2)
         negative_loss = torch.logsumexp(neg_similarity + neg_mask * SMALL_NUM, dim=1, keepdim=False)

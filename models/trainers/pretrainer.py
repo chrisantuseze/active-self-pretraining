@@ -29,35 +29,36 @@ class Pretrainer:
         print(f"{trainingType.value} pretraining in progress, please wait...")
 
         best_epoch_loss = 0
+        log_step = 500
         if self.args.method == SSL_Method.SIMCLR.value:
-            trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
+            trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
 
         elif self.args.method == SSL_Method.DCL.value:
-            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
+            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
 
         elif self.args.method == SSL_Method.MYOW.value:
-            trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType)
+            trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
 
         else:
-            NotImplementedError
+            ValueError
 
         model = trainer.model
         optimizer = trainer.optimizer
 
         for epoch in range(self.args.start_epoch, epochs):
-            # Decay Learning Rate
-            trainer.scheduler.step()
-            
             print('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
             print('-' * 10)
 
             epoch_loss = trainer.train_epoch()
 
+            # Decay Learning Rate
+            trainer.scheduler.step()
+
             if epoch_loss < best_epoch_loss:
                 best_epoch_loss = epoch_loss
                 save_state(self.args, model, optimizer, pretrain_level)
 
-            print(f"Epoch Loss: {epoch_loss / len(train_loader)}\t lr: {round(trainer.scheduler.get_lr(), 5)}")
+            print(f"Epoch Loss: {epoch_loss / len(train_loader)}\t lr: {trainer.scheduler.get_last_lr()}")
             print('-' * 10)
             self.args.current_epoch += 1
 

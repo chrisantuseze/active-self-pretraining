@@ -33,10 +33,10 @@ class PretextDataLoader():
         if self.args.method == SSL_Method.SIMCLR.value:
             transforms = TransformsSimCLR(self.image_size)
 
-        elif self.method == SSL_Method.DCL.value:
+        elif self.args.method == SSL_Method.DCL.value:
             transforms = TransformsDCL(self.image_size)
 
-        elif self.method == SSL_Method.MYOW.value:
+        elif self.args.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])
 
         else:

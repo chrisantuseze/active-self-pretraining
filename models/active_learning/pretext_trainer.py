@@ -58,6 +58,10 @@ class PretextTrainer():
             print('-' * 10)
 
             epoch_loss = trainer.train_epoch()
+
+            # Decay Learning Rate
+            trainer.scheduler.step()
+            
             print('Train Loss: {:.4f}'.format(epoch_loss))
 
         return trainer.model

@@ -83,10 +83,7 @@ class Classifier:
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
         for epoch in range(self.args.finetune_epochs):
-            # Decay Learning Rate
-            self.scheduler.step()
-
-            print('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, round(self.scheduler.get_lr(), 5)))
+            print('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
             print('-' * 10)
 
             # train for one epoch
@@ -95,6 +92,9 @@ class Classifier:
             # evaluate on validation set
             val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
             val_acc_history.append(val_acc)
+
+            # Decay Learning Rate
+            self.scheduler.step()
 
             # early stopping
             early_stopping(train_loss, val_loss)

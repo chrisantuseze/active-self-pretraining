@@ -55,7 +55,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         model = SimCLR(encoder, args.projection_dim, n_features)
         print("using SIMCLR")
 
-    elif args.method == SSL_Method.DC.value:
+    elif args.method == SSL_Method.DCL.value:
         criterion = DCL(args)
         model = SimCLRV2(n_features)
 
@@ -78,14 +78,6 @@ def get_params_to_update(model, feature_extract):
         for name, param in model.named_parameters():
             if param.requires_grad == True:
                 params_to_update.append(param)
-                # print("\t", name)
-    else:
-        None
-        # no need to do anything, just update all the params
-
-        # for name, param in model.named_parameters():
-        #     if param.requires_grad == True:
-        #         print("\t",name)
 
     return params_to_update
 
