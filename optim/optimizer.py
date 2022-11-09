@@ -5,7 +5,7 @@ simclr pytorch repo
 '''
 
 import torch
-from torch.optim.lr_scheduler import StepLR, ExponentialLR
+from torch.optim.lr_scheduler import StepLR, ExponentialLR, CosineAnnealingLR
 from torch.optim import SGD, Adam
 
 from models.utils.training_type_enum import TrainingType
@@ -18,7 +18,14 @@ def load_optimizer(args, params, state, train_params):
     
     if train_params.optimizer == "Adam":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
-        scheduler = ExponentialLR(optimizer, gamma=0.9)
+        scheduler = ExponentialLR(optimizer, gamma=0.95)
+
+    elif train_params.optimizer == "Adam-Cosine":
+        optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
+        # this could be implemented to allow for a restart of the learning rate after a certain number of epochs. To do this, simply call
+        # line 34 in the check for the number of epochs
+        steps = 20
+        scheduler = CosineAnnealingLR(optimizer, steps)
 
     elif train_params.optimizer == "SGD":
         optimizer = SGD(params, lr=train_params.lr, momentum=args.momentum, nesterov=True)
@@ -26,7 +33,7 @@ def load_optimizer(args, params, state, train_params):
         # step_size: at how many multiples of epoch you decay
         # step_size = 1, after every 1 epoch, new_lr = lr*gamma 
         # gamma = decaying factor
-        scheduler = StepLR(optimizer, step_size=5, gamma=0.5)
+        scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
 
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling

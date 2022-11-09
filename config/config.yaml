@@ -11,7 +11,7 @@ seed: 42                        # sacred handles automatic seeding when passed i
 base_batch_size: 32             # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "Adam"           # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+base_optimizer: "Adam"          # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
 base_epochs: 100                 # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
@@ -27,7 +27,7 @@ target_batch_size: 16           # ensure that you get a non-fraction when you do
 target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 128
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_optimizer: "SGD"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+target_optimizer: "Adam-Cosine"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
