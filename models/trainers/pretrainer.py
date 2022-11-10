@@ -24,11 +24,10 @@ class Pretrainer:
         self.args = args
         self.writer = writer
 
-    def base_pretrain(self, encoder, train_loader, epochs, trainingType) -> None:
+    def base_pretrain(self, encoder, train_loader, epochs, trainingType, optimizer_type) -> None:
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"
         print(f"{trainingType.value} pretraining in progress, please wait...")
 
-        best_epoch_loss = 0
         log_step = 500
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
@@ -54,15 +53,14 @@ class Pretrainer:
             # Decay Learning Rate
             trainer.scheduler.step()
 
-            if epoch_loss < best_epoch_loss:
-                best_epoch_loss = epoch_loss
-                save_state(self.args, model, optimizer, pretrain_level)
+            if epoch > 0 and epoch % 20 == 0:
+                save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
-            print(f"Epoch Loss: {epoch_loss / len(train_loader)}\t lr: {trainer.scheduler.get_last_lr()}")
+            print(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
             print('-' * 10)
             self.args.current_epoch += 1
 
-        save_state(self.args, model, optimizer, pretrain_level)
+        save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
 
     def first_pretrain(self) -> None:
@@ -79,7 +77,7 @@ class Pretrainer:
         else:
             NotImplementedError
 
-        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
 
 
     def second_pretrain(self) -> None:
@@ -95,4 +93,4 @@ class Pretrainer:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
+        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN, optimizer_type=self.args.target_optimizer)

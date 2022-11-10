@@ -166,12 +166,9 @@ class PretextTrainer():
         self.args.al_batch_size = 1
 
         model = encoder
-        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING)
+        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=True)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
-
-        #TODO I see no reason why simclr should not use its loss function
-        # criterion = nn.CrossEntropyLoss().to(device)
 
         model = model.to(self.args.device)
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING).get_loader()
@@ -183,19 +180,15 @@ class PretextTrainer():
         count = 0
         with torch.no_grad():
             for step, (image, path) in enumerate(loader):
-                # images[0] = images[0].to(device)
-                # images[1] = images[1].to(device)
-
-                # positive pair, with encoding
-                # h_i, h_j, z_i, z_j = model(images[0], images[1])
-                # loss = criterion(z_i, z_j)
-
                 image = image.to(self.args.device)
+
                 output = model(image)
-                loss = criterion(output)
+
+                # this needs to be really looked into
+                loss = criterion(output, output)
                 
                 loss = loss.item()
-                if step % 100 == 0:
+                if step % 200 == 0:
                     print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))

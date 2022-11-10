@@ -8,13 +8,13 @@ dataset_dir: "./datasets"       # path to dataset
 
 # pretrain options
 seed: 42                        # sacred handles automatic seeding when passed in the config
-base_batch_size: 32             # the default should be 64. However, should be varied until better performance is achieved
+base_batch_size: 64             # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                   # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "Adam"          # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+base_optimizer: "Adam-Cosine"          # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
-base_epochs: 100                 # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+base_epochs: 100                # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
 base_pretrain: True 
 momentum: 0.9                   # momentum of SGD solver
@@ -23,11 +23,11 @@ global_step: 0
 
 # target pretraining options
 target_dataset: 3               # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CLIPART. UCMerced seems to be a bad dataset
-target_batch_size: 16           # ensure that you get a non-fraction when you do len(dataset)/batch_size
-target_epochs: 50               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_batch_size: 32           # ensure that you get a non-fraction when you do len(dataset)/batch_size
+target_epochs: 100               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 128
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_optimizer: "Adam-Cosine"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+target_optimizer: "SGD"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: True 
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
@@ -41,7 +41,7 @@ temperature: 0.5                # see appendix B.7.: Optimal temperature under d
 
 # reload options
 model_path: "save"              # set to the directory containing `checkpoint_##.tar` 
-epoch_num: 50                    # set to checkpoint number
+epoch_num: 100                  # set to checkpoint number
 reload: False                   # indicates whether to start the training from the checkpoint or not
 
 # finetuning options

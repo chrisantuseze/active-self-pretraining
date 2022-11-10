@@ -40,7 +40,7 @@ class PretextDataLoader():
             transforms = Compose([ToTensor()])
 
         else:
-            NotImplementedError
+            ValueError
 
         dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.training_type == TrainingType.AL_FINETUNING)
         loader = torch.utils.data.DataLoader(

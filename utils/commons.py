@@ -8,13 +8,15 @@ from PIL import Image
 from models.utils.ssl_method_enum import SSL_Method
 
 
-def save_state(args, model, optimizer, pretrain_level="1"):
+def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
     if args.method == SSL_Method.SIMCLR.value:
         prefix = "simclr"
-        optimizer_type = args.optimizer
+
+    elif args.method == SSL_Method.DCL.value:
+        prefix = "dcl"
+
     else:
         prefix = "myow"
-        optimizer_type = args.optimizer
 
     out = os.path.join(args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
@@ -30,6 +32,10 @@ def save_state(args, model, optimizer, pretrain_level="1"):
 def load_saved_state(args, recent=True, pretrain_level="1"):
     if args.method == SSL_Method.SIMCLR.value:
         prefix = "simclr"
+
+    elif args.method == SSL_Method.DCL.value:
+        prefix = "dcl"
+
     else:
         prefix = "myow"
 

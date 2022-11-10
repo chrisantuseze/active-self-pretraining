@@ -44,23 +44,26 @@ def compute_loss_for_al(args, images, model, criterion):
 
     return loss, output1, output2
 
-def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING):
+def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
     params = get_params(args, training_type)
     n_features = encoder.fc.in_features  # get dimensions of fc layer
+
+    if is_make_batches:
+        criterion = nn.CrossEntropyLoss().to(args.device)
+        model = SimCLR(encoder, args.projection_dim, n_features)
+        print("using SIMCLR")
+        return model, criterion
 
     if args.method == SSL_Method.SIMCLR.value:
         # criterion = NT_Xent(batch_size, args.temperature, args.world_size)
         criterion = NTXentLoss(args)
-
         model = SimCLR(encoder, args.projection_dim, n_features)
         print("using SIMCLR")
 
-    elif args.method == SSL_Method.DCL.value:
+    else:
         criterion = DCL(args)
         model = SimCLRV2(n_features)
-
-    else:
-        NotImplementedError
+        print("using SIMCLRv2")
 
     return model, criterion
 
