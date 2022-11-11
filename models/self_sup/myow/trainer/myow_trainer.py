@@ -1,3 +1,4 @@
+import utils.logger as logging
 from sched import scheduler
 import numpy as np
 import torch
@@ -255,7 +256,7 @@ class MYOWTrainer(BYOLTrainer):
             # log
             if self.step % self.log_step == 0:
                 # self.log_schedule(loss=loss.item())
-                print(f"Step [{self.step}/{len(self.train_dataloader)}]\t Loss: {loss}")
+                logging.info(f"Step [{self.step}/{len(self.train_dataloader)}]\t Loss: {loss}")
 
             # log images
             if self.mined_loss_weight > 0 and self.log_img_step > 0 and self.step % self.log_img_step == 0 and self.rank == 0:

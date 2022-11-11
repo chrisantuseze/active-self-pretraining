@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 import time
 import copy
+import utils.logger as logging
 from datautils.dataset_enum import DatasetType
 
 from datautils.finetune_dataset import Finetune
@@ -83,8 +84,9 @@ class Classifier:
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
         for epoch in range(self.args.finetune_epochs):
-            print('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
-            print('-' * 10)
+
+            logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
+            logging.info('-' * 10)
 
             # train for one epoch
             train_loss, train_acc = self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
@@ -103,8 +105,8 @@ class Classifier:
                 break
 
         time_elapsed = time.time() - since
-        print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        print('Best val Acc: {:3f}'.format(best_acc * 100))
+        logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        logging.info('Best val Acc: {:3f}'.format(best_acc * 100))
 
         # load best model weights
         self.model.load_state_dict(best_model_wts)
@@ -131,14 +133,14 @@ class Classifier:
             optimizer.step()
 
             if step % 250 == 0:
-                print(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
+                logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
             loss += loss.item() * images.size(0)
             corrects += torch.sum(preds == targets.data)
 
         epoch_loss, epoch_acc = accuracy(loss, corrects, train_loader)
-        print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+        logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
         return epoch_loss, epoch_acc
 
@@ -159,14 +161,14 @@ class Classifier:
                 _, preds = torch.max(outputs, 1)
 
                 if step % 150 == 0:
-                    print(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
+                    logging.info(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics
                 loss += loss.item() * images.size(0)
                 corrects += torch.sum(preds == targets.data)
 
             epoch_loss, epoch_acc = accuracy(loss, corrects, val_loader)
-            print('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+            logging.info('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
             # deep copy the model
             if epoch_acc > best_acc:

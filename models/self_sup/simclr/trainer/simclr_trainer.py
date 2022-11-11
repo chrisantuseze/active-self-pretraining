@@ -1,3 +1,4 @@
+import utils.logger as logging
 from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from optim.optimizer import load_optimizer
 from models.utils.commons import get_model_criterion, get_params
@@ -68,7 +69,7 @@ class SimCLRTrainer():
             total_loss += loss.item() * self.train_params.batch_size
 
             if step % self.log_step == 0:
-                print(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+                logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
 
             self.writer.add_scalar("Loss/train_epoch", loss, self.args.global_step)
             self.args.global_step += 1

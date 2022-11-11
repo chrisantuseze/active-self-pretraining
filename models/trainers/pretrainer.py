@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import utils.logger as logging
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.active_learning.pretext_trainer import PretextTrainer
@@ -25,8 +26,8 @@ class Pretrainer:
         self.writer = writer
 
     def base_pretrain(self, encoder, train_loader, epochs, trainingType, optimizer_type) -> None:
-        pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"
-        print(f"{trainingType.value} pretraining in progress, please wait...")
+        pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
+        logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
         log_step = 500
         if self.args.method == SSL_Method.SIMCLR.value:
@@ -45,8 +46,8 @@ class Pretrainer:
         optimizer = trainer.optimizer
 
         for epoch in range(self.args.start_epoch, epochs):
-            print('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
-            print('-' * 10)
+            logging.info('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
+            logging.info('-' * 10)
 
             epoch_loss = trainer.train_epoch()
 
@@ -56,8 +57,9 @@ class Pretrainer:
             if epoch > 0 and epoch % 20 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
-            print(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
-            print('-' * 10)
+            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
+            logging.info('-' * 10)
+
             self.args.current_epoch += 1
 
         save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
