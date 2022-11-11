@@ -6,6 +6,7 @@ import pickle
 from PIL import Image
 
 from models.utils.ssl_method_enum import SSL_Method
+from datautils.dataset_enum import get_dataset_enum
 
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
@@ -81,6 +82,7 @@ def accuracy(pred, target, topk=1):
 
 
 def save_path_loss(args, filename, image_loss_list):
+    filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
     out = os.path.join(args.model_path, filename)
 
     try:
@@ -92,6 +94,7 @@ def save_path_loss(args, filename, image_loss_list):
 
 
 def load_path_loss(args, filename):
+    filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
     out = os.path.join(args.model_path, filename)
 
     try:

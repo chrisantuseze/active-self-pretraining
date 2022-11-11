@@ -16,16 +16,16 @@ current_epoch: 0
 start_epoch: 0
 base_epochs: 100                # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                      # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
-base_pretrain: True 
+base_pretrain: False 
 momentum: 0.9                   # momentum of SGD solver
 resume: ""                      # path to latest checkpoint (default: none)
 global_step: 0
 
 # target pretraining options
-target_dataset: 3               # 2 for CHEST-XRAY,  3 for SKETCH, and  4 for CLIPART. UCMerced seems to be a bad dataset
+target_dataset: 3               # 2 for QUICKDRAW,  3 for SKETCH, and  4 for CLIPART. 7 CHEST-XRAY UCMerced seems to be a bad dataset
 target_batch_size: 32           # ensure that you get a non-fraction when you do len(dataset)/batch_size
 target_epochs: 100               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 128
+target_image_size: 64
 target_lr: 0.001                # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_optimizer: "SGD"         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: True 
@@ -57,10 +57,10 @@ finetune_weight_decay: 1.0e-6            # "optimized using LARS [...] and weigh
 
 
 # active learning options
-al_epochs: 10                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
+al_epochs: 8                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
 al_batches: 10                # the default should be kept at 10
 al_batch_size: 32               # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_finetune_batch_size: 64      # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_finetune_batch_size: 32      # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 
 al_lr: 0.03
 al_weight_decay: 5.0e-4

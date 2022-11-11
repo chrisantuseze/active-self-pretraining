@@ -7,7 +7,7 @@ from utils.commons import load_saved_state
 class SimCLRTrainerV2():
     def __init__(self, 
     args, writer, encoder, 
-    train_loader, rebuild_al_model=False, 
+    dataloader, rebuild_al_model=False, 
     pretrain_level="1", training_type=TrainingType.BASE_PRETRAIN, 
     log_step=250) -> None:
     
@@ -15,7 +15,7 @@ class SimCLRTrainerV2():
         self.writer = writer
         self.log_step = log_step
 
-        self.train_loader = train_loader
+        self.train_loader = dataloader
 
         state = None
         if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
