@@ -57,7 +57,7 @@ finetune_weight_decay: 1.0e-6            # "optimized using LARS [...] and weigh
 
 
 # active learning options
-al_epochs: 8                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
+al_epochs: 1                   # I would like to take 100 as the default, however for initial confirmation test, I would use 10
 al_batches: 10                # the default should be kept at 10
 al_batch_size: 32               # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 32      # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error

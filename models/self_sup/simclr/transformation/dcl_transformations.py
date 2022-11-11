@@ -31,13 +31,15 @@ class TransformsDCL():
 
         self.test_transform = transforms.Compose(
             [
+                transforms.Resize((size, size)),
                 transforms.ToTensor(),
                 transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010])
             ]
         )
 
-    def __call__(self, x):
-        return self.train_transform(x)
+    def __call__(self, x, is_train=True):
+        if not is_train:
+            return self.test_transform(x)
 
-    def __call__test(self, x):
-        return self.test_transform(x)
+        return self.train_transform(x)
+        
