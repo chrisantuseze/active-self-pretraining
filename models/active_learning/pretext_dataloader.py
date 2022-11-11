@@ -72,10 +72,10 @@ class PretextDataset(torch.utils.data.Dataset):
 
         # img = Image.fromarray(img)
 
-        if self.is_finetune:
-            return self.transform.__call__test(img), path
+        # if self.is_finetune:
+        #     return self.transform.transform_test(img), path
 
-        return self.transform.__call__(img), path
+        return self.transform.__call__(img, not self.is_finetune), path
 
     
 class MakeBatchLoader(torch.utils.data.Dataset):

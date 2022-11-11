@@ -42,9 +42,9 @@ class TransformsSimCLR():
             ]
         )
 
-    def __call__(self, x):
+    def __call__(self, x, is_train=True):
+        if not is_train:
+            return self.test_transform(x)
+
         # return self.train_transform(x), self.train_transform(x)
         return self.train_transform(x)
-
-    def __call__test(self, x):
-        return self.test_transform(x)
