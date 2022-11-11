@@ -66,28 +66,6 @@ class PretextTrainer():
 
         return trainer.model
 
-    def rough_finetune(self, outputs1, outputs2):
-        _, predicted1 = outputs1.max(1)
-        _, predicted2 = outputs2.max(1)
-
-        # save top1 confidence score 
-        outputs1 = F.normalize(outputs1, dim=1)
-        probs1 = F.softmax(outputs1, dim=1)
-        print(predicted1.item())
-        print(probs1[0])
-        top1score1 = probs1[0][predicted1.item()]
-
-        outputs2 = F.normalize(outputs2, dim=1)
-        probs2 = F.softmax(outputs2, dim=1)
-        top1score2 = probs2[0][predicted2.item()]
-                                                    # Honestly not sure of what I am doing here, but the idea is since the two results belong
-                                                    # to the two augmentations of the same image, so basically pick the largest score between the two :)
-        # if top1score1 >= top1score2:
-        #     top1_scores.append(top1score1)
-        # else:
-        #     top1_scores.append(top1score2)
-
-                
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
         loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING).get_loader()
@@ -102,10 +80,15 @@ class PretextTrainer():
                 # images[1] = images[1].to(self.args.device)
 
                 # _, _, outputs1, outputs2 = model(images[0], images[1])
-
                 image = image.to(self.args.device)
-                outputs = model(image)
-                _preds.append(self.get_predictions(outputs))
+
+                if self.args.method == SSL_Method.SIMCLR.value:
+                    features = model(image)
+                
+                else:
+                    features, _ = model(image)
+
+                _preds.append(self.get_predictions(features))
 
                 if step % 100 == 0:
                     print(f"Step [{step}/{len(loader)}]")
@@ -118,16 +101,6 @@ class PretextTrainer():
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
         preds = dist1.detach().cpu()
-
-        # dist2 = F.softmax(outputs2, dim=1)
-        # preds2 = dist2.detach().cpu()
-
-        # this is a hack since I don't know how else to handle it
-        # randnum = random.randint(0, 1)
-        # if randnum == 0:
-        #     return preds1
-        # else:
-        #     return preds2
 
         return preds
 
@@ -166,7 +139,7 @@ class PretextTrainer():
         self.args.al_batch_size = 1
 
         model = encoder
-        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=True)
+        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -182,14 +155,22 @@ class PretextTrainer():
             for step, (image, path) in enumerate(loader):
                 image = image.to(self.args.device)
 
-                output = model(image)
+                # output = model(image)
 
-                # this needs to be really looked into
-                loss = criterion(output, output)
+                # # this needs to be really looked into
+                # loss = criterion(output, output)
+
+                # Forward pass to get output/logits
+                feature1, output1 = model(image)
+                feature2, output2 = model(image)
+
+                # Calculate Loss: softmax --> cross entropy loss
+                loss = criterion(output1, output2) + criterion(output2, output1)
                 
                 loss = loss.item()
                 if step % 200 == 0:
                     print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
+                print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
                 count +=1

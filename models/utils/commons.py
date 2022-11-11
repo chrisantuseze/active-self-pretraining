@@ -12,38 +12,6 @@ from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
-def compute_loss(args, images, model, criterion):
-    images[0] = images[0].to(args.device)
-    images[1] = images[1].to(args.device)
-
-    loss = None
-    if args.method == SSL_Method.SIMCLR.value:
-        # positive pair, with encoding
-        h_i, h_j, z_i, z_j = model(images[0], images[1])
-        loss = criterion(z_i, z_j)
-
-    else:
-        NotImplementedError
-
-    return loss
-
-def compute_loss_for_al(args, images, model, criterion):
-    images[0] = images[0].to(args.device)
-    images[1] = images[1].to(args.device)
-
-    loss, output1, output2 = None, None, None
-    if args.method == SSL_Method.SIMCLR.value:
-        # positive pair, with encoding
-        h_i, h_j, z_i, z_j = model(images[0], images[1])
-        output1, output2 = z_i, z_j
-
-        loss = criterion(z_i, z_j)
-
-    else:
-        NotImplementedError
-
-    return loss, output1, output2
-
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
     params = get_params(args, training_type)
     n_features = encoder.fc.in_features  # get dimensions of fc layer
