@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+import utils.logger as logging
 from typing import List
 
 import random
@@ -30,7 +31,7 @@ class PretextTrainer():
 
         # convert samples to loader
         loader = PretextDataLoader(self.args, samples).get_loader()
-        print("Beginning training the proxy")
+        logging.info("Beginning training the proxy")
 
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(
@@ -54,15 +55,15 @@ class PretextTrainer():
             ValueError
 
         for epoch in range(self.args.al_epochs):
-            print('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
-            print('-' * 10)
+            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
+            logging.info('-' * 10)
 
             epoch_loss = trainer.train_epoch()
 
             # Decay Learning Rate
             trainer.scheduler.step()
             
-            print('Train Loss: {:.4f}'.format(epoch_loss))
+            logging.info('Train Loss: {:.4f}'.format(epoch_loss))
 
         return trainer.model
 
@@ -70,7 +71,7 @@ class PretextTrainer():
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
         loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING).get_loader()
 
-        print("Generating the top1 scores")
+        logging.info("Generating the top1 scores")
         _preds = []
         model.eval()
 
@@ -90,8 +91,8 @@ class PretextTrainer():
 
                 _preds.append(self.get_predictions(features))
 
-                if step % 100 == 0:
-                    print(f"Step [{step}/{len(loader)}]")
+                if step > 0 and step % 100 == 0:
+                    logging.info(f"Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
        
@@ -149,7 +150,7 @@ class PretextTrainer():
         model.eval()
         pathloss = []
 
-        print("About to begin eval to make batches")
+        logging.info("About to begin eval to make batches")
         count = 0
         with torch.no_grad():
             for step, (image, path) in enumerate(loader):
@@ -168,9 +169,8 @@ class PretextTrainer():
                 loss = criterion(output1, output2) + criterion(output2, output1)
                 
                 loss = loss.item()
-                if step % 200 == 0:
-                    print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
-                print(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
+                if step > 0 and step % 200 == 0:
+                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
                 count +=1
@@ -197,8 +197,7 @@ class PretextTrainer():
             sample6400 = path_loss[batch * 6400 : (batch + 1) * 6400] # this should be changed to a size of 6000
 
             if batch > 0:
-                print('>> Getting previous checkpoint for batch ', batch + 1)
-                print(f"Its size is {len(path_loss)}")
+                logging.info('>> Getting previous checkpoint for batch ', batch + 1)
                 proxy_model.load_state_dict(simple_load_model(self.args, f'proxy_{batch-1}.pth'), strict=False)
 
                 # sampling

@@ -29,3 +29,8 @@ TODO:
 - Check out the Decoupled Contrastive Learning Loss paper and code for the proposed approach to improve accuracy even with small batch size and epochs
 - https://github.com/alibaba/EasyCV has a swav implementation that might work
 - https://github.com/HobbitLong/SupContrast has a good implementation of simclr
+
+ssh e_chrisantus@robcog.cs.okstate.edu
+Eze@33963003
+
+scp -r CLionProjects/Group-G cheze@csx2.cs.okstate.edu:.

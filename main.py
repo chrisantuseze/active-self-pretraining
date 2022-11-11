@@ -1,5 +1,4 @@
 import os
-from operator import mod
 import numpy as np
 import torch
 import torch.nn as nn
@@ -15,6 +14,7 @@ from utils.random_seeders import set_random_seeds
 from utils.yaml_config_hook import yaml_config_hook
 from models.trainers.pretrainer import Pretrainer
 from models.trainers.classifier import Classifier
+import utils.logger as logging
 
 def main():
     writer = SummaryWriter()
@@ -32,6 +32,8 @@ def main():
         classifier.finetune()
 
 if __name__ == "__main__":
+    logging.init()
+
     parser = argparse.ArgumentParser(description="CASL")
     config = yaml_config_hook("./config/config.yaml")
     for k, v in config.items():
@@ -46,3 +48,5 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     main()
+
+    logging.info("CASL ended.")
