@@ -15,33 +15,6 @@
 
 # free_gpu_cache()  
 # 
-import numpy as np                         
 
-my_list = [
-    {
-        "name": "Osita",
-        "position": 1
-    },
-    {
-        "name": "Charles",
-        "position": 2
-    },
-    {
-        "name": "Ezinne",
-        "position": 3
-    },
-    {
-        "name": "Nna",
-        "position": 4
-    },
-    {
-        "name": "Uche",
-        "position": 5
-    },
-    {
-        "name": "Chinonso",
-        "position": 6
-    },
-]
-idx = np.argsort(my_list)
-
+import subprocess
+subprocess.Popen(["python","main.py"])

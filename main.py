@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import torch
 import torch.nn as nn
@@ -14,7 +15,24 @@ from utils.random_seeders import set_random_seeds
 from utils.yaml_config_hook import yaml_config_hook
 from models.trainers.pretrainer import Pretrainer
 from models.trainers.classifier import Classifier
-import utils.logger as logging
+#import utils.logger as logging
+import logging
+
+#logger = logging.getLogger(__name__)
+#handler = logging.StreamHandler(stream=sys.stdout)
+#logger.addHandler(handler)
+
+logging.basicConfig(filename="save/casl.log", encoding="utf-8", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
+logging.info("CASL started...")
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+sys.excepthook = handle_exception
 
 def main():
     writer = SummaryWriter()
@@ -32,7 +50,9 @@ def main():
         classifier.finetune()
 
 if __name__ == "__main__":
-    logging.init()
+    #logging.init()
+
+    #raise RuntimeError("Test unhandled")
 
     parser = argparse.ArgumentParser(description="CASL")
     config = yaml_config_hook("./config/config.yaml")

@@ -7,6 +7,7 @@ from PIL import Image
 
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import get_dataset_enum
+import logging
 
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
@@ -88,6 +89,8 @@ def save_path_loss(args, filename, image_loss_list):
     try:
         with open(out, "wb") as file:
             pickle.dump(image_loss_list, file)
+
+        logging.info("path loss saved at {out}")
 
     except IOError:
         print("File could not be opened for write operation")
