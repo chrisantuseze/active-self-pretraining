@@ -84,7 +84,6 @@ class Pretrainer:
 
     def second_pretrain(self) -> None:
         if self.args.do_al:
-
             pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
             if pretrain_data is None:
                 pretext = PretextTrainer(self.args, self.writer)

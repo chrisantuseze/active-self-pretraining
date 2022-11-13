@@ -132,7 +132,7 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        return new_samples[:5120]
+        return new_samples[:self.args.al_trainer_sample_size]
 
     def make_batches(self, encoder) -> List[PathLoss]:
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
@@ -193,9 +193,11 @@ class PretextTrainer():
         pretraining_sample_pool = []
         rebuild_al_model = True
 
+        sample_per_batch = len(path_loss)//self.args.al_batches
         for batch in range(0, self.args.al_batches): # change the '1' to '0'
-            sample6400 = path_loss[batch * 6400 : (batch + 1) * 6400] # this should be changed to a size of 6000
+            sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
+            # sketch -> 5120 | 2400 for 20 batches
             if batch > 0:
                 logging.info(f'>> Getting previous checkpoint for batch {batch + 1}')
                 proxy_model.load_state_dict(simple_load_model(self.args, f'proxy_{batch-1}.pth'), strict=False)
@@ -204,7 +206,7 @@ class PretextTrainer():
                 samplek = self.finetune(proxy_model, sample6400)
             else:
                 # first iteration: sample k at even intervals
-                samplek = sample6400[:5120]
+                samplek = sample6400[:self.args.al_trainer_sample_size]
 
             pretraining_sample_pool.extend(samplek)
 
