@@ -16,7 +16,7 @@ current_epoch: 0
 start_epoch: 0
 base_epochs: 100                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE.
-base_pretrain: False 
+base_pretrain: True 
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
 global_step: 0
