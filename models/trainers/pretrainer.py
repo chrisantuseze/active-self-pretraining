@@ -28,6 +28,7 @@ class Pretrainer:
     def base_pretrain(self, encoder, train_loader, epochs, trainingType, optimizer_type) -> None:
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
+        print(f"{trainingType.value} pretraining in progress, please wait...")
 
         log_step = 500
         if self.args.method == SSL_Method.SIMCLR.value:
