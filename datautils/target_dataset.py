@@ -74,5 +74,9 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
         print("using the IMAGENET dataset")
         return TargetDataset(args, "/imagenet", training_type)
 
+    elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
+        print("using the CIFAR10 dataset")
+        return TargetDataset(args, "/cifar10", training_type)
+
     else:
         ValueError
