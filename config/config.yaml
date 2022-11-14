@@ -15,7 +15,7 @@ base_optimizer: "Adam-Cosine"                 # or LARS (experimental) If you us
 current_epoch: 0
 start_epoch: 0
 base_epochs: 50                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-dataset: 4                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE, 4 for CLIPART
+dataset: 1                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE, 4 for CLIPART
 base_pretrain: True 
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
