@@ -69,6 +69,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"You are using {args.device}")
     args.num_gpus = torch.cuda.device_count()
     args.world_size = args.gpus * args.nodes
 
