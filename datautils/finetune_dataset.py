@@ -37,7 +37,7 @@ class Finetune():
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-        if self.args.finetune_dataset == DatasetType.IMAGENET.value:
+        if self.args.finetune_dataset == DatasetType.IMAGENET.value or self.args.finetune_dataset == DatasetType.CIFAR10.value:
             traindir = os.path.join(self.dir, 'train')
             valdir = os.path.join(self.dir, 'val')
 
