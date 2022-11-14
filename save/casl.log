@@ -953,3 +953,483 @@ Epoch 9/10 lr:
 11-14-2022 01:08:46 PM INFO Training complete in 68m 51s
 11-14-2022 01:08:46 PM INFO Best val Acc: 2.283199
 11-14-2022 01:08:47 PM INFO CASL ended.
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 6.0107951164245605
+INFO:root:Step [500/1526]	 Loss: 5.131892571668187
+INFO:root:Step [1000/1526]	 Loss: 4.914636489990112
+INFO:root:Step [1500/1526]	 Loss: 4.8217362576052
+INFO:root:Epoch Loss: 4.817314102015364	 lr: [0.029815325108927065]
+INFO:root:----------
+INFO:root:
+Epoch 1/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.61225700378418
+INFO:root:Step [500/1526]	 Loss: 4.547882609262675
+INFO:root:Step [1000/1526]	 Loss: 4.525296377016233
+INFO:root:Step [1500/1526]	 Loss: 4.511447282571304
+INFO:root:Epoch Loss: 4.510536172599343	 lr: [0.029265847744427306]
+INFO:root:----------
+INFO:root:
+Epoch 2/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.534487247467041
+INFO:root:Step [500/1526]	 Loss: 4.447181511306002
+INFO:root:Step [1000/1526]	 Loss: 4.446847152995778
+INFO:root:Step [1500/1526]	 Loss: 4.45654849732899
+INFO:root:Epoch Loss: 4.456597552230755	 lr: [0.028365097862825518]
+INFO:root:----------
+INFO:root:
+Epoch 3/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.4889302253723145
+INFO:root:Step [500/1526]	 Loss: 4.4808588694193645
+INFO:root:Step [1000/1526]	 Loss: 4.469448711726811
+INFO:root:Step [1500/1526]	 Loss: 4.480593869084124
+INFO:root:Epoch Loss: 4.481450794252468	 lr: [0.027135254915624213]
+INFO:root:----------
+INFO:root:
+Epoch 4/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.59636116027832
+INFO:root:Step [500/1526]	 Loss: 4.503555266443127
+INFO:root:Step [1000/1526]	 Loss: 4.513600779580069
+INFO:root:Step [1500/1526]	 Loss: 4.528245421745712
+INFO:root:Epoch Loss: 4.5293827913066815	 lr: [0.025606601717798213]
+INFO:root:----------
+INFO:root:
+Epoch 5/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.548282623291016
+INFO:root:Step [500/1526]	 Loss: 4.497207857653528
+INFO:root:Step [1000/1526]	 Loss: 4.502463911915873
+INFO:root:Step [1500/1526]	 Loss: 4.508423004684093
+INFO:root:Epoch Loss: 4.50848673336784	 lr: [0.023816778784387097]
+INFO:root:----------
+INFO:root:
+Epoch 6/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.5382080078125
+INFO:root:Step [500/1526]	 Loss: 4.500389416060762
+INFO:root:Step [1000/1526]	 Loss: 4.4915496805212
+INFO:root:Step [1500/1526]	 Loss: 4.52335378315193
+INFO:root:Epoch Loss: 4.524331402497398	 lr: [0.021809857496093203]
+INFO:root:----------
+INFO:root:
+Epoch 7/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.623676776885986
+INFO:root:Step [500/1526]	 Loss: 4.515826362335753
+INFO:root:Step [1000/1526]	 Loss: 4.526708006025194
+INFO:root:Step [1500/1526]	 Loss: 4.528643608093262
+INFO:root:Epoch Loss: 4.528606976625335	 lr: [0.019635254915624213]
+INFO:root:----------
+INFO:root:
+Epoch 8/50
+INFO:root:----------
+INFO:root:Step [0/1526]	 Loss: 4.5313005447387695
+INFO:root:Step [500/1526]	 Loss: 4.499918528421672
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:----------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 83, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 53, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 60.56 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:----------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 83, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 53, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 155, in forward
+    out = self.bn3(out)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/batchnorm.py", line 168, in forward
+    return F.batch_norm(
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/functional.py", line 2438, in batch_norm
+    return torch.batch_norm(
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 6.80 GiB already allocated; 264.81 MiB free; 6.83 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:----------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 83, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 53, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 22.69 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:----------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 83, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 53, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 50.12 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 82, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 52, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 50.12 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 82, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 52, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 45.94 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 82, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 52, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 53, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 49.94 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 82, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 52, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 52, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 49.94 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+ERROR:root:Uncaught exception
+Traceback (most recent call last):
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 78, in <module>
+    main()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/main.py", line 42, in main
+    pretrainer.first_pretrain()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 82, in first_pretrain
+    self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/trainers/pretrainer.py", line 52, in base_pretrain
+    epoch_loss = trainer.train_epoch()
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/trainer/simclr_trainer_v2.py", line 51, in train_epoch
+    feature2, output2 = self.model(images)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/Projects/active-self-pretraining/models/self_sup/simclr/simclr_v2.py", line 23, in forward
+    x = self.f(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torchvision/models/resnet.py", line 158, in forward
+    identity = self.downsample(x)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 139, in forward
+    input = module(input)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1130, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 457, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
+    return F.conv2d(input, weight, bias, self.stride,
+RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 61.00 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF

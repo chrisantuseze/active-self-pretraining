@@ -56,7 +56,7 @@ class PretextTrainer():
 
         for epoch in range(self.args.al_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
-            logging.info('-' * 10)
+            logging.info('-' * 20)
 
             epoch_loss = trainer.train_epoch()
 
