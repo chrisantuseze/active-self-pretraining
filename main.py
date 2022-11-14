@@ -22,7 +22,7 @@ import logging
 #handler = logging.StreamHandler(stream=sys.stdout)
 #logger.addHandler(handler)
 
-logging.basicConfig(filename="save/casl.log", encoding="utf-8", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
+logging.basicConfig(filename="save/casl.log", level=logging.INFO)
 logging.info("CASL started...")
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -69,6 +69,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"You are using {args.device}")
     args.num_gpus = torch.cuda.device_count()
     args.world_size = args.gpus * args.nodes
 

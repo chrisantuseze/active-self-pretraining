@@ -28,6 +28,7 @@ class Pretrainer:
     def base_pretrain(self, encoder, train_loader, epochs, trainingType, optimizer_type) -> None:
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
+        print(f"{trainingType.value} pretraining in progress, please wait...")
 
         log_step = 500
         if self.args.method == SSL_Method.SIMCLR.value:
@@ -77,7 +78,7 @@ class Pretrainer:
             train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         else:
-            NotImplementedError
+            train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()    
 
         self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
 

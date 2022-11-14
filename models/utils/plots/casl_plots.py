@@ -7,9 +7,9 @@ def acc_pretrain_data_plots():
     # use 25, 50, 75, and 100% of the target dataset
     # one plot for each of the datasets: 
     # 1. imagenet-sketch-quickdraw
-    ## 2. imagenet-clipart-sketch (Depends on the availability of resources)
+    ## 2. imagenet-clipart-quickdraw (Depends on the availability of resources)
     # 3. cifar10-sketch-quickdraw
-    ## 4. cifar10-clipart-sketch (Depends on the availability of resources)
+    ## 4. cifar10-clipart-quickdraw (Depends on the availability of resources)
 
     # do this for SimCLR, DCL, and MYOW/SwAV
     # so we have 4 * 2(or 4) * 3 = Total of 24 cycle of pretrainings
