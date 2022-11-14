@@ -29,6 +29,7 @@ target_image_size: 64
 target_lr: 0.001                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_optimizer: "SGD"                       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: False 
+target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 # arch options

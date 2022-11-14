@@ -91,7 +91,7 @@ class PretextTrainer():
 
                 _preds.append(self.get_predictions(features))
 
-                if step > 0 and step % 100 == 0:
+                if step > 0 and step % 500 == 0:
                     logging.info(f"Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
@@ -169,7 +169,7 @@ class PretextTrainer():
                 loss = criterion(output1, output2) + criterion(output2, output1)
                 
                 loss = loss.item()
-                if step > 0 and step % 200 == 0:
+                if step > 0 and step % 500 == 0:
                     logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))

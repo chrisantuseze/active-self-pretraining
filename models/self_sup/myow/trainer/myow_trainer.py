@@ -279,6 +279,6 @@ def get_myow_trainer(args, writer, encoder, dataloader, pretrain_level, rebuild_
                         train_dataloader=dataloader, view_pool_dataloader=dataloader, transform=transform,
                         transform_m=transform_m, exclude_bias_and_bn=True, 
                         symmetric_loss=True, view_miner_k=1,
-                        decay='cosine', m_decay='cosine', log_step=250)
+                        decay='cosine', m_decay='cosine', log_step=500)
 
     return trainer

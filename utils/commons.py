@@ -41,11 +41,17 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
     else:
         prefix = "myow"
 
-    model_fp = args.resume if recent and args.resume else os.path.join(
-            args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.epoch_num)
+    if pretrain_level == "1":
+        epoch_num = args.epoch_num
+
+    elif pretrain_level == "2":
+        epoch_num = args.target_epoch_num
+
+    out = args.resume if recent and args.resume else os.path.join(
+            args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
         )
 
-    return torch.load(model_fp, map_location=args.device.type)
+    return torch.load(out, map_location=args.device.type)
 
 
 def simple_save_model(args, model, path):

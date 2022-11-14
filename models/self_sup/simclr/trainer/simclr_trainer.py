@@ -11,7 +11,7 @@ class SimCLRTrainer():
     args, writer, encoder, 
     dataloader, rebuild_al_model=False, 
     pretrain_level="1", training_type=TrainingType.BASE_PRETRAIN, 
-    log_step=250) -> None:
+    log_step=500) -> None:
     
         self.args = args
         self.writer = writer
