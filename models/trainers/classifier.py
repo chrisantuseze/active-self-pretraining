@@ -20,10 +20,16 @@ class Classifier:
     def __init__(self, args, writer, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
 
         self.args = args
+        self.writer = writer
         # self.model = LogLossHead(self.encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
         self.model = resnet_backbone(self.args.resnet, pretrained=False)
-        state = load_saved_state(self.args, pretrain_level=pretrain_level)
+
+        if pretrain_level == "AL":
+            state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-1}.pth')
+        else:
+            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+            
         self.model.load_state_dict(state['model'], strict=False)
 
         n_features = self.model.fc.in_features
@@ -57,11 +63,6 @@ class Classifier:
 
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model.fc = nn.Linear(n_features, num_classes)
-
-        conti = True
-        if conti:
-            self.model.load_state_dict(simple_load_model(self.args, 'classifier_0.027774_acc.pth'), strict=False)
-
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)

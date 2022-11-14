@@ -41,13 +41,20 @@ def main():
         pretrainer = Pretrainer(args, writer)
         pretrainer.first_pretrain()
 
-    if args.target_pretrain:
-        pretrainer = Pretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    if args.finetune:
-        classifier = Classifier(args, writer)
+    if args.ml_project:
+        pretext = PretextTrainer(args, writer)
+        pretrain_data = pretext.do_active_learning()
+        classifier = Classifier(args, writer, pretrain_level="AL")
         classifier.finetune()
+
+    else:
+        if args.target_pretrain:
+            pretrainer = Pretrainer(args, writer)
+            pretrainer.second_pretrain()
+
+        if args.finetune:
+            classifier = Classifier(args, writer)
+            classifier.finetune()
 
 if __name__ == "__main__":
     #logging.init()
