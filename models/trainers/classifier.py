@@ -13,7 +13,7 @@ from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
-from utils.commons import load_saved_state, simple_save_model, simple_load_model
+from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -26,7 +26,7 @@ class Classifier:
         self.model = resnet_backbone(self.args.resnet, pretrained=False)
 
         if pretrain_level == "AL":
-            state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-1}.pth')
+            state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-2}.pth')
         else:
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
@@ -112,6 +112,7 @@ class Classifier:
         # load best model weights
         self.model.load_state_dict(best_model_wts)
         simple_save_model(self.args, self.model, 'classifier_{:4f}_acc.pth'.format(best_acc))
+        save_accuracy_to_file(self.args, accuracies=val_acc_history, best_accuracy=best_acc)
 
         return self.model, val_acc_history
 

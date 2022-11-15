@@ -4,6 +4,7 @@ import torch
 
 import pickle
 from PIL import Image
+from models.active_learning.al_method_enum import get_al_method_enum
 
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import get_dataset_enum
@@ -63,10 +64,14 @@ def simple_save_model(args, model, path):
     torch.save(state, out)
 
 def simple_load_model(args, path):
-    out = os.path.join(args.model_path, path)
-    checkpoint = torch.load(out)
+    try:
+        out = os.path.join(args.model_path, path)
+        checkpoint = torch.load(out)
 
-    return checkpoint['model']
+        return checkpoint['model']
+
+    except IOError:
+        return None
 
 def accuracy(pred, target, topk=1):
     assert isinstance(topk, (int, tuple))
@@ -109,6 +114,36 @@ def load_path_loss(args, filename):
     try:
         with open(out, "rb") as file:
             return pickle.load(file)
+
+    except IOError:
+        return None
+
+def save_accuracy_to_file(args, accuracies, best_accuracy):
+    dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
+    filename = "{}_{}_batch_{}".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+    out = os.path.join(args.model_path, filename)
+
+    try:
+        with open(out, "a") as file:
+            file.write("The accuracies are: \n")
+            file.write(accuracies)
+
+            file.write("\nThe best accuracy is: \n")
+            file.write(best_accuracy)
+
+            logging.info("accuracies saved saved at {out}")
+
+    except IOError:
+        print("File could not be opened for write operation")
+
+def load_accuracy_file(args):
+    dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
+    filename = "{}_{}_batch_{}".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+    out = os.path.join(args.model_path, filename)
+
+    try:
+        with open(out, "a") as file:
+            return file.readlines()
 
     except IOError:
         return None
