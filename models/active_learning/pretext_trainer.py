@@ -200,7 +200,9 @@ class PretextTrainer():
             # sketch -> 5120 | 2400 for 20 batches
             if batch > 0:
                 logging.info(f'>> Getting previous checkpoint for batch {batch + 1}')
-                proxy_model.load_state_dict(simple_load_model(self.args, f'proxy_{batch-1}.pth'), strict=False)
+
+                state = simple_load_model(self.args, f'proxy_{batch-1}.pth')
+                proxy_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
                 samplek = self.finetune(proxy_model, sample6400)

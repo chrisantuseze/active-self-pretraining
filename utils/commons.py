@@ -66,9 +66,7 @@ def simple_save_model(args, model, path):
 def simple_load_model(args, path):
     try:
         out = os.path.join(args.model_path, path)
-        checkpoint = torch.load(out)
-
-        return checkpoint['model']
+        return torch.load(out)
 
     except IOError:
         return None
