@@ -42,7 +42,7 @@ temperature: 0.5                              # see appendix B.7.: Optimal tempe
 
 # reload options
 model_path: "save"                            # directory where all checkpoints would be saved
-epoch_num: 100                                # use to determine the base checkpoint to be used for the AL cycle
+epoch_num: 50                                 # use to determine the base checkpoint to be used for the AL cycle
 reload: False                                 # indicates whether to start the training from the checkpoint or not
 
 # finetuning options

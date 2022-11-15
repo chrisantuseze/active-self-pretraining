@@ -1433,3 +1433,10 @@ Traceback (most recent call last):
   File "/home/e_chrisantus/.local/lib/python3.10/site-packages/torch/nn/modules/conv.py", line 453, in _conv_forward
     return F.conv2d(input, weight, bias, self.stride,
 RuntimeError: CUDA out of memory. Tried to allocate 256.00 MiB (GPU 0; 7.92 GiB total capacity; 7.05 GiB already allocated; 61.00 MiB free; 7.08 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+INFO:root:CASL started...
+INFO:numexpr.utils:NumExpr defaulting to 8 threads.
+INFO:root:Base pretraining in progress, please wait...
+INFO:root:
+Epoch 0/50
+INFO:root:--------------------
+INFO:root:Step [0/1875]	 Loss: 7.5374250411987305
