@@ -1,3 +1,4 @@
+from datautils.dataset_enum import DatasetType
 import utils.logger as logging
 from models.self_sup.simclr.loss.dcl_loss import DCL
 from optim.optimizer import load_optimizer
@@ -17,6 +18,12 @@ class SimCLRTrainerV2():
         self.log_step = log_step
 
         self.train_loader = dataloader
+
+        if self.args.dataset == DatasetType.IMAGENET or self.args.target_dataset == DatasetType.IMAGENET:
+            self.args.temperature = 0.1
+
+        elif self.args.dataset == DatasetType.CIFAR10 or self.args.target_dataset == DatasetType.CIFAR10:
+            self.args.temperature = 0.07
 
         state = None
         if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:

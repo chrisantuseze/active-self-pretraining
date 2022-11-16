@@ -94,7 +94,7 @@ class Classifier:
 
             # evaluate on validation set
             val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
-            val_acc_history.append(val_acc)
+            val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
             self.scheduler.step()
@@ -134,7 +134,7 @@ class Classifier:
             loss.backward()
             optimizer.step()
 
-            if step % 500 == 0:
+            if step > 0 and step % self.args.log_step == 0:
                 logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
@@ -162,7 +162,7 @@ class Classifier:
                 loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
-                if step % 500 == 0:
+                if step > 0 and step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics

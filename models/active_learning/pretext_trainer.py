@@ -33,23 +33,24 @@ class PretextTrainer():
         loader = PretextDataLoader(self.args, samples).get_loader()
         logging.info("Beginning training the proxy")
 
+        log_step = self.args.log_step
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(
                 args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                training_type=TrainingType.ACTIVE_LEARNING)
+                training_type=TrainingType.ACTIVE_LEARNING, log_step=log_step)
 
         elif self.args.method == SSL_Method.DCL.value:
             trainer = SimCLRTrainerV2(
                 args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                training_type=TrainingType.ACTIVE_LEARNING)
+                training_type=TrainingType.ACTIVE_LEARNING, log_step=log_step)
 
         elif self.args.method == SSL_Method.MYOW.value:
             trainer = get_myow_trainer(
                 args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
                 pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                trainingType=TrainingType.ACTIVE_LEARNING)
+                trainingType=TrainingType.ACTIVE_LEARNING, log_step=log_step)
 
         else:
             ValueError
@@ -169,7 +170,7 @@ class PretextTrainer():
                 loss = criterion(output1, output2) + criterion(output2, output1)
                 
                 loss = loss.item()
-                if step > 0 and step % 500 == 0:
+                if step > 0 and step % self.args.step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
