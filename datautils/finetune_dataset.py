@@ -38,40 +38,46 @@ class Finetune():
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
+        train_transforms = transforms.Compose([
+                    transforms.RandomResizedCrop(224),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    normalize,
+                ])
+
+        val_transforms = transforms.Compose([
+                    transforms.Resize(256),
+                    transforms.CenterCrop(224),
+                    transforms.ToTensor(),
+                    normalize,
+                ])
+
         if self.args.finetune_dataset == DatasetType.IMAGENET.value:
             traindir = os.path.join(self.dir, 'train')
             valdir = os.path.join(self.dir, 'val')
 
             train_dataset = datasets.ImageFolder(
                 traindir,
-                transforms.Compose([
-                    transforms.RandomResizedCrop(224),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                    normalize,
-                ]))
+                transform=train_transforms
+                )
 
             val_dataset = datasets.ImageFolder(
                 valdir,
-                transforms.Compose([
-                    transforms.Resize(256),
-                    transforms.CenterCrop(224),
-                    transforms.ToTensor(),
-                    normalize,
-                ]))
+                transform=val_transforms
+                )
 
         elif self.args.finetune_dataset == DatasetType.CIFAR10.value:
             train_dataset = torchvision.datasets.CIFAR10(
                 self.dir,
                 train=True,
                 download=True,
-                transform=transforms)
+                transform=train_transforms)
 
             val_dataset = torchvision.datasets.CIFAR10(
                 self.dir,
                 train=False,
                 download=True,
-                transform=transforms)
+                transform=val_transforms)
 
         else:
             train_dataset, val_dataset = self.split_dataset(normalize)
