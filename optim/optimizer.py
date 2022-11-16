@@ -17,8 +17,8 @@ def load_optimizer(args, params, state, train_params):
     scheduler = None
     
     if train_params.optimizer == "Adam":
-        optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
-        scheduler = ExponentialLR(optimizer, gamma=0.95)
+        optimizer = Adam(params, lr=train_params.lr)
+        scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
 
     elif train_params.optimizer == "Adam-Cosine":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
@@ -51,7 +51,7 @@ def load_optimizer(args, params, state, train_params):
             optimizer, train_params.epochs, eta_min=0, last_epoch=-1
         )
     else:
-        raise NotImplementedError
+        raise ValueError
 
     if args.reload:
             optimizer.load_state_dict(state[args.optimizer + '-optimizer'])
