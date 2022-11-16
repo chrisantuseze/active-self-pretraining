@@ -23,7 +23,7 @@ import logging
 #handler = logging.StreamHandler(stream=sys.stdout)
 #logger.addHandler(handler)
 
-logging.basicConfig(filename="datasets/casl.log", level=logging.INFO)
+# logging.basicConfig(filename="save/casl.log", level=logging.INFO)
 logging.info("CASL started...")
 
 def handle_exception(exc_type, exc_value, exc_traceback):
