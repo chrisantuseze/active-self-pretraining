@@ -127,7 +127,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
             file.write(", ".join(accuracies))
 
             file.write("\nThe best accuracy is: \n")
-            file.write(best_accuracy)
+            file.write(str(best_accuracy))
 
             logging.info("accuracies saved saved at {out}")
 
