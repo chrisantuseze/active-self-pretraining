@@ -11,10 +11,10 @@ seed: 42                                      # sacred handles automatic seeding
 base_batch_size: 256                          # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 224
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "SGD"                         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+base_optimizer: "Adam"                         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
-base_epochs: 20                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+base_epochs: 25                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 5 for IMAGENET_LITE, 4 for CLIPART
 base_pretrain: True 
 momentum: 0.9                                 # momentum of SGD solver
@@ -28,7 +28,7 @@ target_batch_size: 32                         # ensure that you get a non-fracti
 target_epochs: 50                             # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 64
 target_lr: 0.001                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_optimizer: "SGD"                       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+target_optimizer: "Adam"                       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: False 
 target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
@@ -51,9 +51,9 @@ finetune_dataset: 1                           # 1 for CIFAR10, 2 for QUICKDRAW, 
 finetune: True
 finetune_batch_size: 256                      # 
 finetune_lr: 0.003                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-finetune_optimizer: "SGD"                     # if you use LARS, then the lr needs to be decayed
+finetune_optimizer: "Adam"                     # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 224                      # this depends on the dataset used
-finetune_epochs: 10                           # this needs to be increased to 90
+finetune_epochs: 20                           # this needs to be increased to 90
 finetune_momentum: 0.9                        # momentum of SGD solver
 finetune_weight_decay: 1.0e-6                 # "optimized using LARS [...] and weight decay of 1.0e−6"
 

@@ -94,7 +94,7 @@ class Classifier:
 
             # evaluate on validation set
             val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
-            val_acc_history.append(val_acc)
+            val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
             self.scheduler.step()
