@@ -29,7 +29,7 @@ class Pretrainer:
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
-        log_step = 500
+        log_step = self.args.log_step
         if self.args.method == SSL_Method.SIMCLR.value:
             trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
 
@@ -54,7 +54,7 @@ class Pretrainer:
             # Decay Learning Rate
             trainer.scheduler.step()
 
-            if epoch > 0 and epoch % 2 == 0:
+            if epoch > 0 and epoch % 20 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
             logging.info(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
