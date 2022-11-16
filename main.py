@@ -23,7 +23,7 @@ import logging
 #handler = logging.StreamHandler(stream=sys.stdout)
 #logger.addHandler(handler)
 
-logging.basicConfig(filename="datasets/casl.log", level=logging.INFO)
+# logging.basicConfig(filename="save/casl.log", level=logging.INFO)
 logging.info("CASL started...")
 
 def handle_exception(exc_type, exc_value, exc_traceback):
@@ -43,12 +43,12 @@ def main():
         pretrainer.first_pretrain()
 
     if args.ml_project:
-        state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
-        if not state:
-            pretext = PretextTrainer(args, writer)
-            pretrain_data = pretext.do_active_learning()
+        # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
+        # if not state:
+        #     pretext = PretextTrainer(args, writer)
+        #     pretrain_data = pretext.do_active_learning()
 
-        classifier = Classifier(args, writer, pretrain_level="AL")
+        classifier = Classifier(args, writer, pretrain_level="1")
         classifier.finetune()
 
     else:

@@ -54,7 +54,7 @@ class Pretrainer:
             # Decay Learning Rate
             trainer.scheduler.step()
 
-            if epoch > 0 and epoch % 20 == 0:
+            if epoch > 0 and epoch % 2 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
             logging.info(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
