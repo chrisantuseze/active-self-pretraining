@@ -8,12 +8,11 @@ import torch
 from torch.optim.lr_scheduler import StepLR, ExponentialLR, CosineAnnealingLR
 from torch.optim import SGD, Adam
 
-from models.utils.training_type_enum import TrainingType
-
+from models.utils.training_type_enum import Params, TrainingType
 from .lars import LARS
 
 
-def load_optimizer(args, params, state, train_params):
+def load_optimizer(args, params, state, train_params: Params):
     scheduler = None
     
     if train_params.optimizer == "Adam":
@@ -28,12 +27,10 @@ def load_optimizer(args, params, state, train_params):
         scheduler = CosineAnnealingLR(optimizer, steps)
 
     elif train_params.optimizer == "SGD":
-        optimizer = SGD(params, lr=train_params.lr, momentum=args.momentum, nesterov=True)
-        
-        # step_size: at how many multiples of epoch you decay
-        # step_size = 1, after every 1 epoch, new_lr = lr*gamma 
-        # gamma = decaying factor
-        scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
+        lr = train_params.lr * train_params.batch_size/256
+        optimizer = SGD(params, lr=lr, momentum=args.momentum, nesterov=True)
+    
+        scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
 
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling
