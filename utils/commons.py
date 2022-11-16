@@ -43,7 +43,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         prefix = "myow"
 
     if pretrain_level == "2":
-        epoch_num = args.target_epochs
+        epoch_num = args.target_base_epochs
 
     else:
         epoch_num = args.base_epochs
@@ -124,7 +124,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
     try:
         with open(out, "a") as file:
             file.write("The accuracies are: \n")
-            file.write(accuracies)
+            file.write(", ".join(accuracies))
 
             file.write("\nThe best accuracy is: \n")
             file.write(best_accuracy)
