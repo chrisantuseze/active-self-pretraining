@@ -8,8 +8,8 @@ dataset_dir: "./datasets"                     # path to dataset
 
 # pretrain options
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_batch_size: 64                          # the default should be 64. However, should be varied until better performance is achieved
-base_image_size: 128
+base_batch_size: 32                          # the default should be 64. However, should be varied until better performance is achieved
+base_image_size: 256
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
 base_optimizer: "Adam"                         # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
@@ -24,9 +24,9 @@ log_step: 750
 
 # target pretraining options
 target_dataset: 1                             # 2 for QUICKDRAW,  3 for SKETCH, and  4 for CLIPART. 7 CHEST-XRAY UCMerced seems to be a bad dataset
-target_batch_size: 64                         # ensure that you get a non-fraction when you do len(dataset)/batch_size
+target_batch_size: 32                         # ensure that you get a non-fraction when you do len(dataset)/batch_size
 target_epochs: 2                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 128
+target_image_size: 256
 target_lr: 0.001                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_optimizer: "Adam"                       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 target_pretrain: False 
@@ -49,7 +49,7 @@ reload: False                                 # indicates whether to start the t
 # finetuning options
 finetune_dataset: 1                           # 1 for CIFAR10, 2 for QUICKDRAW, 3 for SKETCH, 4 for CLIPART, 7 for CHEST-XRAY. Ideally this should be same as the target_dataset, however some datasets don't have the train folder
 finetune: True
-finetune_batch_size: 128                       # 
+finetune_batch_size: 32                       # 
 finetune_lr: 0.003                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 finetune_optimizer: "Adam"                     # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 128                      # this depends on the dataset used
