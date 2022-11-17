@@ -38,9 +38,9 @@ sys.excepthook = handle_exception
 def main():
     writer = SummaryWriter()
 
-    if args.base_pretrain:
-        pretrainer = Pretrainer(args, writer)
-        pretrainer.first_pretrain()
+    # if args.base_pretrain:
+    #     pretrainer = Pretrainer(args, writer)
+    #     pretrainer.first_pretrain()
 
     if args.ml_project:
         state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
