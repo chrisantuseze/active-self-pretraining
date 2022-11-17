@@ -1,7 +1,7 @@
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
-
+import torchvision.datasets as datasets
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
@@ -30,9 +30,13 @@ class CIFAR10():
         else:
             NotImplementedError
 
-        dataset = torchvision.datasets.CIFAR10(
+        # dataset = torchvision.datasets.CIFAR10(
+        #     self.dir,
+        #     download=True,
+        #     transform=transforms)
+
+        dataset = datasets.ImageFolder(
             self.dir,
-            download=True,
             transform=transforms)
 
         loader = torch.utils.data.DataLoader(
