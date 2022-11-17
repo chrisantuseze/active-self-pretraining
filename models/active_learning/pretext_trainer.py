@@ -141,7 +141,7 @@ class PretextTrainer():
         self.args.al_batch_size = 1
 
         model = encoder
-        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False)
+        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=True)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -163,14 +163,14 @@ class PretextTrainer():
                 # loss = criterion(output, output)
 
                 # Forward pass to get output/logits
-                feature1, output1 = model(image)
-                feature2, output2 = model(image)
+                output1 = model(image)
+                output2 = model(image)
 
                 # Calculate Loss: softmax --> cross entropy loss
                 loss = criterion(output1, output2) + criterion(output2, output1)
                 
                 loss = loss.item()
-                if step > 0 and step % self.args.step == 0:
+                if step > 0 and step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
