@@ -70,7 +70,7 @@ class PretextTrainer():
 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
-        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING).get_loader()
+        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING, is_val=True).get_loader()
 
         logging.info("Generating the top1 scores")
         _preds = []
@@ -186,6 +186,8 @@ class PretextTrainer():
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
+        state = load_saved_state(self.args, pretrain_level="1")
+        proxy_model.load_state_dict(state['model'], strict=False)
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
