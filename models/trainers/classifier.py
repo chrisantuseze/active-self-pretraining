@@ -122,7 +122,7 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader, criterion, optimizer) -> None:
+    def train_single_epoch(self, train_loader, criterion, optimizer):
         self.model.train()
 
         loss = 0.0
@@ -153,7 +153,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, criterion, best_acc, best_model_wts) -> None:    
+    def validate(self, val_loader, criterion, best_acc, best_model_wts):    
         self.model.eval()
 
         loss = 0.0

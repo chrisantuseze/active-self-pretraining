@@ -39,3 +39,5 @@ sudo mv info.txt config/
 
 To move folder content up one level
 mv myfolder/* .
+
+pwd
