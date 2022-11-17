@@ -54,6 +54,10 @@ class Classifier:
             num_classes = 200
             self.dir = "/imagenet"
 
+        elif args.finetune_dataset == DatasetType.IMAGENET_LITE.value:
+            num_classes = 100
+            self.dir = "/imagenet_lite"
+
         elif args.finetune_dataset == DatasetType.CIFAR10.value:
             num_classes = 10
             self.dir = "/cifar10"
