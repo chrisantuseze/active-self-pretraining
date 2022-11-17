@@ -80,7 +80,7 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
 
     elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
         print("using the CIFAR10 dataset")
-        return TargetDataset(args, "/cifar10", training_type)
+        return TargetDataset(args, "/cifar10v2", training_type)
 
     else:
         ValueError
