@@ -54,6 +54,10 @@ class Classifier:
             num_classes = 200
             self.dir = "/imagenet"
 
+        elif args.finetune_dataset == DatasetType.IMAGENET_LITE.value:
+            num_classes = 100
+            self.dir = "/imagenet_lite"
+
         elif args.finetune_dataset == DatasetType.CIFAR10.value:
             num_classes = 10
             self.dir = "/cifar10"
@@ -72,8 +76,10 @@ class Classifier:
 
         self.criterion = nn.CrossEntropyLoss().to(self.args.device)
 
-    def finetune(self) -> None:
-        train_loader, val_loader = Finetune(self.args, dir=self.dir, training_type=TrainingType.FINETUNING).get_loader()
+    def finetune(self, pretrain_data=None) -> None:
+        train_loader, val_loader = Finetune(
+            self.args, dir=self.dir, 
+            training_type=TrainingType.FINETUNING).get_loader(pretrain_data=pretrain_data)
 
         since = time.time()
 
@@ -90,10 +96,10 @@ class Classifier:
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader, self.model, self.criterion, self.optimizer)
+            train_loss, train_acc = self.train_single_epoch(train_loader, self.criterion, self.optimizer)
 
             # evaluate on validation set
-            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.model, self.criterion, best_acc, best_model_wts)
+            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.criterion, best_acc, best_model_wts)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -116,8 +122,8 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader, model, criterion, optimizer) -> None:
-        model.train()
+    def train_single_epoch(self, train_loader, criterion, optimizer):
+        self.model.train()
 
         loss = 0.0
         corrects = 0
@@ -127,7 +133,7 @@ class Classifier:
             targets = targets.to(self.args.device)
 
             # compute output
-            outputs = model(images)
+            outputs = self.model(images)
             loss = criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
@@ -147,8 +153,8 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, model, criterion, best_acc, best_model_wts) -> None:    
-        model.eval()
+    def validate(self, val_loader, criterion, best_acc, best_model_wts):    
+        self.model.eval()
 
         loss = 0.0
         corrects = 0
@@ -158,7 +164,7 @@ class Classifier:
                 targets = targets.to(self.args.device)
 
                 # compute output
-                outputs = model(images)
+                outputs = self.model(images)
                 loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
@@ -175,6 +181,6 @@ class Classifier:
             # deep copy the model
             if epoch_acc > best_acc:
                 best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(model.state_dict())
+                best_model_wts = copy.deepcopy(self.model.state_dict())
 
         return epoch_loss, epoch_acc, best_acc, best_model_wts

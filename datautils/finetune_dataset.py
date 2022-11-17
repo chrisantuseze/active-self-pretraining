@@ -5,6 +5,7 @@ from torch.utils.data import random_split
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from datautils.dataset_enum import DatasetType
+from models.active_learning.pretext_dataloader import PretextDataLoader
 
 from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
@@ -34,7 +35,19 @@ class Finetune():
         train_ds, val_ds = random_split(dataset=dataset, lengths=[train_size, val_size])
         return train_ds, val_ds
 
-    def get_loader(self):
+    def get_loader(self, pretrain_data=None):
+
+        if pretrain_data:
+            train_loader = PretextDataLoader(
+                self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN, 
+                is_val=False).get_loader()
+
+            val_loader = PretextDataLoader(
+                self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN, 
+                is_val=True).get_loader()
+
+            return train_loader, val_loader 
+
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
@@ -52,7 +65,7 @@ class Finetune():
                     normalize,
                 ])
 
-        if self.args.finetune_dataset == DatasetType.IMAGENET.value:
+        if self.args.finetune_dataset == DatasetType.IMAGENET.value or self.args.finetune_dataset == DatasetType.IMAGENET_LITE.value:
             traindir = os.path.join(self.dir, 'train')
             valdir = os.path.join(self.dir, 'val')
 

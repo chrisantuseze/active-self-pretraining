@@ -14,11 +14,12 @@ from datautils.dataset_enum import DatasetType
 # import cv2
 
 class PretextDataLoader():
-    def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING) -> None:
+    def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING, is_val=False) -> None:
         self.args = args
         self.path_loss_list = path_loss_list
 
         self.training_type = training_type
+        self.is_val = is_val
 
         params = get_params(args, training_type)
         self.image_size = params.image_size
@@ -42,7 +43,7 @@ class PretextDataLoader():
         else:
             ValueError
 
-        dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.training_type == TrainingType.AL_FINETUNING)
+        dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
@@ -53,11 +54,11 @@ class PretextDataLoader():
 
 
 class PretextDataset(torch.utils.data.Dataset):
-    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_finetune=False) -> None:
+    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_val=False) -> None:
         self.args = args
         self.pathloss_list = pathloss_list
         self.transform = transform
-        self.is_finetune = is_finetune
+        self.is_val = is_val
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -72,10 +73,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         # img = Image.fromarray(img)
 
-        # if self.is_finetune:
-        #     return self.transform.transform_test(img), path
-
-        return self.transform.__call__(img, not self.is_finetune), path
+        return self.transform.__call__(img, not self.is_val), path
 
     
 class MakeBatchLoader(torch.utils.data.Dataset):

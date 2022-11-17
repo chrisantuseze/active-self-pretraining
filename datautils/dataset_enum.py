@@ -14,6 +14,9 @@ def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
         return "imagenet"
 
+    if value == DatasetType.IMAGENET_LITE.value:
+        return "imagenet_lite"
+
     if value == DatasetType.CIFAR10.value:
         return "cifar10"
 
