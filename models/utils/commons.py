@@ -57,13 +57,14 @@ def get_params_to_update(model, feature_extract):
     return params_to_update
 
 def get_params(args, training_type):
-    if args.dataset == DatasetType.CIFAR10.value:
-        base_image_size = 32
-    elif args.dataset == DatasetType.IMAGENET.value:
-        base_image_size = 64
-    else:
-        base_image_size = args.base_image_size
+    # if args.dataset == DatasetType.CIFAR10.value:
+    #     base_image_size = 32
+    # elif args.dataset == DatasetType.IMAGENET.value:
+    #     base_image_size = 64
+    # else:
+    #     base_image_size = args.base_image_size
         
+    base_image_size = args.base_image_size
     target_image_size = args.target_image_size
 
     params = {
