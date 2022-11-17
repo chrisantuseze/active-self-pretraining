@@ -33,26 +33,30 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
     args.resume = out
 
 def load_saved_state(args, recent=True, pretrain_level="1"):
-    if args.method == SSL_Method.SIMCLR.value:
-        prefix = "simclr"
+    try:
+        if args.method == SSL_Method.SIMCLR.value:
+            prefix = "simclr"
 
-    elif args.method == SSL_Method.DCL.value:
-        prefix = "dcl"
+        elif args.method == SSL_Method.DCL.value:
+            prefix = "dcl"
 
-    else:
-        prefix = "myow"
+        else:
+            prefix = "myow"
 
-    if pretrain_level == "2":
-        epoch_num = args.target_base_epochs
+        if pretrain_level == "2":
+            epoch_num = args.target_base_epochs
 
-    else:
-        epoch_num = args.base_epochs
+        else:
+            epoch_num = args.base_epochs
 
-    out = args.resume if recent and args.resume else os.path.join(
-            args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
-        )
+        out = args.resume if recent and args.resume else os.path.join(
+                args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+            )
 
-    return torch.load(out, map_location=args.device.type)
+        return torch.load(out, map_location=args.device.type)
+
+    except IOError:
+        return None
 
 
 def simple_save_model(args, model, path):

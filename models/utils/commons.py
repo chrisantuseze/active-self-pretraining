@@ -13,8 +13,12 @@ from models.utils.training_type_enum import Params, TrainingType
 
 
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
-    params = get_params(args, training_type)
-    n_features = encoder.fc.in_features  # get dimensions of fc layer
+    
+    try:
+        n_features = encoder.fc.in_features  # get dimensions of fc layer
+    except Exception:
+        n_features = 512 #I don't know what causes this erratic behavior yet. I am still investigating it
+        print(encoder)
 
     if is_make_batches:
         criterion = nn.CrossEntropyLoss().to(args.device)
@@ -53,13 +57,14 @@ def get_params_to_update(model, feature_extract):
     return params_to_update
 
 def get_params(args, training_type):
-    if args.dataset == DatasetType.CIFAR10.value:
-        base_image_size = 32
-    elif args.dataset == DatasetType.IMAGENET.value:
-        base_image_size = 64
-    else:
-        base_image_size = args.base_image_size
+    # if args.dataset == DatasetType.CIFAR10.value:
+    #     base_image_size = 32
+    # elif args.dataset == DatasetType.IMAGENET.value:
+    #     base_image_size = 64
+    # else:
+    #     base_image_size = args.base_image_size
         
+    base_image_size = args.base_image_size
     target_image_size = args.target_image_size
 
     params = {
