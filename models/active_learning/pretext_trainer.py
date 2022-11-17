@@ -141,7 +141,7 @@ class PretextTrainer():
         self.args.al_batch_size = 1
 
         model = encoder
-        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False)
+        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=True)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
