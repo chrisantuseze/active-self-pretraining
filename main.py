@@ -10,7 +10,7 @@ import argparse
 from torch.utils.tensorboard import SummaryWriter
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
-from utils.commons import simple_load_model
+from utils.commons import load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
 
 from utils.yaml_config_hook import yaml_config_hook
@@ -39,8 +39,10 @@ def main():
     writer = SummaryWriter()
 
     if args.base_pretrain:
-        pretrainer = Pretrainer(args, writer)
-        pretrainer.first_pretrain()
+        state = load_saved_state(args, pretrain_level="1")
+        if not state:
+            pretrainer = Pretrainer(args, writer)
+            pretrainer.first_pretrain()
 
     if args.ml_project:
         state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')

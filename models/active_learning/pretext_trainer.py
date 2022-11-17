@@ -186,8 +186,6 @@ class PretextTrainer():
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
-        state = load_saved_state(self.args, pretrain_level="1")
-        proxy_model.load_state_dict(state['model'], strict=False)
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:

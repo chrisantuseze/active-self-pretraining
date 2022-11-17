@@ -14,6 +14,7 @@ from models.utils.training_type_enum import Params, TrainingType
 
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
     params = get_params(args, training_type)
+    print(encoder)
     n_features = encoder.fc.in_features  # get dimensions of fc layer
 
     if is_make_batches:
