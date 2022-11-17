@@ -30,14 +30,14 @@ class CIFAR10():
         else:
             NotImplementedError
 
-        # dataset = torchvision.datasets.CIFAR10(
-        #     self.dir,
-        #     download=True,
-        #     transform=transforms)
-
-        dataset = datasets.ImageFolder(
+        dataset = torchvision.datasets.CIFAR10(
             self.dir,
+            download=True,
             transform=transforms)
+
+        # dataset = datasets.ImageFolder(
+        #     self.dir,
+        #     transform=transforms)
 
         loader = torch.utils.data.DataLoader(
             dataset,
