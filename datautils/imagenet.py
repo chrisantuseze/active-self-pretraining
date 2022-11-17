@@ -18,7 +18,7 @@ class ImageNet():
         
         params = get_params(args, training_type)
         self.image_size = params.image_size
-        self.batch_size = 64#params.batch_size
+        self.batch_size = params.batch_size
 
     def get_loader(self):
         if self.method == SSL_Method.SIMCLR.value:
