@@ -118,7 +118,7 @@ def load_path_loss(args, filename):
 
 def save_accuracy_to_file(args, accuracies, best_accuracy):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
-    filename = "{}_{}_batch_{}".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+    filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_path, filename)
 
     try:
@@ -136,7 +136,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
 
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
-    filename = "{}_{}_batch_{}".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+    filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_path, filename)
 
     try:
