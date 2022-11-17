@@ -163,8 +163,8 @@ class PretextTrainer():
                 # loss = criterion(output, output)
 
                 # Forward pass to get output/logits
-                feature1, output1 = model(image)
-                feature2, output2 = model(image)
+                output1 = model(image)
+                output2 = model(image)
 
                 # Calculate Loss: softmax --> cross entropy loss
                 loss = criterion(output1, output2) + criterion(output2, output1)
