@@ -168,6 +168,7 @@ class PretextTrainer():
 
                 # Calculate Loss: softmax --> cross entropy loss
                 loss = criterion(output1, output2) + criterion(output2, output1)
+                loss /= 4
                 
                 loss = loss.item()
                 if step % self.args.log_step == 0:
@@ -223,5 +224,3 @@ class PretextTrainer():
 
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool
-
-            
