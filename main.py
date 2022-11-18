@@ -19,11 +19,11 @@ from models.trainers.classifier import Classifier
 #import utils.logger as logging
 import logging
 
-#logger = logging.getLogger(__name__)
-#handler = logging.StreamHandler(stream=sys.stdout)
-#logger.addHandler(handler)
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(stream=sys.stdout)
+logger.addHandler(handler)
 
-# logging.basicConfig(filename="save/casl.log", level=logging.INFO)
+logging.basicConfig(filename="datasets/casl.log", level=logging.INFO)
 logging.info("CASL started...")
 
 def handle_exception(exc_type, exc_value, exc_traceback):
