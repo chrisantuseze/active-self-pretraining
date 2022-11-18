@@ -47,6 +47,6 @@ def load_optimizer(args, params, state, train_params: Params):
     else:
         raise ValueError
 
-    if args.reload:
+    if args.reload and state:
             optimizer.load_state_dict(state[args.optimizer + '-optimizer'])
     return optimizer, scheduler
