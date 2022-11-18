@@ -1,16 +1,12 @@
 import torch.nn as nn
-from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import PretextDataLoader
-from models.active_learning.pretext_trainer import PretextTrainer
+from models.trainers.base_pretrainer import BasePretrainer
 from models.utils.commons import get_params
 from optim.optimizer import load_optimizer
 import utils.logger as logging
-from models.backbones.resnet import resnet_backbone
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_path_loss, load_saved_state, save_state
-from datautils import dataset_enum, cifar10, imagenet
+from utils.commons import save_state
 
-class SupervisedPretrainer():
+class SupPretrainer(BasePretrainer):
     def __init__(self, args, writer) -> None:
         self.args = args
         self.writer = writer
@@ -73,31 +69,14 @@ class SupervisedPretrainer():
 
     def first_pretrain(self) -> None:
         # initialize ResNet
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        print("=> creating model '{}'".format(self.args.resnet))
-
-        if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value or self.args.dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
-            train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
-
-        elif self.args.dataset == dataset_enum.DatasetType.CIFAR10.value:
-            train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
-
-        else:
-             train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()  
-
+        encoder, train_loader = super().first_pretrain()
+        
         self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
 
 
     def second_pretrain(self) -> None:
-        if self.args.do_al:
-            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
-            if pretrain_data is None:
-                pretext = PretextTrainer(self.args, self.writer)
-                pretrain_data = pretext.do_active_learning()
 
-            loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
-        else:
-            loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
+        # This is a technical debt
+        encoder, loader = super().second_pretrain()
 
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
         self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN, optimizer_type=self.args.target_optimizer)

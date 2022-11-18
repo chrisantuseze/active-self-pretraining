@@ -14,7 +14,8 @@ from utils.commons import load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
 
 from utils.yaml_config_hook import yaml_config_hook
-from models.trainers.pretrainer import Pretrainer
+from models.trainers.selfsup_pretrainer import SelfSupPretrainer
+from models.trainers.sup_pretrainer import SupPretrainer
 from models.trainers.classifier import Classifier
 #import utils.logger as logging
 import logging
@@ -38,13 +39,13 @@ sys.excepthook = handle_exception
 def main():
     writer = SummaryWriter()
 
-    if args.base_pretrain:
+    if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
         if not state:
-            pretrainer = Pretrainer(args, writer)
+            pretrainer = SelfSupPretrainer(args, writer)
+            # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
-    if args.ml_project:
         state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
         if not state:
             pretext = PretextTrainer(args, writer)
@@ -54,8 +55,12 @@ def main():
         classifier.finetune()
 
     else:
+        if args.base_pretrain:
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.first_pretrain()
+
         if args.target_pretrain:
-            pretrainer = Pretrainer(args, writer)
+            pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.second_pretrain()
 
         if args.finetune:
