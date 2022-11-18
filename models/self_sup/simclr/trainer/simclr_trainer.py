@@ -17,7 +17,7 @@ class SimCLRTrainer():
         self.writer = writer
         self.log_step = log_step
 
-        self.dataloader = dataloader
+        self.train_loader = dataloader
 
         state = None
         if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
@@ -41,7 +41,7 @@ class SimCLRTrainer():
     def train_epoch(self) -> int:
         self.model.train()
 
-        for step, (image, _) in enumerate(self.dataloader):
+        for step, (image, _) in enumerate(self.train_loader):
             # Clear gradients w.r.t. parameters
             self.optimizer.zero_grad()
 
