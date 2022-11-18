@@ -73,35 +73,40 @@ def get_params(args, training_type):
             image_size=target_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
-            optimizer=args.target_optimizer
+            optimizer=args.al_optimizer,
+            weight_decay=args.al_weight_decay
             ),
         TrainingType.AL_FINETUNING: Params(
             batch_size=args.al_finetune_batch_size, 
             image_size=target_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
-            optimizer=args.target_optimizer
+            optimizer=args.target_optimizer,
+            weight_decay=args.al_weight_decay
             ),
         TrainingType.BASE_PRETRAIN: Params(
             batch_size=args.base_batch_size, 
             image_size=base_image_size, 
             lr=args.base_lr, 
             epochs=args.base_epochs,
-            optimizer=args.base_optimizer
+            optimizer=args.base_optimizer,
+            weight_decay=args.weight_decay
             ),
         TrainingType.TARGET_PRETRAIN: Params(
             batch_size=args.target_batch_size, 
             image_size=target_image_size, 
             lr=args.target_lr, 
             epochs=args.target_epochs,
-            optimizer=args.target_optimizer
+            optimizer=args.target_optimizer,
+            weight_decay=args.weight_decay
             ),
         TrainingType.FINETUNING: Params(
             batch_size=args.finetune_batch_size, 
             image_size=args.finetune_image_size, 
             lr=args.finetune_lr, 
             epochs=args.finetune_epochs,
-            optimizer=args.finetune_optimizer
+            optimizer=args.finetune_optimizer,
+            weight_decay=args.finetune_weight_decay
             ),
     }
     return params[training_type]

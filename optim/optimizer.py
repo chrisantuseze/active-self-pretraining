@@ -10,11 +10,11 @@ def load_optimizer(args, params, state, train_params: Params):
     scheduler = None
     
     if train_params.optimizer == "Adam":
-        optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
+        optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
 
     elif train_params.optimizer == "Adam-Cosine":
-        optimizer = Adam(params, lr=train_params.lr, weight_decay=args.weight_decay)
+        optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         # this could be implemented to allow for a restart of the learning rate after a certain number of epochs. To do this, simply call
         # line 34 in the check for the number of epochs
         scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
@@ -25,6 +25,10 @@ def load_optimizer(args, params, state, train_params: Params):
     
         scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
 
+    elif train_params.optimizer == "SGD-MultiStep":
+        optimizer = SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
+
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling
         # (i.e. LearningRate = 0.3 × BatchSize/256) and weight decay of 10−6.
@@ -32,7 +36,7 @@ def load_optimizer(args, params, state, train_params: Params):
         optimizer = LARS(
             params,
             lr=lr,
-            weight_decay=args.weight_decay,
+            weight_decay=train_params.weight_decay,
             exclude_from_weight_decay=["batch_normalization", "bias"],
         )
 

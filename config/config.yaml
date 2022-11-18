@@ -51,9 +51,9 @@ finetune_dataset: 1                           # 1 for CIFAR10, 2 for QUICKDRAW, 
 finetune: True
 finetune_batch_size: 32                       # 
 finetune_lr: 0.003                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-finetune_optimizer: "Adam"                     # if you use LARS, then the lr needs to be decayed
-finetune_image_size: 64                      # this depends on the dataset used
-finetune_epochs: 20                           # this needs to be increased to 90
+finetune_optimizer: "Adam"                    # if you use LARS, then the lr needs to be decayed
+finetune_image_size: 64                       # this depends on the dataset used
+finetune_epochs: 50                           # this needs to be increased to 90
 finetune_momentum: 0.9                        # momentum of SGD solver
 finetune_weight_decay: 1.0e-6                 # "optimized using LARS [...] and weight decay of 1.0e−6"
 
@@ -63,8 +63,9 @@ al_epochs: 2                                  # the default should be kept at 10
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_batch_size: 16                             # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 32                    # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_trainer_sample_size: 4800                  # this specifies the amount of samples to be added to the training pool after each AL iteration
-al_lr: 0.003
+al_trainer_sample_size: 3500                  # this specifies the amount of samples to be added to the training pool after each AL iteration
+al_lr: 0.1
+al_optimizer: "SGD-MultiStep"
 al_weight_decay: 5.0e-4
 do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk

@@ -41,3 +41,5 @@ To move folder content up one level
 mv myfolder/* .
 
 pwd
+
+subl main.py # This opens main.py using sublime text

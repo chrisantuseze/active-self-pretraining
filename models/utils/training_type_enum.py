@@ -9,6 +9,7 @@ class Params:
     lr: int
     epochs: int
     optimizer: str
+    weight_decay: int
 
 class TrainingType(Enum):
     BASE_PRETRAIN = "Base"
