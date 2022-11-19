@@ -8,10 +8,10 @@ dataset_dir: "./datasets"                     # path to dataset
 
 # pretrain options
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_batch_size: 32                           # the default should be 64. However, should be varied until better performance is achieved
+base_batch_size: 64                           # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "LARS"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+base_optimizer: "SGD"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
 base_epochs: 50                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
@@ -61,8 +61,8 @@ finetune_weight_decay: 1.0e-6                 # "optimized using LARS [...] and 
 # active learning options
 al_epochs: 10                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
-al_batch_size: 16                             # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_finetune_batch_size: 32                    # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_batch_size: 32                             # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_finetune_batch_size: 64                    # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_trainer_sample_size: 3500                  # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_lr: 0.1
 al_optimizer: "SGD-MultiStep"

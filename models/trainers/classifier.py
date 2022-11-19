@@ -140,7 +140,7 @@ class Classifier:
             loss.backward()
             optimizer.step()
 
-            if step > 0 and step % self.args.log_step == 0:
+            if step % self.args.log_step == 0:
                 logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
@@ -168,7 +168,7 @@ class Classifier:
                 loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
-                if step > 0 and step % self.args.log_step == 0:
+                if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics
