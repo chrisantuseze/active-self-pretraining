@@ -122,7 +122,7 @@ class PretextTrainer():
             entropy = (np.log(preds) * preds).sum(axis=1) * -1.
             indices2 = entropy.argsort(axis=0)[::-1]
 
-            indices = indices1 + indices2
+            indices = np.concatenate((indices1, indices2)) 
             random.shuffle(indices)
             indices = indices[: (len(indices)/2)]
 
