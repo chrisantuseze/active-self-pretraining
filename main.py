@@ -46,12 +46,12 @@ def main():
             # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
-        state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
-        if not state:
-            pretext = PretextTrainer(args, writer)
-            pretrain_data = pretext.do_active_learning()
+        # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
+        # if not state:
+        #     pretext = PretextTrainer(args, writer)
+        #     pretrain_data = pretext.do_active_learning()
 
-        classifier = Classifier(args, writer, pretrain_level="AL")
+        classifier = Classifier(args, writer, pretrain_level="1")
         classifier.finetune()
 
     else:
