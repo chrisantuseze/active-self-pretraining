@@ -76,7 +76,7 @@ class SupPretrainer(BasePretrainer):
 
     def second_pretrain(self) -> None:
 
-        # This is a technical debt
+        # This is a technical debt, but for now supervised learning can only be used in the first pretraining layer
         encoder, loader = super().second_pretrain()
 
         self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN, optimizer_type=self.args.target_optimizer)
