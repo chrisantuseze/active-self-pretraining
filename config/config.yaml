@@ -11,10 +11,10 @@ seed: 42                                      # sacred handles automatic seeding
 base_batch_size: 64                           # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "LARS"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed
+base_optimizer: "SGD"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed
 current_epoch: 0
 start_epoch: 0
-base_epochs: 50                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+base_epochs: 100                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for QUICKDRAW, 5 for IMAGENET_LITE, 4 for CLIPART
 base_pretrain: True 
 momentum: 0.9                                 # momentum of SGD solver
@@ -69,7 +69,7 @@ al_optimizer: "SGD-MultiStep"
 al_weight_decay: 5.0e-4
 do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
-al_method: 1                                  # 0 for least confidence, 1 for entropy, 2 for both
+al_method: 0                                  # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"
 
 ml_project: True                              # switches to ML Final Project mode 
