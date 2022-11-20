@@ -45,7 +45,7 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
 
         if resume_epoch:
             epoch_num = resume_epoch
-            
+
         else:
             if pretrain_level == "2":
                 epoch_num = args.target_base_epochs
@@ -59,7 +59,7 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
 
         return torch.load(out, map_location=args.device.type)
 
-    except IOError:
+    except Exception:
         return None
 
 
