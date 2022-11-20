@@ -29,12 +29,12 @@ class SimCLRTrainer():
         else:
             self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
 
-            if training_type != TrainingType.BASE_PRETRAIN:
-                state = load_saved_state(self.args, pretrain_level=pretrain_level)
-                self.model.load_state_dict(state['model'], strict=False)
+            state = load_saved_state(self.args, pretrain_level=pretrain_level, 
+                                    resume_epoch=None if training_type != TrainingType.BASE_PRETRAIN else self.args.epoch_num)
 
-            self.model = self.model.to(self.args.device)
+            self.model.load_state_dict(state['model'], strict=False)
 
+        self.model = self.model.to(self.args.device)
         train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, train_params)
 
