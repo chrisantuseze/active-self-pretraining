@@ -59,7 +59,7 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
         return torch.load(out, map_location=args.device.type)
 
     except Exception:
-        logging.error("Could not load weights for given epoch num", epoch_num)
+        logging.error(f"Could not load weights for given epoch num {epoch_num}")
         return None
 
 
