@@ -20,7 +20,7 @@ base_pretrain: True
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
 global_step: 0
-log_step: 1000
+log_step: 2
 
 # target pretraining options
 target_dataset: 1                             # 2 for QUICKDRAW,  3 for SKETCH, and  4 for CLIPART. 7 CHEST-XRAY UCMerced seems to be a bad dataset

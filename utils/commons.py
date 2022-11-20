@@ -56,7 +56,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         return torch.load(out, map_location=args.device.type)
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
         return None
 
 
@@ -74,7 +74,7 @@ def simple_load_model(args, path):
         return torch.load(out)
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
         return None
 
 def accuracy(pred, target, topk=1):
@@ -108,7 +108,8 @@ def save_path_loss(args, filename, image_loss_list):
         logging.info("path loss saved at {out}")
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
+        None
 
 
 def load_path_loss(args, filename):
@@ -120,7 +121,7 @@ def load_path_loss(args, filename):
             return pickle.load(file)
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
         return None
 
 def save_accuracy_to_file(args, accuracies, best_accuracy):
@@ -139,7 +140,8 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
             logging.info("accuracies saved saved at {out}")
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
+        None
 
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
@@ -151,7 +153,7 @@ def load_accuracy_file(args):
             return file.readlines()
 
     except IOError as er:
-        logging.error(er)
+        # logging.error(er)
         return None
 
 def pil_loader(path):
