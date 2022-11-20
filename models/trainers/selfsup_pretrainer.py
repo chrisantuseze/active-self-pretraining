@@ -47,7 +47,7 @@ class SelfSupPretrainer(BasePretrainer):
         optimizer = trainer.optimizer
 
         for epoch in range(self.args.start_epoch, epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
+            logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
             epoch_loss = trainer.train_epoch()
