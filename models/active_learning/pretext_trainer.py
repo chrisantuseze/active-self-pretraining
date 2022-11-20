@@ -124,7 +124,7 @@ class PretextTrainer():
 
             indices = np.concatenate((indices1, indices2)) 
             random.shuffle(indices)
-            indices = indices[: (len(indices)/2)]
+            indices = indices[: (len(indices)//2)]
 
         else:
             raise ValueError(f"'{self.args.al_method}' method doesn't exist")
