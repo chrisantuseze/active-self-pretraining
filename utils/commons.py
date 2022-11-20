@@ -8,8 +8,7 @@ from models.active_learning.al_method_enum import get_al_method_enum
 
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import get_dataset_enum
-import logging
-
+import utils.logger as logging
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
     if args.method == SSL_Method.SIMCLR.value:
@@ -60,6 +59,7 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
         return torch.load(out, map_location=args.device.type)
 
     except Exception:
+        logging.error("Could not load weights for given epoch num")
         return None
 
 
@@ -76,7 +76,8 @@ def simple_load_model(args, path):
         out = os.path.join(args.model_path, path)
         return torch.load(out)
 
-    except IOError:
+    except Exception:
+        logging.error("Could not load weights for given path")
         return None
 
 def accuracy(pred, target, topk=1):
@@ -110,7 +111,7 @@ def save_path_loss(args, filename, image_loss_list):
         logging.info("path loss saved at {out}")
 
     except IOError:
-        print("File could not be opened for write operation")
+        logging.error("File could not be opened for write operation")
 
 
 def load_path_loss(args, filename):
@@ -140,7 +141,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
             logging.info("accuracies saved saved at {out}")
 
     except IOError:
-        print("File could not be opened for write operation")
+        logging.error("File could not be opened for write operation")
 
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
