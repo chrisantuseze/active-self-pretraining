@@ -43,7 +43,7 @@ temperature: 0.5                              # see appendix B.7.: Optimal tempe
 
 # reload options
 model_path: "save"                            # directory where all checkpoints would be saved
-epoch_num: 50                                 # use to determine the base checkpoint to be used for the AL cycle
+epoch_num: 40                                 # use to determine the base checkpoint to be used for the AL cycle
 reload: False                                 # indicates whether to start the training from the checkpoint or not
 
 # finetuning options
@@ -61,8 +61,8 @@ finetune_weight_decay: 1.0e-6                 # "optimized using LARS [...] and 
 # active learning options
 al_epochs: 2                                  # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
-al_batch_size: 16                             # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_finetune_batch_size: 32                    # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_batch_size: 32                             # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_finetune_batch_size: 64                    # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_trainer_sample_size: 3500                  # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_lr: 0.1
 al_optimizer: "SGD-MultiStep"

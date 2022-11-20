@@ -58,7 +58,7 @@ class SelfSupPretrainer(BasePretrainer):
             if epoch > 0 and epoch % 20 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
-            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
+            logging.info("Epoch Loss: {:.4f}\t lr: {:.4f}".format(epoch_loss, trainer.scheduler.get_last_lr()))
             logging.info('-' * 20)
 
             self.args.current_epoch += 1

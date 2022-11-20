@@ -46,10 +46,10 @@ def main():
             # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
-        # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
-        # if not state:
-        #     pretext = PretextTrainer(args, writer)
-        #     pretrain_data = pretext.do_active_learning()
+        state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
+        if not state:
+            pretext = PretextTrainer(args, writer)
+            pretrain_data = pretext.do_active_learning()
 
         classifier = Classifier(args, writer, pretrain_level="1")
         classifier.finetune()
@@ -83,6 +83,9 @@ if __name__ == "__main__":
     print(f"You are using {args.device}")
     args.num_gpus = torch.cuda.device_count()
     args.world_size = args.gpus * args.nodes
+
+    args.epoch_num = args.base_epochs
+    args.target_epoch_num = args.target_epochs
 
     set_random_seeds(random_seed=args.seed)
 
