@@ -44,10 +44,10 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
             prefix = "myow"
 
         if pretrain_level == "2":
-            epoch_num = args.target_base_epochs
+            epoch_num = args.target_epoch_num
 
         else:
-            epoch_num = args.base_epochs
+            epoch_num = args.epoch_num
 
         out = args.resume if recent and args.resume else os.path.join(
                 args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
