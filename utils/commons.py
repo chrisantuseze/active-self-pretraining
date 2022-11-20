@@ -8,7 +8,8 @@ from models.active_learning.al_method_enum import get_al_method_enum
 
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import get_dataset_enum
-import utils.logger as logging
+import logging
+
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
     if args.method == SSL_Method.SIMCLR.value:
@@ -31,7 +32,7 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
     print("checkpoint saved at {}".format(out))
     args.resume = out
 
-def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
+def load_saved_state(args, recent=True, pretrain_level="1"):
     try:
         if args.method == SSL_Method.SIMCLR.value:
             prefix = "simclr"
@@ -42,15 +43,11 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
         else:
             prefix = "myow"
 
-        if resume_epoch:
-            epoch_num = resume_epoch
+        if pretrain_level == "2":
+            epoch_num = args.target_base_epochs
 
         else:
-            if pretrain_level == "2":
-                epoch_num = args.target_base_epochs
-
-            else:
-                epoch_num = args.base_epochs
+            epoch_num = args.base_epochs
 
         out = args.resume if recent and args.resume else os.path.join(
                 args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
@@ -58,8 +55,7 @@ def load_saved_state(args, recent=True, pretrain_level="1", resume_epoch=None):
 
         return torch.load(out, map_location=args.device.type)
 
-    except Exception:
-        logging.error(f"Could not load weights for given epoch num {epoch_num}")
+    except IOError:
         return None
 
 
@@ -76,8 +72,7 @@ def simple_load_model(args, path):
         out = os.path.join(args.model_path, path)
         return torch.load(out)
 
-    except Exception:
-        logging.error("Could not load weights for given path")
+    except IOError:
         return None
 
 def accuracy(pred, target, topk=1):
@@ -111,7 +106,7 @@ def save_path_loss(args, filename, image_loss_list):
         logging.info("path loss saved at {out}")
 
     except IOError:
-        logging.error("File could not be opened for write operation")
+        print("File could not be opened for write operation")
 
 
 def load_path_loss(args, filename):
@@ -141,7 +136,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
             logging.info("accuracies saved saved at {out}")
 
     except IOError:
-        logging.error("File could not be opened for write operation")
+        print("File could not be opened for write operation")
 
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"

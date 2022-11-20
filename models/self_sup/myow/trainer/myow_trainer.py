@@ -81,10 +81,9 @@ class MYOWTrainer(BYOLTrainer):
         else:
             self.model = self.build_model(encoder)
 
-            state = load_saved_state(self.args, pretrain_level=pretrain_level, 
-                                    resume_epoch=None if trainingType != TrainingType.BASE_PRETRAIN else self.args.epoch_num)
-
-            self.model.load_state_dict(state['model'], strict=False)
+            if trainingType != TrainingType.BASE_PRETRAIN:
+                state = load_saved_state(self.args, pretrain_level=pretrain_level)
+                self.model.load_state_dict(state['model'], strict=False)
 
         self.model = self.model.to(self.args.device)
 

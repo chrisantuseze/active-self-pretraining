@@ -33,10 +33,9 @@ class SimCLRTrainerV2():
         else:
             self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
 
-            state = load_saved_state(self.args, pretrain_level=pretrain_level, 
-                                    resume_epoch=None if training_type != TrainingType.BASE_PRETRAIN else self.args.epoch_num)
-
-            self.model.load_state_dict(state['model'], strict=False)
+            if training_type != TrainingType.BASE_PRETRAIN:
+                state = load_saved_state(self.args, pretrain_level=pretrain_level)
+                self.model.load_state_dict(state['model'], strict=False)
 
         self.model = self.model.to(self.args.device)
 
