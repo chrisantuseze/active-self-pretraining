@@ -84,6 +84,9 @@ if __name__ == "__main__":
     args.num_gpus = torch.cuda.device_count()
     args.world_size = args.gpus * args.nodes
 
+    args.epoch_num = args.base_epochs
+    args.target_epoch_num = args.target_epochs
+
     set_random_seeds(random_seed=args.seed)
 
     main()
