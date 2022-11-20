@@ -8,7 +8,7 @@ dataset_dir: "./datasets"                     # path to dataset
 
 # pretrain options
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_batch_size: 32                           # the default should be 64. However, should be varied until better performance is achieved
+base_batch_size: 64                           # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
 base_optimizer: "SGD-MultiStep"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed
