@@ -32,13 +32,13 @@ class SelfSupPretrainer(BasePretrainer):
 
         log_step = self.args.log_step
         if self.args.method == SSL_Method.SIMCLR.value:
-            trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
+            trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, training_type=trainingType, log_step=log_step)
 
         elif self.args.method == SSL_Method.DCL.value:
-            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
+            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, training_type=trainingType, log_step=log_step)
 
         elif self.args.method == SSL_Method.MYOW.value:
-            trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level, trainingType, log_step=log_step)
+            trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, trainingType=trainingType, log_step=log_step)
 
         else:
             ValueError

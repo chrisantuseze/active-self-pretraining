@@ -26,6 +26,7 @@ def main():
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
         if not state:
+            args.epoch_num = 40
             pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()

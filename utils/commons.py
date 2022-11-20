@@ -8,7 +8,7 @@ from models.active_learning.al_method_enum import get_al_method_enum
 
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import get_dataset_enum
-import logging
+import utils.logger as logging
 
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
@@ -55,7 +55,8 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
 
         return torch.load(out, map_location=args.device.type)
 
-    except IOError:
+    except IOError as er:
+        logging.error(er)
         return None
 
 
@@ -72,7 +73,8 @@ def simple_load_model(args, path):
         out = os.path.join(args.model_path, path)
         return torch.load(out)
 
-    except IOError:
+    except IOError as er:
+        logging.error(er)
         return None
 
 def accuracy(pred, target, topk=1):
@@ -105,8 +107,8 @@ def save_path_loss(args, filename, image_loss_list):
 
         logging.info("path loss saved at {out}")
 
-    except IOError:
-        print("File could not be opened for write operation")
+    except IOError as er:
+        logging.error(er)
 
 
 def load_path_loss(args, filename):
@@ -117,7 +119,8 @@ def load_path_loss(args, filename):
         with open(out, "rb") as file:
             return pickle.load(file)
 
-    except IOError:
+    except IOError as er:
+        logging.error(er)
         return None
 
 def save_accuracy_to_file(args, accuracies, best_accuracy):
@@ -135,8 +138,8 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
 
             logging.info("accuracies saved saved at {out}")
 
-    except IOError:
-        print("File could not be opened for write operation")
+    except IOError as er:
+        logging.error(er)
 
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
@@ -147,7 +150,8 @@ def load_accuracy_file(args):
         with open(out, "a") as file:
             return file.readlines()
 
-    except IOError:
+    except IOError as er:
+        logging.error(er)
         return None
 
 def pil_loader(path):
