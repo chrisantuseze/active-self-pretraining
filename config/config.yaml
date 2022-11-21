@@ -34,7 +34,7 @@ target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 # arch options
-resnet: "resnet18"
+resnet: "resnet50"
 projection_dim: 128                           # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
