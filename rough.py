@@ -6,5 +6,5 @@ import sys
 #     pzf.extractall()
 
 import zipfile
-with zipfile.ZipFile("cifar10.zip", 'r') as zip_ref:
-    zip_ref.extractall("cifar10")
+with zipfile.ZipFile("quickdraw.zip", 'r') as zip_ref:
+    zip_ref.extractall("quickdraw")
