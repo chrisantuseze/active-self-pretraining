@@ -8,7 +8,7 @@ import argparse
 # import cv2
 from torch.utils.tensorboard import SummaryWriter
 from models.active_learning.pretext_trainer import PretextTrainer
-from utils.commons import load_saved_state, simple_load_model
+from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
 
 from utils.yaml_config_hook import yaml_config_hook
@@ -34,9 +34,12 @@ def main():
         if not state:
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
+        
+        else:
+            pretrain_data = load_path_loss(args, args.pretrain_path_loss_file)
 
-        classifier = Classifier(args, writer, pretrain_level="1")
-        classifier.finetune()
+        classifier = Classifier(args, writer, pretrain_level="AL")
+        classifier.finetune(pretrain_data)
 
     else:
         if args.base_pretrain:

@@ -46,3 +46,7 @@ subl main.py # This opens main.py using sublime text
 
 scp cc@ip:/home/cc/filename . # This copy's the file to the local current directory
 cp filename /destination directory
+
+ssh cc@129.114.108.45
+
+ssh cc@192.5.87.154 
