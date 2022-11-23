@@ -129,8 +129,6 @@ class Classifier:
         corrects = 0
         for step, (images, targets) in enumerate(train_loader):
             optimizer.zero_grad()
-            print(len(targets))
-            print(targets)
             images = images.to(self.args.device)
             targets = targets.to(self.args.device)
 

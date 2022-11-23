@@ -39,7 +39,8 @@ def main():
             pretrain_data = load_path_loss(args, args.pretrain_path_loss_file)
 
         classifier = Classifier(args, writer, pretrain_level="AL")
-        classifier.finetune(pretrain_data)
+        # classifier.finetune(pretrain_data) 
+        classifier.finetune() #Using the AL filtered images to train the classifier won't work for cifar10 since we don't know the class of the images
 
     else:
         if args.base_pretrain:
