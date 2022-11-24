@@ -120,11 +120,13 @@ def accuracy(loss, corrects, loader):
     return epoch_loss, epoch_acc
 
 def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
+    print(dir)
     dataset = torchvision.datasets.ImageFolder(
         dir,
         transform=transforms)
 
     train_ds = dataset
+    print(len(dataset))
     if args.dataset == DatasetType.IMAGENET_LITE.value or is_classifier:
         train_size = int(ratio * len(dataset))
         val_size = len(dataset) - train_size
