@@ -132,6 +132,8 @@ def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
         val_size = len(dataset) - train_size
 
         train_ds, val_ds = random_split(dataset=dataset, lengths=[train_size, val_size])
+
+    print(len(train_ds))
     return train_ds, val_ds
 
 def free_mem(X, y):
