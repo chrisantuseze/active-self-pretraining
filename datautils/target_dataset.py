@@ -5,7 +5,7 @@ from torchvision.transforms import ToTensor, Compose
 from models.active_learning.pretext_dataloader import MakeBatchLoader
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
-from models.utils.commons import get_params
+from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 
@@ -13,6 +13,7 @@ from datautils import dataset_enum
 
 class TargetDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
+        self.args = args
         self.dir = args.dataset_dir + dir
         self.method = args.method
         self.training_type = training_type
@@ -23,9 +24,8 @@ class TargetDataset():
 
     
     def get_dataset(self, transforms):
-        return MakeBatchLoader(self.image_size, self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
-            self.dir,
-            transform=transforms)
+        train_ds, val_ds = split_dataset(self.args, self.dir, transforms)
+        return MakeBatchLoader(self.image_size, self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else train_ds
 
     def get_loader(self):
         if self.method == SSL_Method.SIMCLR.value:
@@ -76,7 +76,7 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
 
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
         print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet_lite", training_type)
+        return TargetDataset(args, "/imagenet", training_type)
 
     elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
         print("using the CIFAR10 dataset")

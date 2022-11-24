@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from datautils.dataset_enum import DatasetType
 from models.active_learning.pretext_dataloader import PretextDataLoader
 
-from models.utils.commons import get_params
+from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 
 class Finetune():
@@ -20,20 +20,14 @@ class Finetune():
 
 
     def split_dataset(self, normalize):
-        dataset = datasets.ImageFolder(
-            self.dir,
-            transforms.Compose([
+        transforms = transforms.Compose([
                 transforms.RandomResizedCrop(224),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
                 normalize,
-            ]))
+            ])
 
-        train_size = int(0.8 * len(dataset))
-        val_size = len(dataset) - train_size
-
-        train_ds, val_ds = random_split(dataset=dataset, lengths=[train_size, val_size])
-        return train_ds, val_ds
+        return split_dataset(self.args, self.dir, transforms, ratio=0.8, is_classifier=True)
 
     def get_loader(self, pretrain_data=None):
 

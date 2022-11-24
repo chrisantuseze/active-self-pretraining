@@ -1,5 +1,7 @@
 import torch.nn as nn
 import torch
+import torchvision
+from torch.utils.data import random_split
 import gc
 from datautils.dataset_enum import DatasetType
 
@@ -112,10 +114,23 @@ def get_params(args, training_type):
     return params[training_type]
 
 def accuracy(loss, corrects, loader):
-        epoch_loss = loss / len(loader.dataset)
-        epoch_acc = corrects.double() / len(loader.dataset)
+    epoch_loss = loss / len(loader.dataset)
+    epoch_acc = corrects.double() / len(loader.dataset)
 
-        return epoch_loss, epoch_acc
+    return epoch_loss, epoch_acc
+
+def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
+    dataset = torchvision.datasets.ImageFolder(
+        dir,
+        transform=transforms)
+
+    train_ds = dataset
+    if args.dataset == DatasetType.IMAGENET_LITE.value or is_classifier:
+        train_size = int(ratio * len(dataset))
+        val_size = len(dataset) - train_size
+
+        train_ds, val_ds = random_split(dataset=dataset, lengths=[train_size, val_size])
+    return train_ds, val_ds
 
 def free_mem(X, y):
     del X
