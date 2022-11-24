@@ -23,7 +23,7 @@ global_step: 0
 log_step: 1000
 
 # target pretraining options
-target_dataset: 1                             # 2 for QUICKDRAW,  3 for SKETCH, and  4 for CLIPART. 7 CHEST-XRAY UCMerced seems to be a bad dataset
+target_dataset: 2                             # 2 for QUICKDRAW,  3 for SKETCH, and  4 for CLIPART. 7 CHEST-XRAY UCMerced seems to be a bad dataset
 target_batch_size: 32                         # ensure that you get a non-fraction when you do len(dataset)/batch_size
 target_epochs: 0                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 64
