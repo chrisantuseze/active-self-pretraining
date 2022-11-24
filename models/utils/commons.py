@@ -120,20 +120,17 @@ def accuracy(loss, corrects, loader):
     return epoch_loss, epoch_acc
 
 def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
-    print(dir)
     dataset = torchvision.datasets.ImageFolder(
         dir,
         transform=transforms)
 
     train_ds = dataset
-    print(len(dataset))
     if args.dataset == DatasetType.IMAGENET_LITE.value or is_classifier:
         train_size = int(ratio * len(dataset))
         val_size = len(dataset) - train_size
 
         train_ds, val_ds = random_split(dataset=dataset, lengths=[train_size, val_size])
 
-    print(len(train_ds))
     return train_ds, val_ds
 
 def free_mem(X, y):

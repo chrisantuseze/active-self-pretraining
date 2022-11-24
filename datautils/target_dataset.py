@@ -25,6 +25,7 @@ class TargetDataset():
     
     def get_dataset(self, transforms):
         train_ds, val_ds = split_dataset(self.args, self.dir, transforms)
+        print(len(train_ds))
         return MakeBatchLoader(self.image_size, self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else train_ds
 
     def get_loader(self):
@@ -41,6 +42,7 @@ class TargetDataset():
             ValueError
 
         dataset = self.get_dataset(transforms)
+        print(len(dataset))
 
         loader = torch.utils.data.DataLoader(
             dataset,
