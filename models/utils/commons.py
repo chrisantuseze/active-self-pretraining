@@ -125,6 +125,7 @@ def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
         transform=transforms)
 
     train_ds = dataset
+    val_ds = None
     if args.dataset == DatasetType.IMAGENET_LITE.value or is_classifier:
         train_size = int(ratio * len(dataset))
         val_size = len(dataset) - train_size
