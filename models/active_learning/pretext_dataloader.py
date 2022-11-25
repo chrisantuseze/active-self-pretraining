@@ -67,6 +67,7 @@ class PretextDataset(torch.utils.data.Dataset):
         index = 0
         self.label_dic = {}
         for label in labels:
+            label = label.replace("\n", "")
             if label not in self.label_dic:
                 self.label_dic[label] = index
                 index += 1
