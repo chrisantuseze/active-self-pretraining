@@ -71,6 +71,7 @@ class PretextDataset(torch.utils.data.Dataset):
                 self.label_dic[label] = index
                 index += 1
 
+        print(self.label_dic)
         self.target_transform = Lambda(lambda y: torch.zeros(len(self.label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
