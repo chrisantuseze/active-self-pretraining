@@ -79,7 +79,7 @@ class Classifier:
     def finetune(self, pretrain_data=None) -> None:
         train_loader, val_loader = Finetune(
             self.args, dir=self.dir, 
-            training_type=TrainingType.FINETUNING).get_loader(pretrain_data=pretrain_data)
+            training_type=TrainingType.FINETUNING).get_loader(pretrain_data=None)
 
         since = time.time()
 
