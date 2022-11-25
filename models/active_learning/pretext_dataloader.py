@@ -80,7 +80,7 @@ class PretextDataset(torch.utils.data.Dataset):
         # img = Image.fromarray(img)
 
         label = path.split('/')[-2]
-        return self.transform.__call__(img, not self.is_val), self.target_transform(self.labels[label])
+        return self.transform.__call__(img, not self.is_val), torch.tensor(self.labels[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
     def __init__(self, image_size, dir, transform=None):
