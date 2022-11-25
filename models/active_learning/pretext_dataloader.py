@@ -115,7 +115,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         return x, path
 
 def get_dic():
-    labels = set('fence', 'traffic_light', 'foot', 'sock', 'crown', 'roller_coaster', 'ambulance', 'dumbbell', 'angel', 'flashlight', 'alarm_clock', 'pig', 'The_Great_Wall_of_China', 'bulldozer', 'birthday_cake', 'flamingo', 'sweater', 'harp', 'bracelet', 'television', 'washing_machine', 'pants', 'sailboat', 'drums', 'pig', 'traffic_light', 'mouse', 'bucket', 'book', 'cell_phone', 'donut', 'flower')
+    labels = ['fence', 'traffic_light', 'foot', 'sock', 'crown', 'roller_coaster', 'ambulance', 'dumbbell', 'angel', 'flashlight', 'alarm_clock', 'pig', 'The_Great_Wall_of_China', 'bulldozer', 'birthday_cake', 'flamingo', 'sweater', 'harp', 'bracelet', 'television', 'washing_machine', 'pants', 'sailboat', 'drums', 'pig', 'traffic_light', 'mouse', 'bucket', 'book', 'cell_phone', 'donut', 'flower']
     index = 0
     dic = {}
     for label in labels:
