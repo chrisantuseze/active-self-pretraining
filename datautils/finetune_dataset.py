@@ -20,14 +20,14 @@ class Finetune():
 
 
     def split_dataset(self, normalize):
-        transforms = transforms.Compose([
+        transform = transforms.Compose([
                 transforms.RandomResizedCrop(224),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
                 normalize,
             ])
 
-        return split_dataset(self.args, self.dir, transforms, ratio=0.8, is_classifier=True)
+        return split_dataset(self.args, self.dir, transform, ratio=0.8, is_classifier=True)
 
     def get_loader(self, pretrain_data=None):
 
