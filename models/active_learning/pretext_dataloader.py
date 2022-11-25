@@ -60,7 +60,7 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        self.target_transform = Lambda(lambda y: torch.zeros(3, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+        self.target_transform = ToTensor() #Lambda(lambda y: torch.FloatTensor(3, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
         return len(self.pathloss_list)
