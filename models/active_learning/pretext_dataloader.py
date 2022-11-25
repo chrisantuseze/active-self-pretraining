@@ -63,7 +63,7 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        labels = load_class_names(self.args)
+        labels = set(load_class_names(self.args))
         index = 0
         self.label_dic = {}
         for label in labels:
@@ -72,7 +72,6 @@ class PretextDataset(torch.utils.data.Dataset):
                 self.label_dic[label] = index
                 index += 1
 
-        print(self.label_dic['spreadsheet'])
         self.target_transform = Lambda(lambda y: torch.zeros(len(self.label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
@@ -87,8 +86,6 @@ class PretextDataset(torch.utils.data.Dataset):
             img = Image.open(path)
 
         # img = Image.fromarray(img)
-
-        print(self.label_dic['spreadsheet'])
 
         label = path.split('/')[-2]
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
