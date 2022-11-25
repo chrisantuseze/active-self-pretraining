@@ -75,10 +75,13 @@ class PretextDataset(torch.utils.data.Dataset):
 
         # img = Image.fromarray(img)
 
-        label = int(path.split('/')[-2])
+        label = self.convert_string_to_ascii(path.split('/')[-2])
         return self.transform.__call__(img, not self.is_val), self.target_transform(label)
 
-    
+    def convert_string_to_ascii(self, input):
+        a = list(input.encode('ascii'))
+        return int("".join(map(str, a)))
+
 class MakeBatchLoader(torch.utils.data.Dataset):
     def __init__(self, image_size, dir, transform=None):
         self.image_size = image_size
