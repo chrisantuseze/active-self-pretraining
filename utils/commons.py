@@ -165,7 +165,7 @@ def save_class_names(args, label):
             file.write(f"{str(label)}\n")
 
     except IOError as er:
-        # logging.error(er)
+        logging.error(er)
         None
 
 def load_class_names(args):
@@ -177,7 +177,7 @@ def load_class_names(args):
             return file.readlines()
 
     except IOError as er:
-        # logging.error(er)
+        logging.error(er)
         return None
 
 def pil_loader(path):
