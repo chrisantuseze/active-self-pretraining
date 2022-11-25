@@ -13,6 +13,9 @@ from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import DatasetType
 # import cv2
 
+labels = {}
+index = 0
+
 class PretextDataLoader():
     def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING, is_val=False) -> None:
         self.args = args
@@ -60,7 +63,7 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        self.target_transform = ToTensor() #Lambda(lambda y: torch.FloatTensor(3, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+        self.target_transform = Lambda(lambda y: torch.FloatTensor(index, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -75,8 +78,8 @@ class PretextDataset(torch.utils.data.Dataset):
 
         # img = Image.fromarray(img)
 
-        label = self.convert_string_to_ascii(path.split('/')[-2])
-        return self.transform.__call__(img, not self.is_val), label
+        label = path.split('/')[-2]
+        return self.transform.__call__(img, not self.is_val), self.target_transform(label)
 
     def convert_string_to_ascii(self, input):
         a = list(input.encode('ascii'))
@@ -105,4 +108,13 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         # x1, x2 = self.transform.__call__(img)
         x = self.transform.__call__(img)
-        return x, self.img_path[idx]
+        path = self.img_path[idx] 
+
+        label = path.split('/')[-2]
+        if label not in labels:
+            labels[label] = index
+            index += 1
+
+        return x, path
+
+    
