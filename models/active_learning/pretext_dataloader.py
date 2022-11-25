@@ -79,11 +79,8 @@ class PretextDataset(torch.utils.data.Dataset):
         # img = Image.fromarray(img)
 
         label = path.split('/')[-2]
-        return self.transform.__call__(img, not self.is_val), label #self.target_transform(labels[label])
-
-    def convert_string_to_ascii(self, input):
-        a = list(input.encode('ascii'))
-        return int("".join(map(str, a)))
+        labels = get_dic()
+        return self.transform.__call__(img, not self.is_val), self.target_transform(labels[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
     def __init__(self, image_size, dir, transform=None):
@@ -117,4 +114,13 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         return x, path
 
-    
+def get_dic():
+    labels = set('fence', 'traffic_light', 'foot', 'sock', 'crown', 'roller_coaster', 'ambulance', 'dumbbell', 'angel', 'flashlight', 'alarm_clock', 'pig', 'The_Great_Wall_of_China', 'bulldozer', 'birthday_cake', 'flamingo', 'sweater', 'harp', 'bracelet', 'television', 'washing_machine', 'pants', 'sailboat', 'drums', 'pig', 'traffic_light', 'mouse', 'bucket', 'book', 'cell_phone', 'donut', 'flower')
+    index = 0
+    dic = {}
+    for label in labels:
+        if label not in dic:
+            dic[label] = index
+            index += 1
+
+    return dic
