@@ -173,7 +173,7 @@ def load_class_names(args):
     out = os.path.join(args.model_path, filename)
 
     try:
-        with open(out, "a") as file:
+        with open(out) as file:
             return file.readlines()
 
     except IOError as er:
