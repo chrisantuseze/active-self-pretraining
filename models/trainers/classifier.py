@@ -130,6 +130,7 @@ class Classifier:
         for step, (images, targets) in enumerate(train_loader):
             optimizer.zero_grad()
             print(targets)
+            print(images)
             images = images.to(self.args.device)
             targets = targets.to(self.args.device)
 
