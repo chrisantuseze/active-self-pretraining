@@ -60,7 +60,7 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        self.target_transform = Lambda(lambda y: torch.zeros(3, dtype=str).scatter_(dim=0, index=torch.tensor(y), value=1))
+        self.target_transform = Lambda(lambda y: torch.zeros(3, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -75,7 +75,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         # img = Image.fromarray(img)
 
-        label = path.split('/')[-2]
+        label = int(path.split('/')[-2])
         return self.transform.__call__(img, not self.is_val), self.target_transform(label)
 
     
