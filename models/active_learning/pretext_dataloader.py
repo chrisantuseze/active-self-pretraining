@@ -63,7 +63,8 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        self.target_transform = Lambda(lambda y: torch.zeros(index, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+        self.labels = get_dic()
+        self.target_transform = Lambda(lambda y: torch.zeros(len(self.labels), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -79,8 +80,7 @@ class PretextDataset(torch.utils.data.Dataset):
         # img = Image.fromarray(img)
 
         label = path.split('/')[-2]
-        labels = get_dic()
-        return self.transform.__call__(img, not self.is_val), self.target_transform(labels[label])
+        return self.transform.__call__(img, not self.is_val), self.target_transform(self.labels[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
     def __init__(self, image_size, dir, transform=None):
