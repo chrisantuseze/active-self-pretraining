@@ -156,6 +156,30 @@ def load_accuracy_file(args):
         # logging.error(er)
         return None
 
+def save_class_names(args, label):
+    filename = f"{args.dataset}.txt"
+    out = os.path.join(args.model_path, filename)
+
+    try:
+        with open(out, "a") as file:
+            file.write(f"{str(label)}\n")
+
+    except IOError as er:
+        # logging.error(er)
+        None
+
+def load_class_names(args):
+    filename = f"{args.dataset}.txt"
+    out = os.path.join(args.model_path, filename)
+
+    try:
+        with open(out, "a") as file:
+            return file.readlines()
+
+    except IOError as er:
+        # logging.error(er)
+        return None
+
 def pil_loader(path):
         # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
         with open(path, 'rb') as f:

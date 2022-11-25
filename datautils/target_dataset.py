@@ -25,6 +25,7 @@ class TargetDataset():
     
     def get_dataset(self, transforms):
         return MakeBatchLoader(
+            self.args,
             self.image_size, 
             self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir,

@@ -7,7 +7,7 @@ from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.utils.commons import get_params
-from utils.commons import pil_loader
+from utils.commons import load_class_names, pil_loader, save_class_names
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import DatasetType
@@ -63,8 +63,15 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        self.labels = get_dic()
-        self.target_transform = Lambda(lambda y: torch.zeros(len(self.labels), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+        self.labels = load_class_names(self.args)
+        index = 0
+        label_dic = {}
+        for label in self.labels:
+            if label not in label_dic:
+                label_dic[label] = index
+                index += 1
+
+        self.target_transform = Lambda(lambda y: torch.zeros(len(label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -83,7 +90,8 @@ class PretextDataset(torch.utils.data.Dataset):
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.labels[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
-    def __init__(self, image_size, dir, transform=None):
+    def __init__(self, args, image_size, dir, transform=None):
+        self.args = args
         self.image_size = image_size
         self.dir = dir
 
@@ -108,9 +116,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         path = self.img_path[idx] 
 
         label = path.split('/')[-2]
-        if label not in labels:
-            labels[label] = index
-            index += 1
+        save_class_names(self.args, label)
 
         return x, path
 
