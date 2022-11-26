@@ -96,7 +96,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         self.image_size = image_size
         self.dir = dir
 
-        if self.dir == "./datasets/chest_xray":
+        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/cifar10v2":
             self.img_path = glob.glob(dir + '/train/*/*')
         else:
             self.img_path = glob.glob(dir + '/*/*')
