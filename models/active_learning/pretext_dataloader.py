@@ -97,7 +97,10 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         self.dir = dir
 
         if with_train:
-            self.img_path = glob.glob(dir + '/train/*/*')
+            if self.dir == "./datasets/imagenet":
+                self.img_path = glob.glob(dir + '/train/*/*/*')
+            else:
+                self.img_path = glob.glob(dir + '/train/*/*')
         else:
             self.img_path = glob.glob(dir + '/*/*')
         self.transform = transform
