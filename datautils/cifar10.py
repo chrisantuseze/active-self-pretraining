@@ -10,7 +10,7 @@ from models.self_sup.simclr.transformation.dcl_transformations import Transforms
 
 class CIFAR10():
     def __init__(self, args, training_type=TrainingType.BASE_PRETRAIN) -> None:
-        self.dir = args.dataset_dir + "/cifar10"
+        self.dir = args.dataset_dir + "/cifar10v2"
         self.method = args.method
 
         params = get_params(args, training_type)
