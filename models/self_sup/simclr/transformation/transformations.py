@@ -18,8 +18,6 @@ class TransformsSimCLR():
     
     def __init__(self, size):
         s = 1
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
 
         color_jitter = transforms.ColorJitter(
             0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s
@@ -31,7 +29,8 @@ class TransformsSimCLR():
                 transforms.RandomApply([color_jitter], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
                 transforms.ToTensor(),
-                normalize
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
             ]
         )
 

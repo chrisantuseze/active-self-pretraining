@@ -11,8 +11,6 @@ import torchvision.transforms as transforms
 
 class TransformsDCL():
     def __init__(self, size):
-        normalize = transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
-                                     std=[0.2023, 0.1994, 0.2010])
 
         color_jitter = transforms.ColorJitter(
            0.4, 0.4, 0.4, 0.1
@@ -24,7 +22,8 @@ class TransformsDCL():
                 transforms.RandomApply([color_jitter], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
                 transforms.ToTensor(),
-                normalize
+                transforms.Normalize(mean=[0.4914, 0.4822, 0.4465],
+                                     std=[0.2023, 0.1994, 0.2010])
             ]
         )
 

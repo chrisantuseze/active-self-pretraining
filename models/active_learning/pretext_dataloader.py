@@ -109,7 +109,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir == "./datasets/chest_xray":
+        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/imagenet":
             img = pil_loader(self.img_path[idx])
 
         else:
