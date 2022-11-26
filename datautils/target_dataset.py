@@ -12,11 +12,12 @@ from models.utils.ssl_method_enum import SSL_Method
 from datautils import dataset_enum
 
 class TargetDataset():
-    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
         self.method = args.method
         self.training_type = training_type
+        self.with_train = with_train
         
         params = get_params(args, training_type)
         self.image_size = params.image_size
@@ -27,7 +28,7 @@ class TargetDataset():
         return MakeBatchLoader(
             self.args,
             self.image_size, 
-            self.dir, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
+            self.dir, self.with_train, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir,
                                                                                                 transform=transforms)
 
@@ -77,15 +78,15 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN):
     
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET.value:
         print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet", training_type)
+        return TargetDataset(args, "/imagenet", training_type, with_train=True)
 
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
         print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet", training_type)
+        return TargetDataset(args, "/imagenet", training_type, with_train=True)
 
     elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
         print("using the CIFAR10 dataset")
-        return TargetDataset(args, "/cifar10v2", training_type)
+        return TargetDataset(args, "/cifar10v2", training_type, with_train=True)
 
     else:
         ValueError

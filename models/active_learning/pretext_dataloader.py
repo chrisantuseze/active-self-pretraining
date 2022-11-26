@@ -91,12 +91,12 @@ class PretextDataset(torch.utils.data.Dataset):
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
-    def __init__(self, args, image_size, dir, transform=None):
+    def __init__(self, args, image_size, dir, with_train, transform=None):
         self.args = args
         self.image_size = image_size
         self.dir = dir
 
-        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/cifar10v2":
+        if with_train:
             self.img_path = glob.glob(dir + '/train/*/*')
         else:
             self.img_path = glob.glob(dir + '/*/*')
