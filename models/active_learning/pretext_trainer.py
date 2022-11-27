@@ -113,7 +113,7 @@ class PretextTrainer():
                 total_loss += loss.item() * 128
 
                 if step % self.log_step == 0:
-                    logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+                    logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
             # Decay Learning Rate
             scheduler.step()
