@@ -1,1 +1,1 @@
-from .transformations import TransformsSimCLR
+from .simclr_transformations import TransformsSimCLR

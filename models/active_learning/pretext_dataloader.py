@@ -5,9 +5,10 @@ from PIL import Image
 import random
 import glob
 from datautils.path_loss import PathLoss
-from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
+from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.utils.commons import get_params
+from models.utils.transformations import Transforms
 from utils.commons import load_class_names, pil_loader, save_class_names
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
@@ -35,22 +36,27 @@ class PretextDataLoader():
             new_data_size = int(self.args.al_finetune_data_ratio * data_size)
             self.path_loss_list = self.path_loss_list[0:new_data_size]
 
-        if self.args.method == SSL_Method.SIMCLR.value:
-            transforms = TransformsSimCLR(self.image_size)
-
-        elif self.args.method == SSL_Method.DCL.value:
-            transforms = TransformsDCL(self.image_size)
-
-        elif self.args.method == SSL_Method.MYOW.value:
-            transforms = Compose([ToTensor()])
+        if self.training_type == TrainingType.ACTIVE_LEARNING:
+            transforms = Transforms(self.image_size)
 
         else:
-            ValueError
+            if self.args.method == SSL_Method.SIMCLR.value:
+                transforms = TransformsSimCLR(self.image_size)
+
+            elif self.args.method == SSL_Method.DCL.value:
+                transforms = TransformsDCL(self.image_size)
+
+            elif self.args.method == SSL_Method.MYOW.value:
+                transforms = Compose([ToTensor()])
+
+            else:
+                ValueError
 
         dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
+            shuffle=not self.is_val
         )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
@@ -84,15 +90,12 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             img = Image.open(path)
 
-        # img = Image.fromarray(img)
-
         label = path.split('/')[-2]
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
-    def __init__(self, args, image_size, dir, with_train, transform=None):
+    def __init__(self, args, dir, with_train, transform=None):
         self.args = args
-        self.image_size = image_size
         self.dir = dir
 
         if with_train:
@@ -123,10 +126,10 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         return x, path
 
-class RotationLoader(torch.utils.data.Dataset):
-    def __init__(self, args, dir, with_train, is_train, transform=None, training_type=TrainingType.ACTIVE_LEARNING):
+class MakeBatchLoader_(torch.utils.data.Dataset):
+    def __init__(self, args, dir, with_train, is_train, transform=None):
         self.args = args
-        params = get_params(args, training_type)
+        params = get_params(args, TrainingType.ACTIVE_LEARNING)
         self.image_size = params.image_size
         self.batch_size = params.batch_size
 
@@ -158,7 +161,7 @@ class RotationLoader(torch.utils.data.Dataset):
         save_class_names(self.args, label)
         
         if self.is_train:
-            img = self.transform(img)
+            img = self.transform.__call__(img)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
@@ -167,7 +170,7 @@ class RotationLoader(torch.utils.data.Dataset):
             random.shuffle(rotations)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
         else:
-            img = self.transform(img)
+            img = self.transform.__call__(img, False)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])

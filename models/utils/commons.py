@@ -14,25 +14,32 @@ from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
-def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
+def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING):
     n_features = get_feature_dimensions_backbone(args)
 
-    if is_make_batches:
+    if training_type == TrainingType.ACTIVE_LEARNING:
         criterion = nn.CrossEntropyLoss().to(args.device)
-        model = SimCLR(encoder, args.projection_dim, n_features)
-        print("using SIMCLR")
-        return model, criterion
-
-    if args.method == SSL_Method.SIMCLR.value:
-        # criterion = NT_Xent(batch_size, args.temperature, args.world_size)
-        criterion = NTXentLoss(args)
-        model = SimCLR(encoder, args.projection_dim, n_features)
-        print("using SIMCLR")
+        model = encoder
+        model.linear = nn.Linear(n_features, 4)
+        print("using Regular model")
 
     else:
-        criterion = DCL(args)
-        model = SimCLRV2(n_features)
-        print("using SIMCLRv2")
+        if args.method == SSL_Method.SIMCLR.value:
+            # criterion = NT_Xent(batch_size, args.temperature, args.world_size)
+            criterion = NTXentLoss(args)
+            model = SimCLR(encoder, args.projection_dim, n_features)
+            print("using SIMCLR")
+
+        elif args.method == SSL_Method.DCL.value:
+            criterion = DCL(args)
+            model = SimCLRV2(n_features)
+            print("using SIMCLRv2")
+
+        elif args.method == SSL_Method.DCL.value:
+            criterion = nn.CrossEntropyLoss().to(args.device)
+            model = encoder
+            print("using Regular model")
+    
 
     return model, criterion
 

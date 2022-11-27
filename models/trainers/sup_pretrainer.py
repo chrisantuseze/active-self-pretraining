@@ -12,11 +12,12 @@ class SupPretrainer(BasePretrainer):
         self.writer = writer
 
     def train_epoch(self, model, train_loader, criterion, optimizer, train_params) -> int:
+        total_loss, total_num = 0, 0
         model.train()
 
         for step, (image, _) in enumerate(train_loader):
             # Clear gradients w.r.t. parameters
-            self.optimizer.zero_grad()
+            optimizer.zero_grad()
 
             image = image.to(self.args.device)
             output = model(image)

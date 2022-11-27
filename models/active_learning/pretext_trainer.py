@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
+from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
 
@@ -16,7 +17,7 @@ from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 
-from models.utils.commons import get_model_criterion
+from models.utils.commons import get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 from models.active_learning.al_method_enum import AL_Method
@@ -71,26 +72,17 @@ class PretextTrainer():
         return trainer.model
 
     def train_proxy_(self, samples, model, rebuild_al_model=False):
-        transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
+        loader = PretextDataLoader(self.args, samples).get_loader()
 
-        ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
-        train_loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True)
-
+        state = None
         if not rebuild_al_model:
-            model.linear = nn.Linear(512, 4)
-            state = load_saved_state(self.args, pretrain_level="1")
+            model, criterion = get_model_criterion(self.args, model)
+            state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
         
         model = model.to(self.args.device)
-
-        criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
+        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
+        optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
 
         model.train()
         total_loss, total_num = 0.0, 0
@@ -99,7 +91,7 @@ class PretextTrainer():
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
             logging.info('-' * 20)
 
-            for step, (inputs, targets) in enumerate(train_loader):
+            for step, (inputs, targets) in enumerate(loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
                 
                 optimizer.zero_grad()
@@ -109,11 +101,11 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                total_num += 128
-                total_loss += loss.item() * 128
+                total_num += train_params.batch_size
+                total_loss += loss.item() * train_params.batch_size
 
-                if step % self.log_step == 0:
-                    logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
 
             # Decay Learning Rate
             scheduler.step()
@@ -122,29 +114,21 @@ class PretextTrainer():
         return model
 
     def finetune_(self, model, samples: List[PathLoss]) -> List[PathLoss]:
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-
-        ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
-        test_loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=False)
+        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING, is_val=True).get_loader()
 
         logging.info("Generating the top1 scores")
         _preds = []
 
-        top1_scores = []
         model.eval()
         with torch.no_grad():
-            for step, (inputs, targets) in enumerate(test_loader):
+            for step, (inputs, targets) in enumerate(loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
                 outputs = model(inputs)
 
-                # scores, predicted = outputs.max(1)
                 _preds.append(self.get_predictions(outputs))
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(test_loader)}]")
+                    logging.info(f"Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
        
@@ -203,7 +187,6 @@ class PretextTrainer():
         return preds
 
     def get_new_samples_(self, preds, samples) -> List[PathLoss]:
-        print(preds)
         if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
             indices = np.argsort(preds)
             samples = np.array(samples)
@@ -259,7 +242,7 @@ class PretextTrainer():
         self.args.al_batch_size = 1
 
         model = encoder
-        model, criterion = get_model_criterion(self.args, model, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=True)
+        model, criterion = get_model_criterion(self.args, model, is_make_batches=True)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
@@ -303,20 +286,16 @@ class PretextTrainer():
         return sorted_samples
 
     def make_batches_(self, model):
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
+        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
+        batch_size = self.args.al_batch_size
+        self.args.al_batch_size = 1
 
-        testset = RotationLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
-        testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
+        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False).get_loader()
 
-        model.linear = nn.Linear(512, 4)
+        model, criterion = get_model_criterion(self.args, model, is_make_batches=True)
         state = simple_load_model(self.args, path='finetuner.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
-
-        criterion = nn.CrossEntropyLoss()
 
         model.eval()
         test_loss = 0
@@ -326,7 +305,7 @@ class PretextTrainer():
 
         logging.info("About to begin eval to make batches")
         with torch.no_grad():
-            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(testloader):
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
                 outputs = model(inputs)
@@ -345,34 +324,27 @@ class PretextTrainer():
 
                 loss = loss.item()
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(testloader)}]\t Loss: {loss}")
+                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
         save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
 
+        self.args.al_batch_size = batch_size
+
         return sorted_samples
 
     def finetune_trainer(self, model):
-        transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
+        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=True).get_loader()
 
-        ds = RotationLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
-        train_loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
-
-        model.linear = nn.Linear(512, 4)
+        model, criterion = get_model_criterion(self.args, model)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
-        criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
+        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
+        optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
 
         model.train()
 
@@ -384,7 +356,7 @@ class PretextTrainer():
             total_loss, total_num = 0, 0
             correct = 0
             total = 0
-            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
                 
@@ -413,8 +385,8 @@ class PretextTrainer():
                 correct += predicted2.eq(targets2).sum().item()
                 correct += predicted3.eq(targets3).sum().item()
 
-                if step % self.log_step == 0:
-                    logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
 
             scheduler.step()
 

@@ -29,6 +29,10 @@ def load_optimizer(args, params, state, train_params: Params):
         optimizer = SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
+    elif train_params.optimizer == "SGD-MultiStepV2":
+        optimizer = torch.optim.SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
+
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling
         # (i.e. LearningRate = 0.3 × BatchSize/256) and weight decay of 10−6.

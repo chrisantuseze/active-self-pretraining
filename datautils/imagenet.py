@@ -7,9 +7,10 @@ from torch.utils.data import random_split
 from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
-from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
+from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from datautils.dataset_enum import DatasetType
+from models.utils.transformations import Transforms
 
 
 class ImageNet():
@@ -31,6 +32,9 @@ class ImageNet():
 
         elif self.method == SSL_Method.MYOW.value:
             transforms = Compose([ToTensor()])
+
+        elif self.method == SSL_Method.SUPERVISED.value:
+            transforms = Transforms(self.image_size)
 
         else:
             NotImplementedError

@@ -18,8 +18,11 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
     elif args.method == SSL_Method.DCL.value:
         prefix = "dcl"
 
-    else:
+    elif args.method == SSL_Method.MYOW.value:
         prefix = "myow"
+    
+    elif args.method == SSL_Method.SUPERVISED.value:
+        prefix = "sup"
 
     out = os.path.join(args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
@@ -40,8 +43,11 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         elif args.method == SSL_Method.DCL.value:
             prefix = "dcl"
 
-        else:
+        elif args.method == SSL_Method.MYOW.value:
             prefix = "myow"
+        
+        elif args.method == SSL_Method.SUPERVISED.value:
+            prefix = "sup"
 
         if pretrain_level == "2":
             epoch_num = args.target_epoch_num
