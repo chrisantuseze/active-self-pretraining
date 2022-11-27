@@ -77,6 +77,8 @@ class PretextTrainer():
             model, criterion = get_model_criterion(self.args, model)
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
+        else:
+            _, criterion = get_model_criterion(self.args, model)
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
