@@ -53,7 +53,7 @@ finetune_batch_size: 128                      #
 finetune_lr: 0.003                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 finetune_optimizer: "Adam"                    # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 32                       # this depends on the dataset used
-finetune_epochs: 50                           # this needs to be increased to 90
+finetune_epochs: 50                           # this needs to be increased to 100
 finetune_momentum: 0.9                        # momentum of SGD solver
 finetune_weight_decay: 1.0e-6                 # "optimized using LARS [...] and weight decay of 1.0e−6"
 

@@ -90,14 +90,14 @@ class PretextTrainer():
                 else:
                     features, _ = model(image)
 
-                _preds.append(self.get_predictions(features))
+                _preds.append(self.get_preds(features))
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]")
 
-        preds = torch.cat(_preds).numpy()
+        # preds = torch.cat(_preds).numpy()
        
-        return self.get_new_samples(preds, samples)
+        return self.get_new_samples_(_preds, samples)
 
 
     def get_predictions(self, outputs):
@@ -105,6 +105,40 @@ class PretextTrainer():
         preds = dist1.detach().cpu()
 
         return preds
+
+    def get_preds(self, outputs):
+        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
+            _, predicted = outputs.max(1)
+            outputs = F.normalize(outputs, dim=1)
+            probs = F.softmax(outputs, dim=1)
+            preds = probs[0][predicted.item()]
+
+        else:
+            e = -1.0 * torch.sum(F.softmax(outputs, dim=1) * F.log_softmax(outputs, dim=1), dim=1)
+            preds = e.view(e.size(0))
+
+        return preds
+
+    def get_new_samples_(self, preds, samples) -> List[PathLoss]:
+        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
+            indices = np.argsort(preds)
+            samples = np.array(samples)
+            # return samples[indices[:1000]]
+            indices = indices[:1000]
+
+        elif self.args.al_method == AL_Method.ENTROPY.value:
+            indices = np.argsort(preds)
+            samples = np.array(samples)
+            # return samples[indices[-1000:]]
+            indices = indices[-1000:]
+
+        print(indices)
+
+        new_samples = []
+        for item in indices:
+            new_samples.append(samples[item]) # Map back to original indices
+
+        return new_samples[:self.args.al_trainer_sample_size]
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
         if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:

@@ -33,11 +33,11 @@ class Finetune():
 
         if pretrain_data:
             train_loader = PretextDataLoader(
-                self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN, 
+                self.args, pretrain_data, training_type=TrainingType.FINETUNING, 
                 is_val=False).get_loader()
 
             val_loader = PretextDataLoader(
-                self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN, 
+                self.args, pretrain_data, training_type=TrainingType.FINETUNING, 
                 is_val=True).get_loader()
 
             return train_loader, val_loader 
