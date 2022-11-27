@@ -20,6 +20,8 @@ class SupPretrainer(BasePretrainer):
             optimizer.zero_grad()
 
             image = image.to(self.args.device)
+            target = target.to(self.args.device)
+
             output = model(image)
             loss = criterion(output, target)
 
