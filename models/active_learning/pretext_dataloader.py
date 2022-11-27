@@ -137,11 +137,11 @@ class RotationLoader(torch.utils.data.Dataset):
 
         if with_train:
             if self.dir == "./datasets/imagenet":
-                self.img_path = glob.glob(dir + '/train/*/*/*')
+                self.img_path = glob.glob(self.dir + '/train/*/*/*')
             else:
-                self.img_path = glob.glob(dir + '/train/*/*')
+                self.img_path = glob.glob(self.dir + '/train/*/*')
         else:
-            self.img_path = glob.glob(dir + '/*/*')
+            self.img_path = glob.glob(self.dir + '/*/*')
         self.transform = transform
 
         print(self.dir)
