@@ -133,7 +133,7 @@ class PretextTrainer():
         top1_scores = []
         model.eval()
         with torch.no_grad():
-            for idx, (inputs, targets) in enumerate(test_loader):
+            for step, (inputs, targets) in enumerate(test_loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
                 outputs = model(inputs)
 
@@ -142,7 +142,12 @@ class PretextTrainer():
 
                 outputs = F.normalize(outputs, dim=1)
                 probs = F.softmax(outputs, dim=1)
+                print(probs)
+                print(predicted.item())
                 top1_scores.append(probs[0][predicted.item()])
+
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(test_loader)}]")
 
         print(top1_scores)
         idx = np.argsort(top1_scores)
@@ -398,7 +403,7 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                total_loss += loss.item()
+                total_loss += loss.item() * 256
                 total_num += 256
 
                 _, predicted = outputs.max(1)
