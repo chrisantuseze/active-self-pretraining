@@ -35,10 +35,10 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
             model = SimCLRV2(n_features)
             print("using SIMCLRv2")
 
-        elif args.method == SSL_Method.DCL.value:
+        elif args.method == SSL_Method.SUPERVISED.value:
             criterion = nn.CrossEntropyLoss().to(args.device)
             model = encoder
-            print("using Regular model")
+            print("using Supervised model")
     
 
     return model, criterion

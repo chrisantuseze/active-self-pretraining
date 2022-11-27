@@ -1,6 +1,6 @@
 import torch.nn as nn
 from models.trainers.base_pretrainer import BasePretrainer
-from models.utils.commons import get_params
+from models.utils.commons import get_model_criterion, get_params
 from optim.optimizer import load_optimizer
 import utils.logger as logging
 from models.utils.training_type_enum import TrainingType
@@ -15,13 +15,13 @@ class SupPretrainer(BasePretrainer):
         total_loss, total_num = 0, 0
         model.train()
 
-        for step, (image, _) in enumerate(train_loader):
+        for step, (image, target) in enumerate(train_loader):
             # Clear gradients w.r.t. parameters
             optimizer.zero_grad()
 
             image = image.to(self.args.device)
             output = model(image)
-            loss = criterion(output)
+            loss = criterion(output, target)
 
             # Getting gradients w.r.t. parameters
             loss.backward()
@@ -44,9 +44,11 @@ class SupPretrainer(BasePretrainer):
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
+        model, criterion = get_model_criterion(self.args, model)
+        model = model.to(self.args.device)
+
         train_params = get_params(self.args, trainingType)
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), None, train_params)
-        criterion = nn.CrossEntropyLoss().to(self.args.device)
 
         for epoch in range(self.args.start_epoch, epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, (epochs - self.args.start_epoch)))
