@@ -144,9 +144,6 @@ class RotationLoader(torch.utils.data.Dataset):
             self.img_path = glob.glob(self.dir + '/*/*')
         self.transform = transform
 
-        print(self.dir)
-        print(self.img_path)
-
     def __len__(self):
         return len(self.img_path)
 

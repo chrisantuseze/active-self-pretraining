@@ -344,9 +344,7 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(testloader)}]\t Loss: {loss}")
 
-                s = str(float(loss)) + '_' + str(path[0]) + "\n"
                 pathloss.append(PathLoss(path, loss))
-                count +=1
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
         save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
@@ -376,11 +374,13 @@ class PretextTrainer():
         model.train()
 
         for epoch in range(30):
-            print('\nEpoch: %d' % epoch)
-            train_loss = 0
+            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
+            logging.info('-' * 20)
+
+            total_loss, total_num = 0, 0
             correct = 0
             total = 0
-            for batch_idx, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(trainloader):
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(trainloader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
                 
@@ -395,7 +395,9 @@ class PretextTrainer():
                 loss.backward()
                 optimizer.step()
 
-                train_loss += loss.item()
+                total_loss += loss.item()
+                total_num += 256
+
                 _, predicted = outputs.max(1)
                 _, predicted1 = outputs1.max(1)
                 _, predicted2 = outputs2.max(1)
@@ -406,6 +408,10 @@ class PretextTrainer():
                 correct += predicted1.eq(targets1).sum().item()
                 correct += predicted2.eq(targets2).sum().item()
                 correct += predicted3.eq(targets3).sum().item()
+
+                if step % self.log_step == 0:
+                    logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+
             scheduler.step()
 
         simple_save_model(self.args, model, 'finetuner.pth')
