@@ -173,14 +173,14 @@ class PretextTrainer():
                 else:
                     features, _ = model(image)
 
-                _preds.append(self.get_preds(features))
+                _preds.append(self.get_predictions(features))
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]")
 
         # preds = torch.cat(_preds).numpy()
        
-        return self.get_new_samples_(_preds, samples)
+        return self.get_new_samples(_preds, samples)
 
 
     def get_predictions(self, outputs):
