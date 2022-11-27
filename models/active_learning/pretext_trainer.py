@@ -85,7 +85,8 @@ class PretextTrainer():
             model.linear = nn.Linear(512, 4)
             state = load_saved_state(self.args, pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
-            model = model.to(self.args.device)
+        
+        model = model.to(self.args.device)
 
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
