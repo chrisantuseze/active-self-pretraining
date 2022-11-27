@@ -73,8 +73,6 @@ class PretextDataset(torch.utils.data.Dataset):
                 self.label_dic[label] = index
                 index += 1
 
-        self.target_transform = Lambda(lambda y: torch.zeros(len(self.label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
-
     def __len__(self):
         return len(self.pathloss_list)
 
@@ -194,8 +192,6 @@ class Loader(torch.utils.data.Dataset):
                 self.label_dic[label] = index
                 index += 1
 
-        self.target_transform = Lambda(lambda y: torch.zeros(len(self.label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
-
     
     def __len__(self):
         return len(self.pathloss_list)
@@ -209,4 +205,4 @@ class Loader(torch.utils.data.Dataset):
             img = Image.open(path)
 
         label = path.split('/')[-2]
-        return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
+        return self.transform(img), torch.tensor(self.label_dic[label])
