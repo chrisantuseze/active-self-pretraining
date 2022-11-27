@@ -143,7 +143,8 @@ class PretextTrainer():
                 outputs = F.normalize(outputs, dim=1)
                 probs = F.softmax(outputs, dim=1)
                 print(probs)
-                print(predicted.item())
+                print(scores)
+                print(predicted)
                 top1_scores.append(probs[0][predicted.item()])
 
                 if step % self.args.log_step == 0:
