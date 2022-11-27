@@ -39,6 +39,7 @@ class SimCLRTrainer():
         self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, train_params)
 
     def train_epoch(self) -> int:
+        total_loss, total_num = 0.0, 0
         self.model.train()
 
         for step, (image, _) in enumerate(self.train_loader):
