@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -22,15 +23,13 @@ class SimCLR(nn.Module):
             nn.Linear(self.n_features, projection_dim, bias=False),
         )
 
-    # def forward(self, x_i, x_j):
-    #     h_i = self.encoder(x_i)
-    #     h_j = self.encoder(x_j)
-
-    #     z_i = self.projector(h_i)
-    #     z_j = self.projector(h_j)
-    #     return h_i, h_j, z_i, z_j
-
     def forward(self, x):
+        b, c, h, w = x.size()
+        x = torch.cat([x.unsqueeze(1), x.unsqueeze(1)], dim=1)
+        x = x.view(-1, c, h, w) 
+
+        x = x.cuda(non_blocking=True)
+
         features = self.contrastive_head(self.backbone(x))
         features = F.normalize(features, dim = 1)
-        return features
+        return features.view(b, 2, -1)

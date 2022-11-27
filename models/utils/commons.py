@@ -15,12 +15,7 @@ from models.utils.training_type_enum import Params, TrainingType
 
 
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, is_make_batches=False):
-    
-    try:
-        n_features = encoder.fc.in_features  # get dimensions of fc layer
-    except Exception:
-        n_features = 512 #I don't know what causes this erratic behavior yet. I am still investigating it
-        print(encoder)
+    n_features = get_feature_dimensions_backbone(args)
 
     if is_make_batches:
         criterion = nn.CrossEntropyLoss().to(args.device)
@@ -40,6 +35,16 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         print("using SIMCLRv2")
 
     return model, criterion
+
+def get_feature_dimensions_backbone(args):
+    if args.resnet == 'resnet18':
+        return 512
+
+    elif args.resnet == 'resnet50':
+        return 2048
+
+    else:
+        raise NotImplementedError
 
 def set_parameter_requires_grad(model, feature_extract):
     if feature_extract:

@@ -2,6 +2,7 @@ import torch
 from torchvision.transforms import ToTensor, Compose, Lambda
 from typing import List
 from PIL import Image
+import random
 import glob
 from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.transformations import TransformsSimCLR
@@ -124,13 +125,88 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         return x, path
 
-def get_dic():
-    labels = ['fence', 'traffic_light', 'foot', 'sock', 'crown', 'roller_coaster', 'ambulance', 'dumbbell', 'angel', 'flashlight', 'alarm_clock', 'pig', 'The_Great_Wall_of_China', 'bulldozer', 'birthday_cake', 'flamingo', 'sweater', 'harp', 'bracelet', 'television', 'washing_machine', 'pants', 'sailboat', 'drums', 'pig', 'traffic_light', 'mouse', 'bucket', 'book', 'cell_phone', 'donut', 'flower']
-    index = 0
-    dic = {}
-    for label in labels:
-        if label not in dic:
-            dic[label] = index
-            index += 1
+class RotationLoader(torch.utils.data.Dataset):
+    def __init__(self, args, dir, with_train, is_train, transform=None, training_type=TrainingType.ACTIVE_LEARNING):
+        self.args = args
+        params = get_params(args, training_type)
+        self.image_size = params.image_size
+        self.batch_size = params.batch_size
 
-    return dic
+        self.dir = dir
+        self.is_train = is_train
+
+        if with_train:
+            if self.dir == "./datasets/imagenet":
+                self.img_path = glob.glob(dir + '/train/*/*/*')
+            else:
+                self.img_path = glob.glob(dir + '/train/*/*')
+        else:
+            self.img_path = glob.glob(dir + '/*/*')
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.img_path)
+
+    def __getitem__(self, idx):
+        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/imagenet":
+            img = pil_loader(self.img_path[idx])
+
+        else:
+            img = Image.open(self.img_path[idx])
+
+        path = self.img_path[idx] 
+
+        label = path.split('/')[-2]
+        save_class_names(self.args, label)
+        
+        if self.is_train:
+            img = self.transform.__call__(img)
+            img1 = torch.rot90(img, 1, [1,2])
+            img2 = torch.rot90(img, 2, [1,2])
+            img3 = torch.rot90(img, 3, [1,2])
+            imgs = [img, img1, img2, img3]
+            rotations = [0, 1, 2, 3]
+            random.shuffle(rotations)
+            return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
+        else:
+            img = self.transform.__call__(img, is_train=False)
+            img1 = torch.rot90(img, 1, [1,2])
+            img2 = torch.rot90(img, 2, [1,2])
+            img3 = torch.rot90(img, 3, [1,2])
+            imgs = [img, img1, img2, img3]
+            rotations = [0, 1, 2, 3]
+            random.shuffle(rotations)
+            return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path
+
+class Loader(torch.utils.data.Dataset):
+    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_val=False) -> None:
+        self.args = args
+        self.pathloss_list = pathloss_list
+        self.transform = transform
+        self.is_val = is_val
+
+        labels = set(load_class_names(self.args))
+        index = 0
+        self.label_dic = {}
+        for label in labels:
+            label = label.replace("\n", "")
+            if label not in self.label_dic:
+                self.label_dic[label] = index
+                index += 1
+
+        self.target_transform = Lambda(lambda y: torch.zeros(len(self.label_dic), dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+
+    
+    def __len__(self):
+        return len(self.pathloss_list)
+
+    def __getitem__(self, idx):
+        path = self.pathloss_list[idx].path[0]
+        if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
+            img = pil_loader(path)
+
+        else:
+            img = Image.open(path)
+
+        label = path.split('/')[-2]
+        return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])

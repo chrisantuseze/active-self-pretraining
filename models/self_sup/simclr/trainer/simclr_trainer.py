@@ -45,17 +45,7 @@ class SimCLRTrainer():
             # Clear gradients w.r.t. parameters
             self.optimizer.zero_grad()
 
-            # images[0] = images[0].to(self.args.device)
-            # images[1] = images[1].to(self.args.device)
-
-            # Forward pass to get output/logits
-            # positive pair, with encoding
-            # h_i, h_j, z_i, z_j = self.model(images[0], images[1])
-
-            # Calculate Loss: softmax --> cross entropy loss
-            # loss = self.criterion(z_i, z_j)
-
-            image = image.to(self.args.device)
+            # image = image.to(self.args.device)
             output = self.model(image)
             loss = self.criterion(output)
 

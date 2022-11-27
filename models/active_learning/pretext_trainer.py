@@ -6,10 +6,11 @@ import utils.logger as logging
 from typing import List
 
 import random
+import torchvision.transforms as transforms
 
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import PretextDataLoader
+from models.active_learning.pretext_dataloader import Loader, PretextDataLoader, RotationLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
@@ -67,6 +68,85 @@ class PretextTrainer():
             logging.info('Train Loss: {:.4f}'.format(epoch_loss))
 
         return trainer.model
+
+    def train_proxy_(self, samples, model, rebuild_al_model=False):
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
+        train_loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True)
+
+        if not rebuild_al_model:
+            model.linear = nn.Linear(512, 4)
+            state = load_saved_state(self.args, pretrain_level="1")
+            model.load_state_dict(state['model'], strict=False)
+            model = model.to(self.args.device)
+
+        criterion = nn.CrossEntropyLoss()
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
+
+        model.train()
+        total_loss, total_num = 0.0, 0
+
+        for epoch in range(self.args.al_epochs):
+            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
+            logging.info('-' * 20)
+
+            for step, (inputs, targets) in enumerate(train_loader):
+                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
+                
+                optimizer.zero_grad()
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+                
+                loss.backward()
+                optimizer.step()
+
+                total_num += 128
+                total_loss += loss.item() * 128
+
+                if step % self.log_step == 0:
+                    logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+
+            # Decay Learning Rate
+            scheduler.step()
+            logging.info('Train Loss: {:.4f}'.format(total_loss))
+
+        return model
+
+    def finetune_(self, model, samples: List[PathLoss]) -> List[PathLoss]:
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
+        test_loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=False)
+
+        top1_scores = []
+        model.eval()
+        with torch.no_grad():
+            for idx, (inputs, targets) in enumerate(test_loader):
+                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
+                outputs = model(inputs)
+
+                scores, predicted = outputs.max(1)
+                # save top1 confidence score 
+
+                outputs = F.normalize(outputs, dim=1)
+                probs = F.softmax(outputs, dim=1)
+                top1_scores.append(probs[0][predicted.item()])
+
+        print(top1_scores)
+        idx = np.argsort(top1_scores)
+        samples = np.array(samples)
+        return samples[idx[:1000]]
+
 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         # Train using 70% of the samples with the highest loss. So this should be the source of the data
@@ -219,13 +299,129 @@ class PretextTrainer():
 
         return sorted_samples
 
+    def make_batches_(self, model):
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        testset = RotationLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
+        testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
+
+        model.linear = nn.Linear(512, 4)
+        state = simple_load_model(self.args, path='finetuner.pth')
+        model.load_state_dict(state['model'], strict=False)
+        model = model.to(self.args.device)
+
+        criterion = nn.CrossEntropyLoss()
+
+        model.eval()
+        test_loss = 0
+        correct = 0
+        total = 0
+        pathloss = []
+
+        logging.info("About to begin eval to make batches")
+        with torch.no_grad():
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(testloader):
+                inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
+                inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
+                outputs = model(inputs)
+                outputs1 = model(inputs1)
+                outputs2 = model(inputs2)
+                outputs3 = model(inputs3)
+                loss1 = criterion(outputs, targets)
+                loss2 = criterion(outputs1, targets1)
+                loss3 = criterion(outputs2, targets2)
+                loss4 = criterion(outputs3, targets3)
+                loss = (loss1+loss2+loss3+loss4)/4.
+                test_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+
+                loss = loss.item()
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(testloader)}]\t Loss: {loss}")
+
+                s = str(float(loss)) + '_' + str(path[0]) + "\n"
+                pathloss.append(PathLoss(path, loss))
+                count +=1
+        
+        sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
+        save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
+
+        return sorted_samples
+
+    def finetune_trainer(self, model):
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        ds = RotationLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
+        trainloader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
+
+        model.linear = nn.Linear(512, 4)
+        state = load_saved_state(self.args, pretrain_level="1")
+        model.load_state_dict(state['model'], strict=False)
+        model = model.to(self.args.device)
+
+        criterion = nn.CrossEntropyLoss()
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
+
+        model.train()
+
+        for epoch in range(30):
+            print('\nEpoch: %d' % epoch)
+            train_loss = 0
+            correct = 0
+            total = 0
+            for batch_idx, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(trainloader):
+                inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
+                inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
+                
+                optimizer.zero_grad()
+                outputs, outputs1, outputs2, outputs3 = model(inputs), model(inputs1), model(inputs2), model(inputs3)
+
+                loss1 = criterion(outputs, targets)
+                loss2 = criterion(outputs1, targets1)
+                loss3 = criterion(outputs2, targets2)
+                loss4 = criterion(outputs3, targets3)
+                loss = (loss1+loss2+loss3+loss4)/4.
+                loss.backward()
+                optimizer.step()
+
+                train_loss += loss.item()
+                _, predicted = outputs.max(1)
+                _, predicted1 = outputs1.max(1)
+                _, predicted2 = outputs2.max(1)
+                _, predicted3 = outputs3.max(1)
+                total += targets.size(0)*4
+
+                correct += predicted.eq(targets).sum().item()
+                correct += predicted1.eq(targets1).sum().item()
+                correct += predicted2.eq(targets2).sum().item()
+                correct += predicted3.eq(targets3).sum().item()
+            scheduler.step()
+
+        simple_save_model(self.args, model, 'finetuner.pth')
+
+
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
 
+        state = simple_load_model(self.args, path='finetuner.pth')
+        if not state:
+            self.finetune_trainer(encoder)
+
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
-            path_loss = self.make_batches(encoder)
+            path_loss = self.make_batches_(encoder)
 
         pretraining_sample_pool = []
         rebuild_al_model = True
@@ -242,7 +438,7 @@ class PretextTrainer():
                 proxy_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.finetune(proxy_model, sample6400)
+                samplek = self.finetune_(proxy_model, sample6400)
             else:
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
@@ -250,7 +446,7 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                proxy_model = self.train_proxy(
+                proxy_model = self.train_proxy_(
                     pretraining_sample_pool, 
                     proxy_model, rebuild_al_model=rebuild_al_model)
 
