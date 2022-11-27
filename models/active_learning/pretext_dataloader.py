@@ -160,7 +160,7 @@ class RotationLoader(torch.utils.data.Dataset):
         save_class_names(self.args, label)
         
         if self.is_train:
-            img = self.transform.__call__(img)
+            img = self.transform(img)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
@@ -169,7 +169,7 @@ class RotationLoader(torch.utils.data.Dataset):
             random.shuffle(rotations)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
         else:
-            img = self.transform.__call__(img, is_train=False)
+            img = self.transform(img)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
