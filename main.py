@@ -26,8 +26,8 @@ def main():
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
         if not state:
-            pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer = SupPretrainer(args, writer)
+            # pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
         # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
