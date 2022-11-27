@@ -22,8 +22,6 @@ class SimCLRTrainer():
         state = None
         if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
             self.model = encoder
-            # self.criterion = NT_Xent(self.args.al_batch_size, self.args.temperature, self.args.world_size)
-
             self.criterion = NTXentLoss(self.args)
 
         else:
@@ -35,8 +33,8 @@ class SimCLRTrainer():
 
         self.model = self.model.to(self.args.device)
 
-        train_params = get_params(self.args, training_type)
-        self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, train_params)
+        self.train_params = get_params(self.args, training_type)
+        self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, self.train_params)
 
     def train_epoch(self) -> int:
         total_loss, total_num = 0.0, 0
