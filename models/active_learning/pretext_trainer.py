@@ -1,5 +1,4 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from optim.optimizer import load_optimizer
@@ -7,11 +6,10 @@ import utils.logger as logging
 from typing import List
 
 import random
-import torchvision.transforms as transforms
 
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import Loader, PretextDataLoader, RotationLoader
+from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
