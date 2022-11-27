@@ -3,7 +3,7 @@ import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
 
-from models.active_learning.pretext_dataloader import MakeBatchLoader, MakeBatchLoader_
+from models.active_learning.pretext_dataloader import MakeBatchLoader
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.utils.commons import get_params, split_dataset
@@ -28,7 +28,7 @@ class TargetDataset():
 
     
     def get_dataset(self, transforms):
-        return MakeBatchLoader_(
+        return MakeBatchLoader(
             self.args,
             self.dir, self.with_train, self.is_train, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir,
