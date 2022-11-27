@@ -130,6 +130,9 @@ class PretextTrainer():
         ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
         test_loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=False)
 
+        logging.info("Generating the top1 scores")
+        _preds = []
+
         top1_scores = []
         model.eval()
         with torch.no_grad():
@@ -137,23 +140,15 @@ class PretextTrainer():
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
                 outputs = model(inputs)
 
-                scores, predicted = outputs.max(1)
-                # save top1 confidence score 
-
-                outputs = F.normalize(outputs, dim=1)
-                probs = F.softmax(outputs, dim=1)
-                print(probs)
-                print(scores)
-                print(predicted)
-                top1_scores.append(probs[0][predicted.item()])
+                # scores, predicted = outputs.max(1)
+                _preds.append(self.get_preds(outputs))
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(test_loader)}]")
 
-        print(top1_scores)
-        idx = np.argsort(top1_scores)
-        samples = np.array(samples)
-        return samples[idx[:1000]]
+        # preds = torch.cat(_preds).numpy()
+       
+        return self.get_new_samples_(_preds, samples)
 
 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
