@@ -146,9 +146,9 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(test_loader)}]")
 
-        # preds = torch.cat(_preds).numpy()
+        preds = torch.cat(_preds).numpy()
        
-        return self.get_new_samples(_preds, samples)
+        return self.get_new_samples(preds, samples)
 
 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
@@ -178,9 +178,9 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]")
 
-        # preds = torch.cat(_preds).numpy()
+        preds = torch.cat(_preds).numpy()
        
-        return self.get_new_samples_(_preds, samples)
+        return self.get_new_samples_(preds, samples)
 
 
     def get_predictions(self, outputs):
