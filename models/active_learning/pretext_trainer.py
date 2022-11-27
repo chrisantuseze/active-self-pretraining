@@ -27,6 +27,7 @@ class PretextTrainer():
         self.args = args
         self.writer = writer
         self.criterion = None
+        self.log_step = 1000
 
     def train_proxy(self, samples, model, rebuild_al_model=False):
 
@@ -373,8 +374,9 @@ class PretextTrainer():
 
         model.train()
 
-        for epoch in range(30):
-            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
+        epochs = 5
+        for epoch in range(epochs):
+            logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
             total_loss, total_num = 0, 0
