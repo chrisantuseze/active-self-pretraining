@@ -94,39 +94,6 @@ class PretextDataset(torch.utils.data.Dataset):
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
-    def __init__(self, args, dir, with_train, transform=None):
-        self.args = args
-        self.dir = dir
-
-        if with_train:
-            if self.dir == "./datasets/imagenet":
-                self.img_path = glob.glob(dir + '/train/*/*/*')
-            else:
-                self.img_path = glob.glob(dir + '/train/*/*')
-        else:
-            self.img_path = glob.glob(dir + '/*/*')
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.img_path)
-
-    def __getitem__(self, idx):
-        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/imagenet":
-            img = pil_loader(self.img_path[idx])
-
-        else:
-            img = Image.open(self.img_path[idx])
-
-        # x1, x2 = self.transform.__call__(img)
-        x = self.transform.__call__(img)
-        path = self.img_path[idx] 
-
-        label = path.split('/')[-2]
-        save_class_names(self.args, label)
-
-        return x, path
-
-class MakeBatchLoader_(torch.utils.data.Dataset):
     def __init__(self, args, dir, with_train, is_train, transform=None):
         self.args = args
         params = get_params(args, TrainingType.ACTIVE_LEARNING)
@@ -178,34 +145,3 @@ class MakeBatchLoader_(torch.utils.data.Dataset):
             rotations = [0, 1, 2, 3]
             random.shuffle(rotations)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path
-
-class Loader(torch.utils.data.Dataset):
-    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_val=False) -> None:
-        self.args = args
-        self.pathloss_list = pathloss_list
-        self.transform = transform
-        self.is_val = is_val
-
-        labels = set(load_class_names(self.args))
-        index = 0
-        self.label_dic = {}
-        for label in labels:
-            label = label.replace("\n", "")
-            if label not in self.label_dic:
-                self.label_dic[label] = index
-                index += 1
-
-    
-    def __len__(self):
-        return len(self.pathloss_list)
-
-    def __getitem__(self, idx):
-        path = self.pathloss_list[idx].path[0]
-        if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
-            img = pil_loader(path)
-
-        else:
-            img = Image.open(path)
-
-        label = path.split('/')[-2]
-        return self.transform(img), torch.tensor(self.label_dic[label])
