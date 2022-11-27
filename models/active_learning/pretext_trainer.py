@@ -361,7 +361,7 @@ class PretextTrainer():
         ])
 
         ds = RotationLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
-        trainloader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
+        train_loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
 
         model.linear = nn.Linear(512, 4)
         state = load_saved_state(self.args, pretrain_level="1")
@@ -382,7 +382,7 @@ class PretextTrainer():
             total_loss, total_num = 0, 0
             correct = 0
             total = 0
-            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(trainloader):
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
                 
@@ -412,7 +412,7 @@ class PretextTrainer():
                 correct += predicted3.eq(targets3).sum().item()
 
                 if step % self.log_step == 0:
-                    logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+                    logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
             scheduler.step()
 
