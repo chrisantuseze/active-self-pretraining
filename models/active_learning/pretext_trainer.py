@@ -29,47 +29,6 @@ class PretextTrainer():
         self.log_step = 1000
 
     def train_proxy(self, samples, model, rebuild_al_model=False):
-
-        # convert samples to loader
-        loader = PretextDataLoader(self.args, samples).get_loader()
-        logging.info("Beginning training the proxy")
-
-        log_step = self.args.log_step
-        if self.args.method == SSL_Method.SIMCLR.value:
-            trainer = SimCLRTrainer(
-                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
-                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                training_type=TrainingType.ACTIVE_LEARNING, log_step=log_step)
-
-        elif self.args.method == SSL_Method.DCL.value:
-            trainer = SimCLRTrainerV2(
-                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
-                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                training_type=TrainingType.ACTIVE_LEARNING, log_step=log_step)
-
-        elif self.args.method == SSL_Method.MYOW.value:
-            trainer = get_myow_trainer(
-                args=self.args, writer=self.writer, encoder=model, dataloader=loader, 
-                pretrain_level="1", rebuild_al_model=rebuild_al_model, 
-                trainingType=TrainingType.ACTIVE_LEARNING, log_step=log_step)
-
-        else:
-            ValueError
-
-        for epoch in range(self.args.al_epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
-            logging.info('-' * 20)
-
-            epoch_loss = trainer.train_epoch()
-
-            # Decay Learning Rate
-            trainer.scheduler.step()
-            
-            logging.info('Train Loss: {:.4f}'.format(epoch_loss))
-
-        return trainer.model
-
-    def train_proxy_(self, samples, model, rebuild_al_model=False):
         loader = PretextDataLoader(self.args, samples).get_loader()
 
         state = None
@@ -113,7 +72,7 @@ class PretextTrainer():
 
         return model
 
-    def finetune_(self, model, samples: List[PathLoss]) -> List[PathLoss]:
+    def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING, is_val=True).get_loader()
 
         logging.info("Generating the top1 scores")
@@ -133,39 +92,6 @@ class PretextTrainer():
         preds = torch.cat(_preds).numpy()
        
         return self.get_new_samples(preds, samples)
-
-
-    def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
-        # Train using 70% of the samples with the highest loss. So this should be the source of the data
-        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING, is_val=True).get_loader()
-
-        logging.info("Generating the top1 scores")
-        _preds = []
-        model.eval()
-
-        with torch.no_grad():
-            for step, (image, _) in enumerate(loader):
-                # images[0] = images[0].to(self.args.device)
-                # images[1] = images[1].to(self.args.device)
-
-                # _, _, outputs1, outputs2 = model(images[0], images[1])
-                image = image.to(self.args.device)
-
-                if self.args.method == SSL_Method.SIMCLR.value:
-                    features = model(image)
-                
-                else:
-                    features, _ = model(image)
-
-                _preds.append(self.get_preds(features))
-
-                if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]")
-
-        preds = torch.cat(_preds).numpy()
-       
-        return self.get_new_samples_(preds, samples)
-
 
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
@@ -236,56 +162,7 @@ class PretextTrainer():
 
         return new_samples[:self.args.al_trainer_sample_size]
 
-    def make_batches(self, encoder) -> List[PathLoss]:
-        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
-        batch_size = self.args.al_batch_size
-        self.args.al_batch_size = 1
-
-        model = encoder
-        model, criterion = get_model_criterion(self.args, model)
-        state = load_saved_state(self.args, pretrain_level="1")
-        model.load_state_dict(state['model'], strict=False)
-
-        model = model.to(self.args.device)
-        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING).get_loader()
-
-        model.eval()
-        pathloss = []
-
-        logging.info("About to begin eval to make batches")
-        count = 0
-        with torch.no_grad():
-            for step, (image, path) in enumerate(loader):
-                image = image.to(self.args.device)
-
-                # output = model(image)
-
-                # # this needs to be really looked into
-                # loss = criterion(output, output)
-
-                # Forward pass to get output/logits
-                output1 = model(image)
-                output2 = model(image)
-
-                # Calculate Loss: softmax --> cross entropy loss
-                loss = criterion(output1, output2) + criterion(output2, output1)
-                loss /= 4
-                
-                loss = loss.item()
-                if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
-
-                pathloss.append(PathLoss(path, loss))
-                count +=1
-        
-        sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
-        save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
-
-        self.args.al_batch_size = batch_size
-
-        return sorted_samples
-
-    def make_batches_(self, model):
+    def make_batches(self, model):
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
         batch_size = self.args.al_batch_size
         self.args.al_batch_size = 1
@@ -348,7 +225,7 @@ class PretextTrainer():
 
         model.train()
 
-        epochs = 5
+        epochs = 30
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
@@ -403,13 +280,13 @@ class PretextTrainer():
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
-            path_loss = self.make_batches_(encoder)
+            path_loss = self.make_batches(encoder)
 
         pretraining_sample_pool = []
         rebuild_al_model = True
 
         sample_per_batch = len(path_loss)//self.args.al_batches
-        for batch in range(0, self.args.al_batches): # change the '1' to '0'
+        for batch in range(0, self.args.al_batches):
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
             # sketch -> 5120 | 2400 for 20 batches
@@ -420,7 +297,7 @@ class PretextTrainer():
                 proxy_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.finetune_(proxy_model, sample6400)
+                samplek = self.finetune(proxy_model, sample6400)
             else:
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
@@ -428,7 +305,7 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                proxy_model = self.train_proxy_(
+                proxy_model = self.train_proxy(
                     pretraining_sample_pool, 
                     proxy_model, rebuild_al_model=rebuild_al_model)
 
