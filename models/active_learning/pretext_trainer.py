@@ -29,7 +29,37 @@ class PretextTrainer():
         self.criterion = None
         self.log_step = 1000
 
-    def train_proxy(self, samples, model, rebuild_al_model=False):
+    def test_proxy(self, model, criterion, batch, test_loader):
+        global best_proxy_acc
+        model.eval()
+        correct = 0
+        total = 0
+        total_loss, total_num = 0.0, 0
+        with torch.no_grad():
+            for step, (inputs, targets) in enumerate(test_loader):
+                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
+                outputs = model(inputs)
+                loss = criterion(outputs, targets)
+
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+
+                total_num += 100
+                total_loss += loss.item() * 100
+
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+
+
+        # Save checkpoint.
+        acc = 100.*correct/total
+        if acc > best_proxy_acc:
+            print('Saving..')
+            simple_save_model(self.args, model, f'proxy_{batch}.pth')
+            best_proxy_acc = acc
+
+    def train_proxy(self, samples, model, batch, rebuild_al_model=False):
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
@@ -39,6 +69,15 @@ class PretextTrainer():
 
         ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
         loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True, num_workers=2)
+
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        testset = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
+        test_loader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+
 
         state = None
         if not rebuild_al_model:
@@ -74,6 +113,8 @@ class PretextTrainer():
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
+
+            self.test_proxy(model, criterion, batch, test_loader)
 
             # Decay Learning Rate
             scheduler.step()
@@ -234,6 +275,52 @@ class PretextTrainer():
 
         return sorted_samples
 
+    def test_finetune_trainer(self, model, criterion, test_loader):
+        global best_trainer_acc
+        model.eval()
+        test_loss = 0
+        correct = 0
+        total = 0
+        total_loss, total_num = 0.0, 0
+        with torch.no_grad():
+            for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(test_loader):
+                inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
+                inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
+                outputs = model(inputs)
+                outputs1 = model(inputs1)
+                outputs2 = model(inputs2)
+                outputs3 = model(inputs3)
+                loss1 = criterion(outputs, targets)
+                loss2 = criterion(outputs1, targets1)
+                loss3 = criterion(outputs2, targets2)
+                loss4 = criterion(outputs3, targets3)
+                loss = (loss1+loss2+loss3+loss4)/4.
+                test_loss += loss.item()
+                _, predicted = outputs.max(1)
+                _, predicted1 = outputs1.max(1)
+                _, predicted2 = outputs2.max(1)
+                _, predicted3 = outputs3.max(1)
+                total += targets.size(0)*4
+
+                correct += predicted.eq(targets).sum().item()
+                correct += predicted1.eq(targets1).sum().item()
+                correct += predicted2.eq(targets2).sum().item()
+                correct += predicted3.eq(targets3).sum().item()
+
+                total_num += 100
+                total_loss += loss.item() * 100
+
+                if step % self.args.log_step == 0:
+                    logging.info(f"Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+
+        # Save checkpoint.
+        acc = 100.*correct/total
+        if acc > best_trainer_acc:
+            print('Saving..')
+            simple_save_model(self.args, model, 'finetuner.pth')
+            
+            best_trainer_acc = acc
+
     def finetune_trainer(self, model):
         transform_train = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
@@ -245,6 +332,15 @@ class PretextTrainer():
 
         ds = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
         loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
+
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
+        test_loader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False)#, num_workers=2)
+
 
         model, criterion = get_model_criterion(self.args, model)
         state = load_saved_state(self.args, pretrain_level="1")
@@ -296,9 +392,11 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
 
+            self.test_finetune_trainer(model, criterion, test_loader)
+
             scheduler.step()
 
-        simple_save_model(self.args, model, 'finetuner.pth')
+        # simple_save_model(self.args, model, 'finetuner.pth')
 
 
     def do_active_learning(self) -> List[PathLoss]:
@@ -341,7 +439,7 @@ class PretextTrainer():
                     proxy_model, rebuild_al_model=rebuild_al_model)
 
                 rebuild_al_model=False
-                simple_save_model(self.args, proxy_model, f'proxy_{batch}.pth')
+                # simple_save_model(self.args, proxy_model, f'proxy_{batch}.pth')
 
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool
