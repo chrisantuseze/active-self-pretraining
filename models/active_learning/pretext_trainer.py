@@ -88,7 +88,7 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        _, criterion = get_model_criterion(self.args, model, num_classes=self.num_classes) #num classes is not required here
+        _, criterion = get_model_criterion(self.args, model, num_classes=4)
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
@@ -169,13 +169,6 @@ class PretextTrainer():
         return new_samples[:self.args.al_trainer_sample_size]
 
     def make_batches(self, model):
-        # transform_test = transforms.Compose([
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-        # testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
-        # loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
-
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
