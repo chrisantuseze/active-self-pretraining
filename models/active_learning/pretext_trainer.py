@@ -27,10 +27,11 @@ class PretextTrainer():
         self.args = args
         self.writer = writer
         self.criterion = None
-        self.log_step = 1000
+        self.best_proxy_acc = 0  # best test accuracy
+        self.best_trainer_acc = 0  # best test accuracy
+
 
     def test_proxy(self, model, criterion, batch, test_loader):
-        global best_proxy_acc
         model.eval()
         correct = 0
         total = 0
@@ -54,10 +55,10 @@ class PretextTrainer():
 
         # Save checkpoint.
         acc = 100.*correct/total
-        if acc > best_proxy_acc:
+        if acc > self.best_proxy_acc:
             print('Saving..')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
-            best_proxy_acc = acc
+            self.best_proxy_acc = acc
 
     def train_proxy(self, samples, model, batch, rebuild_al_model=False):
         transform_train = transforms.Compose([
@@ -276,7 +277,6 @@ class PretextTrainer():
         return sorted_samples
 
     def test_finetune_trainer(self, model, criterion, test_loader):
-        global best_trainer_acc
         model.eval()
         test_loss = 0
         correct = 0
@@ -315,11 +315,11 @@ class PretextTrainer():
 
         # Save checkpoint.
         acc = 100.*correct/total
-        if acc > best_trainer_acc:
+        if acc > self.best_trainer_acc:
             print('Saving..')
             simple_save_model(self.args, model, 'finetuner.pth')
             
-            best_trainer_acc = acc
+            self.best_trainer_acc = acc
 
     def finetune_trainer(self, model):
         transform_train = transforms.Compose([
