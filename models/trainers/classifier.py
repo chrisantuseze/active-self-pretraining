@@ -96,12 +96,9 @@ class Classifier:
         loss = 0.0
         corrects = 0
         for step, (images, targets) in enumerate(train_loader):
+            images, targets = images.to(self.args.device), targets.to(self.args.device)
+
             self.optimizer.zero_grad()
-
-            images = images.to(self.args.device)
-            targets = targets.to(self.args.device)
-
-            # compute output
             outputs = self.model(images)
             loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
