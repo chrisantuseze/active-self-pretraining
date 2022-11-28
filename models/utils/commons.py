@@ -20,7 +20,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
     if training_type == TrainingType.ACTIVE_LEARNING or training_type == TrainingType.FINETUNING:
         criterion = nn.CrossEntropyLoss()
         model = encoder
-        model.fc = nn.Linear(n_features, num_classes)
+        model.linear = nn.Linear(n_features, num_classes)
         print("using Regular model")
 
     else:
