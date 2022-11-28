@@ -51,7 +51,7 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
 
         # Save checkpoint.
@@ -116,13 +116,12 @@ class PretextTrainer():
                 total_loss += loss.item() * train_params.batch_size
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
+                    logging.info(f"Train Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
 
             self.test_proxy(model, criterion, batch, test_loader)
 
             # Decay Learning Rate
             scheduler.step()
-            logging.info('Train Loss: {:.4f}'.format(total_loss))
 
         return model
 
@@ -147,7 +146,7 @@ class PretextTrainer():
                 _preds.append(self.get_predictions(outputs))
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]")
+                    logging.info(f"Eval Step [{step}/{len(loader)}]")
 
         preds = torch.cat(_preds).numpy()
        
@@ -268,7 +267,7 @@ class PretextTrainer():
 
                 loss = loss.item()
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {loss}")
+                    logging.info(f"Eval Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
         
@@ -314,7 +313,7 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
         # Save checkpoint.
         acc = 100.*correct/total
@@ -393,7 +392,7 @@ class PretextTrainer():
                 correct += predicted3.eq(targets3).sum().item()
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
+                    logging.info(f"Train Step [{step}/{len(loader)}]\t Loss: {total_loss / total_num}")
 
             self.test_finetune_trainer(model, criterion, test_loader)
 
@@ -406,11 +405,11 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
 
-        state = None#simple_load_model(self.args, path='finetuner.pth')
+        state = simple_load_model(self.args, path='finetuner.pth')
         if not state:
             self.finetune_trainer(encoder)
 
-        path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
+        path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 

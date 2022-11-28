@@ -141,7 +141,7 @@ class Classifier:
             optimizer.step()
 
             if step % self.args.log_step == 0:
-                logging.info(f"Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
+                logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
             loss += loss.item() * images.size(0)
@@ -169,7 +169,7 @@ class Classifier:
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
+                    logging.info(f"Eval Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics
                 loss += loss.item() * images.size(0)
