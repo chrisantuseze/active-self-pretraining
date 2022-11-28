@@ -103,6 +103,7 @@ class Classifier:
             _, preds = torch.max(outputs, 1)
 
             loss.backward()
+            print(loss)
             self.optimizer.step()
 
             if step % self.args.log_step == 0:
