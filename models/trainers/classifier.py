@@ -35,7 +35,8 @@ class Classifier:
         num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
-        self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
+        self.model.fc = nn.Linear(512, num_classes)
+        _, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
@@ -57,18 +58,16 @@ class Classifier:
 
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
-        self.criterion = nn.CrossEntropyLoss().to(self.args.device)
-
         for epoch in range(self.args.finetune_epochs):
 
             logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader, self.criterion)
+            train_loss, train_acc = self.train_single_epoch(train_loader)
 
             # evaluate on validation set
-            val_loss, val_acc = self.validate(val_loader, self.criterion)
+            val_loss, val_acc = self.validate(val_loader)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -92,7 +91,7 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader, criterion):
+    def train_single_epoch(self, train_loader):
         self.model.train()
 
         total_loss, corrects = 0.0, 0
@@ -101,7 +100,7 @@ class Classifier:
 
             self.optimizer.zero_grad()
             outputs = self.model(images)
-            loss = criterion(outputs, targets)
+            loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
             print(loss)
@@ -121,7 +120,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, criterion):    
+    def validate(self, val_loader):    
         self.model.eval()
 
         total_loss, corrects = 0.0, 0
@@ -132,7 +131,7 @@ class Classifier:
 
                 # compute output
                 outputs = self.model(images)
-                loss = criterion(outputs, targets)
+                loss = self.criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
