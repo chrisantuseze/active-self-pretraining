@@ -361,7 +361,7 @@ class PretextTrainer():
             correct += predicted2.eq(targets2).sum().item()
             correct += predicted3.eq(targets3).sum().item()
 
-            print(loss.item(), total_loss, predicted)
+            # print(loss.item(), total_loss)
 
             if step % self.args.log_step == 0:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
