@@ -28,6 +28,7 @@ class PretextTrainer():
         self.writer = writer
         self.criterion = None
         self.best_proxy_acc = 0  # best test accuracy
+        self.best_batch = 0
         self.best_trainer_acc = 0  # best test accuracy
 
 
@@ -59,6 +60,7 @@ class PretextTrainer():
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
             self.best_proxy_acc = acc
+            self.best_batch = batch
 
     def train_proxy(self, samples, model, batch, rebuild_al_model=False):
         transform_train = transforms.Compose([
@@ -404,11 +406,11 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
 
-        state = simple_load_model(self.args, path='finetuner.pth')
+        state = None#simple_load_model(self.args, path='finetuner.pth')
         if not state:
             self.finetune_trainer(encoder)
 
-        path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
+        path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 
@@ -423,7 +425,7 @@ class PretextTrainer():
             if batch > 0:
                 logging.info(f'>> Getting previous checkpoint for batch {batch + 1}')
 
-                state = simple_load_model(self.args, f'proxy_{batch-1}.pth')
+                state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 proxy_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
