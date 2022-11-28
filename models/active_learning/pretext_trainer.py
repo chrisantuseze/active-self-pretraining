@@ -88,7 +88,7 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        _, criterion = get_model_criterion(self.args, model, num_classes=4)
+        _, criterion = get_model_criterion(self.args, model)
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)

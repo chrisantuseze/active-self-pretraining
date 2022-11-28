@@ -14,7 +14,7 @@ from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
-def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, num_classes=None):
+def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, num_classes=4):
     n_features = get_feature_dimensions_backbone(args)
 
     if training_type == TrainingType.ACTIVE_LEARNING or training_type == TrainingType.FINETUNING:
