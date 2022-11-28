@@ -305,11 +305,11 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
 
-        state = simple_load_model(self.args, path='finetuner.pth')
+        state = None#simple_load_model(self.args, path='finetuner.pth')
         if not state:
             self.finetune_trainer(encoder)
 
-        path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
+        path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 
