@@ -102,8 +102,8 @@ class Classifier:
             loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
-            loss.backward()
             print(loss)
+            loss.backward()
             self.optimizer.step()
 
             if step % self.args.log_step == 0:
