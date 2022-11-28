@@ -17,7 +17,15 @@ from models.utils.training_type_enum import Params, TrainingType
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, num_classes=4):
     n_features = get_feature_dimensions_backbone(args)
 
-    if training_type == TrainingType.ACTIVE_LEARNING or training_type == TrainingType.FINETUNING:
+    if training_type == TrainingType.ACTIVE_LEARNING:
+        criterion = nn.CrossEntropyLoss()
+        model = encoder
+        model.linear = nn.Linear(n_features, num_classes)
+        print("using Regular model")
+
+    # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
+
+    elif training_type == TrainingType.FINETUNING:
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
