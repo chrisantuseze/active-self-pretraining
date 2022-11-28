@@ -16,7 +16,7 @@ from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
-from models.active_learning.al_method_enum import AL_Method
+from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_path_loss, load_saved_state, save_accuracy_to_file, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
@@ -139,7 +139,7 @@ class PretextTrainer():
 
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
-        logging.info("Generating the top1 scores")
+        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
         _preds = []
 
         model.eval()
