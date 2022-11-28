@@ -94,10 +94,10 @@ class Classifier:
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader, self.criterion, self.optimizer)
+            train_loss, train_acc = self.train_single_epoch(train_loader)
 
             # evaluate on validation set
-            val_loss, val_acc = self.validate(val_loader, self.criterion)
+            val_loss, val_acc = self.validate(val_loader)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -121,23 +121,24 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader, criterion, optimizer):
+    def train_single_epoch(self, train_loader):
         self.model.train()
 
         loss = 0.0
         corrects = 0
         for step, (images, targets) in enumerate(train_loader):
-            optimizer.zero_grad()
+            self.optimizer.zero_grad()
+            
             images = images.to(self.args.device)
             targets = targets.to(self.args.device)
 
             # compute output
             outputs = self.model(images)
-            loss = criterion(outputs, targets)
+            loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
             loss.backward()
-            optimizer.step()
+            self.optimizer.step()
 
             if step % self.args.log_step == 0:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
@@ -152,7 +153,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, criterion):    
+    def validate(self, val_loader):    
         self.model.eval()
 
         loss = 0.0
@@ -164,7 +165,7 @@ class Classifier:
 
                 # compute output
                 outputs = self.model(images)
-                loss = criterion(outputs, targets)
+                loss = self.criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
