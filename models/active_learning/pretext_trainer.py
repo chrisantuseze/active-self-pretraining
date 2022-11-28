@@ -83,12 +83,10 @@ class PretextTrainer():
 
 
         state = None
+        _, criterion = get_model_criterion(self.args, model)
         if rebuild_al_model:
-            model, criterion = get_model_criterion(self.args, model)
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
-        else:
-            _, criterion = get_model_criterion(self.args, model)
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
@@ -105,7 +103,7 @@ class PretextTrainer():
             for step, (inputs, targets) in enumerate(loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
 
-                print(inputs.min(), inputs.max())
+                print(targets.min(), targets.max())
                 
                 optimizer.zero_grad()
                 outputs = model(inputs)
