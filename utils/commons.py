@@ -111,7 +111,7 @@ def save_path_loss(args, filename, image_loss_list):
         with open(out, "wb") as file:
             pickle.dump(image_loss_list, file)
 
-        logging.info("path loss saved at {out}")
+        logging.info(f"path loss saved at {out}")
 
     except IOError as er:
         # logging.error(er)
