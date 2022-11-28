@@ -49,6 +49,8 @@ class PretextTrainer():
                 total_num += 100
                 total_loss += loss.item() * 100
 
+                print(loss.item(), total_loss)
+
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
@@ -78,6 +80,8 @@ class PretextTrainer():
 
                 total_num += train_params.batch_size
                 total_loss += loss.item() * train_params.batch_size
+
+                print(loss.item(), total_loss)
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
@@ -225,18 +229,18 @@ class PretextTrainer():
         return new_samples[:self.args.al_trainer_sample_size]
 
     def make_batches(self, model):
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
-        testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
-        loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
+        # transform_test = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        # ])
+        # testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
+        # loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
         # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
         # batch_size = self.args.al_batch_size
         # self.args.al_batch_size = 1
 
-        # loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False).get_loader()
+        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model)
         state = simple_load_model(self.args, path='finetuner.pth')
@@ -315,6 +319,8 @@ class PretextTrainer():
                 total_num += 100
                 total_loss += loss.item() * 100
 
+                print(loss.item(), total_loss)
+
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
@@ -345,8 +351,8 @@ class PretextTrainer():
             loss.backward()
             optimizer.step()
 
-            total_loss += loss.item() * 256
-            total_num += 256
+            total_loss += loss.item() * self.args.al_batch_size
+            total_num += self.args.al_batch_size
 
             _, predicted = outputs.max(1)
             _, predicted1 = outputs1.max(1)
@@ -358,6 +364,8 @@ class PretextTrainer():
             correct += predicted1.eq(targets1).sum().item()
             correct += predicted2.eq(targets2).sum().item()
             correct += predicted3.eq(targets3).sum().item()
+
+            print(loss.item(), total_loss)
 
             if step % self.args.log_step == 0:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
