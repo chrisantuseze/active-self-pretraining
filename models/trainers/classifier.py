@@ -76,6 +76,9 @@ class Classifier:
 
         self.criterion = nn.CrossEntropyLoss().to(self.args.device)
 
+        self.best_model = copy.deepcopy(self.model)
+        self.best_acc = 0
+
     def finetune(self, pretrain_data=None) -> None:
         train_loader, val_loader = Finetune(
             self.args, dir=self.dir, 
@@ -84,9 +87,6 @@ class Classifier:
         since = time.time()
 
         val_acc_history = []
-
-        best_model_wts = copy.deepcopy(self.model.state_dict())
-        best_acc = 0.0
 
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
@@ -99,7 +99,7 @@ class Classifier:
             train_loss, train_acc = self.train_single_epoch(train_loader, self.criterion, self.optimizer)
 
             # evaluate on validation set
-            val_loss, val_acc, best_acc, best_model_wts = self.validate(val_loader, self.criterion, best_acc, best_model_wts)
+            val_loss, val_acc = self.validate(val_loader, self.criterion)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -113,13 +113,11 @@ class Classifier:
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        logging.info('Best val Acc: {:3f}'.format(best_acc * 100))
+        logging.info('Best val Acc: {:3f}'.format(self.best_acc * 100))
 
-        # load best model weights
-        self.model.load_state_dict(best_model_wts)
-        simple_save_model(self.args, self.model, 'classifier_{:4f}_acc.pth'.format(best_acc))
+        simple_save_model(self.args, self.best_model, 'classifier_{:4f}_acc.pth'.format(self.best_acc))
         save_accuracy_to_file(
-            self.args, accuracies=val_acc_history, best_accuracy=best_acc, 
+            self.args, accuracies=val_acc_history, best_accuracy=self.best_acc, 
             filename=f"classifier_{get_dataset_enum(self.args.finetune_dataset)}_batch_{self.args.finetune_epochs}.txt")
 
         return self.model, val_acc_history
@@ -155,7 +153,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader, criterion, best_acc, best_model_wts):    
+    def validate(self, val_loader, criterion):    
         self.model.eval()
 
         loss = 0.0
@@ -181,8 +179,9 @@ class Classifier:
             logging.info('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
             # deep copy the model
-            if epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(self.model.state_dict())
+            if epoch_acc > self.best_acc:
+                print(f'Saving.. prev best acc = {self.best_acc}, new best acc = {epoch_acc}')
+                self.best_acc = epoch_acc
+                self.best_model = copy.deepcopy(self.model)
 
-        return epoch_loss, epoch_acc, best_acc, best_model_wts
+        return epoch_loss, epoch_acc

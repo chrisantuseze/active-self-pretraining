@@ -6,7 +6,7 @@ from datautils.dataset_enum import get_dataset_enum
 from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
-
+import copy
 import random
 
 from datautils.path_loss import PathLoss
@@ -28,6 +28,7 @@ class PretextTrainer():
         self.best_batch = 0
         self.best_trainer_acc = 0
         self.val_acc_history = []
+        self.best_model = None
 
 
     def test_classifier(self, model, criterion, batch, test_loader):
@@ -126,10 +127,6 @@ class PretextTrainer():
 
             # Decay Learning Rate
             scheduler.step()
-
-        save_accuracy_to_file(
-            self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-            filename=f"main_task_{get_dataset_enum(self.args.base_dataset)}_batch_{self.args.al_epochs}.txt")
 
         return model
 
@@ -322,8 +319,8 @@ class PretextTrainer():
         # Save checkpoint.
         acc = 100.*correct/total
         if acc > self.best_trainer_acc:
-            print(f'Saving.. Prev acc = {self.best_trainer_acc}, new acc = {acc}')
-            simple_save_model(self.args, model, 'finetuner.pth')
+            print(f'Saving.. prev best acc = {self.best_trainer_acc}, new best acc = {acc}')
+            self.best_model = copy.deepcopy(model)
             
             self.best_trainer_acc = acc
 
@@ -410,6 +407,8 @@ class PretextTrainer():
 
             scheduler.step()
 
+        simple_save_model(self.args, self.best_model, 'finetuner.pth')
+
 
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
@@ -452,5 +451,8 @@ class PretextTrainer():
                 rebuild_al_model=False
 
         logging.info('Best main task val acc: {:3f}'.format(self.best_proxy_acc))
+        save_accuracy_to_file(
+                self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
+                filename=f"main_task_{get_dataset_enum(self.args.dataset)}_batch_{self.args.al_epochs}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool
