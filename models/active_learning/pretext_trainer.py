@@ -91,6 +91,7 @@ class PretextTrainer():
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
         model.train()
         total_loss, total_num = 0.0, 0
