@@ -33,9 +33,14 @@ def main():
         if args.do_al_for_ml_project:
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
+
+            # remove this
+            classifier = Classifier(args, writer, pretrain_level="1")
+            classifier.finetune() 
+            
         else:
             classifier = Classifier(args, writer, pretrain_level="1")
-            classifier.finetune(pretrain_data) 
+            classifier.finetune() 
 
         # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
         # if not state:
