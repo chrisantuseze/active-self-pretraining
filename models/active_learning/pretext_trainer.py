@@ -30,8 +30,7 @@ class PretextTrainer():
         self.val_acc_history = []
         self.best_model = None
 
-
-    def test_classifier(self, model, criterion, batch, test_loader):
+    def eval_main_task(self, model, criterion, batch, test_loader):
         model.eval()
         correct, total = 0, 0
         total_loss, total_num = 0.0, 0
@@ -53,7 +52,7 @@ class PretextTrainer():
 
 
         # Save checkpoint.
-        acc = 100.*correct/total
+        acc = 100. * correct / total
         self.val_acc_history.append(str(acc))
         if acc > self.best_proxy_acc:
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {acc}')
@@ -61,7 +60,7 @@ class PretextTrainer():
             self.best_proxy_acc = acc
             self.best_batch = batch
 
-    def train_classifier(self, model, criterion, optimizer, train_params, train_loader):
+    def train_main_task(self, model, criterion, optimizer, train_params, train_loader):
         model.train()
         total_loss, total_num = 0.0, 0
         for step, (inputs, targets) in enumerate(train_loader):
@@ -83,27 +82,8 @@ class PretextTrainer():
                     logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
     def main_task(self, samples, model, batch, rebuild_al_model=False):
-        # transform_train = transforms.Compose([
-        #     transforms.RandomCrop(32, padding=4),
-        #     transforms.RandomHorizontalFlip(),
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-
-        # ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
-        # loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True, num_workers=2)
-
-        # transform_test = transforms.Compose([
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-
-        # testset = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
-        # test_loader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
-
         train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_finetune_batch_size).get_loader()
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
-
 
         state = None
         _, criterion = get_model_criterion(self.args, model)
@@ -116,12 +96,14 @@ class PretextTrainer():
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
+        self.val_acc_history = []
+
         for epoch in range(self.args.al_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
             logging.info('-' * 20)
 
-            self.train_classifier(model, criterion, optimizer, train_params, train_loader)
-            self.test_classifier(model, criterion, batch, test_loader)
+            self.train_main_task(model, criterion, optimizer, train_params, train_loader)
+            self.eval_main_task(model, criterion, batch, test_loader)
 
             # Decay Learning Rate
             scheduler.step()
@@ -129,14 +111,6 @@ class PretextTrainer():
         return model
 
     def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
-        # transform_test = transforms.Compose([
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-
-        # ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
-        # loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False, num_workers=2)
-
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
         logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
@@ -162,40 +136,6 @@ class PretextTrainer():
         preds = dist1.detach().cpu()
 
         return preds
-
-    def get_preds(self, outputs):
-        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
-            _, predicted = outputs.max(1)
-            outputs = F.normalize(outputs, dim=1)
-            probs = F.softmax(outputs, dim=1)
-            preds = probs[0][predicted.item()]
-
-        else:
-            e = -1.0 * torch.sum(F.softmax(outputs, dim=1) * F.log_softmax(outputs, dim=1), dim=1)
-            preds = e.view(e.size(0))
-
-        return preds
-
-    def get_new_samples_(self, preds, samples) -> List[PathLoss]:
-        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
-            indices = np.argsort(preds)
-            samples = np.array(samples)
-            # return samples[indices[:1000]]
-            indices = indices[:1000]
-
-        elif self.args.al_method == AL_Method.ENTROPY.value:
-            indices = np.argsort(preds)
-            samples = np.array(samples)
-            # return samples[indices[-1000:]]
-            indices = indices[-1000:]
-
-        print(indices)
-
-        new_samples = []
-        for item in indices:
-            new_samples.append(samples[item]) # Map back to original indices
-
-        return new_samples[:self.args.al_trainer_sample_size]
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
         if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
@@ -277,12 +217,11 @@ class PretextTrainer():
 
         return sorted_samples
 
-    def test_finetuner(self, model, criterion, test_loader):
+    def eval_finetuner(self, model, criterion, test_loader):
         model.eval()
-        test_loss = 0
-        correct = 0
-        total = 0
         total_loss, total_num = 0.0, 0
+        total, correct = 0, 0
+
         with torch.no_grad():
             for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(test_loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
@@ -291,12 +230,13 @@ class PretextTrainer():
                 outputs1 = model(inputs1)
                 outputs2 = model(inputs2)
                 outputs3 = model(inputs3)
+
                 loss1 = criterion(outputs, targets)
                 loss2 = criterion(outputs1, targets1)
                 loss3 = criterion(outputs2, targets2)
                 loss4 = criterion(outputs3, targets3)
                 loss = (loss1+loss2+loss3+loss4)/4.
-                test_loss += loss.item()
+
                 _, predicted = outputs.max(1)
                 _, predicted1 = outputs1.max(1)
                 _, predicted2 = outputs2.max(1)
@@ -315,7 +255,7 @@ class PretextTrainer():
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
         # Save checkpoint.
-        acc = 100.*correct/total
+        acc = 100. * correct / total
         if acc > self.best_trainer_acc:
             print(f'Saving.. prev best acc = {self.best_trainer_acc}, new best acc = {acc}')
             self.best_model = copy.deepcopy(model)
@@ -325,7 +265,7 @@ class PretextTrainer():
     def train_finetuner(self, model, criterion, optimizer, train_loader):
         model.train()
         total_loss, total_num = 0, 0
-        correct, total = 0, 0
+        total, correct = 0, 0
 
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
             inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
@@ -356,30 +296,10 @@ class PretextTrainer():
             correct += predicted2.eq(targets2).sum().item()
             correct += predicted3.eq(targets3).sum().item()
 
-            # print(loss.item(), total_loss)
-
             if step % self.args.log_step == 0:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
     def finetuner(self, model):
-        # transform_train = transforms.Compose([
-        #     transforms.RandomCrop(32, padding=4),
-        #     transforms.RandomHorizontalFlip(),
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-
-        # ds = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
-        # loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
-
-        # transform_test = transforms.Compose([
-        #     transforms.ToTensor(),
-        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        # ])
-
-        # testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
-        # test_loader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False)#, num_workers=2)
-
         train_loader = get_target_pretrain_ds(
             self.args, training_type=TrainingType.ACTIVE_LEARNING, 
             is_train=True, batch_size=self.args.al_batch_size).get_loader()
@@ -401,7 +321,7 @@ class PretextTrainer():
             logging.info('-' * 20)
 
             self.train_finetuner(model, criterion, optimizer, train_loader)
-            self.test_finetuner(model, criterion, test_loader)
+            self.eval_finetuner(model, criterion, test_loader)
 
             scheduler.step()
 
@@ -448,7 +368,7 @@ class PretextTrainer():
 
                 rebuild_al_model=False
 
-        logging.info('Best main task val acc: {:3f}'.format(self.best_proxy_acc))
+        logging.info('Best main task val accuracy: {:3f}'.format(self.best_proxy_acc))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
                 filename=f"main_task_{get_dataset_enum(self.args.dataset)}_batch_{self.args.al_epochs}.txt")

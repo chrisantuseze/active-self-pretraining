@@ -34,25 +34,9 @@ def main():
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
 
-            # remove this
-            classifier = Classifier(args, writer, pretrain_level="1")
-            classifier.finetune() 
-            
         else:
             classifier = Classifier(args, writer, pretrain_level="1")
             classifier.finetune() 
-
-        # state = simple_load_model(args, path=f'proxy_{args.al_batches-2}.pth')
-        # if not state:
-        #     pretext = PretextTrainer(args, writer)
-        #     pretrain_data = pretext.do_active_learning()
-        
-        # else:
-        #     pretrain_data = load_path_loss(args, args.pretrain_path_loss_file)
-
-        # classifier = Classifier(args, writer, pretrain_level="1") #TODO Revert to pretrain_level="AL"
-        # classifier.finetune(pretrain_data) 
-        # classifier.finetune() #Using the AL filtered images to train the classifier won't work for cifar10 since we don't know the class of the images
 
     else:
         if args.base_pretrain:
@@ -68,10 +52,6 @@ def main():
             classifier.finetune()
 
 if __name__ == "__main__":
-    #logging.init()
-
-    #raise RuntimeError("Test unhandled")
-
     parser = argparse.ArgumentParser(description="CASL")
     config = yaml_config_hook("./config/config.yaml")
     for k, v in config.items():
