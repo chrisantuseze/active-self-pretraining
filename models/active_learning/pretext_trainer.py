@@ -92,6 +92,8 @@ class PretextTrainer():
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
+
+            model.linear = nn.Linear(self.n_features, self.num_classes)
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
