@@ -49,7 +49,6 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    print(loss.item(), total_loss)
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
 
@@ -81,7 +80,6 @@ class PretextTrainer():
                 total_loss += loss.item() * train_params.batch_size
 
                 if step % self.args.log_step == 0:
-                    print(loss.item(), total_loss)
                     logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
     def main_task(self, samples, model, batch, rebuild_al_model=False):
