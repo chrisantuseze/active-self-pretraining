@@ -103,7 +103,7 @@ class PretextTrainer():
             for step, (inputs, targets) in enumerate(loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
 
-                print(targets.min(), targets.max())
+                # print(targets.min(), targets.max())
                 
                 optimizer.zero_grad()
                 outputs = model(inputs)
