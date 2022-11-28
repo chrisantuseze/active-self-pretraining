@@ -368,9 +368,9 @@ class PretextTrainer():
 
                 rebuild_al_model=False
 
-        logging.info('Best main task val accuracy: {:3f}'.format(self.best_proxy_acc))
+        logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method)))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-                filename=f"main_task_{get_dataset_enum(self.args.dataset)}_batch_{self.args.al_epochs}.txt")
+                filename=f"main_task_{get_dataset_enum(self.args.dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool
