@@ -63,10 +63,10 @@ class Classifier:
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader)
+            train_loss, train_acc = self.train_single_epoch(self.model, train_loader, self.criterion)
 
             # evaluate on validation set
-            val_loss, val_acc = self.validate(val_loader)
+            val_loss, val_acc = self.validate(self.model, val_loader, self.criterion)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -90,17 +90,16 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader):
-        self.model.train()
+    def train_single_epoch(self, model, train_loader, criterion):
+        model.train()
 
-        loss = 0.0
-        corrects = 0
+        loss, corrects = 0.0, 0
         for step, (images, targets) in enumerate(train_loader):
             images, targets = images.to(self.args.device), targets.to(self.args.device)
 
             self.optimizer.zero_grad()
-            outputs = self.model(images)
-            loss = self.criterion(outputs, targets)
+            outputs = model(images)
+            loss = criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
             loss.backward()
@@ -119,8 +118,8 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader):    
-        self.model.eval()
+    def validate(self, model, val_loader, criterion):    
+        model.eval()
 
         loss = 0.0
         corrects = 0
@@ -130,8 +129,8 @@ class Classifier:
                 targets = targets.to(self.args.device)
 
                 # compute output
-                outputs = self.model(images)
-                loss = self.criterion(outputs, targets)
+                outputs = model(images)
+                loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
@@ -148,6 +147,6 @@ class Classifier:
             if epoch_acc > self.best_acc:
                 print(f'Saving.. prev best acc = {self.best_acc}, new best acc = {epoch_acc}')
                 self.best_acc = epoch_acc
-                self.best_model = copy.deepcopy(self.model)
+                self.best_model = copy.deepcopy(model)
 
         return epoch_loss, epoch_acc
