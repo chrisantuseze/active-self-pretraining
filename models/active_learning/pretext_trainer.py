@@ -31,6 +31,9 @@ class PretextTrainer():
         self.val_acc_history = []
         self.best_model = None
 
+        self.num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
+        self.n_features = get_feature_dimensions_backbone(self.args)
+
     def eval_main_task(self, model, criterion, batch, test_loader):
         model.eval()
         correct, total = 0, 0
@@ -85,7 +88,7 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        _, criterion = get_model_criterion(self.args, model) #num classes is not required here
+        _, criterion = get_model_criterion(self.args, model, num_classes=self.num_classes) #num classes is not required here
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
@@ -331,9 +334,7 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         
         main_task_model = encoder
-        num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
-        n_features = get_feature_dimensions_backbone(self.args)
-        main_task_model.linear = nn.Linear(n_features, num_classes)
+        main_task_model.linear = nn.Linear(self.n_features, self.num_classes)
 
         state = simple_load_model(self.args, path='finetuner.pth')
         if not state:
