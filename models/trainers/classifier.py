@@ -63,10 +63,10 @@ class Classifier:
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(self.model, train_loader, self.criterion)
+            train_loss, train_acc = self.train_single_epoch(train_loader)
 
             # evaluate on validation set
-            val_loss, val_acc = self.validate(self.model, val_loader, self.criterion)
+            val_loss, val_acc = self.validate(val_loader)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -90,16 +90,16 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, model, train_loader, criterion):
-        model.train()
+    def train_single_epoch(self, train_loader):
+        self.model.train()
 
-        loss, corrects = 0.0, 0
+        total_loss, corrects = 0.0, 0
         for step, (images, targets) in enumerate(train_loader):
             images, targets = images.to(self.args.device), targets.to(self.args.device)
 
             self.optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, targets)
+            outputs = self.model(images)
+            loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
             loss.backward()
@@ -109,44 +109,43 @@ class Classifier:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {loss.item()}")
 
             # statistics
-            loss += loss.item() * images.size(0)
+            total_loss += loss.item() * images.size(0)
             corrects += torch.sum(preds == targets.data)
 
-        epoch_loss, epoch_acc = accuracy(loss, corrects, train_loader)
+        epoch_loss, epoch_acc = accuracy(total_loss, corrects, train_loader)
         logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
         return epoch_loss, epoch_acc
 
 
-    def validate(self, model, val_loader, criterion):    
-        model.eval()
+    def validate(self, val_loader):    
+        self.model.eval()
 
-        loss = 0.0
-        corrects = 0
+        total_loss, corrects = 0.0, 0
         with torch.no_grad():
             for step, (images, targets) in enumerate(val_loader):
                 images = images.to(self.args.device)
                 targets = targets.to(self.args.device)
 
                 # compute output
-                outputs = model(images)
-                loss = criterion(outputs, targets)
+                outputs = self.model(images)
+                loss = self.criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(val_loader)}]\t Loss: {loss.item()}")
 
                 # statistics
-                loss += loss.item() * images.size(0)
+                total_loss += loss.item() * images.size(0)
                 corrects += torch.sum(preds == targets.data)
 
-            epoch_loss, epoch_acc = accuracy(loss, corrects, val_loader)
+            epoch_loss, epoch_acc = accuracy(total_loss, corrects, val_loader)
             logging.info('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
             # deep copy the model
             if epoch_acc > self.best_acc:
                 print(f'Saving.. prev best acc = {self.best_acc}, new best acc = {epoch_acc}')
                 self.best_acc = epoch_acc
-                self.best_model = copy.deepcopy(model)
+                self.best_model = copy.deepcopy(self.model)
 
         return epoch_loss, epoch_acc
