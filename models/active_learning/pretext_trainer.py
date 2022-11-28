@@ -403,11 +403,11 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         proxy_model = encoder
 
-        state = None#simple_load_model(self.args, path='finetuner.pth')
+        state = simple_load_model(self.args, path='finetuner.pth')
         if not state:
             self.finetune_trainer(encoder)
 
-        path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
+        path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 
@@ -436,7 +436,7 @@ class PretextTrainer():
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 proxy_model = self.train_proxy(
                     pretraining_sample_pool, 
-                    proxy_model, rebuild_al_model=rebuild_al_model)
+                    proxy_model, batch, rebuild_al_model=rebuild_al_model)
 
                 rebuild_al_model=False
                 # simple_save_model(self.args, proxy_model, f'proxy_{batch}.pth')
