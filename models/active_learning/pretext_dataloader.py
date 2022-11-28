@@ -100,7 +100,9 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         self.image_size = params.image_size
         self.batch_size = params.batch_size
 
-        self.dir = dir
+        # self.dir = dir
+        self.dir = args.dataset_dir + dir
+        
         self.is_train = is_train
 
         if with_train:
