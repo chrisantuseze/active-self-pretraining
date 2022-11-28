@@ -46,7 +46,7 @@ class SupPretrainer(BasePretrainer):
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
-        model, criterion = get_model_criterion(self.args, model)
+        model, criterion = get_model_criterion(self.args, model, TrainingType.BASE_PRETRAIN)
         model = model.to(self.args.device)
 
         train_params = get_params(self.args, trainingType)

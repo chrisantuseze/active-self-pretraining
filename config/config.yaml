@@ -50,12 +50,12 @@ reload: False                                 # indicates whether to start the t
 finetune_dataset: 1                           # 1 for CIFAR10, 2 for QUICKDRAW, 3 for SKETCH, 4 for CLIPART, 7 for CHEST-XRAY. Ideally this should be same as the target_dataset, however some datasets don't have the train folder
 finetune: True
 finetune_batch_size: 256                      # 
-finetune_lr: 0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-finetune_optimizer: "SGD-MultiStepV2"                     # if you use LARS, then the lr needs to be decayed
+finetune_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
+finetune_optimizer: "Adam" #"SGD-MultiStepV2"                     # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 32                       # this depends on the dataset used
 finetune_epochs: 100                          # this needs to be increased to 100
 finetune_momentum: 0.9                        # momentum of SGD solver
-finetune_weight_decay: 5.0e-4                 # "optimized using LARS [...] and weight decay of 1.0e−6"
+finetune_weight_decay: 1.0e-6 #5.0e-4                 # "optimized using LARS [...] and weight decay of 1.0e−6"
 
 
 # active learning options
@@ -75,4 +75,4 @@ al_path_loss_file: "al_path_loss.pkl"
 
 
 ml_project: True                              # switches to ML Final Project mode 
-do_al_for_ml_project: True                    # switches between AL and regular classification
+do_al_for_ml_project: False                    # switches between AL and regular classification

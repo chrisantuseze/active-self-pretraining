@@ -57,3 +57,25 @@ https://github.com/fastai/imagenette
 Since the train_proxy trains the classifier iteratively by updating the pool after each iteration, you don't need this for the casl project
 For the casl project use the finetune_trainer trained on long epochs, to generate the pretext task losses, then use the finetune to
 get the new samples, once.
+
+DCL:
+epochs = 200 (for all datasets)
+temperature = 0.1 (ImageNet-1k), 0.07 (Cifar10, Cifar100, STL)
+optimizer = SGD with Cosine annealing scheduler
+lr = 0.03 * batch size/256
+backbone = resnet-18 (Cifar10, Cifar100, STL), resnet-50 (ImageNet-1k, ImageNet-100)
+batch size = They experimented with 32 - 512, but stuck with 256 eventually for simclr, dcl, and dclw
+
+SimCLR:
+epochs = 500
+temperature = 0.5
+optimizer = Adam
+lr = 1e-3
+weight_decay=1e-6
+backbone = resnet-50
+batch size = 512
+num_workers = 16
+train drop last = True
+test drop last = False
+train pin memory = True
+test pin memory = True

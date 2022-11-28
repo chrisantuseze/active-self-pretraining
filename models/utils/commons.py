@@ -14,13 +14,13 @@ from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 
 
-def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING):
+def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, num_classes=None):
     n_features = get_feature_dimensions_backbone(args)
 
-    if training_type == TrainingType.ACTIVE_LEARNING:
+    if training_type == TrainingType.ACTIVE_LEARNING or training_type == TrainingType.FINETUNING:
         criterion = nn.CrossEntropyLoss()
         model = encoder
-        model.linear = nn.Linear(n_features, 4)
+        model.linear = nn.Linear(n_features, num_classes)
         print("using Regular model")
 
     else:

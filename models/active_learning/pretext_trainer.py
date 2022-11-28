@@ -176,7 +176,7 @@ class PretextTrainer():
 
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
-        model, criterion = get_model_criterion(self.args, model)
+        model, criterion = get_model_criterion(self.args, model, num_classes=4)
         state = simple_load_model(self.args, path='finetuner.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
@@ -308,7 +308,7 @@ class PretextTrainer():
             self.args, training_type=TrainingType.ACTIVE_LEARNING, 
             is_train=False, batch_size=100).get_loader()
 
-        model, criterion = get_model_criterion(self.args, model)
+        model, criterion = get_model_criterion(self.args, model, num_classes=4)
         state = load_saved_state(self.args, pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)

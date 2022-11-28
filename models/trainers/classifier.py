@@ -10,7 +10,7 @@ from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
 from optim.optimizer import load_optimizer
-from models.utils.commons import accuracy, get_params, get_params_to_update, set_parameter_requires_grad
+from models.utils.commons import accuracy, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
 from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
@@ -66,15 +66,13 @@ class Classifier:
             NotImplementedError
 
         set_parameter_requires_grad(self.model, feature_extract=True)
-        self.model.fc = nn.Linear(n_features, num_classes)
+        self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
         train_params = get_params(self.args, TrainingType.FINETUNING)
         self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
-
-        self.criterion = nn.CrossEntropyLoss().to(self.args.device)
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
@@ -103,7 +101,8 @@ class Classifier:
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
-            self.scheduler.step()
+            if not self.scheduler:
+                self.scheduler.step()
 
             # early stopping
             early_stopping(train_loss, val_loss)

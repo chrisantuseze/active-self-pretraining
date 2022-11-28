@@ -13,6 +13,9 @@ def load_optimizer(args, params, state, train_params: Params):
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
 
+    elif train_params.optimizer == "Adam-DCL":
+        optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
+
     elif train_params.optimizer == "Adam-Cosine":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         # this could be implemented to allow for a restart of the learning rate after a certain number of epochs. To do this, simply call
