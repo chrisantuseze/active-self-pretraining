@@ -128,7 +128,7 @@ class PretextTrainer():
 
         return model
 
-    def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
+    def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         transform_test = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
@@ -415,7 +415,7 @@ class PretextTrainer():
 
         state = None#simple_load_model(self.args, path='finetuner.pth')
         if not state:
-            self.finetune_trainer(encoder)
+            self.finetuner(encoder)
 
         path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
@@ -435,7 +435,7 @@ class PretextTrainer():
                 main_task_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.finetune(main_task_model, sample6400)
+                samplek = self.batch_sampler(main_task_model, sample6400)
             else:
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
