@@ -52,3 +52,8 @@ ssh cc@129.114.108.45
 ssh cc@192.5.87.154 
 
 https://github.com/fastai/imagenette
+
+
+Since the train_proxy trains the classifier iteratively by updating the pool after each iteration, you don't need this for the casl project
+For the casl project use the finetune_trainer trained on long epochs, to generate the pretext task losses, then use the finetune to
+get the new samples, once.

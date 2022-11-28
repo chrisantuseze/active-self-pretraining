@@ -354,9 +354,8 @@ class PretextTrainer():
 
         model.train()
 
-        epochs = 5
-        for epoch in range(epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, epochs))
+        for epoch in range(self.args.al_finetune_trainer_epochs):
+            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
             total_loss, total_num = 0, 0

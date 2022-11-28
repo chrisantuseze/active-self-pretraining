@@ -21,15 +21,15 @@ class Classifier:
 
         self.args = args
         self.writer = writer
-        # self.model = LogLossHead(self.encoder, with_avg_pool=True, in_channels=2048, num_classes=None) #todo: The num_classes parameter is determined by the dataset used for the finetuning
         
         self.model = resnet_backbone(self.args.resnet, pretrained=False)
 
-        if pretrain_level == "AL":
-            state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-2}.pth')
-        else:
-            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+        # if pretrain_level == "AL":
+        #     state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-2}.pth')
+        # else:
+        #     state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
+        state = load_saved_state(self.args, pretrain_level=pretrain_level)
         self.model.load_state_dict(state['model'], strict=False)
 
         n_features = self.model.fc.in_features
