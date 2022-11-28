@@ -353,7 +353,7 @@ class PretextTrainer():
 
         model.train()
 
-        epochs = 5
+        epochs = 10
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
