@@ -38,7 +38,7 @@ class PretextTrainer():
         ])
 
         ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
-        loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True)
+        loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True, num_workers=2)
 
         state = None
         if not rebuild_al_model:
@@ -88,7 +88,7 @@ class PretextTrainer():
         ])
 
         ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
-        loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=False)
+        loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False, num_workers=2)
 
         logging.info("Generating the top1 scores")
         _preds = []
