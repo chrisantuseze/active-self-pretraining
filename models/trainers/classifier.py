@@ -63,10 +63,10 @@ class Classifier:
             logging.info('-' * 10)
 
             # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader)
+            train_loss, train_acc = self.train_single_epoch(train_loader, self.criterion)
 
             # evaluate on validation set
-            val_loss, val_acc = self.validate(val_loader)
+            val_loss, val_acc = self.validate(val_loader, self.criterion)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
@@ -90,7 +90,7 @@ class Classifier:
 
         return self.model, val_acc_history
 
-    def train_single_epoch(self, train_loader):
+    def train_single_epoch(self, train_loader, criterion):
         self.model.train()
 
         total_loss, corrects = 0.0, 0
@@ -99,7 +99,7 @@ class Classifier:
 
             self.optimizer.zero_grad()
             outputs = self.model(images)
-            loss = self.criterion(outputs, targets)
+            loss = criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
             print(loss)
@@ -119,7 +119,7 @@ class Classifier:
         return epoch_loss, epoch_acc
 
 
-    def validate(self, val_loader):    
+    def validate(self, val_loader, criterion):    
         self.model.eval()
 
         total_loss, corrects = 0.0, 0
@@ -130,7 +130,7 @@ class Classifier:
 
                 # compute output
                 outputs = self.model(images)
-                loss = self.criterion(outputs, targets)
+                loss = criterion(outputs, targets)
                 _, preds = torch.max(outputs, 1)
 
                 if step % self.args.log_step == 0:
