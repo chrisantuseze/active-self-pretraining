@@ -317,7 +317,6 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    print(loss.item(), total_loss)
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
 
         # Save checkpoint.
@@ -329,6 +328,7 @@ class PretextTrainer():
             self.best_trainer_acc = acc
 
     def train_finetuner(self, model, criterion, optimizer, train_loader):
+        model.train()
         total_loss, total_num = 0, 0
         correct, total = 0, 0
 
@@ -361,8 +361,9 @@ class PretextTrainer():
             correct += predicted2.eq(targets2).sum().item()
             correct += predicted3.eq(targets3).sum().item()
 
+            print(loss.item(), total_loss, predicted)
+
             if step % self.args.log_step == 0:
-                print(loss.item(), total_loss)
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
     def finetuner(self, model):
