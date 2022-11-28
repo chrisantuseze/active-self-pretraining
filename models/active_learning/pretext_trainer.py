@@ -334,7 +334,7 @@ class PretextTrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         
         main_task_model = encoder
-        main_task_model.linear = nn.Linear(self.n_features, self.num_classes)
+        # main_task_model.linear = nn.Linear(self.n_features, self.num_classes)
 
         state = simple_load_model(self.args, path='finetuner.pth')
         if not state:
