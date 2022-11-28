@@ -56,7 +56,7 @@ class PretextTrainer():
         # Save checkpoint.
         acc = 100.*correct/total
         if acc > self.best_proxy_acc:
-            print('Saving..')
+            print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
             self.best_proxy_acc = acc
 
@@ -317,7 +317,7 @@ class PretextTrainer():
         # Save checkpoint.
         acc = 100.*correct/total
         if acc > self.best_trainer_acc:
-            print('Saving..')
+            print(f'Saving.. Prev acc = {self.best_trainer_acc}, new acc = {acc}')
             simple_save_model(self.args, model, 'finetuner.pth')
             
             self.best_trainer_acc = acc
@@ -435,6 +435,7 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                print(f"The dataset size is {len(pretraining_sample_pool)}")
                 proxy_model = self.train_proxy(
                     pretraining_sample_pool, 
                     proxy_model, batch, rebuild_al_model=rebuild_al_model)
