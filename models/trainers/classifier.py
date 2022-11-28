@@ -57,6 +57,8 @@ class Classifier:
 
         early_stopping = EarlyStopping(tolerance=5, min_delta=20)
 
+        self.criterion = nn.CrossEntropyLoss().to(self.args.device)
+
         for epoch in range(self.args.finetune_epochs):
 
             logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
