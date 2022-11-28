@@ -146,6 +146,38 @@ def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
 
     return train_ds, val_ds
 
+
+def get_ds_num_classes(dataset):
+    if dataset == DatasetType.CLIPART.value:
+        num_classes = 345
+        dir = "/clipart"
+        
+    elif dataset == DatasetType.SKETCH.value:
+        num_classes = 345
+        dir = "/sketch"
+
+    elif dataset == DatasetType.QUICKDRAW.value:
+        num_classes = 345
+        dir = "/quickdraw"
+
+    elif dataset == DatasetType.UCMERCED.value:
+        num_classes = 21
+        dir = "/ucmerced/images"
+
+    elif dataset == DatasetType.IMAGENET.value:
+        num_classes = 200
+        dir = "/imagenet"
+
+    elif dataset == DatasetType.IMAGENET_LITE.value:
+        num_classes = 100
+        dir = "/imagenet"
+
+    else:
+        num_classes = 10
+        dir = "/cifar10"
+    
+    return num_classes, dir
+
 def free_mem(X, y):
     del X
     del y

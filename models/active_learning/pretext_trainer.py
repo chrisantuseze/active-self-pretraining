@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
 import numpy as np
@@ -14,7 +15,7 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import Loader, MakeBatchLoader, PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import get_model_criterion, get_params
+from models.utils.commons import get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_path_loss, load_saved_state, save_accuracy_to_file, save_path_loss, simple_load_model, simple_save_model
@@ -65,8 +66,6 @@ class PretextTrainer():
         total_loss, total_num = 0.0, 0
         for step, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
-
-                # print(targets.min(), targets.max())
                 
                 optimizer.zero_grad()
                 outputs = model(inputs)
@@ -86,7 +85,7 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        _, criterion = get_model_criterion(self.args, model)
+        _, criterion = get_model_criterion(self.args, model) #num classes is not required here
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
@@ -330,7 +329,11 @@ class PretextTrainer():
 
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        
         main_task_model = encoder
+        num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
+        n_features = get_feature_dimensions_backbone(self.args)
+        main_task_model.linear = nn.Linear(n_features, num_classes)
 
         state = simple_load_model(self.args, path='finetuner.pth')
         if not state:
@@ -371,6 +374,6 @@ class PretextTrainer():
         logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method)))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-                filename=f"main_task_{get_dataset_enum(self.args.dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}.txt")
+                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool

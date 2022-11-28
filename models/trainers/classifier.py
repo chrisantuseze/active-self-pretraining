@@ -10,7 +10,7 @@ from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
 from optim.optimizer import load_optimizer
-from models.utils.commons import accuracy, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
+from models.utils.commons import accuracy, get_ds_num_classes, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
 from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
@@ -32,38 +32,7 @@ class Classifier:
         state = load_saved_state(self.args, pretrain_level=pretrain_level)
         self.model.load_state_dict(state['model'], strict=False)
 
-        n_features = self.model.fc.in_features
-        
-        if args.finetune_dataset == DatasetType.CLIPART.value:
-            num_classes = 345
-            self.dir = "/clipart"
-            
-        elif args.finetune_dataset == DatasetType.SKETCH.value:
-            num_classes = 345
-            self.dir = "/sketch"
-
-        elif args.finetune_dataset == DatasetType.QUICKDRAW.value:
-            num_classes = 345
-            self.dir = "/quickdraw"
-
-        elif args.finetune_dataset == DatasetType.UCMERCED.value:
-            num_classes = 21
-            self.dir = "/ucmerced/images"
-
-        elif args.finetune_dataset == DatasetType.IMAGENET.value:
-            num_classes = 200
-            self.dir = "/imagenet"
-
-        elif args.finetune_dataset == DatasetType.IMAGENET_LITE.value:
-            num_classes = 100
-            self.dir = "/imagenet"
-
-        elif args.finetune_dataset == DatasetType.CIFAR10.value:
-            num_classes = 10
-            self.dir = "/cifar10"
-        
-        else: 
-            NotImplementedError
+        num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
@@ -128,7 +97,7 @@ class Classifier:
         corrects = 0
         for step, (images, targets) in enumerate(train_loader):
             self.optimizer.zero_grad()
-            
+
             images = images.to(self.args.device)
             targets = targets.to(self.args.device)
 
