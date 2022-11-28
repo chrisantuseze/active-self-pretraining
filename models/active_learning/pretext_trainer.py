@@ -74,7 +74,6 @@ class PretextTrainer():
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
                 
-                print(loss)
                 loss.backward()
                 optimizer.step()
 
