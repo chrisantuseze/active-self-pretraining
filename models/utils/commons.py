@@ -18,7 +18,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
     n_features = get_feature_dimensions_backbone(args)
 
     if training_type == TrainingType.ACTIVE_LEARNING:
-        criterion = nn.CrossEntropyLoss().to(args.device)
+        criterion = nn.CrossEntropyLoss()
         model = encoder
         model.linear = nn.Linear(n_features, 4)
         print("using Regular model")
@@ -36,7 +36,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
             print("using SIMCLRv2")
 
         elif args.method == SSL_Method.SUPERVISED.value:
-            criterion = nn.CrossEntropyLoss().to(args.device)
+            criterion = nn.CrossEntropyLoss()
             model = encoder
             print("using Supervised model")
     

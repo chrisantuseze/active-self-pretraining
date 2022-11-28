@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from torchvision import transforms
 import numpy as np
 from optim.optimizer import load_optimizer
 import utils.logger as logging
@@ -9,7 +10,7 @@ import random
 
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import PretextDataLoader
+from models.active_learning.pretext_dataloader import Loader, MakeBatchLoader, PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
@@ -29,7 +30,15 @@ class PretextTrainer():
         self.log_step = 1000
 
     def train_proxy(self, samples, model, rebuild_al_model=False):
-        loader = PretextDataLoader(self.args, samples).get_loader()
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        ds = Loader(self.args, pathloss_list=samples, transform=transform_train, is_val=False)
+        loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=True)
 
         state = None
         if not rebuild_al_model:
@@ -73,7 +82,13 @@ class PretextTrainer():
         return model
 
     def finetune(self, model, samples: List[PathLoss]) -> List[PathLoss]:
-        loader = PretextDataLoader(self.args, samples, training_type=TrainingType.AL_FINETUNING, is_val=True).get_loader()
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+
+        ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
+        loader = torch.utils.data.DataLoader(ds, batch_size=128, shuffle=False)
 
         logging.info("Generating the top1 scores")
         _preds = []
@@ -163,11 +178,18 @@ class PretextTrainer():
         return new_samples[:self.args.al_trainer_sample_size]
 
     def make_batches(self, model):
-        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
-        batch_size = self.args.al_batch_size
-        self.args.al_batch_size = 1
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
+        loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
-        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False).get_loader()
+        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
+        # batch_size = self.args.al_batch_size
+        # self.args.al_batch_size = 1
+
+        # loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False).get_loader()
 
         model, criterion = get_model_criterion(self.args, model)
         state = simple_load_model(self.args, path='finetuner.pth')
@@ -208,12 +230,21 @@ class PretextTrainer():
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
         save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
 
-        self.args.al_batch_size = batch_size
+        # self.args.al_batch_size = batch_size
 
         return sorted_samples
 
     def finetune_trainer(self, model):
-        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=True).get_loader()
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        # loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=True).get_loader()
+
+        ds = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=True, transform=transform_train)
+        loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
 
         model, criterion = get_model_criterion(self.args, model)
         state = load_saved_state(self.args, pretrain_level="1")
