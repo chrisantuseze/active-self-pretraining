@@ -130,9 +130,9 @@ def load_path_loss(args, filename):
         # logging.error(er)
         return None
 
-def save_accuracy_to_file(args, accuracies, best_accuracy):
-    dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
-    filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
+    # dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
+    # filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_path, filename)
 
     try:
@@ -143,7 +143,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy):
             file.write("\nThe best accuracy is: \n")
             file.write(str(best_accuracy))
 
-            logging.info("accuracies saved saved at {out}")
+            logging.info(f"accuracies saved saved at {out}")
 
     except IOError as er:
         # logging.error(er)

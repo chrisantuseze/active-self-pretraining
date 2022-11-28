@@ -4,7 +4,7 @@ from torch.optim.lr_scheduler import StepLR
 import time
 import copy
 import utils.logger as logging
-from datautils.dataset_enum import DatasetType
+from datautils.dataset_enum import DatasetType, get_dataset_enum
 
 from datautils.finetune_dataset import Finetune
 from models.backbones.resnet import resnet_backbone
@@ -118,7 +118,9 @@ class Classifier:
         # load best model weights
         self.model.load_state_dict(best_model_wts)
         simple_save_model(self.args, self.model, 'classifier_{:4f}_acc.pth'.format(best_acc))
-        save_accuracy_to_file(self.args, accuracies=val_acc_history, best_accuracy=best_acc)
+        save_accuracy_to_file(
+            self.args, accuracies=val_acc_history, best_accuracy=best_acc, 
+            filename=f"classifier_{get_dataset_enum(self.args.finetune_dataset)}_batch_{self.args.finetune_epochs}.txt")
 
         return self.model, val_acc_history
 

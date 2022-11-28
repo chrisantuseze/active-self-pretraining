@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torchvision import transforms
 import numpy as np
+from datautils.dataset_enum import get_dataset_enum
 from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
@@ -16,7 +17,7 @@ from models.backbones.resnet import resnet_backbone
 from models.utils.commons import get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method
-from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
+from utils.commons import load_path_loss, load_saved_state, save_accuracy_to_file, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
@@ -26,6 +27,7 @@ class PretextTrainer():
         self.best_proxy_acc = 0
         self.best_batch = 0
         self.best_trainer_acc = 0
+        self.val_acc_history = []
 
 
     def test_classifier(self, model, criterion, batch, test_loader):
@@ -51,6 +53,7 @@ class PretextTrainer():
 
         # Save checkpoint.
         acc = 100.*correct/total
+        self.val_acc_history.append(str(acc))
         if acc > self.best_proxy_acc:
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
@@ -121,6 +124,10 @@ class PretextTrainer():
 
             # Decay Learning Rate
             scheduler.step()
+
+        save_accuracy_to_file(
+            self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
+            filename=f"main_task_{get_dataset_enum(self.args.base_dataset)}_batch_{self.args.al_epochs}.txt")
 
         return model
 
@@ -441,5 +448,6 @@ class PretextTrainer():
 
                 rebuild_al_model=False
 
+        logging.info('Best main task val acc: {:3f}'.format(self.best_proxy_acc))
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool
