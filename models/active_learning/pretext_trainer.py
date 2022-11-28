@@ -12,13 +12,9 @@ from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import Loader, MakeBatchLoader, PretextDataLoader
 from models.backbones.resnet import resnet_backbone
-from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
-from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
-from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 
 from models.utils.commons import get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import SSL_Method
 from models.active_learning.al_method_enum import AL_Method
 from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
@@ -27,9 +23,9 @@ class PretextTrainer():
         self.args = args
         self.writer = writer
         self.criterion = None
-        self.best_proxy_acc = 0  # best test accuracy
+        self.best_proxy_acc = 0
         self.best_batch = 0
-        self.best_trainer_acc = 0  # best test accuracy
+        self.best_trainer_acc = 0
 
 
     def test_classifier(self, model, criterion, batch, test_loader):
@@ -48,8 +44,6 @@ class PretextTrainer():
 
                 total_num += 100
                 total_loss += loss.item() * 100
-
-                print(loss.item(), total_loss)
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
@@ -80,8 +74,6 @@ class PretextTrainer():
 
                 total_num += train_params.batch_size
                 total_loss += loss.item() * train_params.batch_size
-
-                print(loss.item(), total_loss)
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
@@ -133,13 +125,15 @@ class PretextTrainer():
         return model
 
     def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
-        transform_test = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-        ])
+        # transform_test = transforms.Compose([
+        #     transforms.ToTensor(),
+        #     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        # ])
 
-        ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
-        loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False, num_workers=2)
+        # ds = Loader(self.args, pathloss_list=samples, transform=transform_test, is_val=True)
+        # loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False, num_workers=2)
+
+        loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
         logging.info("Generating the top1 scores")
         _preds = []
@@ -236,10 +230,6 @@ class PretextTrainer():
         # testset = MakeBatchLoader(self.args, dir="/cifar10v2", with_train=True, is_train=False, transform=transform_test)
         # loader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
-        # This is a hack to the model can use a batch size of 1 to compute the loss for all the samples
-        # batch_size = self.args.al_batch_size
-        # self.args.al_batch_size = 1
-
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model)
@@ -281,8 +271,6 @@ class PretextTrainer():
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
         save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
 
-        # self.args.al_batch_size = batch_size
-
         return sorted_samples
 
     def test_finetuner(self, model, criterion, test_loader):
@@ -318,8 +306,6 @@ class PretextTrainer():
 
                 total_num += 100
                 total_loss += loss.item() * 100
-
-                print(loss.item(), total_loss)
 
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
@@ -364,8 +350,6 @@ class PretextTrainer():
             correct += predicted1.eq(targets1).sum().item()
             correct += predicted2.eq(targets2).sum().item()
             correct += predicted3.eq(targets3).sum().item()
-
-            print(loss.item(), total_loss)
 
             if step % self.args.log_step == 0:
                 logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
@@ -425,7 +409,7 @@ class PretextTrainer():
         if not state:
             self.finetuner(encoder)
 
-        path_loss = None#load_path_loss(self.args, self.args.al_path_loss_file)
+        path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 
@@ -437,7 +421,7 @@ class PretextTrainer():
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
             if batch > 0:
-                logging.info(f'>> Getting previous checkpoint for batch {batch + 1}')
+                logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
                 state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 main_task_model.load_state_dict(state['model'], strict=False)
@@ -451,7 +435,6 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                print(f"The dataset size is {len(pretraining_sample_pool)}")
                 main_task_model = self.main_task(
                     pretraining_sample_pool, 
                     main_task_model, batch, rebuild_al_model=rebuild_al_model)
