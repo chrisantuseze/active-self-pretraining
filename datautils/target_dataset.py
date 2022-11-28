@@ -14,7 +14,7 @@ from datautils import dataset_enum
 from models.utils.transformations import Transforms
 
 class TargetDataset():
-    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
         self.method = args.method
@@ -24,7 +24,7 @@ class TargetDataset():
         
         params = get_params(args, training_type)
         self.image_size = params.image_size
-        self.batch_size = params.batch_size
+        self.batch_size = params.batch_size if not batch_size else batch_size
 
     
     def get_dataset(self, transforms):
@@ -70,34 +70,34 @@ class TargetDataset():
         return loader
     
 
-def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True):
+def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None):
     if args.target_dataset == dataset_enum.DatasetType.QUICKDRAW.value:
         print("using the QUICKDRAW dataset")
-        return TargetDataset(args, "/quickdraw", training_type, is_train=is_train)
+        return TargetDataset(args, "/quickdraw", training_type, is_train=is_train, batch_size=batch_size)
     
     elif args.target_dataset == dataset_enum.DatasetType.SKETCH.value:
         print("using the SKETCH dataset")
-        return TargetDataset(args, "/sketch", training_type, is_train=is_train)
+        return TargetDataset(args, "/sketch", training_type, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
         print("using the CLIPART dataset")
-        return TargetDataset(args, "/clipart", training_type, is_train=is_train)
+        return TargetDataset(args, "/clipart", training_type, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.UCMERCED.value:
         print("using the UCMERCED dataset")
-        return TargetDataset(args, "/ucmerced/images", training_type, is_train=is_train)
+        return TargetDataset(args, "/ucmerced/images", training_type, is_train=is_train, batch_size=batch_size)
     
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET.value:
         print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet", training_type, with_train=True, is_train=is_train)
+        return TargetDataset(args, "/imagenet", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
         print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet", training_type, with_train=True, is_train=is_train)
+        return TargetDataset(args, "/imagenet", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
         print("using the CIFAR10 dataset")
-        return TargetDataset(args, "/cifar10v2", training_type, with_train=True, is_train=is_train)
+        return TargetDataset(args, "/cifar10v2", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError

@@ -19,7 +19,7 @@ labels = {}
 index = 0
 
 class PretextDataLoader():
-    def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING, is_val=False) -> None:
+    def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING, is_val=False, batch_size=None) -> None:
         self.args = args
         self.path_loss_list = path_loss_list
 
@@ -28,7 +28,7 @@ class PretextDataLoader():
 
         params = get_params(args, training_type)
         self.image_size = params.image_size
-        self.batch_size = params.batch_size
+        self.batch_size = params.batch_size if not batch_size else batch_size
 
     def get_loader(self):
         if self.training_type == TrainingType.AL_FINETUNING:
@@ -56,7 +56,8 @@ class PretextDataLoader():
         loader = torch.utils.data.DataLoader(
             dataset,
             batch_size=self.batch_size,
-            shuffle=not self.is_val
+            shuffle=not self.is_val,
+            num_workers=2
         )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
@@ -100,9 +101,9 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         self.image_size = params.image_size
         self.batch_size = params.batch_size
 
-        # self.dir = dir
-        self.dir = args.dataset_dir + dir
-        
+        self.dir = dir
+        # self.dir = args.dataset_dir + dir
+
         self.is_train = is_train
 
         if with_train:
@@ -130,7 +131,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         save_class_names(self.args, label)
         
         if self.is_train:
-            img = self.transform(img)
+            img = self.transform.__call__(img)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
@@ -139,7 +140,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
             random.shuffle(rotations)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
         else:
-            img = self.transform(img)
+            img = self.transform.__call__(img, False)
             img1 = torch.rot90(img, 1, [1,2])
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
