@@ -35,8 +35,7 @@ class Classifier:
         num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
-        self.model.fc = nn.Linear(512, num_classes)
-        _, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
+        self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
@@ -103,7 +102,6 @@ class Classifier:
             loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
-            print(loss)
             loss.backward()
             self.optimizer.step()
 
