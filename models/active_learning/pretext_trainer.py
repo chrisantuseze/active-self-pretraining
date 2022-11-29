@@ -68,20 +68,24 @@ class PretextTrainer():
         model.train()
         total_loss, total_num = 0.0, 0
         for step, (inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
-                
-                optimizer.zero_grad()
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-                
-                loss.backward()
-                optimizer.step()
+            inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
 
-                total_num += train_params.batch_size
-                total_loss += loss.item() * train_params.batch_size
+            print(targets)
+            
+            optimizer.zero_grad()
+            outputs = model(inputs)
 
-                if step % self.args.log_step == 0:
-                    logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
+            print(outputs)
+            loss = criterion(outputs, targets)
+            
+            loss.backward()
+            optimizer.step()
+
+            total_num += train_params.batch_size
+            total_loss += loss.item() * train_params.batch_size
+
+            if step % self.args.log_step == 0:
+                logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
 
     def main_task(self, samples, model, batch, rebuild_al_model=False):
         train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_finetune_batch_size).get_loader()
@@ -93,7 +97,7 @@ class PretextTrainer():
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
 
-            model.linear = nn.Linear(self.n_features, self.num_classes) # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
+            model.fc = nn.Linear(self.n_features, self.num_classes) # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
