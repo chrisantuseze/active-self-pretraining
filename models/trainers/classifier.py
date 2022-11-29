@@ -59,7 +59,11 @@ class Classifier:
 
         for epoch in range(self.args.finetune_epochs):
 
-            logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, self.scheduler.get_last_lr()))
+            lr = 0
+            if not self.scheduler:
+                self.scheduler.get_last_lr()
+                
+            logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, lr))
             logging.info('-' * 10)
 
             # train for one epoch
