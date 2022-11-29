@@ -69,13 +69,10 @@ class PretextTrainer():
         total_loss, total_num = 0.0, 0
         for step, (inputs, targets) in enumerate(train_loader):
             inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
-
-            print(targets)
             
             optimizer.zero_grad()
             outputs = model(inputs)
 
-            print(outputs)
             loss = criterion(outputs, targets)
             
             loss.backward()
