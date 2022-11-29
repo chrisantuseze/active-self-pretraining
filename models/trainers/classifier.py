@@ -60,9 +60,9 @@ class Classifier:
         for epoch in range(self.args.finetune_epochs):
 
             lr = 0
-            if not self.scheduler:
-                self.scheduler.get_last_lr()
-                
+            if self.scheduler:
+                lr = self.scheduler.get_last_lr()
+
             logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.finetune_epochs, lr))
             logging.info('-' * 10)
 
@@ -74,7 +74,7 @@ class Classifier:
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
-            if not self.scheduler:
+            if self.scheduler:
                 self.scheduler.step()
 
             # early stopping
