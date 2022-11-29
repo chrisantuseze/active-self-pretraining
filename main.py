@@ -34,7 +34,7 @@ def main():
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
 
-        else:
+        # else: Please uncomment
             classifier = Classifier(args, writer, pretrain_level="1")
             classifier.finetune() 
 
