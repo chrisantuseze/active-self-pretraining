@@ -93,7 +93,7 @@ class PretextTrainer():
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
 
-            model.fc = nn.Linear(self.n_features, self.num_classes) # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
+            model.linear = nn.Linear(self.n_features, self.num_classes) # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
