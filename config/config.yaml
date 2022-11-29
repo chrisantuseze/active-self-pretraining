@@ -51,7 +51,7 @@ finetune_dataset: 1                           # 1 for CIFAR10, 2 for QUICKDRAW, 
 finetune: True
 finetune_batch_size: 256                      # 
 finetune_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-finetune_optimizer: "Adam" #"SGD-MultiStepV2"                     # if you use LARS, then the lr needs to be decayed
+finetune_optimizer: "Adam-DCL" #"SGD-MultiStepV2"                     # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 32                       # this depends on the dataset used
 finetune_epochs: 100                          # this needs to be increased to 100
 finetune_momentum: 0.9                        # momentum of SGD solver
