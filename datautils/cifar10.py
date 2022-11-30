@@ -1,3 +1,4 @@
+from random import shuffle
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
@@ -47,6 +48,7 @@ class CIFAR10():
             dataset,
             batch_size=self.batch_size,
             drop_last=True,
+            shuffle=True
         )
 
         print(f"The size of the Cifar10 dataset is {len(dataset)} and the number of batches is ", loader.__len__())

@@ -1,3 +1,4 @@
+from random import shuffle
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
@@ -45,6 +46,7 @@ class ImageNet():
             train_ds,
             batch_size=self.batch_size,
             drop_last=True, 
+            shuffle=True
         )
 
         print(f"The size of the ImageNet dataset is {len(train_ds)} and the number of batches is ", loader.__len__())
