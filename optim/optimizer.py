@@ -9,9 +9,9 @@ from .lars import LARS
 def load_optimizer(args, params, state, train_params: Params):
     scheduler = None
     
-    if train_params.optimizer == "Adam":
+    if train_params.optimizer == "Adam-SimCLR":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
-        scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
+        # scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
 
     elif train_params.optimizer == "Adam-DCL":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
