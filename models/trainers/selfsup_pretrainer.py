@@ -52,13 +52,16 @@ class SelfSupPretrainer(BasePretrainer):
 
             epoch_loss = trainer.train_epoch()
 
+            lr = 0
             # Decay Learning Rate
-            trainer.scheduler.step()
+            if trainer.scheduler:
+                trainer.scheduler.step()
+                lr = trainer.scheduler.get_last_lr()
 
             if epoch > 0 and epoch % 20 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
-            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {trainer.scheduler.get_last_lr()}")
+            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {lr}")
             logging.info('-' * 20)
 
             self.args.current_epoch += 1

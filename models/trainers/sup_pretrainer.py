@@ -58,13 +58,16 @@ class SupPretrainer(BasePretrainer):
 
             epoch_loss = self.train_epoch(model, train_loader, criterion, optimizer, train_params)
 
+            lr = 0
             # Decay Learning Rate
-            scheduler.step()
+            if scheduler:
+                scheduler.step()
+                lr = scheduler.get_last_lr()
 
             if epoch > 0 and epoch % 20 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
 
-            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {scheduler.get_last_lr()}")
+            logging.info(f"Epoch Loss: {epoch_loss}\t lr: {lr}")
             logging.info('-' * 20)
 
             self.args.current_epoch += 1
