@@ -12,7 +12,7 @@ from models.utils.transformations import Transforms
 from utils.commons import load_class_names, pil_loader, save_class_names
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
-from datautils.dataset_enum import DatasetType
+from datautils.dataset_enum import DatasetType, get_dataset_enum
 # import cv2
 
 labels = {}
@@ -25,6 +25,8 @@ class PretextDataLoader():
 
         self.training_type = training_type
         self.is_val = is_val
+
+        self.dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
 
         if is_val:
             img_paths = glob.glob(self.dir + '/test/*/*')[0:len(path_loss_list)]
