@@ -26,6 +26,12 @@ class PretextDataLoader():
         self.training_type = training_type
         self.is_val = is_val
 
+        if is_val:
+            img_paths = glob.glob(self.dir + '/test/*/*')[0:len(path_loss_list)]
+            for path in img_paths:
+                self.path_loss_list.append(PathLoss(path, 0))
+        
+
         params = get_params(args, training_type)
         self.image_size = params.image_size
         self.batch_size = params.batch_size if not batch_size else batch_size
