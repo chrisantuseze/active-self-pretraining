@@ -29,7 +29,6 @@ class PretextDataLoader():
         self.dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
 
         if is_val:
-            print(len(path_loss_list))
             val_path_loss_list = []
             img_paths = glob.glob(self.dir + '/test/*/*')[0:len(path_loss_list)]
             for path in img_paths:
