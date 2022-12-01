@@ -6,5 +6,5 @@ import sys
 #     pzf.extractall()
 
 import zipfile
-with zipfile.ZipFile("tiny-imagenet-65.zip", 'r') as zip_ref:
+with zipfile.ZipFile("tiny-imagenet-70.zip", 'r') as zip_ref:
     zip_ref.extractall("imagenet")
