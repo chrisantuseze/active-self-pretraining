@@ -30,8 +30,15 @@ class PretextDataLoader():
 
         if is_val:
             val_path_loss_list = []
-            img_paths = glob.glob(self.dir + '/test/*/*')[0:len(path_loss_list)]
-            for path in img_paths:
+
+            if self.args.target_dataset == DatasetType.IMAGENET.value:
+                img_paths = glob.glob(self.dir + '/train/*/*/*')
+            elif self.args.target_dataset == DatasetType.CIFAR10.value:
+                img_paths = glob.glob(self.dir + '/train/*/*')
+            else:
+                img_paths = glob.glob(self.dir + '/*/*')
+
+            for path in img_paths[0:len(path_loss_list)]:
                 val_path_loss_list.append(PathLoss(path, 0))     
 
             self.path_loss_list = val_path_loss_list 
