@@ -100,7 +100,6 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        print(path)
         if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
             img = pil_loader(path)
 
