@@ -173,7 +173,7 @@ def get_ds_num_classes(dataset):
         dir = "/ucmerced/images"
 
     elif dataset == DatasetType.IMAGENET.value:
-        num_classes = 60#200
+        num_classes = 65#200
         dir = "/imagenet"
 
     elif dataset == DatasetType.IMAGENET_LITE.value:
