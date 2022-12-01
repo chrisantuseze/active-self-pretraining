@@ -93,8 +93,14 @@ class PretextDataset(torch.utils.data.Dataset):
         return len(self.pathloss_list)
 
     def __getitem__(self, idx):
-        path = self.pathloss_list[idx].path[0]
-        print(self.pathloss_list[idx])
+        path_loss = self.pathloss_list[idx]
+
+        if isinstance(path_loss.path, tuple):
+            path = path_loss.path[0]
+        else:
+            path = path_loss.path
+
+        print(path)
         if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
             img = pil_loader(path)
 
