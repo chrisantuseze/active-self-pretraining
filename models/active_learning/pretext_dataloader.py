@@ -137,7 +137,6 @@ class MakeBatchLoader(torch.utils.data.Dataset):
         else:
             label = path.split('/')[-2]
         
-        print(label)
         save_class_names(self.args, label)
         
         if self.is_train:
