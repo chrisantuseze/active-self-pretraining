@@ -108,7 +108,7 @@ class PretextTrainer():
             logging.info('-' * 20)
 
             self.train_main_task(model, criterion, optimizer, train_params, train_loader)
-            self.eval_main_task(model, criterion, batch, test_loader)
+            # self.eval_main_task(model, criterion, batch, test_loader)
 
             # Decay Learning Rate
             scheduler.step()
