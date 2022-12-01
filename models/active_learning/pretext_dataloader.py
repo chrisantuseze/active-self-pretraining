@@ -112,6 +112,8 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             label = path.split('/')[-2]
 
+        print(path)
+
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
 class MakeBatchLoader(torch.utils.data.Dataset):
