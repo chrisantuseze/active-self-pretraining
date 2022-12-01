@@ -132,9 +132,11 @@ class MakeBatchLoader(torch.utils.data.Dataset):
             img = Image.open(self.img_path[idx])
 
         path = self.img_path[idx] 
-        print(path)
-
-        label = path.split('/')[-2]
+        if self.dir == "./datasets/imagenet":
+            label = path.split('/')[-3]
+        else:
+            label = path.split('/')[-2]
+        
         print(label)
         save_class_names(self.args, label)
         
