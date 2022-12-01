@@ -30,9 +30,12 @@ class PretextDataLoader():
 
         if is_val:
             print(len(path_loss_list))
+            val_path_loss_list = []
             img_paths = glob.glob(self.dir + '/test/*/*')[0:len(path_loss_list)]
             for path in img_paths:
-                self.path_loss_list.append(PathLoss(path, 0))        
+                val_path_loss_list.append(PathLoss(path, 0))     
+
+            self.path_loss_list = val_path_loss_list   
 
         params = get_params(args, training_type)
         self.image_size = params.image_size
