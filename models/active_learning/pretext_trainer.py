@@ -52,16 +52,20 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}")
 
 
+        epoch_acc = 100. * correct / total
+        epoch_loss = total_loss/total_num
+
+        logging.info(f"Epoch Loss: {epoch_loss}\t Epoch Acc: {epoch_acc}")
+        
         # Save checkpoint.
-        acc = 100. * correct / total
-        self.val_acc_history.append(str(acc))
-        if acc > self.best_proxy_acc:
-            print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {acc}')
+        self.val_acc_history.append(str(epoch_acc))
+        if epoch_acc > self.best_proxy_acc:
+            print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {epoch_acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
-            self.best_proxy_acc = acc
+            self.best_proxy_acc = epoch_acc
             self.best_batch = batch
 
     def train_main_task(self, model, criterion, optimizer, train_params, train_loader):
@@ -250,15 +254,18 @@ class PretextTrainer():
                 total_loss += loss.item() * 100
 
                 if step % self.args.log_step == 0:
-                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}\t Acc: {100.*correct/total}")
+                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}")
 
         # Save checkpoint.
-        acc = 100. * correct / total
-        if acc > self.best_trainer_acc:
-            print(f'Saving.. prev best acc = {self.best_trainer_acc}, new best acc = {acc}')
+        epoch_acc = 100. * correct / total
+        epoch_loss = total_loss/total_num
+
+        logging.info(f"Epoch Loss: {epoch_loss}\t Epoch Acc: {epoch_acc}")
+        if epoch_acc > self.best_trainer_acc:
+            print(f'Saving.. prev best acc = {self.best_trainer_acc}, new best acc = {epoch_acc}')
             self.best_model = copy.deepcopy(model)
             
-            self.best_trainer_acc = acc
+            self.best_trainer_acc = epoch_acc
 
     def train_finetuner(self, model, criterion, optimizer, train_loader):
         model.train()
