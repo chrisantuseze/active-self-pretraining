@@ -70,7 +70,7 @@ al_optimizer: "SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
 do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
-al_method: 0                                  # 0 for least confidence, 1 for entropy, 2 for both
+al_method: 01                                 # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"
 
 
