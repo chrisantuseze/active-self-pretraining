@@ -8,7 +8,7 @@ dataset_dir: "./datasets"                     # path to dataset
 
 # pretrain options
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_batch_size: 160                          # the default should be 64. However, should be varied until better performance is achieved
+base_batch_size: 128                          # the default should be 64. However, should be varied until better performance is achieved
 base_image_size: 64
 base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
 base_optimizer: "SGD"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed. I noticed that when SGD-MultiStep was used, the training was very slow. Check row 21. It does not reduce the learning rate
