@@ -27,6 +27,7 @@ class PretextDataLoader():
         self.is_val = is_val
 
         self.dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
+        print(self.dir)
 
         if is_val:
             val_path_loss_list = []
