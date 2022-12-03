@@ -366,6 +366,7 @@ class PretextTrainer():
                 print(main_task_model.linear.weight.shape)
                 state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 main_task_model.load_state_dict(state['model'], strict=False)
+                print(main_task_model.linear.weight.shape)
 
                 
                 # model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
