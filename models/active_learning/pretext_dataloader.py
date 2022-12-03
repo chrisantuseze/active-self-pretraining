@@ -32,7 +32,7 @@ class PretextDataLoader():
             val_path_loss_list = []
 
             if self.args.target_dataset == DatasetType.IMAGENET.value:
-                img_paths = glob.glob(self.dir + '/train/*/*/*')
+                img_paths = glob.glob(self.dir + '/train/*/*')# img_paths = glob.glob(self.dir + '/train/*/*/*')
             elif self.args.target_dataset == DatasetType.CIFAR10.value:
                 img_paths = glob.glob(self.args.dataset_dir + '/cifar10v2/train/*/*')
             else:
@@ -115,7 +115,7 @@ class PretextDataset(torch.utils.data.Dataset):
             img = Image.open(path)
 
         if self.args.target_dataset == DatasetType.IMAGENET.value:
-            label = path.split('/')[-3]
+            label = path.split('/')[-2]# label = path.split('/')[-3]
         else:
             label = path.split('/')[-2]
 
@@ -135,7 +135,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         if with_train:
             if self.dir == "./datasets/imagenet":
-                self.img_path = glob.glob(self.dir + '/train/*/*/*')
+                self.img_path = glob.glob(self.dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
             else:
                 self.img_path = glob.glob(self.dir + '/train/*/*')
         else:
@@ -154,7 +154,7 @@ class MakeBatchLoader(torch.utils.data.Dataset):
 
         path = self.img_path[idx] 
         if self.dir == "./datasets/imagenet":
-            label = path.split('/')[-3]
+            label = path.split('/')[-2]# label = path.split('/')[-3]
         else:
             label = path.split('/')[-2]
         
