@@ -229,10 +229,6 @@ class PretextTrainer():
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
                 
-                print(inputs.shape)
-                print(inputs1.shape)
-                print(inputs2.shape)
-                print(inputs3.shape)
                 outputs = model(inputs)
                 outputs1 = model(inputs1)
                 outputs2 = model(inputs2)
