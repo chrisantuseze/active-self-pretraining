@@ -94,9 +94,10 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        print(model.linear.weight.shape)
-        _, criterion = get_model_criterion(self.args, model)
-        print(model.linear.weight.shape)
+        if not rebuild_al_model:
+            print(model.linear.weight.shape)
+
+        criterion = nn.CrossEntropyLoss()
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
