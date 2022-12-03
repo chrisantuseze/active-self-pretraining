@@ -31,7 +31,6 @@ def main():
             pretrainer.first_pretrain()
 
         if args.do_al_for_ml_project:
-            print("About to begin AL")
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
 
