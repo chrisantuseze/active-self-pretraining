@@ -175,6 +175,12 @@ class MakeBatchLoader(torch.utils.data.Dataset):
             img2 = torch.rot90(img, 2, [1,2])
             img3 = torch.rot90(img, 3, [1,2])
             imgs = [img, img1, img2, img3]
+
+
+            print(imgs[rotations[0]].shape)
+            print(imgs[rotations[1]].shape)
+            print(imgs[rotations[2]].shape)
+            print(imgs[rotations[3]].shape)
             rotations = [0, 1, 2, 3]
             random.shuffle(rotations)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path
