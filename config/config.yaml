@@ -14,7 +14,7 @@ base_lr: 0.03                                 # initial learning rate. This shou
 base_optimizer: "SGD"                        # or LARS (experimental) If you use LARS, then the lr needs to be decayed. I noticed that when SGD-MultiStep was used, the training was very slow. Check row 21. It does not reduce the learning rate
 current_epoch: 0
 start_epoch: 0
-base_epochs: 200                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+base_epochs: 100                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 dataset: 1                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for QUICKDRAW, 5 for IMAGENET_LITE, 4 for CLIPART
 base_pretrain: True
 momentum: 0.9                                 # momentum of SGD solver
@@ -52,7 +52,7 @@ finetune: True
 finetune_batch_size: 256                      # 
 finetune_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 finetune_optimizer: "Adam-DCL"                # if you use LARS, then the lr needs to be decayed
-finetune_image_size: 32                       # this depends on the dataset used
+finetune_image_size: 64                       # this depends on the dataset used
 finetune_epochs: 100                          # this needs to be increased to 100
 finetune_momentum: 0.9                        # momentum of SGD solver
 finetune_weight_decay: 1.0e-6 #5.0e-4                 # "optimized using LARS [...] and weight decay of 1.0e−6"
@@ -60,7 +60,7 @@ finetune_weight_decay: 1.0e-6 #5.0e-4                 # "optimized using LARS [.
 
 # active learning options
 al_finetune_trainer_epochs: 25
-al_epochs: 50                                 # the default should be kept at 10, however due to compute limitations, I would use 3
+al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_batch_size: 256                            # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
