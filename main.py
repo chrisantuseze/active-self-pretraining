@@ -26,12 +26,12 @@ def main():
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
         if not state:
-            print("About to start ")
             pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
         if args.do_al_for_ml_project:
+            print("About to begin AL")
             pretext = PretextTrainer(args, writer)
             pretrain_data = pretext.do_active_learning()
 
