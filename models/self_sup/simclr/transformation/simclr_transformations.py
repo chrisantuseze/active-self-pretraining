@@ -36,7 +36,7 @@ class TransformsSimCLR():
 
         self.test_transform = transforms.Compose(
             [
-                transforms.Resize((size, size)),
+                transforms.Resize((64, 64)),
                 transforms.ToTensor(),
             ]
         )
