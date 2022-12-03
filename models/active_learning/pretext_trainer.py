@@ -103,6 +103,7 @@ class PretextTrainer():
 
             model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
         
+        print(model.linear.weight.shape)
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
