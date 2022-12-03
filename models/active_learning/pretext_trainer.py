@@ -12,7 +12,7 @@ import random
 
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import Loader, MakeBatchLoader, PretextDataLoader
+from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
@@ -228,6 +228,11 @@ class PretextTrainer():
             for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3, path) in enumerate(test_loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
                 inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
+                
+                print(inputs.shape)
+                print(inputs1.shape)
+                print(inputs2.shape)
+                print(inputs3.shape)
                 outputs = model(inputs)
                 outputs1 = model(inputs1)
                 outputs2 = model(inputs2)
@@ -335,8 +340,8 @@ class PretextTrainer():
 
     def do_active_learning(self, sample_size, method) -> List[PathLoss]:
 
-        self.args.al_trainer_sample_size = sample_size
-        self.args.al_method = method
+        # self.args.al_trainer_sample_size = sample_size
+        # self.args.al_method = method
 
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)

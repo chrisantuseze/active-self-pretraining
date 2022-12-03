@@ -55,7 +55,6 @@ class TargetDataset():
                 ValueError
 
         dataset = self.get_dataset(transforms)
-        print(len(dataset))
 
         loader = torch.utils.data.DataLoader(
             dataset,
