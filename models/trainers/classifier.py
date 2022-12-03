@@ -24,12 +24,12 @@ class Classifier:
         
         self.model = resnet_backbone(self.args.resnet, pretrained=False)
 
-        # if pretrain_level == "AL":
-        #     state = simple_load_model(self.args, path=f'proxy_{self.args.al_batches-2}.pth')
-        # else:
-        #     state = load_saved_state(self.args, pretrain_level=pretrain_level)
+        if pretrain_level == "AL":
+            state = simple_load_model(self.args, path='finetuner.pth')
+        else:
+            state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        state = load_saved_state(self.args, pretrain_level=pretrain_level)
+        # state = load_saved_state(self.args, pretrain_level=pretrain_level)
         self.model.load_state_dict(state['model'], strict=False)
 
         num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
