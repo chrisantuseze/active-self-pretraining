@@ -65,7 +65,7 @@ class PretextTrainer():
         if epoch_acc > self.best_proxy_acc:
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {epoch_acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
-            print(model.linear.shape)
+            print(model.linear.weight.shape)
             self.best_proxy_acc = epoch_acc
             self.best_batch = batch
 
@@ -363,7 +363,7 @@ class PretextTrainer():
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
-                print(main_task_model.linear.shape)
+                print(main_task_model.linear.weight.shape)
                 state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 main_task_model.load_state_dict(state['model'], strict=False)
 
