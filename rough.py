@@ -72,7 +72,7 @@ al_epochs: 20                                 # the default should be kept at 10
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_batch_size: 256                            # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_trainer_sample_size: 3000                  # this specifies the amount of samples to be added to the training pool after each AL iteration
+al_trainer_sample_size: 500                  # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_lr: 0.1
 al_optimizer: "SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
@@ -80,7 +80,7 @@ do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"
-al_pretext_from_pretrain: False               # this enables the pretext task to be finetuned using the weights of the pretrained model
+al_pretext_from_pretrain: True               # this enables the pretext task to be finetuned using the weights of the pretrained model
 
 ml_project: True                              # switches to ML Final Project mode 
 do_al_for_ml_project: True                    # switches between AL and regular classification
