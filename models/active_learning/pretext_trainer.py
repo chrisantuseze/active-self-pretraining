@@ -65,7 +65,6 @@ class PretextTrainer():
         if epoch_acc > self.best_proxy_acc:
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {epoch_acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
-            # print(model.linear.weight.shape)
             self.best_proxy_acc = epoch_acc
             self.best_batch = batch
 
@@ -94,10 +93,6 @@ class PretextTrainer():
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
-        if not rebuild_al_model:
-            # print(model.linear.weight.shape)
-            pass #You can remove this block
-
         criterion = nn.CrossEntropyLoss()
         if rebuild_al_model:
             state = simple_load_model(self.args, path='finetuner.pth')
@@ -105,7 +100,6 @@ class PretextTrainer():
 
             model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
         
-        # print(model.linear.weight.shape)
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
@@ -340,10 +334,10 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
 
-    def do_active_learning(self) -> List[PathLoss]:
+    def do_active_learning(self, sample_size, method) -> List[PathLoss]:
 
-        # self.args.al_trainer_sample_size = sample_size
-        # self.args.al_method = method
+        self.args.al_trainer_sample_size = sample_size
+        self.args.al_method = method
 
 
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
@@ -368,13 +362,8 @@ class PretextTrainer():
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
-                # print(main_task_model.linear.weight.shape)
                 state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 main_task_model.load_state_dict(state['model'], strict=False)
-                # print(main_task_model.linear.weight.shape)
-
-                
-                # model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
 
                 # sampling
                 samplek = self.batch_sampler(main_task_model, sample6400)

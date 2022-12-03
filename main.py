@@ -32,16 +32,16 @@ def main():
             pretrainer.first_pretrain()
 
         if args.do_al_for_ml_project:
-            # methods = [AL_Method.LEAST_CONFIDENCE.value, AL_Method.ENTROPY.value, AL_Method.BOTH.value]
-            # sample_sizes = [3000] #30% and 10%. We already have for 60%
+            methods = [AL_Method.BOTH.value]
+            sample_sizes = [1500, 500] #30% and 10%. We already have for 60%
 
-            # for method in methods:
-            #     for sample_size in sample_sizes:
-            #         pretext = PretextTrainer(args, writer)
-            #         pretrain_data = pretext.do_active_learning(sample_size, method)
+            for method in methods:
+                for sample_size in sample_sizes:
+                    pretext = PretextTrainer(args, writer)
+                    pretrain_data = pretext.do_active_learning(sample_size, method)
 
-            pretext = PretextTrainer(args, writer)
-            pretrain_data = pretext.do_active_learning()
+            # pretext = PretextTrainer(args, writer)
+            # pretrain_data = pretext.do_active_learning()
 
         else: #TODO Please uncomment this
             classifier = Classifier(args, writer, pretrain_level="1")
