@@ -65,6 +65,7 @@ class PretextTrainer():
         if epoch_acc > self.best_proxy_acc:
             print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {epoch_acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
+            print(model.linear.shape)
             self.best_proxy_acc = epoch_acc
             self.best_batch = batch
 
@@ -98,7 +99,7 @@ class PretextTrainer():
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
 
-            model.linear = nn.Linear(self.n_features, self.num_classes) # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
+            model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
@@ -362,8 +363,12 @@ class PretextTrainer():
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
+                print(main_task_model.linear.shape)
                 state = simple_load_model(self.args, f'proxy_{self.best_batch}.pth')
                 main_task_model.load_state_dict(state['model'], strict=False)
+
+                
+                # model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
 
                 # sampling
                 samplek = self.batch_sampler(main_task_model, sample6400)
