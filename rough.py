@@ -6,7 +6,7 @@ with zipfile.ZipFile("imagenette2-160.zip", 'r') as zip_ref:
     zip_ref.extractall("imagenet")  
 
 
-# method: 1                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SUPERVISED
+# method: 0                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SUPERVISED
 
 # # distributed training
 # nodes: 1
