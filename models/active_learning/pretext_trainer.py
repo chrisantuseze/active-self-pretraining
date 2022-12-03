@@ -315,8 +315,12 @@ class PretextTrainer():
             is_train=False, batch_size=100).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        state = load_saved_state(self.args, pretrain_level="1")
-        model.load_state_dict(state['model'], strict=False)
+
+        state = None
+        if self.args.al_pretext_from_pretrain:
+            state = load_saved_state(self.args, pretrain_level="1")
+            model.load_state_dict(state['model'], strict=False)
+        
         model = model.to(self.args.device)
 
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
