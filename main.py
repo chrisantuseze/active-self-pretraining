@@ -24,8 +24,8 @@ def main():
     writer = SummaryWriter()
 
     if args.ml_project:
-        print("Starting ML eval")
         state = load_saved_state(args, pretrain_level="1")
+        print("check point")
         if not state:
             pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer = SupPretrainer(args, writer)
