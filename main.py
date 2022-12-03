@@ -25,8 +25,8 @@ def main():
 
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
-        print("check point")
         if not state:
+            print("About to start ")
             pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer = SupPretrainer(args, writer)
             pretrainer.first_pretrain()
