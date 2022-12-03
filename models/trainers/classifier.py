@@ -25,8 +25,10 @@ class Classifier:
         self.model = resnet_backbone(self.args.resnet, pretrained=False)
 
         if pretrain_level == "AL":
+            logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
         else:
+            logging.info("Using pretrained model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
         # state = load_saved_state(self.args, pretrain_level=pretrain_level)
