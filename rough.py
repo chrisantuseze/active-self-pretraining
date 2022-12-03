@@ -83,4 +83,4 @@ with zipfile.ZipFile("imagenette2-160.zip", 'r') as zip_ref:
 
 
 # ml_project: True                              # switches to ML Final Project mode 
-# do_al_for_ml_project: True                    # switches between AL and regular classification
+# do_al_for_ml_project: False                    # switches between AL and regular classification
