@@ -7,6 +7,7 @@ import argparse
 
 # import cv2
 from torch.utils.tensorboard import SummaryWriter
+from models.active_learning.al_method_enum import AL_Method
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
@@ -31,8 +32,13 @@ def main():
             pretrainer.first_pretrain()
 
         if args.do_al_for_ml_project:
-            pretext = PretextTrainer(args, writer)
-            pretrain_data = pretext.do_active_learning()
+            methods = [AL_Method.LEAST_CONFIDENCE.value, AL_Method.ENTROPY.value, AL_Method.BOTH.value]
+            sample_sizes = [1500, 500] #30% and 10%. We already have for 60%
+
+            for method in methods:
+                for sample_size in sample_sizes:
+                    pretext = PretextTrainer(args, writer)
+                    pretrain_data = pretext.do_active_learning(sample_size, method)
 
         else: #TODO Please uncomment this
             classifier = Classifier(args, writer, pretrain_level="1")

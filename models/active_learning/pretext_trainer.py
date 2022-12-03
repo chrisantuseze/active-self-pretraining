@@ -333,7 +333,12 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
 
-    def do_active_learning(self) -> List[PathLoss]:
+    def do_active_learning(self, sample_size, method) -> List[PathLoss]:
+
+        self.args.al_trainer_sample_size = sample_size
+        self.args.al_method = method
+
+
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         
         main_task_model = encoder
@@ -377,6 +382,6 @@ class PretextTrainer():
         logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method)))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}.txt")
+                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}_{self.args.al_trainer_sample_size}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool

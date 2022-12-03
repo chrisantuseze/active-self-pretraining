@@ -78,12 +78,12 @@ with zipfile.ZipFile("imagenette2-160.zip", 'r') as zip_ref:
 # al_weight_decay: 5.0e-4
 # do_al: True
 # al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
-# al_method: 1                                 # 0 for least confidence, 1 for entropy, 2 for both
+# al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
 # al_path_loss_file: "al_path_loss.pkl"
 
 
 # ml_project: True                              # switches to ML Final Project mode 
-# do_al_for_ml_project: False                    # switches between AL and regular classification
+# do_al_for_ml_project: True                    # switches between AL and regular classification
 
 
 
