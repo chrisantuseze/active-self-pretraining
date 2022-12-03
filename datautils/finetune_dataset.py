@@ -40,6 +40,8 @@ class Finetune():
                 self.args, pretrain_data, training_type=TrainingType.FINETUNING, 
                 is_val=True).get_loader()
 
+            print(f"The size of the dataset is ({len(train_dataset)}, {len(val_dataset)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
+
             return train_loader, val_loader 
 
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -102,6 +104,7 @@ class Finetune():
                         shuffle=False,
                         pin_memory=True
                     )
+        print(f"The size of the dataset is ({len(train_dataset)}, {len(val_dataset)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
 
         return train_loader, val_loader
     
