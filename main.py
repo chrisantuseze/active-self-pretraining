@@ -32,8 +32,8 @@ def main():
             pretrainer.first_pretrain()
 
         if args.do_al_for_ml_project:
-            methods = [AL_Method.BOTH.value]
-            sample_sizes = [1500, 500] #30% and 10%. We already have for 60%
+            methods = [AL_Method.LEAST_CONFIDENCE.value, AL_Method.ENTROPY.value, AL_Method.BOTH.value]
+            sample_sizes = [50] #30% and 10%. We already have for 60%
 
             for method in methods:
                 for sample_size in sample_sizes:
