@@ -49,7 +49,7 @@ reload: False                                 # indicates whether to start the t
 # finetuning options
 finetune_dataset: 0                           # 1 for CIFAR10, 2 for QUICKDRAW, 3 for SKETCH, 4 for CLIPART, 7 for CHEST-XRAY. Ideally this should be same as the target_dataset, however some datasets don't have the train folder
 finetune: True
-finetune_batch_size: 100                      # 
+finetune_batch_size: 128                      # 
 finetune_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 finetune_optimizer: "Adam-DCL"                # if you use LARS, then the lr needs to be decayed
 finetune_image_size: 64                       # this depends on the dataset used
