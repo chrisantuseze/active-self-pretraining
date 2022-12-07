@@ -31,7 +31,6 @@ class Classifier:
             logging.info("Using pretrained model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        # state = load_saved_state(self.args, pretrain_level=pretrain_level)
         self.model.load_state_dict(state['model'], strict=False)
 
         num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
