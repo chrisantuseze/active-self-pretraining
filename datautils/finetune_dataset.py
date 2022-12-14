@@ -61,7 +61,7 @@ class Finetune():
                     normalize,
                 ])
 
-        if self.args.finetune_dataset == DatasetType.IMAGENET.value or self.args.finetune_dataset == DatasetType.IMAGENET_LITE.value:
+        if self.args.finetune_dataset == DatasetType.IMAGENET.value:
             traindir = os.path.join(self.dir, 'train')
             valdir = os.path.join(self.dir, 'val')
 

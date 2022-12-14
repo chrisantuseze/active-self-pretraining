@@ -146,7 +146,7 @@ def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
 
     train_ds = dataset
     val_ds = None
-    if args.dataset == DatasetType.IMAGENET_LITE.value or is_classifier:
+    if is_classifier:
         train_size = int(ratio * len(dataset))
         val_size = len(dataset) - train_size
 
@@ -156,18 +156,10 @@ def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
 
 
 def get_ds_num_classes(dataset):
-    if dataset == DatasetType.CLIPART.value:
+    if dataset == DatasetType.REAL.value:
         num_classes = 345
-        dir = "/clipart"
+        dir = "/real"
         
-    elif dataset == DatasetType.SKETCH.value:
-        num_classes = 345
-        dir = "/sketch"
-
-    elif dataset == DatasetType.QUICKDRAW.value:
-        num_classes = 345
-        dir = "/quickdraw"
-
     elif dataset == DatasetType.UCMERCED.value:
         num_classes = 21
         dir = "/ucmerced/images"
@@ -176,9 +168,9 @@ def get_ds_num_classes(dataset):
         num_classes = 10#200
         dir = "/imagenet"
 
-    elif dataset == DatasetType.IMAGENET_LITE.value:
+    elif dataset == DatasetType.CHEST_XRAY.value:
         num_classes = 100
-        dir = "/imagenet"
+        dir = "/chest_xray"
 
     else:
         num_classes = 10

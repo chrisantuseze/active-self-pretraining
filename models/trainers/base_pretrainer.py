@@ -15,7 +15,7 @@ class BasePretrainer():
         encoder = resnet_backbone(self.args.resnet, pretrained=False)
         print("=> creating model '{}'".format(self.args.resnet))
 
-        if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value or self.args.dataset == dataset_enum.DatasetType.IMAGENET_LITE.value:
+        if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value:
             train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         elif self.args.dataset == dataset_enum.DatasetType.CIFAR10.value:
