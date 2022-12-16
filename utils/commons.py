@@ -52,7 +52,7 @@ def load_classifier_chkpts(args, model, pretrain_level="1"):
         epoch_num = args.target_epoch_num
 
     else:
-        epoch_num = args.epoch_num
+        epoch_num = args.base_epochs
 
     try:
         out = os.path.join(
@@ -75,7 +75,7 @@ def load_classifier_chkpts(args, model, pretrain_level="1"):
         return model
 
     except IOError as er:
-        # logging.error(er)
+        logging.error(er)
         return None
 
 def simple_save_model(args, model, path):

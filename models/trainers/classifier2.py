@@ -47,7 +47,7 @@ class Classifier2():
         self.model = load_classifier_chkpts(self.args, self.model, pretrain_level)
 
         train_params = get_params(self.args, TrainingType.FINETUNING)
-        self.optimizer, self.scheduler = load_optimizer(self.args, self.linear_classifier.parameters(), train_params)
+        self.optimizer, self.scheduler = load_optimizer(self.args, self.linear_classifier.parameters(), train_params=train_params)
         
         cudnn.benchmark = True
 
@@ -58,14 +58,8 @@ class Classifier2():
             
         for epoch in range(0, self.args.lc_epochs):
 
-            # train the network for one epoch
-            logging.info("============ Starting epoch %i ... ============" % epoch)
-
-            # set samplers
-            # train_loader.sampler.set_epoch(epoch)
-
-            scores = self.train(self.model, self.linear_classifier, self.optimizer, self.train_loader, epoch)
-            scores_val = self.validate_network(self.val_loader, self.model, self.linear_classifier)
+            scores = self.train(self.model, self.linear_classifier, self.optimizer, train_loader, epoch)
+            scores_val = self.validate_network(val_loader, self.model, self.linear_classifier)
             self.training_stats.update(scores + scores_val)
 
             self.scheduler.step()
@@ -81,7 +75,7 @@ class Classifier2():
             torch.save(save_dict, os.path.join(self.args.model_checkpoint_path, 'classifier_{:4f}_acc.pth'.format(self.best_acc)))
 
             logging.info("Training of the supervised linear classifier on frozen features completed.\n"
-                    "Top-1 test accuracy: {acc:.1f}".format(acc=self.best_acc))
+                    "Top-1 test accuracy: {acc:.1f}\n".format(acc=self.best_acc))
 
     def train(self, model, reglog, optimizer, loader, epoch):
         """

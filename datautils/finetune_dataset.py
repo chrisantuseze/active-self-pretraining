@@ -61,7 +61,7 @@ class Finetune():
                     normalize,
                 ])
 
-        if self.args.finetune_dataset == DatasetType.IMAGENET.value:
+        if self.args.lc_dataset == DatasetType.IMAGENET.value:
             traindir = os.path.join(self.dir, 'train')
             valdir = os.path.join(self.dir, 'val')
 
@@ -75,7 +75,7 @@ class Finetune():
                 transform=val_transforms
                 )
 
-        elif self.args.finetune_dataset == DatasetType.CIFAR10.value:
+        elif self.args.lc_dataset == DatasetType.CIFAR10.value:
             train_dataset = torchvision.datasets.CIFAR10(
                 self.dir,
                 train=True,
