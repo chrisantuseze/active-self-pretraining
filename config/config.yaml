@@ -59,7 +59,7 @@ epoch_queue_starts: 15
 #########################
 #### optim parameters ###
 #########################
-swav_batch_size: 64
+swav_batch_size: 32
 swav_base_lr: 4.8
 final_lr: 0
 swav_optimizer: "SwAV"
@@ -83,7 +83,7 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 100
+base_epochs: 50
 base_image_size: 40
 base_dataset: 0                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
