@@ -126,12 +126,12 @@ def get_params(args, training_type):
             image_size=target_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
-            optimizer=args.target_optimizer,
+            optimizer=optimizer,
             weight_decay=args.al_weight_decay,
             temperature=temperature
             ),
         TrainingType.BASE_PRETRAIN: Params(
-            batch_size=args.batch_size, 
+            batch_size=batch_size, 
             image_size=base_image_size, 
             lr=base_lr, 
             epochs=epochs,

@@ -6,7 +6,6 @@
 #
 import os
 import time
-from logging import getLogger
 
 import numpy as np
 import torch
@@ -14,18 +13,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
-import torch.distributed as dist
 import torch.optim
-from models.self_sup.swav.utils import bool_flag, initialize_exp
+from models.self_sup.swav.utils import initialize_exp
 from models.utils.commons import get_params, AverageMeter
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
-from models.self_sup.swav.backbone.resnet50 import resnet50 as resnet_models
 import utils.logger as logging
-
-logger = getLogger()
-
-# parser = argparse.ArgumentParser(description="Implementation of SwAV")
+import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 class SwAVTrainer():
     def __init__(self, args, dataloader, pretrain_level="1", 
@@ -38,7 +32,7 @@ class SwAVTrainer():
         self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
-        self.model = resnet_models.__dict__[args.resnet](
+        self.model = resnet_models.__dict__[args.backbone](
             normalize=True,
             hidden_mlp=args.hidden_mlp,
             output_dim=args.feat_dim,
@@ -54,33 +48,32 @@ class SwAVTrainer():
         )
 
         # build the queue
-        queue = None
+        self.queue = None
         self.queue_path = os.path.join(args.model_misc_path, "queue" + str(args.rank) + ".pth")
         if os.path.isfile(self.queue_path):
-            queue = torch.load(self.queue_path)["queue"]
+            self.queue = torch.load(self.queue_path)["queue"]
         # the queue needs to be divisible by the batch size
-        self.args.queue_length -= args.queue_length % (args.batch_size * args.world_size)
+        self.args.queue_length -= args.queue_length % (args.swav_batch_size * args.world_size)
 
         cudnn.benchmark = True
 
     def train_epoch(self, epoch):
         # train the network for one epoch
-        logger.info("============ Starting epoch %i ... ============" % epoch)
 
         # optionally starts a queue
-        if self.args.queue_length > 0 and epoch >= self.args.epoch_queue_starts and queue is None:
-            queue = torch.zeros(
+        if self.args.queue_length > 0 and epoch >= self.args.epoch_queue_starts and self.queue is None:
+            self.queue = torch.zeros(
                 len(self.args.crops_for_assign),
                 self.args.queue_length // self.args.world_size,
                 self.args.feat_dim,
             ).cuda()
 
         # train the network
-        scores, queue = self.train(self.train_loader, epoch, queue)
+        scores, self.queue = self.train(self.train_loader, epoch, self.queue)
         self.training_stats.update(scores)
 
-        if queue is not None:
-            torch.save({"queue": queue}, self.queue_path)
+        if self.queue is not None:
+            torch.save({"queue": self.queue}, self.queue_path)
 
 
     def train(self, train_loader, epoch, queue):

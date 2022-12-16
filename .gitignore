@@ -1,6 +1,7 @@
 __pycache__
 runs/
 datasets/
+save/
 *.tar
 build/
 dist/

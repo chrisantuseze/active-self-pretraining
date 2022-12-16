@@ -12,6 +12,9 @@ import utils.logger as logging
 
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
+    if not os.path.isdir(args.model_checkpoint_path):
+        os.makedirs(args.model_checkpoint_path)
+
     prefix = get_ssl_method(args.method)
     out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 

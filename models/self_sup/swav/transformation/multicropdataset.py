@@ -30,7 +30,7 @@ class MultiCropDataset(datasets.ImageFolder):
         nmb_crops,
         min_scale_crops,
         max_scale_crops,
-        pathloss_list: List[PathLoss],
+        pathloss_list: List[PathLoss]=None,
         size_dataset=-1,
         return_index=False,
     ):

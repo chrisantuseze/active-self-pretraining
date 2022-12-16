@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 
@@ -7,7 +8,10 @@ def init():
     handler = logging.StreamHandler(stream=sys.stdout)
     logger.addHandler(handler)
 
-    logging.basicConfig(filename="datasets/casl.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
+    if not os.path.isdir("save/misc"):
+        os.makedirs("save/misc")
+
+    logging.basicConfig(filename="save/misc/casl.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
     logging.info("CASL started...")
 
     def handle_exception(exc_type, exc_value, exc_traceback):

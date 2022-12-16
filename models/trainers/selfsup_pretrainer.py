@@ -1,5 +1,6 @@
 from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
+from models.utils.commons import get_params
 import utils.logger as logging
 from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
@@ -17,7 +18,9 @@ class SelfSupPretrainer(BasePretrainer):
         self.args = args
         self.writer = writer
 
-    def base_pretrain(self, encoder, train_loader, epochs, trainingType, optimizer_type) -> None:
+    def base_pretrain(self, encoder, train_loader, epochs, trainingType) -> None:
+        train_params = get_params(self.args, trainingType)
+        
         pretrain_level = "1" if trainingType == TrainingType.BASE_PRETRAIN else "2"        
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
@@ -42,7 +45,7 @@ class SelfSupPretrainer(BasePretrainer):
 
         elif self.args.method == SSL_Method.SWAV.value:
             trainer = SwAVTrainer(
-                self.args, self.writer, train_loader, 
+                self.args, train_loader, 
                 pretrain_level=pretrain_level, 
                 training_type=trainingType, 
                 log_step=log_step
@@ -63,7 +66,7 @@ class SelfSupPretrainer(BasePretrainer):
         model = trainer.model
         optimizer = trainer.optimizer
 
-        for epoch in range(self.args.start_epoch, epochs):
+        for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
@@ -76,23 +79,23 @@ class SelfSupPretrainer(BasePretrainer):
                 lr = trainer.scheduler.get_last_lr()
 
             if epoch > 0 and epoch % 20 == 0:
-                save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
+                save_state(self.args, model, optimizer, pretrain_level, train_params.optimizer)
 
             logging.info(f"Epoch Loss: {epoch_loss}\t lr: {lr}")
             logging.info('-' * 20)
 
             self.args.current_epoch += 1
 
-        save_state(self.args, model, optimizer, pretrain_level, optimizer_type)
+        save_state(self.args, model, optimizer, pretrain_level, train_params.optimizer)
 
 
     def first_pretrain(self) -> None:
         encoder, train_loader = super().first_pretrain()
         
-        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN, optimizer_type=self.args.base_optimizer)
+        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
 
     def second_pretrain(self) -> None:
         encoder, loader = super().second_pretrain()
 
-        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN, optimizer_type=self.args.target_optimizer)
+        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
