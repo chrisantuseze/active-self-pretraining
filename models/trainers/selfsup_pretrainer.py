@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
 import utils.logger as logging
 from datautils.target_dataset import get_target_pretrain_ds
@@ -32,13 +33,39 @@ class SelfSupPretrainer(BasePretrainer):
 
         log_step = self.args.log_step
         if self.args.method == SSL_Method.SIMCLR.value:
-            trainer = SimCLRTrainer(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, training_type=trainingType, log_step=log_step)
+            trainer = SimCLRTrainer(
+                self.args, self.writer, 
+                encoder, train_loader, 
+                pretrain_level=pretrain_level, 
+                training_type=trainingType, 
+                log_step=log_step
+            )
 
         elif self.args.method == SSL_Method.DCL.value:
-            trainer = SimCLRTrainerV2(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, training_type=trainingType, log_step=log_step)
+            trainer = SimCLRTrainerV2(
+                self.args, self.writer, 
+                encoder, train_loader, 
+                pretrain_level=pretrain_level, 
+                training_type=trainingType, 
+                log_step=log_step
+            )
+
+        elif self.args.method == SSL_Method.SWAV.value:
+            trainer = SwAVTrainer(
+                self.args, self.writer, train_loader, 
+                pretrain_level=pretrain_level, 
+                training_type=trainingType, 
+                log_step=log_step
+            )
 
         elif self.args.method == SSL_Method.MYOW.value:
-            trainer = get_myow_trainer(self.args, self.writer, encoder, train_loader, pretrain_level=pretrain_level, trainingType=trainingType, log_step=log_step)
+            trainer = get_myow_trainer(
+                self.args, self.writer, 
+                encoder, train_loader, 
+                pretrain_level=pretrain_level, 
+                trainingType=trainingType, 
+                log_step=log_step
+            )
 
         else:
             ValueError
@@ -50,7 +77,7 @@ class SelfSupPretrainer(BasePretrainer):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
-            epoch_loss = trainer.train_epoch()
+            epoch_loss = trainer.train_epoch(epoch)
 
             lr = 0
             # Decay Learning Rate

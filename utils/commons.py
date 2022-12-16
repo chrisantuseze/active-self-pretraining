@@ -20,11 +20,14 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
 
     elif args.method == SSL_Method.MYOW.value:
         prefix = "myow"
+
+    elif args.method == SSL_Method.SWAV.value:
+        prefix = "swav"
     
     elif args.method == SSL_Method.SUPERVISED.value:
         prefix = "sup"
 
-    out = os.path.join(args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
+    out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
     state = {
         'model': model.state_dict(),
@@ -45,6 +48,9 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
 
         elif args.method == SSL_Method.MYOW.value:
             prefix = "myow"
+
+        elif args.method == SSL_Method.SWAV.value:
+            prefix = "swav"
         
         elif args.method == SSL_Method.SUPERVISED.value:
             prefix = "sup"
@@ -56,7 +62,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
             epoch_num = args.epoch_num
 
         out = args.resume if recent and args.resume else os.path.join(
-                args.model_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+                args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
             )
 
         return torch.load(out, map_location=args.device.type)
@@ -71,12 +77,12 @@ def simple_save_model(args, model, path):
         'model': model.state_dict()
     }
 
-    out = os.path.join(args.model_path, path)
+    out = os.path.join(args.model_checkpoint_path, path)
     torch.save(state, out)
 
 def simple_load_model(args, path):
     try:
-        out = os.path.join(args.model_path, path)
+        out = os.path.join(args.model_checkpoint_path, path)
         return torch.load(out)
 
     except IOError as er:
@@ -105,7 +111,7 @@ def accuracy(pred, target, topk=1):
 
 def save_path_loss(args, filename, image_loss_list):
     filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out, "wb") as file:
@@ -120,7 +126,7 @@ def save_path_loss(args, filename, image_loss_list):
 
 def load_path_loss(args, filename):
     filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out, "rb") as file:
@@ -133,7 +139,7 @@ def load_path_loss(args, filename):
 def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
     # dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
     # filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out, "a") as file:
@@ -152,7 +158,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
 def load_accuracy_file(args):
     dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
     filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out, "a") as file:
@@ -164,7 +170,7 @@ def load_accuracy_file(args):
 
 def save_class_names(args, label):
     filename = f"{get_dataset_enum(args.dataset)}.txt"
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out, "a") as file:
@@ -176,7 +182,7 @@ def save_class_names(args, label):
 
 def load_class_names(args):
     filename = f"{get_dataset_enum(args.dataset)}.txt"
-    out = os.path.join(args.model_path, filename)
+    out = os.path.join(args.model_misc_path, filename)
 
     try:
         with open(out) as file:

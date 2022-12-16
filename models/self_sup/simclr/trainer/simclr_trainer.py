@@ -8,10 +8,9 @@ from models.heads.nt_xent import NT_Xent
 
 class SimCLRTrainer():
     def __init__(self, 
-    args, writer, encoder, 
-    dataloader, rebuild_al_model=False, 
-    pretrain_level="1", training_type=TrainingType.BASE_PRETRAIN, 
-    log_step=500) -> None:
+        args, writer, encoder, 
+        dataloader, pretrain_level="1", 
+        training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
     
         self.args = args
         self.writer = writer
@@ -19,24 +18,17 @@ class SimCLRTrainer():
 
         self.train_loader = dataloader
 
-        state = None
-        if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
-            self.model = encoder
-            self.criterion = NTXentLoss(self.args)
-
-        else:
-            self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
-
-            if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-                state = load_saved_state(self.args, pretrain_level=pretrain_level)
-                self.model.load_state_dict(state['model'], strict=False)
+        self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
+        if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
+            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+            self.model.load_state_dict(state['model'], strict=False)
 
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, self.train_params)
 
-    def train_epoch(self) -> int:
+    def train_epoch(self, epoch) -> int:
         total_loss, total_num = 0.0, 0
         self.model.train()
 

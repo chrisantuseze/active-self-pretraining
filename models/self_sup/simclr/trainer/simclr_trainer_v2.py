@@ -8,10 +8,9 @@ from utils.commons import load_saved_state
 
 class SimCLRTrainerV2():
     def __init__(self, 
-    args, writer, encoder, 
-    dataloader, rebuild_al_model=False, 
-    pretrain_level="1", training_type=TrainingType.BASE_PRETRAIN, 
-    log_step=500) -> None:
+        args, writer, encoder, 
+        dataloader, pretrain_level="1", 
+        training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
     
         self.args = args
         self.writer = writer
@@ -25,24 +24,17 @@ class SimCLRTrainerV2():
         elif self.args.dataset == DatasetType.CIFAR10 or self.args.target_dataset == DatasetType.CIFAR10:
             self.args.temperature = 0.07
 
-        state = None
-        if training_type == TrainingType.ACTIVE_LEARNING and not rebuild_al_model:
-            self.model = encoder
-            self.criterion = DCL(self.args)
-
-        else:
-            self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
-
-            if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-                state = load_saved_state(self.args, pretrain_level=pretrain_level)
-                self.model.load_state_dict(state['model'], strict=False)
+        self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
+        if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
+            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+            self.model.load_state_dict(state['model'], strict=False)
 
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, self.train_params)
 
-    def train_epoch(self) -> int:
+    def train_epoch(self, epoch) -> int:
         total_loss, total_num = 0.0, 0
 
         self.model.train()

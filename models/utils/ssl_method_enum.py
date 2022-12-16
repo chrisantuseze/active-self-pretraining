@@ -5,3 +5,4 @@ class SSL_Method(Enum):
     DCL = 1
     MYOW = 2
     SUPERVISED = 3
+    SWAV = 4

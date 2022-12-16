@@ -1,3 +1,5 @@
+import math
+import numpy as np
 import torch
 from torch.optim.lr_scheduler import StepLR, ExponentialLR, CosineAnnealingLR
 from torch.optim import SGD, Adam
@@ -6,7 +8,7 @@ from models.utils.training_type_enum import Params, TrainingType
 from .lars import LARS
 
 
-def load_optimizer(args, params, state, train_params: Params):
+def load_optimizer(args, params, state=None, train_params: Params=None, train_loader=None):
     scheduler = None
     
     if train_params.optimizer == "Adam-SimCLR":
@@ -36,6 +38,21 @@ def load_optimizer(args, params, state, train_params: Params):
         optimizer = torch.optim.SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
 
+    elif train_params.optimizer == "SGD-SwAV":
+        # build optimizer
+        optimizer = torch.optim.SGD(
+            params,
+            lr=args.base_lr,
+            momentum=0.9,
+            weight_decay=args.wd,
+        )
+        # optimizer = LARC(optimizer=optimizer, trust_coefficient=0.001, clip=False)
+        warmup_lr_schedule = np.linspace(args.start_warmup, args.base_lr, len(train_loader) * args.warmup_epochs)
+        iters = np.arange(len(train_loader) * (args.epochs - args.warmup_epochs))
+        cosine_lr_schedule = np.array([args.final_lr + 0.5 * (args.base_lr - args.final_lr) * (1 + \
+                            math.cos(math.pi * t / (len(train_loader) * (args.epochs - args.warmup_epochs)))) for t in iters])
+        scheduler = np.concatenate((warmup_lr_schedule, cosine_lr_schedule))
+
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling
         # (i.e. LearningRate = 0.3 × BatchSize/256) and weight decay of 10−6.
@@ -54,6 +71,4 @@ def load_optimizer(args, params, state, train_params: Params):
     else:
         raise ValueError
 
-    if args.reload and state:
-            optimizer.load_state_dict(state[args.optimizer + '-optimizer'])
     return optimizer, scheduler
