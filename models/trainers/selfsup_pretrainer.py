@@ -74,11 +74,11 @@ class SelfSupPretrainer(BasePretrainer):
 
             lr = 0
             # Decay Learning Rate
-            if trainer.scheduler:
+            if self.args.method is not SSL_Method.SWAV.value and trainer.scheduler:
                 trainer.scheduler.step()
                 lr = trainer.scheduler.get_last_lr()
 
-            if epoch > 0 and epoch % 20 == 0:
+            if epoch > 0 and epoch % 25 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, train_params.optimizer)
 
             logging.info(f"Epoch Loss: {epoch_loss}\t lr: {lr}")
