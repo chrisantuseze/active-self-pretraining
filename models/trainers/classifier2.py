@@ -20,7 +20,7 @@ from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
 from utils.commons import load_classifier_chkpts
 import utils.logger as logging
-from models.self_sup.swav.backbone.resnet50 import resnet50 as resnet_models
+import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 class Classifier2():
     def __init__(self, args, pretrain_level="2") -> None:
