@@ -160,7 +160,7 @@ class BYOLTrainer():
         self.writer.add_scalar('mm', self.mm, self.step)
         self.writer.add_scalar('loss', loss, self.step)
 
-    def train_epoch(self):
+    def train_epoch(self, epoch):
         self.model.train()
         for inputs in self.train_dataloader:
             # update parameters

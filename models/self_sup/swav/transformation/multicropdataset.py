@@ -9,11 +9,15 @@ Adapted from the SwAV repo
 #
 import random
 from logging import getLogger
+from typing import List
 
-from PIL import ImageFilter
+from PIL import ImageFilter, Image
 import numpy as np
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
+from datautils.dataset_enum import DatasetType
+from datautils.path_loss import PathLoss
+from utils.commons import pil_loader
 
 logger = getLogger()
 
@@ -26,6 +30,7 @@ class MultiCropDataset(datasets.ImageFolder):
         nmb_crops,
         min_scale_crops,
         max_scale_crops,
+        pathloss_list: List[PathLoss],
         size_dataset=-1,
         return_index=False,
     ):
@@ -33,9 +38,11 @@ class MultiCropDataset(datasets.ImageFolder):
         assert len(size_crops) == len(nmb_crops)
         assert len(min_scale_crops) == len(nmb_crops)
         assert len(max_scale_crops) == len(nmb_crops)
-        if size_dataset >= 0:
+        if pathloss_list is not None and size_dataset >= 0:
             self.samples = self.samples[:size_dataset]
+
         self.return_index = return_index
+        self.pathloss_list = pathloss_list
 
         color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
         mean = [0.485, 0.456, 0.406]
@@ -56,8 +63,23 @@ class MultiCropDataset(datasets.ImageFolder):
         self.trans = trans
 
     def __getitem__(self, index):
-        path, _ = self.samples[index]
-        image = self.loader(path)
+
+        if self.pathloss_list:
+            path_loss = self.pathloss_list[index]
+            if isinstance(path_loss.path, tuple):
+                path = path_loss.path[0]
+            else:
+                path = path_loss.path
+
+            if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
+                image = pil_loader(path)
+            else:
+                image = Image.open(path)
+                
+        else:
+            path, _ = self.samples[index]
+            image = self.loader(path)
+
         multi_crops = list(map(lambda trans: trans(image), self.trans))
         if self.return_index:
             return index, multi_crops

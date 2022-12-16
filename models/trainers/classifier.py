@@ -17,12 +17,11 @@ from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_m
 
 
 class Classifier:
-    def __init__(self, args, writer, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
+    def __init__(self, args, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
 
         self.args = args
-        self.writer = writer
         
-        self.model = resnet_backbone(self.args.resnet, pretrained=False)
+        self.model = resnet_backbone(self.args.backbone, pretrained=False)
 
         if pretrain_level == "AL":
             logging.info("Using pretext task weights")
@@ -47,7 +46,7 @@ class Classifier:
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
 
-    def finetune(self, pretrain_data=None) -> None:
+    def train_and_eval(self, pretrain_data=None) -> None:
         train_loader, val_loader = Finetune(
             self.args, dir=self.dir, 
             training_type=TrainingType.FINETUNING).get_loader(pretrain_data=pretrain_data)

@@ -11,11 +11,7 @@ from .lars import LARS
 def load_optimizer(args, params, state=None, train_params: Params=None, train_loader=None):
     scheduler = None
     
-    if train_params.optimizer == "Adam-SimCLR":
-        optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
-        # scheduler = StepLR(optimizer, step_size=5, gamma=0.9)
-
-    elif train_params.optimizer == "Adam-DCL":
+    if train_params.optimizer == "SimCLR":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
 
     elif train_params.optimizer == "Adam-Cosine":
@@ -24,7 +20,7 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
         # line 34 in the check for the number of epochs
         scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
 
-    elif train_params.optimizer == "SGD":
+    elif train_params.optimizer == "DCL":
         lr = train_params.lr * train_params.batch_size/256
         optimizer = SGD(params, lr=lr, momentum=args.momentum, nesterov=True)
     
@@ -38,20 +34,40 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
         optimizer = torch.optim.SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30, 60, 90])
 
-    elif train_params.optimizer == "SGD-SwAV":
+    elif train_params.optimizer == "SwAV":
         # build optimizer
         optimizer = torch.optim.SGD(
             params,
-            lr=args.base_lr,
-            momentum=0.9,
-            weight_decay=args.wd,
+            lr=train_params.lr,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
         )
         # optimizer = LARC(optimizer=optimizer, trust_coefficient=0.001, clip=False)
-        warmup_lr_schedule = np.linspace(args.start_warmup, args.base_lr, len(train_loader) * args.warmup_epochs)
-        iters = np.arange(len(train_loader) * (args.epochs - args.warmup_epochs))
-        cosine_lr_schedule = np.array([args.final_lr + 0.5 * (args.base_lr - args.final_lr) * (1 + \
-                            math.cos(math.pi * t / (len(train_loader) * (args.epochs - args.warmup_epochs)))) for t in iters])
+        warmup_lr_schedule = np.linspace(args.start_warmup, train_params.lr, len(train_loader) * args.warmup_epochs)
+        iters = np.arange(len(train_loader) * (train_params.epochs - args.warmup_epochs))
+        cosine_lr_schedule = np.array([args.final_lr + 0.5 * (train_params.lr - args.final_lr) * (1 + \
+                            math.cos(math.pi * t / (len(train_loader) * (train_params.epochs - args.warmup_epochs)))) for t in iters])
         scheduler = np.concatenate((warmup_lr_schedule, cosine_lr_schedule))
+
+    elif train_params.optimizer == "Classifier":
+        # set optimizer
+        optimizer = torch.optim.SGD(
+            params,
+            lr=train_params.lr,
+            nesterov=args.nesterov,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay,
+        )
+
+        # set scheduler
+        if args.scheduler_type == "step":
+            scheduler = torch.optim.lr_scheduler.MultiStepLR(
+                optimizer, args.decay_epochs, gamma=args.gamma
+            )
+        elif args.scheduler_type == "cosine":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer, train_params.epochs, eta_min=args.final_lr
+            )
 
     elif train_params.optimizer == "LARS":
         # optimized using LARS with linear learning rate scaling

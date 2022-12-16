@@ -1,3 +1,4 @@
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,7 +16,7 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
+from models.utils.commons import AverageMeter, get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_path_loss, load_saved_state, save_accuracy_to_file, save_path_loss, simple_load_model, simple_save_model
@@ -34,10 +35,14 @@ class PretextTrainer():
         self.num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
         self.n_features = get_feature_dimensions_backbone(self.args)
 
-    def eval_main_task(self, model, criterion, batch, test_loader):
+    def eval_main_task(self, model, epoch, criterion, batch, test_loader):
+        batch_time = AverageMeter()
+        losses = AverageMeter()
+
         model.eval()
         correct, total = 0, 0
-        total_loss, total_num = 0.0, 0
+
+        end = time.time()
         with torch.no_grad():
             for step, (inputs, targets) in enumerate(test_loader):
                 inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
@@ -48,28 +53,37 @@ class PretextTrainer():
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
 
-                total_num += 100
-                total_loss += loss.item() * 100
-
-                if step % self.args.log_step == 0:
-                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}")
-
+                losses.update(loss.item(), inputs[0].size(0))
+                
+                # measure elapsed time
+                batch_time.update(time.perf_counter() - end)
+                end = time.perf_counter()
 
         epoch_acc = 100. * correct / total
-        epoch_loss = total_loss/total_num
-
-        logging.info(f"Epoch Loss: {epoch_loss}\t Epoch Acc: {epoch_acc}")
         
         # Save checkpoint.
         self.val_acc_history.append(str(epoch_acc))
         if epoch_acc > self.best_proxy_acc:
-            print(f'Saving.. Prev acc = {self.best_proxy_acc}, new acc = {epoch_acc}')
             simple_save_model(self.args, model, f'proxy_{batch}.pth')
             self.best_proxy_acc = epoch_acc
             self.best_batch = batch
 
-    def train_main_task(self, model, criterion, optimizer, train_params, train_loader):
+        logging.info(
+            "Test:\t"
+            "Time {batch_time.avg:.3f}\t"
+            "Loss {loss.avg:.4f}\t"
+            "Acc@1 {top1.avg:.3f}\t"
+            "Best Acc@1 so far {acc:.1f}".format(
+                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_proxy_acc))
+
+    def train_main_task(self, model, epoch, criterion, optimizer, train_params, train_loader):
+        batch_time = AverageMeter()
+        data_time = AverageMeter()
+        losses = AverageMeter()
+
         model.train()
+        end = time.time()
+
         total_loss, total_num = 0.0, 0
         for step, (inputs, targets) in enumerate(train_loader):
             inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
@@ -85,8 +99,25 @@ class PretextTrainer():
             total_num += train_params.batch_size
             total_loss += loss.item() * train_params.batch_size
 
+            losses.update(loss.item(), inputs[0].size(0))
+            batch_time.update(time.time() - end)
+            end = time.time()
+
             if step % self.args.log_step == 0:
-                logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
+                logging.info(
+                    "Epoch: [{0}][{1}]\t"
+                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
+                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
+                    "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
+                    "Lr: {lr:.4f}".format(
+                        epoch,
+                        step,
+                        batch_time=batch_time,
+                        data_time=data_time,
+                        loss=losses,
+                        lr=self.optimizer.param_groups[0]["lr"],
+                    )
+                )
 
     def main_task(self, samples, model, batch, rebuild_al_model=False):
         train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_finetune_batch_size).get_loader()
@@ -111,8 +142,8 @@ class PretextTrainer():
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
             logging.info('-' * 20)
 
-            self.train_main_task(model, criterion, optimizer, train_params, train_loader)
-            self.eval_main_task(model, criterion, batch, test_loader)
+            self.train_main_task(model, epoch, criterion, optimizer, train_params, train_loader)
+            self.eval_main_task(model, epoch, criterion, batch, test_loader)
 
             # Decay Learning Rate
             scheduler.step()
@@ -175,7 +206,7 @@ class PretextTrainer():
 
         return new_samples[:self.args.al_trainer_sample_size]
 
-    def make_batches(self, model):
+    def make_batches(self, model, epoch):
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
@@ -183,7 +214,13 @@ class PretextTrainer():
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
+        batch_time = AverageMeter()
+        data_time = AverageMeter()
+        losses = AverageMeter()
+
         model.eval()
+        end = time.time()
+
         test_loss = 0
         correct = 0
         total = 0
@@ -209,8 +246,26 @@ class PretextTrainer():
                 correct += predicted.eq(targets).sum().item()
 
                 loss = loss.item()
+
+                losses.update(loss.item(), inputs[0].size(0))
+                batch_time.update(time.time() - end)
+                end = time.time()
+
                 if step % self.args.log_step == 0:
-                    logging.info(f"Eval Step [{step}/{len(loader)}]\t Loss: {loss}")
+                    logging.info(
+                        "Epoch: [{0}][{1}]\t"
+                        "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
+                        "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
+                        "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
+                        "Lr: {lr:.4f}".format(
+                            epoch,
+                            step,
+                            batch_time=batch_time,
+                            data_time=data_time,
+                            loss=losses,
+                            lr=self.optimizer.param_groups[0]["lr"],
+                        )
+                    )
 
                 pathloss.append(PathLoss(path, loss))
         
@@ -220,8 +275,11 @@ class PretextTrainer():
         return sorted_samples
 
     def eval_finetuner(self, model, criterion, test_loader):
+        batch_time = AverageMeter()
+        losses = AverageMeter()
+
         model.eval()
-        total_loss, total_num = 0.0, 0
+        end = time.time()
         total, correct = 0, 0
 
         with torch.no_grad():
@@ -234,11 +292,11 @@ class PretextTrainer():
                 outputs2 = model(inputs2)
                 outputs3 = model(inputs3)
 
-                loss1 = criterion(outputs, targets)
-                loss2 = criterion(outputs1, targets1)
-                loss3 = criterion(outputs2, targets2)
-                loss4 = criterion(outputs3, targets3)
-                loss = (loss1+loss2+loss3+loss4)/4.
+                loss = criterion(outputs, targets)
+                loss1 = criterion(outputs1, targets1)
+                loss2 = criterion(outputs2, targets2)
+                loss3 = criterion(outputs3, targets3)
+                loss_avg = (loss + loss1 + loss2 + loss3) / 4.
 
                 _, predicted = outputs.max(1)
                 _, predicted1 = outputs1.max(1)
@@ -251,28 +309,35 @@ class PretextTrainer():
                 correct += predicted2.eq(targets2).sum().item()
                 correct += predicted3.eq(targets3).sum().item()
 
-                total_num += 100
-                total_loss += loss.item() * 100
-
-                if step % self.args.log_step == 0:
-                    logging.info(f"Eval Step [{step}/{len(test_loader)}]\t Loss: {total_loss / total_num}")
+                losses.update(loss_avg.item(), inputs[0].size(0))
+                
+                # measure elapsed time
+                batch_time.update(time.perf_counter() - end)
+                end = time.perf_counter()
 
         # Save checkpoint.
         epoch_acc = 100. * correct / total
-        epoch_loss = total_loss/total_num
 
-        logging.info(f"Epoch Loss: {epoch_loss}\t Epoch Acc: {epoch_acc}")
         if epoch_acc > self.best_trainer_acc:
-            print(f'Saving.. prev best acc = {self.best_trainer_acc}, new best acc = {epoch_acc}')
             self.best_model = copy.deepcopy(model)
-            
             self.best_trainer_acc = epoch_acc
 
-    def train_finetuner(self, model, criterion, optimizer, train_loader):
-        model.train()
-        total_loss, total_num = 0, 0
-        total, correct = 0, 0
+        logging.info(
+            "Test:\t"
+            "Time {batch_time.avg:.3f}\t"
+            "Loss {loss.avg:.4f}\t"
+            "Acc@1 {top1.avg:.3f}\t"
+            "Best Acc@1 so far {acc:.1f}".format(
+                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_trainer_acc))
 
+
+    def train_finetuner(self, model, epoch, criterion, optimizer, train_loader):
+        batch_time = AverageMeter()
+        data_time = AverageMeter()
+        losses = AverageMeter()
+
+        model.train()
+        end = time.time()
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
             inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
             inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
@@ -280,30 +345,33 @@ class PretextTrainer():
             optimizer.zero_grad()
             outputs, outputs1, outputs2, outputs3 = model(inputs), model(inputs1), model(inputs2), model(inputs3)
 
-            loss1 = criterion(outputs, targets)
-            loss2 = criterion(outputs1, targets1)
-            loss3 = criterion(outputs2, targets2)
-            loss4 = criterion(outputs3, targets3)
-            loss = (loss1+loss2+loss3+loss4)/4.
-            loss.backward()
+            loss = criterion(outputs, targets)
+            loss1 = criterion(outputs1, targets1)
+            loss2 = criterion(outputs2, targets2)
+            loss3 = criterion(outputs3, targets3)
+            loss_avg = (loss + loss1 + loss2 + loss3) / 4.
+            loss_avg.backward()
             optimizer.step()
 
-            total_loss += loss.item() * self.args.al_batch_size
-            total_num += self.args.al_batch_size
-
-            _, predicted = outputs.max(1)
-            _, predicted1 = outputs1.max(1)
-            _, predicted2 = outputs2.max(1)
-            _, predicted3 = outputs3.max(1)
-            total += targets.size(0)*4
-
-            correct += predicted.eq(targets).sum().item()
-            correct += predicted1.eq(targets1).sum().item()
-            correct += predicted2.eq(targets2).sum().item()
-            correct += predicted3.eq(targets3).sum().item()
+            losses.update(loss_avg.item(), inputs[0].size(0))
+            batch_time.update(time.time() - end)
+            end = time.time()
 
             if step % self.args.log_step == 0:
-                logging.info(f"Train Step [{step}/{len(train_loader)}]\t Loss: {total_loss / total_num}")
+                logging.info(
+                    "Epoch: [{0}][{1}]\t"
+                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
+                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
+                    "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
+                    "Lr: {lr:.4f}".format(
+                        epoch,
+                        step,
+                        batch_time=batch_time,
+                        data_time=data_time,
+                        loss=losses,
+                        lr=self.optimizer.param_groups[0]["lr"],
+                    )
+                )
 
     def finetuner(self, model):
         train_loader = get_target_pretrain_ds(
@@ -330,7 +398,7 @@ class PretextTrainer():
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
-            self.train_finetuner(model, criterion, optimizer, train_loader)
+            self.train_finetuner(model, epoch, criterion, optimizer, train_loader)
             self.eval_finetuner(model, criterion, test_loader)
 
             scheduler.step()
@@ -344,7 +412,7 @@ class PretextTrainer():
         self.args.al_method = method
 
 
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         main_task_model = encoder
 

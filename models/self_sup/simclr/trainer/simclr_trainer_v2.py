@@ -1,8 +1,9 @@
+import time
 from datautils.dataset_enum import DatasetType
 import utils.logger as logging
 from models.self_sup.simclr.loss.dcl_loss import DCL
 from optim.optimizer import load_optimizer
-from models.utils.commons import get_model_criterion, get_params
+from models.utils.commons import get_model_criterion, get_params, AverageMeter
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_saved_state
 
@@ -35,19 +36,24 @@ class SimCLRTrainerV2():
         self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, self.train_params)
 
     def train_epoch(self, epoch) -> int:
-        total_loss, total_num = 0.0, 0
+        batch_time = AverageMeter()
+        data_time = AverageMeter()
+        losses = AverageMeter()
+
+        # total_loss, total_num = 0.0, 0
 
         self.model.train()
+        end = time.time()
 
-        for step, (images, _) in enumerate(self.train_loader):
+        for step, (inputs, _) in enumerate(self.train_loader):
             # Clear gradients w.r.t. parameters
             self.optimizer.zero_grad()
 
-            images = images.to(self.args.device)
+            inputs = inputs.to(self.args.device)
 
             # Forward pass to get output/logits
-            feature1, output1 = self.model(images)
-            feature2, output2 = self.model(images)
+            _, output1 = self.model(inputs)
+            _, output2 = self.model(inputs)
 
             # Calculate Loss: softmax --> cross entropy loss
             loss = self.criterion(output1, output2) + self.criterion(output2, output1)
@@ -58,13 +64,30 @@ class SimCLRTrainerV2():
             # Updating parameters
             self.optimizer.step()
 
-            total_num += self.train_params.batch_size
-            total_loss += loss.item() * self.train_params.batch_size
+            losses.update(loss.item(), inputs[0].size(0))
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            # total_num += self.train_params.batch_size
+            # total_loss += loss.item() * self.train_params.batch_size
 
             if step % self.log_step == 0:
-                logging.info(f"Step [{step}/{len(self.train_loader)}]\t Loss: {total_loss / total_num}")
+                logging.info(
+                    "Epoch: [{0}][{1}]\t"
+                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
+                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
+                    "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
+                    "Lr: {lr:.4f}".format(
+                        epoch,
+                        step,
+                        batch_time=batch_time,
+                        data_time=data_time,
+                        loss=losses,
+                        lr=self.optimizer.param_groups[0]["lr"],
+                    )
+                )
 
-            self.writer.add_scalar("Loss/train_epoch", total_loss, self.args.global_step)
+            # self.writer.add_scalar("Loss/train_epoch", total_loss, self.args.global_step)
             self.args.global_step += 1
 
-        return total_loss / total_num
+        return losses.avg

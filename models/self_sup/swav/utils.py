@@ -38,16 +38,15 @@ def initialize_exp(params, *args, dump_params=True):
     Initialize the experience:
     - dump parameters
     - create checkpoint repo
-    - create a logger
     - create a panda object to keep track of the training statistics
     """
 
     # dump parameters
     if dump_params:
-        pickle.dump(params, open(os.path.join(params.dump_path, "params.pkl"), "wb"))
+        pickle.dump(params, open(os.path.join(params.model_misc_path, "params.pkl"), "wb"))
 
     # create repo to store checkpoints
-    params.dump_checkpoints = os.path.join(params.dump_path, "checkpoints")
+    params.dump_checkpoints = os.path.join(params.model_misc_path, "checkpoints")
     if not params.rank and not os.path.isdir(params.dump_checkpoints):
         os.mkdir(params.dump_checkpoints)
 
@@ -56,48 +55,10 @@ def initialize_exp(params, *args, dump_params=True):
     #     os.path.join(params.dump_path, "stats" + str(params.rank) + ".pkl"), args
     # )
     training_stats = PD_Stats(
-        os.path.join(params.dump_path, "stats_" + str(params.rank) + ".pkl"), args
+        os.path.join(params.model_misc_path, "stats_" + str(params.rank) + ".pkl"), args
     )
 
-    # create a logger
-    logger = create_logger(
-        os.path.join(params.dump_path, "train.log"), rank=params.rank
-    )
-    logger.info("============ Initialized logger ============")
-    logger.info(
-        "\n".join("%s: %s" % (k, str(v)) for k, v in sorted(dict(vars(params)).items()))
-    )
-    logger.info("The experiment will be stored in %s\n" % params.dump_path)
-    logger.info("")
-    return logger, training_stats
-
-def fix_random_seeds(seed=31):
-    """
-    Fix random seeds.
-    """
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    np.random.seed(seed)
-
-
-class AverageMeter(object):
-    """computes and stores the average and current value"""
-
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
+    return training_stats
 
 def accuracy(output, target, topk=(1,)):
     """Computes the accuracy over the k top predictions for the specified values of k"""

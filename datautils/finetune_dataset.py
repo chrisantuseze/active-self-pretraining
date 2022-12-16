@@ -45,7 +45,7 @@ class Finetune():
             return train_loader, val_loader 
 
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
+                                     std=[0.228, 0.224, 0.225])
 
         train_transforms = transforms.Compose([
                     transforms.RandomResizedCrop(224),
@@ -94,6 +94,7 @@ class Finetune():
         train_loader = torch.utils.data.DataLoader(
                             train_dataset, 
                             batch_size=self.batch_size,
+                            num_workers=self.args.workers,
                             shuffle=True,
                             pin_memory=True
                         )
@@ -101,6 +102,7 @@ class Finetune():
         val_loader = torch.utils.data.DataLoader(
                         val_dataset, 
                         batch_size=self.batch_size, 
+                        num_workers=self.args.workers,
                         shuffle=False,
                         pin_memory=True
                     )

@@ -1,3 +1,4 @@
+import time
 import utils.logger as logging
 from sched import scheduler
 import numpy as np
@@ -11,7 +12,7 @@ from models.self_sup.myow.model.mlp3 import MLP3
 from models.self_sup.myow.trainer.byol_trainer import BYOLTrainer
 from models.self_sup.myow.transformation.transformations import TransformsMYOW
 from optim.optimizer import load_optimizer
-from models.utils.commons import get_params
+from models.utils.commons import AverageMeter, get_params
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_saved_state
 
@@ -160,8 +161,14 @@ class MYOWTrainer(BYOLTrainer):
         outputs = {'view1': x, 'view2': x}
         return outputs
 
-    def train_epoch(self):
+    def train_epoch(self, epoch):
+        batch_time = AverageMeter()
+        data_time = AverageMeter()
+        losses = AverageMeter()
+
         self.model.train()
+        end = time.time()
+
         if self.view_pool_dataloader is not None:
             view_pooler = iter(self.view_pool_dataloader)
         for inputs in self.train_dataloader:
@@ -253,10 +260,26 @@ class MYOWTrainer(BYOLTrainer):
             # update moving average
             self.update_target_network()
 
+            losses.update(loss.item(), inputs[0].size(0))
+            batch_time.update(time.time() - end)
+            end = time.time()
+
             # log
             if self.step % self.log_step == 0:
-                # self.log_schedule(loss=loss.item())
-                logging.info(f"Step [{self.step}/{len(self.train_dataloader)}]\t Loss: {loss}")
+                logging.info(
+                    "Epoch: [{0}][{1}]\t"
+                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
+                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
+                    "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
+                    "Lr: {lr:.4f}".format(
+                        epoch,
+                        self.step,
+                        batch_time=batch_time,
+                        data_time=data_time,
+                        loss=losses,
+                        lr=self.optimizer.param_groups[0]["lr"],
+                    )
+                )
 
             # log images
             if self.mined_loss_weight > 0 and self.log_img_step > 0 and self.step % self.log_img_step == 0 and self.rank == 0:
@@ -265,7 +288,7 @@ class MYOWTrainer(BYOLTrainer):
             # update parameters
             self.step += 1
 
-        return loss.item()
+        return losses.avg
 
 
 

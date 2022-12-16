@@ -12,8 +12,8 @@ class BasePretrainer():
     
     def first_pretrain(self) :
         # initialize ResNet
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
-        print("=> creating model '{}'".format(self.args.resnet))
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
+        print("=> creating model '{}'".format(self.args.backbone))
 
         if self.args.dataset == dataset_enum.DatasetType.IMAGENET.value:
             train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
@@ -38,6 +38,6 @@ class BasePretrainer():
         else:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
 
-        encoder = resnet_backbone(self.args.resnet, pretrained=False)
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
 
         return encoder, loader

@@ -89,6 +89,28 @@ def get_params(args, training_type):
     base_image_size = args.base_image_size
     target_image_size = args.target_image_size
 
+    if args.method == SSL_Method.DCL.value:
+        batch_size = args.dcl_batch_size
+        epochs = args.base_epochs
+        temperature = args.dcl_temperature
+        optimizer = args.dcl_optimizer
+        base_lr = args.dcl_base_lr
+
+    elif args.method == SSL_Method.SIMCLR.value:
+        batch_size = args.simclr_batch_size
+        epochs = args.base_epochs
+        temperature = args.simclr_temperature
+        optimizer = args.simclr_optimizer
+        base_lr = args.simclr_base_lr
+
+    elif args.method == SSL_Method.SWAV.value:
+        batch_size = args.swav_batch_size
+        epochs = args.base_epochs
+        temperature = args.swav_temperature
+        optimizer = args.swav_optimizer
+        base_lr = args.swav_base_lr
+
+
     params = {
         TrainingType.ACTIVE_LEARNING: Params(
             batch_size=args.al_batch_size, 
@@ -96,7 +118,8 @@ def get_params(args, training_type):
             lr=args.al_lr, 
             epochs=args.al_epochs,
             optimizer=args.al_optimizer,
-            weight_decay=args.al_weight_decay
+            weight_decay=args.al_weight_decay,
+            temperature=temperature
             ),
         TrainingType.AL_FINETUNING: Params(
             batch_size=args.al_finetune_batch_size, 
@@ -104,31 +127,35 @@ def get_params(args, training_type):
             lr=args.al_lr, 
             epochs=args.al_epochs,
             optimizer=args.target_optimizer,
-            weight_decay=args.al_weight_decay
+            weight_decay=args.al_weight_decay,
+            temperature=temperature
             ),
         TrainingType.BASE_PRETRAIN: Params(
-            batch_size=args.base_batch_size, 
+            batch_size=args.batch_size, 
             image_size=base_image_size, 
-            lr=args.base_lr, 
-            epochs=args.base_epochs,
-            optimizer=args.base_optimizer,
-            weight_decay=args.weight_decay
+            lr=base_lr, 
+            epochs=epochs,
+            optimizer=optimizer,
+            weight_decay=args.weight_decay,
+            temperature=temperature
             ),
         TrainingType.TARGET_PRETRAIN: Params(
-            batch_size=args.target_batch_size, 
+            batch_size=batch_size, 
             image_size=target_image_size, 
-            lr=args.target_lr, 
+            lr=base_lr, 
             epochs=args.target_epochs,
-            optimizer=args.target_optimizer,
-            weight_decay=args.weight_decay
+            optimizer=optimizer,
+            weight_decay=args.weight_decay,
+            temperature=temperature
             ),
         TrainingType.FINETUNING: Params(
-            batch_size=args.finetune_batch_size, 
-            image_size=args.finetune_image_size, 
-            lr=args.finetune_lr, 
-            epochs=args.finetune_epochs,
-            optimizer=args.finetune_optimizer,
-            weight_decay=args.finetune_weight_decay
+            batch_size=args.lc_batch_size, 
+            image_size=args.lc_image_size, 
+            lr=args.lc_lr, 
+            epochs=args.lc_epochs,
+            optimizer=args.lc_optimizer,
+            weight_decay=args.weight_decay,
+            temperature=temperature
             ),
     }
     return params[training_type]
@@ -178,6 +205,24 @@ def get_ds_num_classes(dataset):
     
     return num_classes, dir
 
+class AverageMeter(object):
+    """computes and stores the average and current value"""
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+        
 def free_mem(X, y):
     del X
     del y

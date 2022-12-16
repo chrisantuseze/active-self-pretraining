@@ -1,40 +1,8 @@
-method: 0                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SUPERVISED
-
 # distributed training
 nodes: 1
 gpus: 1                                       # I recommend always assigning 1 GPU to 1 node
-workers: 8
 dataset_dir: "./datasets"                     # path to dataset
-
-# pretrain options
-seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_batch_size: 64                          # the default should be 64. However, should be varied until better performance is achieved
-base_image_size: 40
-base_lr: 0.03                                 # initial learning rate. This should be varied between 3.0e-3 to 3.0e-2 - If you use LARS, then the lr needs to be decayed
-base_optimizer: "SGD"                         # or LARS (experimental) If you use LARS, then the lr needs to be decayed. I noticed that when SGD-MultiStep was used, the training was very slow. Check row 21. It does not reduce the learning rate
-current_epoch: 0
-start_epoch: 0
-base_epochs: 10                                # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-dataset: 3                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-base_pretrain: True
-momentum: 0.9                                 # momentum of SGD solver
-resume: ""                                    # path to latest checkpoint (default: none)
-global_step: 0
-log_step: 1000
-
-# target pretraining options
-target_dataset: 3                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-target_batch_size: 64                         # ensure that you get a non-fraction when you do len(dataset)/batch_size
-target_epochs: 0                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 64
-target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_optimizer: "SGD"                       # or LARS (experimental) If you use LARS, then the lr needs to be decayed
-target_pretrain: False
-target_epoch_num: 40
-pretrain_path_loss_file: "pretrain_path_loss.pkl"
-
-# arch options
-resnet: "resnet50"
+backbone: "resnet50"
 projection_dim: 128                           # "[...] to project the representation to a 128-dimensional latent space"
 
 # loss options
@@ -47,33 +15,139 @@ model_misc_path: "save/misc"                  # directory where all misc files w
 epoch_num: 40                                 # use to determine the base checkpoint to be used for the AL cycle
 reload: False                                 # indicates whether to start the training from the checkpoint or not
 
-# finetuning options
-finetune_dataset: 3                           # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-finetune: True
-finetune_batch_size: 64                      # 
-finetune_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-finetune_optimizer: "Adam-DCL"                # if you use LARS, then the lr needs to be decayed
-finetune_image_size: 40                       # this depends on the dataset used
-finetune_epochs: 50                           # this needs to be increased to 100
-finetune_momentum: 0.9                        # momentum of SGD solver
-finetune_weight_decay: 1.0e-6 #5.0e-4                 # "optimized using LARS [...] and weight decay of 1.0e−6"
+# pretrain options
+
+method: 3                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SwAV, 4 for SUPERVISED, 
+
+################################ SIMCLR #######################################
+simclr_batch_size: 512
+simclr_epochs: 500
+simclr_temperature: 0.5
+simclr_optimizer: "SimCLR"
+simclr_base_lr: 1.0e-3
+
+################################ DCL #######################################
+dcl_batch_size: 64                        # They experimented with 32 - 512, but stuck with 256 eventually for simclr, dcl, and dclw
+dcl_base_epochs: 200                      # for all datasets
+dcl_temperature: 0.1                      # 0.1 (ImageNet-1k), 0.07 (Cifar10, Cifar100, STL)
+dcl_optimizer: "DCL"                 # SGD with Cosine annealing scheduler
+dcl_base_lr: 0.03                         # 0.03 * batch_size/256
+# backbone: "resnet50"                  # resnet18 (Cifar10, Cifar100, STL), resnet50 (ImageNet-1k, ImageNet-100)
+
+################################ SWAV #######################################
+
+#########################
+#### data parameters ####
+#########################
+nmb_crops: [2]                    
+size_crops: [224]
+min_scale_crops: [0.14]
+max_scale_crops: [1]
+
+#########################
+## swav specific params #
+#########################
+crops_for_assign: [0, 1]
+swav_temperature: 0.1
+epsilon: 0.05
+sinkhorn_iterations: 3
+feat_dim: 128
+nmb_prototypes: 3000
+queue_length: 0
+epoch_queue_starts: 15
+
+#########################
+#### optim parameters ###
+#########################
+swav_batch_size: 64
+swav_base_lr: 4.8
+final_lr: 0
+freeze_prototypes_niters: 313
+warmup_epochs: 10
+start_warmup: 0
+
+#########################
+#### dist parameters ###
+#########################
+world_size: -1
+rank: 0
+local_rank: 0
+
+#########################
+#### other parameters ###
+#########################
+hidden_mlp: 2048
+workers: 4
+checkpoint_freq: 25
+
+################################ GENERAL ######################################
+seed: 42                                      # sacred handles automatic seeding when passed in the config
+base_epochs: 100
+base_image_size: 40
+base_dataset: 3                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+base_pretrain: True
+momentum: 0.9                                 # momentum of SGD solver
+resume: ""                                    # path to latest checkpoint (default: none)
+global_step: 0
+log_step: 1000
+
+######################## target pretraining options
+target_dataset: 3                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_epochs: 10                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_image_size: 64
+target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
+target_pretrain: False
+target_epoch_num: 40
+pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 
-# active learning options
+################################## LINEAR CLASSIFIER ###########################################
+lc_dataset: 3                           # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+# lc_batch_size: 64                      # 
+# lc_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
+lc_optimizer: "Classifier" #"Adam-DCL"                # if you use LARS, then the lr needs to be decayed
+lc_image_size: 40                       # this depends on the dataset used
+# lc_epochs: 50                           # this needs to be increased to 100
+
+
+#########################
+#### model parameters ###
+#########################
+global_pooling: True
+use_bn: False
+
+#########################
+#### optim parameters ###
+#########################
+lc_epochs: 100
+lc_batch_size: 32
+lc_lr: 0.3
+lc_nesterov: False
+scheduler_type: "cosine"
+
+# for multi-step learning rate decay
+decay_epochs: [60, 80]
+lc_gamma: 0.1
+
+# for cosine learning rate schedule
+lc_final_lr: 0
+
+################################### AL ###########################################################
+al_method: 0                                  # 0 for least confidence, 1 for entropy, 2 for both
 al_finetune_trainer_epochs: 25
 al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_batch_size: 256                            # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_finetune_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_trainer_sample_size: 500                  # this specifies the amount of samples to be added to the training pool after each AL iteration
+al_trainer_sample_size: 500                   # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_lr: 0.1
 al_optimizer: "SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
 do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
-al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
 al_path_loss_file: "al_path_loss.pkl"
-al_pretext_from_pretrain: True               # this enables the pretext task to be finetuned using the weights of the pretrained model
+al_pretext_from_pretrain: True                # this enables the pretext task to be finetuned using the weights of the pretrained model
 
-ml_project: True                              # switches to ML Final Project mode 
+ml_project: False                              # switches to ML Final Project mode 
 do_al_for_ml_project: False                    # switches between AL and regular classification
+

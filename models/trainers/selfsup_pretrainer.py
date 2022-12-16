@@ -1,21 +1,11 @@
-import torch
-import torch.nn as nn
 from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
 import utils.logger as logging
-from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import PretextDataLoader
-from models.active_learning.pretext_trainer import PretextTrainer
-from models.backbones.resnet import resnet_backbone
-from models.self_sup.myow.model.resnets import resnet_cifar
-from models.self_sup.myow.trainer.myow_trainer import MYOWTrainer, get_myow_trainer
+from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_path_loss, load_saved_state, save_state
-from datautils import dataset_enum, cifar10, imagenet
-from torch.utils.tensorboard import SummaryWriter
-
+from utils.commons import save_state
 from models.utils.ssl_method_enum import SSL_Method
 
 

@@ -6,10 +6,11 @@ from dataclasses import dataclass, field
 class Params:
     batch_size: int
     image_size: int
-    lr: int
+    lr: float
     epochs: int
     optimizer: str
-    weight_decay: int
+    weight_decay: float
+    temperature: float
 
 class TrainingType(Enum):
     BASE_PRETRAIN = "Base"

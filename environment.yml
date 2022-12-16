@@ -1,0 +1,10 @@
+name: casl
+channels:
+  - pytorch
+dependencies:
+  - numpy
+  - pytorch
+  - torchvision
+  - pyyaml
+  - opencv
+  - tensorboard

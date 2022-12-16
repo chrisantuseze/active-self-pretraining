@@ -16,6 +16,7 @@ from utils.yaml_config_hook import yaml_config_hook
 from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.trainers.sup_pretrainer import SupPretrainer
 from models.trainers.classifier import Classifier
+from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
@@ -37,7 +38,7 @@ def main():
 
         else: 
             classifier = Classifier(args, writer, pretrain_level="1")
-            classifier.finetune() 
+            classifier.train_and_eval() 
 
     else:
         if args.base_pretrain:
@@ -49,8 +50,8 @@ def main():
             pretrainer.second_pretrain()
 
         if args.finetune:
-            classifier = Classifier(args, writer)
-            classifier.finetune()
+            classifier = Classifier2(args)
+            classifier.train_and_eval()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

@@ -6,27 +6,13 @@ import pickle
 from PIL import Image
 from models.active_learning.al_method_enum import get_al_method_enum
 
-from models.utils.ssl_method_enum import SSL_Method
+from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
 from datautils.dataset_enum import get_dataset_enum
 import utils.logger as logging
 
 
 def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
-    if args.method == SSL_Method.SIMCLR.value:
-        prefix = "simclr"
-
-    elif args.method == SSL_Method.DCL.value:
-        prefix = "dcl"
-
-    elif args.method == SSL_Method.MYOW.value:
-        prefix = "myow"
-
-    elif args.method == SSL_Method.SWAV.value:
-        prefix = "swav"
-    
-    elif args.method == SSL_Method.SUPERVISED.value:
-        prefix = "sup"
-
+    prefix = get_ssl_method(args.method)
     out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
 
     state = {
@@ -40,21 +26,7 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
 
 def load_saved_state(args, recent=True, pretrain_level="1"):
     try:
-        if args.method == SSL_Method.SIMCLR.value:
-            prefix = "simclr"
-
-        elif args.method == SSL_Method.DCL.value:
-            prefix = "dcl"
-
-        elif args.method == SSL_Method.MYOW.value:
-            prefix = "myow"
-
-        elif args.method == SSL_Method.SWAV.value:
-            prefix = "swav"
-        
-        elif args.method == SSL_Method.SUPERVISED.value:
-            prefix = "sup"
-
+        prefix = get_ssl_method(args.method)
         if pretrain_level == "2":
             epoch_num = args.target_epoch_num
 
@@ -71,6 +43,37 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         # logging.error(er)
         return None
 
+def load_classifier_chkpts(args, model, pretrain_level="1"):
+    prefix = get_ssl_method(args.method)
+    if pretrain_level == "2":
+        epoch_num = args.target_epoch_num
+
+    else:
+        epoch_num = args.epoch_num
+
+    try:
+        out = os.path.join(
+            args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+        )
+    
+        state_dict = torch.load(out, map_location="cuda:0")
+        if "state_dict" in state_dict:
+            state_dict = state_dict["state_dict"]
+        # remove prefixe "module."
+        state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+        for k, v in model.state_dict().items():
+            if k not in list(state_dict):
+                logging.info('key "{}" could not be found in provided state dict'.format(k))
+            elif state_dict[k].shape != v.shape:
+                logging.info('key "{}" is of different shape in model and provided state dict'.format(k))
+                state_dict[k] = v
+        msg = model.load_state_dict(state_dict, strict=False)
+
+        return model
+
+    except IOError as er:
+        # logging.error(er)
+        return None
 
 def simple_save_model(args, model, path):
     state = {

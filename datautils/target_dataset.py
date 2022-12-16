@@ -3,9 +3,10 @@ import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
 
-from models.active_learning.pretext_dataloader import MakeBatchLoader
+from models.active_learning.pretext_dataloader import MakeBatchDataset
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
+from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
 from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
@@ -28,41 +29,46 @@ class TargetDataset():
 
     
     def get_dataset(self, transforms):
-        return MakeBatchLoader(
+        return MakeBatchDataset(
             self.args,
             self.dir, self.with_train, self.is_train, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir,
                                                                                                 transform=transforms)
 
     def get_loader(self):
-        if self.training_type == TrainingType.ACTIVE_LEARNING:
-            transforms = Transforms(self.image_size)
-
-        else:
-            if self.method == SSL_Method.SIMCLR.value:
-                transforms = TransformsSimCLR(self.image_size)
-
-            if self.method == SSL_Method.DCL.value:
-                transforms = TransformsDCL(self.image_size)
-
-            elif self.method == SSL_Method.MYOW.value:
-                transforms = Compose([ToTensor()])
-
-            elif self.method == SSL_Method.SUPERVISED.value:
+        if self.method is not SSL_Method.SWAV.value:
+            if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
 
             else:
-                ValueError
+                if self.method == SSL_Method.SIMCLR.value:
+                    transforms = TransformsSimCLR(self.image_size)
 
-        dataset = self.get_dataset(transforms)
+                if self.method == SSL_Method.DCL.value:
+                    transforms = TransformsDCL(self.image_size)
 
-        loader = torch.utils.data.DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            drop_last=True,
-            shuffle=self.is_train, 
-            num_workers=2
-        )
+                elif self.method == SSL_Method.MYOW.value:
+                    transforms = Compose([ToTensor()])
+
+                elif self.method == SSL_Method.SUPERVISED.value:
+                    transforms = Transforms(self.image_size)
+
+                else:
+                    ValueError
+
+            dataset = self.get_dataset(transforms)
+
+            loader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=self.batch_size,
+                drop_last=True,
+                shuffle=self.is_train, 
+                num_workers=2
+            )
+        
+        else:
+            swav = TransformsSwAV(self.args, self.dir, self.batch_size)
+            loader, dataset = swav.train_loader, swav.train_dataset
         
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
 

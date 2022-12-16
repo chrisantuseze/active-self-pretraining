@@ -121,7 +121,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
-class MakeBatchLoader(torch.utils.data.Dataset):
+class MakeBatchDataset(torch.utils.data.Dataset):
     def __init__(self, args, dir, with_train, is_train, transform=None):
         self.args = args
         params = get_params(args, TrainingType.ACTIVE_LEARNING)

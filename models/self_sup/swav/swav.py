@@ -4,10 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 #
-import argparse
-import math
 import os
-import shutil
 import time
 from logging import getLogger
 
@@ -19,98 +16,16 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.distributed as dist
 import torch.optim
-from models.self_sup.swav.utils import AverageMeter, bool_flag, initialize_exp
-from models.utils.commons import get_params
+from models.self_sup.swav.utils import bool_flag, initialize_exp
+from models.utils.commons import get_params, AverageMeter
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
-from backbone import resnet50 as resnet_models
+from models.self_sup.swav.backbone.resnet50 import resnet50 as resnet_models
+import utils.logger as logging
 
 logger = getLogger()
 
-parser = argparse.ArgumentParser(description="Implementation of SwAV")
-
-#########################
-#### data parameters ####
-#########################
-parser.add_argument("--data_path", type=str, default="imagenet",
-                    help="path to dataset repository")
-parser.add_argument("--nmb_crops", type=int, default=[2], nargs="+",
-                    help="list of number of crops (example: [2, 6])")
-parser.add_argument("--size_crops", type=int, default=[224], nargs="+",
-                    help="crops resolutions (example: [224, 96])")
-parser.add_argument("--min_scale_crops", type=float, default=[0.14], nargs="+",
-                    help="argument in RandomResizedCrop (example: [0.14, 0.05])")
-parser.add_argument("--max_scale_crops", type=float, default=[1], nargs="+",
-                    help="argument in RandomResizedCrop (example: [1., 0.14])")
-
-#########################
-## swav specific params #
-#########################
-parser.add_argument("--crops_for_assign", type=int, nargs="+", default=[0, 1],
-                    help="list of crops id used for computing assignments")
-parser.add_argument("--temperature", default=0.1, type=float,
-                    help="temperature parameter in training loss")
-parser.add_argument("--epsilon", default=0.05, type=float,
-                    help="regularization parameter for Sinkhorn-Knopp algorithm")
-parser.add_argument("--sinkhorn_iterations", default=3, type=int,
-                    help="number of iterations in Sinkhorn-Knopp algorithm")
-parser.add_argument("--feat_dim", default=128, type=int,
-                    help="feature dimension")
-parser.add_argument("--nmb_prototypes", default=3000, type=int,
-                    help="number of prototypes")
-parser.add_argument("--queue_length", type=int, default=0,
-                    help="length of the queue (0 for no queue)")
-parser.add_argument("--epoch_queue_starts", type=int, default=15,
-                    help="from this epoch, we start using a queue")
-
-#########################
-#### optim parameters ###
-#########################
-parser.add_argument("--epochs", default=5, type=int, #100
-                    help="number of total epochs to run")
-parser.add_argument("--batch_size", default=32, type=int, #64
-                    help="batch size per gpu, i.e. how many unique instances per gpu")
-parser.add_argument("--base_lr", default=4.8, type=float, help="base learning rate")
-parser.add_argument("--final_lr", type=float, default=0, help="final learning rate")
-parser.add_argument("--freeze_prototypes_niters", default=313, type=int,
-                    help="freeze the prototypes during this many iterations from the start")
-parser.add_argument("--wd", default=1e-6, type=float, help="weight decay")
-parser.add_argument("--warmup_epochs", default=10, type=int, help="number of warmup epochs")
-parser.add_argument("--start_warmup", default=0, type=float,
-                    help="initial warmup learning rate")
-
-#########################
-#### dist parameters ###
-#########################
-parser.add_argument("--dist_url", default="env://", type=str, help="""url used to set up distributed
-                    training; see https://pytorch.org/docs/stable/distributed.html""")
-parser.add_argument("--world_size", default=-1, type=int, help="""
-                    number of processes: it is set automatically and
-                    should not be passed as argument""")
-parser.add_argument("--rank", default=0, type=int, help="""rank of this process:
-                    it is set automatically and should not be passed as argument""")
-parser.add_argument("--local_rank", default=0, type=int,
-                    help="this argument is not used and should be ignored")
-
-#########################
-#### other parameters ###
-#########################
-parser.add_argument("--arch", default="resnet50", type=str, help="convnet architecture")
-parser.add_argument("--hidden_mlp", default=2048, type=int,
-                    help="hidden layer dimension in projection head")
-parser.add_argument("--workers", default=4, type=int, #10 Had to reduce to 4 due to dataloader error
-                    help="number of data loading workers")
-parser.add_argument("--checkpoint_freq", type=int, default=25,
-                    help="Save the model periodically")
-parser.add_argument("--use_fp16", type=bool_flag, default=True,
-                    help="whether to train with mixed precision or not")
-parser.add_argument("--sync_bn", type=str, default="pytorch", help="synchronize bn")
-parser.add_argument("--syncbn_process_group_size", type=int, default=8, help=""" see
-                    https://github.com/NVIDIA/apex/blob/master/apex/parallel/__init__.py#L58-L67""")
-parser.add_argument("--dump_path", type=str, default=".",
-                    help="experiment dump path for checkpoints and log")
-parser.add_argument("--seed", type=int, default=31, help="seed")
-
+# parser = argparse.ArgumentParser(description="Implementation of SwAV")
 
 class SwAVTrainer():
     def __init__(self, args, dataloader, pretrain_level="1", 
@@ -118,11 +33,12 @@ class SwAVTrainer():
         
         self.args = args
         self.train_loader = dataloader
+        self.log_step = log_step
 
-        self.logger, self.training_stats = initialize_exp(args, "epoch", "loss")
+        self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
-        self.model = resnet_models.__dict__[args.arch](
+        self.model = resnet_models.__dict__[args.resnet](
             normalize=True,
             hidden_mlp=args.hidden_mlp,
             output_dim=args.feat_dim,
@@ -139,7 +55,7 @@ class SwAVTrainer():
 
         # build the queue
         queue = None
-        self.queue_path = os.path.join(args.dump_path, "queue" + str(args.rank) + ".pth")
+        self.queue_path = os.path.join(args.model_misc_path, "queue" + str(args.rank) + ".pth")
         if os.path.isfile(self.queue_path):
             queue = torch.load(self.queue_path)["queue"]
         # the queue needs to be divisible by the batch size
@@ -160,19 +76,19 @@ class SwAVTrainer():
             ).cuda()
 
         # train the network
-        scores, queue = self.train(self.train_loader, self.model, self.optimizer, epoch, self.scheduler, queue)
+        scores, queue = self.train(self.train_loader, epoch, queue)
         self.training_stats.update(scores)
 
         if queue is not None:
             torch.save({"queue": queue}, self.queue_path)
 
 
-    def train(self, train_loader, model, optimizer, epoch, lr_schedule, queue):
+    def train(self, train_loader, epoch, queue):
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
 
-        model.train()
+        self.model.train()
         use_the_queue = False
 
         end = time.time()
@@ -182,17 +98,17 @@ class SwAVTrainer():
 
             # update learning rate
             iteration = epoch * len(train_loader) + it
-            for param_group in optimizer.param_groups:
-                param_group["lr"] = lr_schedule[iteration]
+            for param_group in self.optimizer.param_groups:
+                param_group["lr"] = self.scheduler[iteration]
 
             # normalize the prototypes
             with torch.no_grad():
-                w = model.prototypes.weight.data.clone()
+                w = self.model.prototypes.weight.data.clone()
                 w = nn.functional.normalize(w, dim=1, p=2)
-                model.prototypes.weight.copy_(w)
+                self.model.prototypes.weight.copy_(w)
 
             # ============ multi-res forward passes ... ============
-            embedding, output = model(inputs)
+            embedding, output = self.model(inputs)
             embedding = embedding.detach()
             bs = inputs[0].size(0)
 
@@ -208,7 +124,7 @@ class SwAVTrainer():
                             use_the_queue = True
                             out = torch.cat((torch.mm(
                                 queue[i],
-                                model.prototypes.weight.t()
+                                self.model.prototypes.weight.t()
                             ), out))
                         # fill the queue
                         queue[i, bs:] = queue[i, :-bs].clone()
@@ -226,21 +142,21 @@ class SwAVTrainer():
             loss /= len(self.args.crops_for_assign)
 
             # ============ backward and optim step ... ============
-            optimizer.zero_grad()
+            self.optimizer.zero_grad()
             loss.backward()
             # cancel gradients for the prototypes
             if iteration < self.args.freeze_prototypes_niters:
-                for name, p in model.named_parameters():
+                for name, p in self.model.named_parameters():
                     if "prototypes" in name:
                         p.grad = None
-            optimizer.step()
+            self.optimizer.step()
 
             # ============ misc ... ============
             losses.update(loss.item(), inputs[0].size(0))
             batch_time.update(time.time() - end)
             end = time.time()
-            if self.args.rank ==0 and it % 50 == 0:
-                logger.info(
+            if self.args.rank ==0 and it % self.log_step == 0:
+                logging.info(
                     "Epoch: [{0}][{1}]\t"
                     "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
                     "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
@@ -251,7 +167,7 @@ class SwAVTrainer():
                         batch_time=batch_time,
                         data_time=data_time,
                         loss=losses,
-                        lr=optimizer.param_groups[0]["lr"],
+                        lr=self.optimizer.param_groups[0]["lr"],
                     )
                 )
         return (epoch, losses.avg), queue
