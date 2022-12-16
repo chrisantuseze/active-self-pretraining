@@ -18,6 +18,7 @@ from models.self_sup.swav.utils import initialize_exp
 from models.utils.commons import get_params, AverageMeter
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
+from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
@@ -38,6 +39,16 @@ class SwAVTrainer():
             output_dim=args.feat_dim,
             nmb_prototypes=args.nmb_prototypes,
         )
+
+        # load weights
+        if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
+            # either this
+            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+            self.model.load_state_dict(state['model'], strict=False)
+
+            # or this
+            self.model = load_chkpts(self.args, "swa_800ep_pretrain.pth.tar", self.model)
+
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
@@ -58,7 +69,6 @@ class SwAVTrainer():
         cudnn.benchmark = True
 
     def train_epoch(self, epoch):
-        # train the network for one epoch
 
         # optionally starts a queue
         if self.args.queue_length > 0 and epoch >= self.args.epoch_queue_starts and self.queue is None:

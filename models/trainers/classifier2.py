@@ -14,7 +14,7 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
 from datautils.finetune_dataset import Finetune
-from models.self_sup.swav.utils import accuracy, bool_flag, initialize_exp
+from models.self_sup.swav.utils import accuracy, initialize_exp
 from models.utils.commons import AverageMeter, get_ds_num_classes, get_params
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer

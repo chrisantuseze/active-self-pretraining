@@ -2,6 +2,8 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
+from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
+from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_path_loss
 from datautils import dataset_enum, cifar10, imagenet
@@ -34,7 +36,11 @@ class BasePretrainer():
                 pretext = PretextTrainer(self.args, self.writer)
                 pretrain_data = pretext.do_active_learning()
 
-            loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
+            if self.args.method is not SSL_Method.SWAV.value:
+                loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
+            else:
+                swav = TransformsSwAV(self.args, self.batch_size, pathloss_list=pretrain_data)
+                loader = swav.train_loader
         else:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
 

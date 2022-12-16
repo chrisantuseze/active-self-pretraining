@@ -34,7 +34,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
             epoch_num = args.target_epoch_num
 
         else:
-            epoch_num = args.epoch_num
+            epoch_num = args.base_epochs
 
         out = args.resume if recent and args.resume else os.path.join(
                 args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
@@ -43,7 +43,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         return torch.load(out, map_location=args.device.type)
 
     except IOError as er:
-        # logging.error(er)
+        logging.error(er)
         return None
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
@@ -54,9 +54,13 @@ def load_classifier_chkpts(args, model, pretrain_level="1"):
     else:
         epoch_num = args.base_epochs
 
+    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+    return load_chkpts(args, filename, model)
+
+def load_chkpts(args, filename, model):
     try:
         out = os.path.join(
-            args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+            args.model_checkpoint_path, filename
         )
     
         state_dict = torch.load(out, map_location="cuda:0")

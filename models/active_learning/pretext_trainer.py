@@ -204,7 +204,7 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        return new_samples[:self.args.al_trainer_sample_size]
+        return new_samples
 
     def make_batches(self, model, epoch):
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
@@ -424,11 +424,20 @@ class PretextTrainer():
         if path_loss is None:
             path_loss = self.make_batches(encoder)
 
+        # Do not train main task iteratively. Proceed to 2nd pretraining
+        if not self.args.al_train_maintask:
+            model, _ = get_model_criterion(self.args, encoder, num_classes=4)
+            state = simple_load_model(self.args, path='finetuner.pth')
+            model.load_state_dict(state['model'], strict=False)
+
+            samplek = self.batch_sampler(model, path_loss)
+            return samplek[: self.args.al_batches * self.args.al_trainer_sample_size]
+
         pretraining_sample_pool = []
         rebuild_al_model = True
 
         sample_per_batch = len(path_loss)//self.args.al_batches
-        for batch in range(0, self.args.al_batches):
+        for batch in range(self.args.al_batches):
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
             if batch > 0:
@@ -438,7 +447,7 @@ class PretextTrainer():
                 main_task_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.batch_sampler(main_task_model, sample6400)
+                samplek = self.batch_sampler(main_task_model, sample6400)[:self.args.al_trainer_sample_size]
             else:
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]

@@ -34,10 +34,13 @@ class MultiCropDataset(datasets.ImageFolder):
         size_dataset=-1,
         return_index=False,
     ):
-        super(MultiCropDataset, self).__init__(data_path)
+        if data_path:
+            super(MultiCropDataset, self).__init__(data_path)
+
         assert len(size_crops) == len(nmb_crops)
         assert len(min_scale_crops) == len(nmb_crops)
         assert len(max_scale_crops) == len(nmb_crops)
+        
         if pathloss_list is not None and size_dataset >= 0:
             self.samples = self.samples[:size_dataset]
 

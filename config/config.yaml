@@ -149,7 +149,8 @@ do_al: True
 al_finetune_data_ratio: 1                     # this indicates the amount of the target data at each batch to be used for finetuning to get the topk
 al_path_loss_file: "al_path_loss.pkl"
 al_pretext_from_pretrain: True                # this enables the pretext task to be finetuned using the weights of the pretrained model
+al_train_maintask: False                      # this enables the training of the main task. If disabled, the generated pathloss from 'make_batch' is used for the second pretrain
 
-ml_project: False                              # switches to ML Final Project mode 
-do_al_for_ml_project: False                    # switches between AL and regular classification
+ml_project: False                             # switches to ML Final Project mode 
+do_al_for_ml_project: False                   # switches between AL and regular classification
 
