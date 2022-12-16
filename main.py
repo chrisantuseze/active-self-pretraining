@@ -49,9 +49,8 @@ def main():
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.second_pretrain()
 
-        if args.finetune:
-            classifier = Classifier2(args)
-            classifier.train_and_eval()
+        classifier = Classifier2(args)
+        classifier.train_and_eval()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
