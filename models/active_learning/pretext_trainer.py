@@ -115,7 +115,7 @@ class PretextTrainer():
                         batch_time=batch_time,
                         data_time=data_time,
                         loss=losses,
-                        lr=self.optimizer.param_groups[0]["lr"],
+                        lr=optimizer.param_groups[0]["lr"],
                     )
                 )
 
@@ -214,12 +214,7 @@ class PretextTrainer():
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
-        batch_time = AverageMeter()
-        data_time = AverageMeter()
-        losses = AverageMeter()
-
         model.eval()
-        end = time.time()
 
         test_loss = 0
         correct = 0
@@ -247,25 +242,8 @@ class PretextTrainer():
 
                 loss = loss.item()
 
-                losses.update(loss.item(), inputs[0].size(0))
-                batch_time.update(time.time() - end)
-                end = time.time()
-
                 if step % self.args.log_step == 0:
-                    logging.info(
-                        "Epoch: [{0}][{1}]\t"
-                        "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
-                        "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
-                        "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
-                        "Lr: {lr:.4f}".format(
-                            epoch,
-                            step,
-                            batch_time=batch_time,
-                            data_time=data_time,
-                            loss=losses,
-                            lr=self.optimizer.param_groups[0]["lr"],
-                        )
-                    )
+                    logging.info(f"Eval Step [{step}/{len(loader)}]\t Loss: {loss}")
 
                 pathloss.append(PathLoss(path, loss))
         
@@ -369,7 +347,7 @@ class PretextTrainer():
                         batch_time=batch_time,
                         data_time=data_time,
                         loss=losses,
-                        lr=self.optimizer.param_groups[0]["lr"],
+                        lr=optimizer.param_groups[0]["lr"],
                     )
                 )
 
