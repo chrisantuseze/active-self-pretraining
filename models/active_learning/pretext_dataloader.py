@@ -85,7 +85,7 @@ class PretextDataLoader():
                 dataset,
                 batch_size=self.batch_size,
                 shuffle=not self.is_val,
-                num_workers=2
+                num_workers=self.args.workers#2
             )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
@@ -162,6 +162,9 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
                 transforms.Normalize(mean=mean, std=std)])
             ] * args.nmb_crops[i])
         self.trans = trans
+
+    def __len__(self):
+        return len(self.pathloss_list)
 
     def __getitem__(self, index):
         path_loss = self.pathloss_list[index]
