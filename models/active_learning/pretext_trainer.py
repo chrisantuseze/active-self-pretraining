@@ -417,6 +417,7 @@ class PretextTrainer():
 
             # this does a reverse active learning to pick only the most certain data
             samplek = samplek.sort(reverse=True)
+            print(self.args.al_batches, self.args.al_trainer_sample_size_, len(samplek))
             return samplek[: self.args.al_batches * self.args.al_trainer_sample_size_]
 
         pretraining_sample_pool = []
