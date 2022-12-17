@@ -18,7 +18,7 @@ from models.self_sup.swav.utils import accuracy, initialize_exp
 from models.utils.commons import AverageMeter, get_ds_num_classes, get_params
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
-from utils.commons import load_classifier_chkpts
+from utils.commons import load_chkpts, load_classifier_chkpts
 import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
@@ -44,7 +44,8 @@ class Classifier2():
         self.model.eval()
 
         # load weights
-        self.model = load_classifier_chkpts(self.args, self.model, pretrain_level)
+        # self.model = load_classifier_chkpts(self.args, self.model, pretrain_level)
+        self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         train_params = get_params(self.args, TrainingType.FINETUNING)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.linear_classifier.parameters(), train_params=train_params)
