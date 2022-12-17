@@ -43,7 +43,7 @@ class SwAVTrainer():
         # load weights
         if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
             # either this
-            state = load_saved_state(self.args, pretrain_level=pretrain_level)
+            state = load_saved_state(self.args, pretrain_level="1")
             self.model.load_state_dict(state['model'], strict=False)
 
             # or this
