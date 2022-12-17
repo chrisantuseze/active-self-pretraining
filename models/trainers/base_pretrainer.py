@@ -30,20 +30,4 @@ class BasePretrainer():
 
 
     def second_pretrain(self) -> None:
-        if self.args.do_al:
-            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
-            if pretrain_data is None:
-                pretext = PretextTrainer(self.args, self.writer)
-                pretrain_data = pretext.do_active_learning()
-
-            if self.args.method is not SSL_Method.SWAV.value:
-                loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
-            else:
-                swav = TransformsSwAV(self.args, self.args.swav_batch_size, pathloss_list=pretrain_data)
-                loader = swav.train_loader
-        else:
-            loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
-
-        encoder = resnet_backbone(self.args.backbone, pretrained=False)
-
-        return encoder, loader
+        None

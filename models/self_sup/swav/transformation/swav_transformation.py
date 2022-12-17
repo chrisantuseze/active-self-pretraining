@@ -6,7 +6,7 @@ import torch
 from models.self_sup.swav.transformation.multicropdataset import MultiCropDataset
 
 class TransformsSwAV():
-    def __init__(self, args, batch_size, dir=None, pathloss_list=None):
+    def __init__(self, args, batch_size, dir, pathloss_list=None):
         
         # build data
         self.train_dataset = MultiCropDataset(

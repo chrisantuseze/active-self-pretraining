@@ -1,4 +1,10 @@
+from datautils.dataset_enum import get_dataset_enum
+from datautils.target_dataset import get_target_pretrain_ds
+from models.active_learning.pretext_dataloader import PretextDataLoader
+from models.active_learning.pretext_trainer import PretextTrainer
+from models.backbones.resnet import resnet_backbone
 from models.self_sup.swav.swav import SwAVTrainer
+from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
 from models.trainers.base_pretrainer import BasePretrainer
 from models.utils.commons import get_params
 import utils.logger as logging
@@ -6,7 +12,7 @@ from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 from models.utils.training_type_enum import TrainingType
-from utils.commons import save_state
+from utils.commons import load_path_loss, save_state
 from models.utils.ssl_method_enum import SSL_Method
 
 
@@ -93,6 +99,22 @@ class SelfSupPretrainer(BasePretrainer):
 
 
     def second_pretrain(self) -> None:
-        encoder, loader = super().second_pretrain()
+        if self.args.do_al:
+            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
+            if pretrain_data is None:
+                pretext = PretextTrainer(self.args, self.writer)
+                pretrain_data = pretext.do_active_learning()
+
+            if self.args.method is not SSL_Method.SWAV.value:
+                loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
+            else:
+                dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
+                swav = TransformsSwAV(self.args, self.args.swav_batch_size, dir=dir, pathloss_list=pretrain_data)
+                loader = swav.train_loader
+        else:
+            loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
+
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
+
 
         self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
