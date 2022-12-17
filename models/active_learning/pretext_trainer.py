@@ -204,7 +204,6 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        print(new_samples)
 
         return new_samples
 
@@ -418,7 +417,10 @@ class PretextTrainer():
             samplek = self.batch_sampler(model, path_loss)
 
             # this does a reverse active learning to pick only the most certain data
+            print(samplek)
             samplek = samplek.sort(reverse=True)
+            print("======================================")
+            print(samplek)
             print(self.args.al_batches, self.args.al_trainer_sample_size_, len(samplek))
             return samplek[: self.args.al_batches * self.args.al_trainer_sample_size_]
 
