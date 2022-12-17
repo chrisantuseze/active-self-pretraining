@@ -206,7 +206,7 @@ class PretextTrainer():
 
         return new_samples
 
-    def make_batches(self, model, epoch):
+    def make_batches(self, model):
         loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
