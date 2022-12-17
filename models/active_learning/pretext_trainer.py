@@ -153,7 +153,7 @@ class PretextTrainer():
     def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
-        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
+        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method_)}")
         _preds = []
 
         model.eval()
