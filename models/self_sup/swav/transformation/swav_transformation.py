@@ -10,6 +10,7 @@ class TransformsSwAV():
         
         # build data
         self.train_dataset = MultiCropDataset(
+            args,
             dir,
             args.size_crops,
             args.nmb_crops,

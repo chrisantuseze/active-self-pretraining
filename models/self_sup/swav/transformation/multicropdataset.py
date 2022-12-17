@@ -25,6 +25,7 @@ logger = getLogger()
 class MultiCropDataset(datasets.ImageFolder):
     def __init__(
         self,
+        args,
         data_path,
         size_crops,
         nmb_crops,
@@ -38,6 +39,8 @@ class MultiCropDataset(datasets.ImageFolder):
         assert len(size_crops) == len(nmb_crops)
         assert len(min_scale_crops) == len(nmb_crops)
         assert len(max_scale_crops) == len(nmb_crops)
+
+        self.args = args
         
         if pathloss_list is not None and size_dataset >= 0:
             self.samples = self.samples[:size_dataset]
