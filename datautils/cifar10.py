@@ -54,7 +54,7 @@ class CIFAR10():
             )
 
         else:
-            swav = TransformsSwAV(self.args, self.dir, self.batch_size)
+            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
             loader, dataset = swav.train_loader, swav.train_dataset
 
         print(f"The size of the Cifar10 dataset is {len(dataset)} and the number of batches is ", loader.__len__())

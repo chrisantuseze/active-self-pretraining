@@ -52,7 +52,7 @@ class ImageNet():
             )
         
         else:
-            swav = TransformsSwAV(self.args, self.dir, self.batch_size)
+            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
             loader, train_ds = swav.train_loader, swav.train_dataset
 
         print(f"The size of the ImageNet dataset is {len(train_ds)} and the number of batches is ", loader.__len__())
