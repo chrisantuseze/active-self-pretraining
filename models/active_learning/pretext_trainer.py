@@ -386,8 +386,12 @@ class PretextTrainer():
 
         state = None
         if self.args.al_pretext_from_pretrain:
+            # do this
             state = load_saved_state(self.args, pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
+
+            # or this
+            # self.model = load_chkpts(self.args, "swa_800ep_pretrain.pth.tar", self.model)
         
         model = model.to(self.args.device)
 
@@ -406,7 +410,7 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
 
-    def do_active_learning(self, sample_size, method) -> List[PathLoss]:
+    def do_active_learning(self, sample_size=None, method=None) -> List[PathLoss]:
 
         self.args.al_trainer_sample_size = sample_size
         self.args.al_method = method

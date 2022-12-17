@@ -36,7 +36,7 @@ class TargetDataset():
                                                                                                 transform=transforms)
 
     def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value:
+        if self.method is not SSL_Method.SWAV.value or self.training_type == TrainingType.ACTIVE_LEARNING:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
 
@@ -67,7 +67,7 @@ class TargetDataset():
             )
         
         else:
-            swav = TransformsSwAV(self.args, self.dir, self.batch_size)
+            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
             loader, dataset = swav.train_loader, swav.train_dataset
         
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")

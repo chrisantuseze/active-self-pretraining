@@ -47,7 +47,7 @@ class SwAVTrainer():
             self.model.load_state_dict(state['model'], strict=False)
 
             # or this
-            self.model = load_chkpts(self.args, "swa_800ep_pretrain.pth.tar", self.model)
+            # self.model = load_chkpts(self.args, "swa_800ep_pretrain.pth.tar", self.model)
 
         self.model = self.model.to(self.args.device)
 

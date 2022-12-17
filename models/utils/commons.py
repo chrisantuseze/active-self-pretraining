@@ -52,10 +52,10 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
     return model, criterion
 
 def get_feature_dimensions_backbone(args):
-    if args.resnet == 'resnet18':
+    if args.backbone == 'resnet18':
         return 512
 
-    elif args.resnet == 'resnet50':
+    elif args.backbone == 'resnet50':
         return 2048
 
     else:

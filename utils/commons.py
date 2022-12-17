@@ -179,7 +179,7 @@ def load_accuracy_file(args):
         return None
 
 def save_class_names(args, label):
-    filename = f"{get_dataset_enum(args.dataset)}.txt"
+    filename = f"{get_dataset_enum(args.target_dataset)}.txt"
     out = os.path.join(args.model_misc_path, filename)
 
     try:

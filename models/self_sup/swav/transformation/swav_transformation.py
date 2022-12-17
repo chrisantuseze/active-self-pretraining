@@ -7,6 +7,7 @@ from models.self_sup.swav.transformation.multicropdataset import MultiCropDatase
 
 class TransformsSwAV():
     def __init__(self, args, batch_size, dir=None, pathloss_list=None):
+        
         # build data
         self.train_dataset = MultiCropDataset(
             dir,
