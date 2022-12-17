@@ -306,7 +306,7 @@ class PretextTrainer():
             "Loss {loss.avg:.4f}\t"
             "Acc@1 {top1:.3f}\t"
             "Best Acc@1 so far {acc:.1f}".format(
-                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_acc))
+                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_trainer_acc))
 
 
     def train_finetuner(self, model, epoch, criterion, optimizer, train_loader):
