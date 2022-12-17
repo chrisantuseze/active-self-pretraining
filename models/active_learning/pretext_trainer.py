@@ -178,16 +178,16 @@ class PretextTrainer():
         return preds
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        print(self.args.al_method)
-        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
+        print(self.args.al_method_)
+        if self.args.al_method_ == AL_Method.LEAST_CONFIDENCE.value:
             probs = preds.max(axis=1)
             indices = probs.argsort(axis=0)
 
-        elif self.args.al_method == AL_Method.ENTROPY.value:
+        elif self.args.al_method_ == AL_Method.ENTROPY.value:
             entropy = (np.log(preds) * preds).sum(axis=1) * -1.
             indices = entropy.argsort(axis=0)[::-1]
 
-        elif self.args.al_method == AL_Method.BOTH.value:
+        elif self.args.al_method_ == AL_Method.BOTH.value:
             probs = preds.max(axis=1)
             indices1 = probs.argsort(axis=0)
 
@@ -199,7 +199,7 @@ class PretextTrainer():
             indices = indices[: (len(indices)//2)]
 
         else:
-            raise ValueError(f"'{self.args.al_method}' method doesn't exist")
+            raise ValueError(f"'{self.args.al_method_}' method doesn't exist")
 
         new_samples = []
         for item in indices:
@@ -445,9 +445,9 @@ class PretextTrainer():
 
                 rebuild_al_model=False
 
-        logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method)))
+        logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method_)))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}_{self.args.al_trainer_sample_size}.txt")
+                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method_)}_batch_{self.args.al_epochs}_{self.args.al_trainer_sample_size}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool

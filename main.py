@@ -7,7 +7,6 @@ import argparse
 
 # import cv2
 from torch.utils.tensorboard import SummaryWriter
-from models.active_learning.al_method_enum import AL_Method
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
