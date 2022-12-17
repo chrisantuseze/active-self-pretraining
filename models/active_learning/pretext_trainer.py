@@ -204,6 +204,8 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
+        print(new_samples)
+
         return new_samples
 
     def make_batches(self, model):
