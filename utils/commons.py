@@ -166,7 +166,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
         None
 
 def load_accuracy_file(args):
-    dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
+    dataset = f"{get_dataset_enum(args.base_dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
     filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_misc_path, filename)
 
@@ -191,7 +191,7 @@ def save_class_names(args, label):
         None
 
 def load_class_names(args):
-    filename = f"{get_dataset_enum(args.dataset)}.txt"
+    filename = f"{get_dataset_enum(args.target_dataset)}.txt"
     out = os.path.join(args.model_misc_path, filename)
 
     try:
