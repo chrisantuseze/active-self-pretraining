@@ -1,5 +1,5 @@
 import torch
-from torchvision.transforms import ToTensor, Compose, Lambda
+import torchvision.transforms as transforms
 from typing import List
 from PIL import Image
 import random
@@ -7,6 +7,7 @@ import glob
 from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
+from models.self_sup.swav.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
 from models.utils.commons import get_params
 from models.utils.transformations import Transforms
 from utils.commons import load_class_names, pil_loader, save_class_names
@@ -48,34 +49,44 @@ class PretextDataLoader():
         self.batch_size = params.batch_size if not batch_size else batch_size
 
     def get_loader(self):
-        if self.training_type == TrainingType.AL_FINETUNING:
-            data_size = len(self.path_loss_list)
-            new_data_size = int(self.args.al_finetune_data_ratio * data_size)
-            self.path_loss_list = self.path_loss_list[0:new_data_size]
+        if self.args.method == SSL_Method.SWAV.value:
+            dataset = PretextMultiCropDataset(
+                self.args,
+                self.path_loss_list,
+            )
 
-        if self.training_type == TrainingType.ACTIVE_LEARNING:
-            transforms = Transforms(self.image_size)
+            loader = torch.utils.data.DataLoader(
+                self.train_dataset,
+                batch_size=self.swav_batch_size,
+                num_workers=self.args.workers,
+                pin_memory=True,
+                drop_last=True
+            )
 
         else:
-            if self.args.method == SSL_Method.SIMCLR.value:
-                transforms = TransformsSimCLR(self.image_size)
-
-            elif self.args.method == SSL_Method.DCL.value:
-                transforms = TransformsDCL(self.image_size)
-
-            elif self.args.method == SSL_Method.MYOW.value:
-                transforms = Compose([ToTensor()])
+            if self.training_type == TrainingType.ACTIVE_LEARNING:
+                transforms = Transforms(self.image_size)
 
             else:
-                ValueError
+                if self.args.method == SSL_Method.SIMCLR.value:
+                    transforms = TransformsSimCLR(self.image_size)
 
-        dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
-        loader = torch.utils.data.DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=not self.is_val,
-            num_workers=2
-        )
+                elif self.args.method == SSL_Method.DCL.value:
+                    transforms = TransformsDCL(self.image_size)
+
+                elif self.args.method == SSL_Method.MYOW.value:
+                    transforms = transforms.Compose([transforms.ToTensor()])
+
+                else:
+                    ValueError
+
+            dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
+            loader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=self.batch_size,
+                shuffle=not self.is_val,
+                num_workers=2
+            )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
         return loader
@@ -120,6 +131,53 @@ class PretextDataset(torch.utils.data.Dataset):
             label = path.split('/')[-2]
 
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
+
+class PretextMultiCropDataset(torch.utils.data.Dataset):
+    def __init__(
+        self,
+        args,
+        pathloss_list: List[PathLoss]=None,
+    ):
+        assert len(args.size_crops) == len(args.nmb_crops)
+        assert len(args.min_scale_crops) == len(args.nmb_crops)
+        assert len(args.max_scale_crops) == len(args.nmb_crops)
+
+        self.args = args
+        self.pathloss_list = pathloss_list
+
+        color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
+        mean = [0.485, 0.456, 0.406]
+        std = [0.228, 0.224, 0.225]
+        trans = []
+        for i in range(len(args.size_crops)):
+            randomresizedcrop = transforms.RandomResizedCrop(
+                args.size_crops[i],
+                scale=(args.min_scale_crops[i], args.max_scale_crops[i]),
+            )
+            trans.extend([transforms.Compose([
+                randomresizedcrop,
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.Compose(color_transform),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=mean, std=std)])
+            ] * args.nmb_crops[i])
+        self.trans = trans
+
+    def __getitem__(self, index):
+        path_loss = self.pathloss_list[index]
+        if isinstance(path_loss.path, tuple):
+            path = path_loss.path[0]
+        else:
+            path = path_loss.path
+
+        if self.args.target_dataset == DatasetType.CHEST_XRAY.value or self.args.target_dataset == DatasetType.IMAGENET.value:
+            image = pil_loader(path)
+        else:
+            image = Image.open(path)
+
+        multi_crops = list(map(lambda trans: trans(image), self.trans))
+        return multi_crops
+
 
 class MakeBatchDataset(torch.utils.data.Dataset):
     def __init__(self, args, dir, with_train, is_train, transform=None):

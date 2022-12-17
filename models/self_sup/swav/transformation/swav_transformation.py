@@ -6,7 +6,7 @@ import torch
 from models.self_sup.swav.transformation.multicropdataset import MultiCropDataset
 
 class TransformsSwAV():
-    def __init__(self, args, batch_size, dir, pathloss_list=None):
+    def __init__(self, args, batch_size, dir):
         
         # build data
         self.train_dataset = MultiCropDataset(
@@ -16,7 +16,6 @@ class TransformsSwAV():
             args.nmb_crops,
             args.min_scale_crops,
             args.max_scale_crops,
-            pathloss_list,
         )
 
         self.train_loader = torch.utils.data.DataLoader(
@@ -26,3 +25,5 @@ class TransformsSwAV():
             pin_memory=True,
             drop_last=True
         )
+
+        print(f"The size of the dataset is {len(self.train_dataset)} and the number of batches is {self.train_loader.__len__()} for a batch size of {batch_size}")
