@@ -39,7 +39,7 @@ class BasePretrainer():
             if self.args.method is not SSL_Method.SWAV.value:
                 loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
             else:
-                swav = TransformsSwAV(self.args, self.swav_batch_size, pathloss_list=pretrain_data)
+                swav = TransformsSwAV(self.args, self.args.swav_batch_size, pathloss_list=pretrain_data)
                 loader = swav.train_loader
         else:
             loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
