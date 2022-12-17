@@ -415,7 +415,7 @@ class PretextTrainer():
             model = model.to(self.args.device)
 
             samplek = self.batch_sampler(model, path_loss)
-            return samplek[: self.args.al_batches * self.args.al_trainer_sample_size]
+            return samplek[: self.args.al_batches * self.args.al_trainer_sample_size_]
 
         pretraining_sample_pool = []
         rebuild_al_model = True
@@ -431,10 +431,10 @@ class PretextTrainer():
                 main_task_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.batch_sampler(main_task_model, sample6400)[:self.args.al_trainer_sample_size]
+                samplek = self.batch_sampler(main_task_model, sample6400)[:self.args.al_trainer_sample_size_]
             else:
                 # first iteration: sample k at even intervals
-                samplek = sample6400[:self.args.al_trainer_sample_size]
+                samplek = sample6400[:self.args.al_trainer_sample_size_]
 
             pretraining_sample_pool.extend(samplek)
 
