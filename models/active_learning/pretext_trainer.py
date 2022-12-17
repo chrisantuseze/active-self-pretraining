@@ -369,7 +369,7 @@ class PretextTrainer():
             # model.load_state_dict(state['model'], strict=False)
 
             # or this
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", model)
         
         model = model.to(self.args.device)
 
