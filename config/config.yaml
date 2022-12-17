@@ -91,7 +91,7 @@ momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
 global_step: 0
 current_epoch: 0
-log_step: 1000
+log_step: 500
 
 ######################## target pretraining options
 target_dataset: 0                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL

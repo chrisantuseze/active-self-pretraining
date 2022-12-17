@@ -300,6 +300,9 @@ class PretextTrainer():
             self.best_model = copy.deepcopy(model)
             self.best_trainer_acc = epoch_acc
 
+        print(losses)
+        print(losses.avg)
+
         logging.info(
             "Test:\t"
             "Time {batch_time.avg:.3f}\t"
