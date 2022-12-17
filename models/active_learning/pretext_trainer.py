@@ -411,6 +411,7 @@ class PretextTrainer():
             model, _ = get_model_criterion(self.args, encoder, num_classes=4)
             state = simple_load_model(self.args, path='finetuner.pth')
             model.load_state_dict(state['model'], strict=False)
+            model = model.to(self.args.device)
 
             samplek = self.batch_sampler(model, path_loss)
             return samplek[: self.args.al_batches * self.args.al_trainer_sample_size]
