@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 import sys
 
-import zipfile
-with zipfile.ZipFile("imagenette2-160.zip", 'r') as zip_ref:
-    zip_ref.extractall("imagenet")  
+# import zipfile
+# with zipfile.ZipFile("imagenette2-160.zip", 'r') as zip_ref:
+#     zip_ref.extractall("imagenet")  
+
+arr = [3, 4, 1, 0, 6]
+arr = arr[::-1]
+print(arr)
 
 
 # method: 0                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SUPERVISED
