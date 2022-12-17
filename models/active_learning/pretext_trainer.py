@@ -414,6 +414,9 @@ class PretextTrainer():
             model = model.to(self.args.device)
 
             samplek = self.batch_sampler(model, path_loss)
+
+            # this does a reverse active learning to pick only the most certain data
+            samplek = samplek.sort(reverse=True)
             return samplek[: self.args.al_batches * self.args.al_trainer_sample_size_]
 
         pretraining_sample_pool = []
