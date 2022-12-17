@@ -55,7 +55,7 @@ def initialize_exp(params, *args, dump_params=True):
     #     os.path.join(params.dump_path, "stats" + str(params.rank) + ".pkl"), args
     # )
     training_stats = PD_Stats(
-        os.path.join(params.model_misc_path, "stats_" + str(params.rank) + ".pkl"), args
+        os.path.join(params.model_misc_path, "stats_" + str(len(args)) + ".pkl"), args
     )
 
     return training_stats
