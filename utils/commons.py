@@ -70,9 +70,10 @@ def load_chkpts(args, filename, model):
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
         for k, v in model.state_dict().items():
             if k not in list(state_dict):
-                logging.info('key "{}" could not be found in provided state dict'.format(k))
+                # logging.info('key "{}" could not be found in provided state dict'.format(k))
+                pass
             elif state_dict[k].shape != v.shape:
-                logging.info('key "{}" is of different shape in model and provided state dict'.format(k))
+                # logging.info('key "{}" is of different shape in model and provided state dict'.format(k))
                 state_dict[k] = v
         msg = model.load_state_dict(state_dict, strict=False)
 

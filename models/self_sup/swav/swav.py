@@ -43,11 +43,11 @@ class SwAVTrainer():
         # load weights
         if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
             # either this
-            state = load_saved_state(self.args, pretrain_level="1")
-            self.model.load_state_dict(state['model'], strict=False)
+            # state = load_saved_state(self.args, pretrain_level="1")
+            # self.model.load_state_dict(state['model'], strict=False)
 
             # or this
-            # self.model = load_chkpts(self.args, "swa_800ep_pretrain.pth.tar", self.model)
+            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         self.model = self.model.to(self.args.device)
 
