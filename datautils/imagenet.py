@@ -11,7 +11,6 @@ from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
-from datautils.dataset_enum import DatasetType
 from models.utils.transformations import Transforms
 
 

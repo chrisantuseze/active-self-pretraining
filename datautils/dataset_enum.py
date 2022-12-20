@@ -6,6 +6,7 @@ class DatasetType(Enum):
     CHEST_XRAY = 2
     REAL = 3
     UCMERCED = 4
+    FOOD = 5
 
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
@@ -22,3 +23,6 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.UCMERCED.value:
         return "ucmerced"
+
+    if value == DatasetType.FOOD.value:
+        return "food"
