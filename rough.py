@@ -2,7 +2,7 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("ILSVRC.zip", 'r') as zip_ref:
+with zipfile.ZipFile("/datasets/ILSVRC.zip", 'r') as zip_ref:
     zip_ref.extractall("ILSVRC")  
 
 # arr = [3, 4, 1, 0, 6]
