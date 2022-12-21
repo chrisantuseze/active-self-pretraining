@@ -121,7 +121,7 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
 
     elif args.target_dataset == dataset_enum.DatasetType.FOOD.value:
         print("using the FOOD dataset")
-        return TargetDataset(args, "/food", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/food", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError
