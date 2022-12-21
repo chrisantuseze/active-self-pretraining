@@ -207,7 +207,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir == "./datasets/chest_xray" or self.dir == "./datasets/imagenet":
+        if self.dir in ["./datasets/chest_xray", "./datasets/imagenet", "./datasets/food"]:
             img = pil_loader(self.img_path[idx])
         else:
             img = Image.open(self.img_path[idx])
