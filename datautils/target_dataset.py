@@ -35,6 +35,29 @@ class TargetDataset():
                                                                                                 self.dir,
                                                                                                 transform=transforms)
 
+    def get_finetuner_loaders(self, train_batch_size, val_batch_size):
+        transforms = Transforms(self.image_size)
+        train_ds, val_ds = split_dataset(self.args, self.dir, transforms, 0.6, True)
+
+        train_loader = torch.utils.data.DataLoader(
+                    train_ds, 
+                    batch_size=train_batch_size,
+                    num_workers=self.args.workers,
+                    shuffle=True,
+                    pin_memory=True
+                )
+        val_loader = torch.utils.data.DataLoader(
+                        val_ds, 
+                        batch_size=val_batch_size, 
+                        num_workers=self.args.workers,
+                        shuffle=False,
+                        pin_memory=True
+                    )
+
+        print(f"The size of the dataset is ({len(train_ds)}, {len(val_ds)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
+
+        return train_loader, val_loader
+
     def get_loader(self):
         if self.method is not SSL_Method.SWAV.value or self.training_type == TrainingType.ACTIVE_LEARNING:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
