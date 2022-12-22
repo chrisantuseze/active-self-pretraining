@@ -98,7 +98,7 @@ target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 
 target_epochs: 10                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 64
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_pretrain: False
+target_pretrain: True
 target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
@@ -108,7 +108,7 @@ lc_dataset: 5                           # dataset type. 0 for IMAGENET, 1 for CI
 # lc_batch_size: 64                      # 
 # lc_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 lc_optimizer: "Classifier" #"Adam-DCL"                # if you use LARS, then the lr needs to be decayed
-lc_image_size: 20                       # this depends on the dataset used
+lc_image_size: 40                       # this depends on the dataset used
 # lc_epochs: 50                           # this needs to be increased to 100
 
 

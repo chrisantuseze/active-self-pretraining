@@ -52,6 +52,8 @@ ssh cc@129.114.108.45
 
 ssh cc@192.5.87.154 
 
+ssh-keygen -R 192.5.87.74 #Removes all keys belonging to hostname from a known_hosts file.
+
 https://github.com/fastai/imagenette
 
 
