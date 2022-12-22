@@ -145,7 +145,7 @@ al_trainer_sample_size_: 500                   # this specifies the amount of sa
 al_lr: 0.1
 al_optimizer: "SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
-do_al: False
+do_al: True
 al_path_loss_file: "al_path_loss.pkl"
 al_pretext_from_pretrain: True                # this enables the pretext task to be finetuned using the weights of the pretrained model
 al_train_maintask: False                      # this enables the training of the main task. If disabled, the generated pathloss from 'make_batch' is used for the second pretrain
