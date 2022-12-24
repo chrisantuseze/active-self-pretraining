@@ -49,22 +49,13 @@ class SwAVTrainer():
             # or this
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
-        # set_parameter_requires_grad(self.model, feature_extract=True)
+        # freeze some layers
         for name, param in self.model.named_parameters():
             if 'layer4' in name or 'projection_head' in name or 'prototypes' in name:
-                print(name)
                 continue
             param.requires_grad = False
 
         self.model = self.model.to(self.args.device)
-
-        print("\n\n")
-        for name, param in self.model.named_parameters():
-            if not param.requires_grad:
-                print(name)
-
-        n_features = get_feature_dimensions_backbone(args)
-        # self.model.linear = nn.Linear(n_features, n_features)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
