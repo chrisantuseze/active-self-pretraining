@@ -76,8 +76,6 @@ def get_params_to_update(model, feature_extract):
             if param.requires_grad == True:
                 params_to_update.append(param)
 
-    print("params_to_update", params_to_update)
-
     return params_to_update
 
 def get_params(args, training_type):
