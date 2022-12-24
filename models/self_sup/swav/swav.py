@@ -55,8 +55,8 @@ class SwAVTrainer():
         n_features = get_feature_dimensions_backbone(args)
         # self.model.linear = nn.Linear(n_features, n_features)
 
-        for param in self.model.parameters():
-            print(param)
+        for name, param in self.model.named_parameters():
+            print(name)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
