@@ -59,7 +59,7 @@ epoch_queue_starts: 15
 #########################
 #### optim parameters ###
 #########################
-swav_batch_size: 32
+swav_batch_size: 128 #32
 swav_base_lr: 4.8
 final_lr: 0
 swav_optimizer: "SwAV"
