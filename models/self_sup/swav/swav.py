@@ -15,7 +15,7 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
 from models.self_sup.swav.utils import initialize_exp
-from models.utils.commons import get_params, AverageMeter, get_params_to_update, set_parameter_requires_grad
+from models.utils.commons import get_feature_dimensions_backbone, get_params, AverageMeter, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
 from utils.commons import load_chkpts, load_saved_state
@@ -52,6 +52,8 @@ class SwAVTrainer():
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model = self.model.to(self.args.device)
 
+        n_features = get_feature_dimensions_backbone(args)
+        self.model.linear = nn.Linear(n_features, n_features)
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
         self.train_params = get_params(self.args, training_type)
