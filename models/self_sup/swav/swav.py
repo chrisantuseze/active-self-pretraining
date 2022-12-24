@@ -49,13 +49,14 @@ class SwAVTrainer():
             # or this
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
-        set_parameter_requires_grad(self.model, feature_extract=True)
+        # set_parameter_requires_grad(self.model, feature_extract=True)
         self.model = self.model.to(self.args.device)
 
         n_features = get_feature_dimensions_backbone(args)
         # self.model.linear = nn.Linear(n_features, n_features)
 
-        print("self.model", self.model.parameters())
+        for param in self.model.parameters():
+            print(param)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
