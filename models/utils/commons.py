@@ -64,6 +64,7 @@ def get_feature_dimensions_backbone(args):
 def set_parameter_requires_grad(model, feature_extract):
     if feature_extract:
         for param in model.parameters():
+            
             param.requires_grad = False
 
 def get_params_to_update(model, feature_extract):
