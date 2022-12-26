@@ -40,6 +40,7 @@ class SwAVTrainer():
             nmb_prototypes=args.nmb_prototypes,
         )
 
+        params_to_update = self.model.parameters()
         # load weights
         if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
             # either this
@@ -49,15 +50,15 @@ class SwAVTrainer():
             # or this
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
-        # freeze some layers
-        for name, param in self.model.named_parameters():
-            if 'projection_head' in name or 'prototypes' in name:
-                continue
-            param.requires_grad = False
+            # freeze some layers
+            for name, param in self.model.named_parameters():
+                if 'projection_head' in name or 'prototypes' in name:
+                    continue
+                param.requires_grad = False
 
-        self.model = self.model.to(self.args.device)
+            self.model = self.model.to(self.args.device)
 
-        params_to_update = get_params_to_update(self.model, feature_extract=True)
+            params_to_update = get_params_to_update(self.model, feature_extract=True)
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(
