@@ -51,7 +51,7 @@ class SwAVTrainer():
 
         # freeze some layers
         for name, param in self.model.named_parameters():
-            if 'layer4' in name or 'projection_head' in name or 'prototypes' in name:
+            if 'projection_head' in name or 'prototypes' in name:
                 continue
             param.requires_grad = False
 
