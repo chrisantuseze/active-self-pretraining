@@ -2,9 +2,9 @@ import time
 import utils.logger as logging
 from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from optim.optimizer import load_optimizer
-from models.utils.commons import get_model_criterion, get_params, AverageMeter
+from models.utils.commons import get_model_criterion, get_params, AverageMeter, get_params_to_update
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_saved_state
+from utils.commons import load_chkpts, load_saved_state
 from models.heads.nt_xent import NT_Xent
 
 class SimCLRTrainer():
@@ -21,13 +21,22 @@ class SimCLRTrainer():
 
         self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
         if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-            state = load_saved_state(self.args, pretrain_level="1")
-            self.model.load_state_dict(state['model'], strict=False)
+            # state = load_saved_state(self.args, pretrain_level="1")
+            # self.model.load_state_dict(state['model'], strict=False)
+            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+
+        # freeze some layers
+        for name, param in self.model.named_parameters():
+            if 'projection_head' in name or 'prototypes' in name:
+                continue
+            param.requires_grad = False
 
         self.model = self.model.to(self.args.device)
 
+        params_to_update = get_params_to_update(self.model, feature_extract=True)
+
         self.train_params = get_params(self.args, training_type)
-        self.optimizer, self.scheduler = load_optimizer(self.args, self.model.parameters(), state, self.train_params)
+        self.optimizer, self.scheduler = load_optimizer(self.args, params=params_to_update, train_params=self.train_params)
 
     def train_epoch(self, epoch) -> int:
         batch_time = AverageMeter()
