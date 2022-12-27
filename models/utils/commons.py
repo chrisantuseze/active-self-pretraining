@@ -199,7 +199,7 @@ def get_ds_num_classes(dataset):
         num_classes = 100
         dir = "/chest_xray"
 
-    elif dataset == DatasetType.FLOWERSvalue:
+    elif dataset == DatasetType.FLOWERS.value:
         num_classes = 5
         dir = "/flowers"
 
