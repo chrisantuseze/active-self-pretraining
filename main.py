@@ -48,7 +48,7 @@ def main():
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.second_pretrain()
 
-        classifier = Classifier(args, pretrain_level="1")
+        classifier = Classifier2(args, pretrain_level="1")
         classifier.train_and_eval()
 
 if __name__ == "__main__":
