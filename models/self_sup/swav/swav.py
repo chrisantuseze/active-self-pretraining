@@ -56,9 +56,9 @@ class SwAVTrainer():
                     continue
                 param.requires_grad = False
 
-            self.model = self.model.to(self.args.device)
-
             params_to_update = get_params_to_update(self.model, feature_extract=True)
+
+        self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(
