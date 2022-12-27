@@ -51,18 +51,18 @@ class SwAVTrainer():
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
             # freeze some layers
-            for name, param in self.model.named_parameters():
-                if 'projection_head' in name or 'prototypes' in name:
-                    continue
-                param.requires_grad = False
+            # for name, param in self.model.named_parameters():
+            #     if 'projection_head' in name or 'prototypes' in name:
+            #         continue
+            #     param.requires_grad = False
 
-            params_to_update = get_params_to_update(self.model, feature_extract=True)
+            # params_to_update = get_params_to_update(self.model, feature_extract=True)
 
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(
-            self.args, params_to_update, #self.model.parameters(),
+            self.args, self.model.parameters(),
             train_params=self.train_params, 
             train_loader=self.train_loader
         )
