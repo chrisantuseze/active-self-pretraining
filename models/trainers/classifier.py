@@ -118,6 +118,7 @@ class Classifier:
             corrects += torch.sum(preds == targets.data)
 
         epoch_loss, epoch_acc = accuracy(total_loss, corrects, train_loader)
+        epoch_acc = epoch_acc * 100.0
         logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
         return epoch_loss, epoch_acc
@@ -145,6 +146,7 @@ class Classifier:
                 corrects += torch.sum(preds == targets.data)
 
             epoch_loss, epoch_acc = accuracy(total_loss, corrects, val_loader)
+            epoch_acc = epoch_acc * 100.0
             logging.info('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
             # deep copy the model
