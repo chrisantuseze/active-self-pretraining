@@ -44,8 +44,8 @@ class Classifier2():
         self.model.eval()
 
         # load weights
-        self.model = load_classifier_chkpts(self.args, self.model, pretrain_level)
-        # self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+        # self.model = load_classifier_chkpts(self.args, self.model, pretrain_level)
+        self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         train_params = get_params(self.args, TrainingType.FINETUNING)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.linear_classifier.parameters(), train_params=train_params)
