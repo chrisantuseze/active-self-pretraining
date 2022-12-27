@@ -13,7 +13,7 @@ from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_ds_num_classes, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
-from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
+from utils.commons import load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -30,7 +30,8 @@ class Classifier:
             logging.info("Using pretrained model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        self.model.load_state_dict(state['model'], strict=False)
+        # self.model.load_state_dict(state['model'], strict=False)
+        self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         num_classes, self.dir = get_ds_num_classes(self.args.finetune_dataset)
 
