@@ -199,9 +199,9 @@ def get_ds_num_classes(dataset):
         num_classes = 100
         dir = "/chest_xray"
 
-    elif dataset == DatasetType.FOOD.value:
-        num_classes = 101
-        dir = "/food"
+    elif dataset == DatasetType.FLOWERSvalue:
+        num_classes = 5
+        dir = "/flowers"
 
     else:
         num_classes = 10
