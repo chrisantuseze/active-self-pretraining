@@ -31,7 +31,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
     try:
         prefix = get_ssl_method(args.method)
         if pretrain_level == "2":
-            epoch_num = args.target_epoch_num
+            epoch_num = args.target_epochs
 
         else:
             epoch_num = args.base_epochs
@@ -49,7 +49,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
 def load_classifier_chkpts(args, model, pretrain_level="1"):
     prefix = get_ssl_method(args.method)
     if pretrain_level == "2":
-        epoch_num = args.target_epoch_num
+        epoch_num = args.target_epochs
 
     else:
         epoch_num = args.base_epochs
