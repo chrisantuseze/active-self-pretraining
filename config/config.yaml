@@ -59,7 +59,7 @@ epoch_queue_starts: 15
 #########################
 #### optim parameters ###
 #########################
-swav_batch_size: 128 #64
+swav_batch_size: 256 #64
 swav_base_lr: 4.8
 final_lr: 0
 swav_optimizer: "SwAV"
@@ -83,7 +83,7 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 20 #50
+base_epochs: 50
 base_image_size: 40
 base_dataset: 5                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: False
@@ -95,7 +95,7 @@ log_step: 500
 
 ######################## target pretraining options
 target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-target_epochs: 100                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_epochs: 300                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True
