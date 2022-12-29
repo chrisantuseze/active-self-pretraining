@@ -17,7 +17,7 @@ reload: False                                 # indicates whether to start the t
 
 # pretrain options
 
-method: 3                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SwAV, 4 for SUPERVISED, 
+method: 1                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SwAV, 4 for SUPERVISED, 
 
 ################################ SIMCLR #######################################
 simclr_batch_size: 512
@@ -83,10 +83,10 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 50
+base_epochs: 100
 base_image_size: 40
 base_dataset: 5                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-base_pretrain: False
+base_pretrain: True
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
 global_step: 0
@@ -98,7 +98,7 @@ target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 
 target_epochs: 500                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_pretrain: True
+target_pretrain: False
 target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
@@ -121,7 +121,7 @@ use_bn: False
 #########################
 #### optim parameters ###
 #########################
-lc_epochs: 300 #100
+lc_epochs: 100
 lc_batch_size: 32
 lc_lr: 0.3
 nesterov: False
