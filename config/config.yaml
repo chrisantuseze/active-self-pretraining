@@ -17,7 +17,7 @@ reload: False                                 # indicates whether to start the t
 
 # pretrain options
 
-method: 1                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SwAV, 4 for SUPERVISED, 
+method: 3                                     # 0 for SimCLR, 1 for DCL, 2 for MYOW, 3 for SwAV, 4 for SUPERVISED, 
 
 ################################ SIMCLR #######################################
 simclr_batch_size: 512
