@@ -206,7 +206,10 @@ class LogReg(nn.Module):
         super(LogReg, self).__init__()
         self.bn = None
         if global_avg:
-            s = 2048
+            if arch == "resnet18":
+                s = 512
+            else:
+                s = 2048
             self.av_pool = nn.AdaptiveAvgPool2d((1, 1))
         else:
             assert arch == "resnet50"
