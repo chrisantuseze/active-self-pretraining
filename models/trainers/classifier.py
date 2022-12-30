@@ -80,9 +80,9 @@ class Classifier:
 
             # early stopping
             early_stopping(train_loss, val_loss)
-            if early_stopping.early_stop:
-                print("We are at epoch:", epoch)
-                break
+            # if early_stopping.early_stop:
+            #     print("We are at epoch:", epoch)
+            #     break
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
