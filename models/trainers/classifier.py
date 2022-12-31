@@ -147,12 +147,12 @@ class Classifier:
 
             epoch_loss, epoch_acc = accuracy(total_loss, corrects, val_loader)
             epoch_acc = epoch_acc * 100.0
-            logging.info('Val Loss: {:.4f} Acc@1: {:.4f} Best Acc@1 so far: '.format(epoch_loss, epoch_acc, self.best_acc))
 
             # deep copy the model
             if epoch_acc > self.best_acc:
-                print(f'Saving.. prev best acc = {self.best_acc}, new best acc = {epoch_acc}')
                 self.best_acc = epoch_acc
                 self.best_model = copy.deepcopy(self.model)
+
+            logging.info('Val Loss: {:.4f} Acc@1: {:.4f} Best Acc@1 so far: '.format(epoch_loss, epoch_acc, self.best_acc))
 
         return epoch_loss, epoch_acc
