@@ -17,6 +17,10 @@ The weights of the trained proxy should be saved at each epoch and after all epo
 This process repeats itself until the data budget is reached. These samples used in training the proxy is what is saved and eventually used for the 
 second pretraining
 
+.....
+- Try to vary the lr and batch size to see if the performance can be improved
+- Why do literature care about number of iterations? Is the number of epochs and batch size not enough?
+
 
 
 image_loss.pkl should contain 30,000 images

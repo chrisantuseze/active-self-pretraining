@@ -60,7 +60,7 @@ epoch_queue_starts: 15
 #### optim parameters ###
 #########################
 swav_batch_size: 256 #64
-swav_base_lr: 4.8
+swav_base_lr: 2.4 ##4.8
 final_lr: 0
 swav_optimizer: "SwAV"
 freeze_prototypes_niters: 313
@@ -108,7 +108,7 @@ lc_dataset: 2                           # dataset type. 0 for IMAGENET, 1 for CI
 # lc_batch_size: 64                      # 
 # lc_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
 lc_optimizer: "Classifier" #"Adam-DCL"                # if you use LARS, then the lr needs to be decayed
-lc_image_size: 40                       # this depends on the dataset used
+lc_image_size: 80 ##40                       # this depends on the dataset used
 # lc_epochs: 50                           # this needs to be increased to 100
 
 
@@ -122,8 +122,8 @@ use_bn: False
 #### optim parameters ###
 #########################
 lc_epochs: 200
-lc_batch_size: 32
-lc_lr: 0.3
+lc_batch_size: 64 ##32
+lc_lr: 1.0e-2 ##0.3
 nesterov: False
 scheduler_type: "cosine"
 
