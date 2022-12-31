@@ -153,6 +153,6 @@ class Classifier:
                 self.best_acc = epoch_acc
                 self.best_model = copy.deepcopy(self.model)
 
-            logging.info('Val Loss: {:.4f} Acc@1: {acc:.3f} Best Acc@1 so far: {acc:.1f}'.format(epoch_loss, epoch_acc, self.best_acc))
+            logging.info('Val Loss: {:.4f} Acc@1: {:.3f} Best Acc@1 so far: {:.1f}'.format(epoch_loss, epoch_acc, self.best_acc))
 
         return epoch_loss, epoch_acc
