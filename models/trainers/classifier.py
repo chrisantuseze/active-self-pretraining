@@ -30,8 +30,8 @@ class Classifier:
             logging.info("Using pretrained model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        # self.model.load_state_dict(state['model'], strict=False)
-        self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+        self.model.load_state_dict(state['model'], strict=False)
+        # self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         num_classes, self.dir = get_ds_num_classes(self.args.lc_dataset)
 
