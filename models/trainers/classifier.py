@@ -80,9 +80,9 @@ class Classifier:
 
             # early stopping
             early_stopping(train_loss, val_loss)
-            # if early_stopping.early_stop:
-            #     print("We are at epoch:", epoch)
-            #     break
+            if early_stopping.early_stop:
+                print("We are at epoch:", epoch)
+                break
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -147,7 +147,7 @@ class Classifier:
 
             epoch_loss, epoch_acc = accuracy(total_loss, corrects, val_loader)
             epoch_acc = epoch_acc * 100.0
-            logging.info('Val Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+            logging.info('Val Loss: {:.4f} Acc@1: {:.4f} Best Acc@1 so far: '.format(epoch_loss, epoch_acc, self.best_acc))
 
             # deep copy the model
             if epoch_acc > self.best_acc:
