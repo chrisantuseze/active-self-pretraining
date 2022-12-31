@@ -80,9 +80,9 @@ class Classifier:
 
             # early stopping
             early_stopping(train_loss, val_loss)
-            if early_stopping.early_stop:
-                print("We are at epoch:", epoch)
-                break
+            # if early_stopping.early_stop:
+            #     print("We are at epoch:", epoch)
+            #     break
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -153,6 +153,6 @@ class Classifier:
                 self.best_acc = epoch_acc
                 self.best_model = copy.deepcopy(self.model)
 
-            logging.info('Val Loss: {:.4f} Acc@1: {:.3f} Best Acc@1 so far: {:.1f}'.format(epoch_loss, epoch_acc, self.best_acc))
+            logging.info('Val Loss: {:.4f} Acc@1: {:.3f} Best Acc@1 so far: {:.3f}'.format(epoch_loss, epoch_acc, self.best_acc))
 
         return epoch_loss, epoch_acc
