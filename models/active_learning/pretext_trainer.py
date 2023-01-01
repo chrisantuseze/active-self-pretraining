@@ -120,7 +120,7 @@ class PretextTrainer():
                 )
 
     def main_task(self, samples, model, batch, rebuild_al_model=False):
-        train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_finetune_batch_size).get_loader()
+        train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_maintask_batch_size).get_loader()
         test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
 
         state = None
@@ -354,7 +354,7 @@ class PretextTrainer():
     def finetuner(self, model):
         train_loader = get_target_pretrain_ds(
             self.args, training_type=TrainingType.ACTIVE_LEARNING, 
-            is_train=True, batch_size=self.args.al_batch_size).get_loader()
+            is_train=True, batch_size=self.args.al_finetune_batch_size).get_loader()
 
         test_loader = get_target_pretrain_ds(
             self.args, training_type=TrainingType.ACTIVE_LEARNING, 
