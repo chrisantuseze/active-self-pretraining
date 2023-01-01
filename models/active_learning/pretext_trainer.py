@@ -388,12 +388,7 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
 
-    def do_active_learning(self, sample_size=None, method=None) -> List[PathLoss]:
-
-        self.args.al_trainer_sample_size = sample_size
-        self.args.al_method = method
-
-
+    def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         main_task_model = encoder
