@@ -98,7 +98,7 @@ target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 
 target_epochs: 300                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
-target_pretrain: True
+target_pretrain: False
 target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
@@ -145,7 +145,7 @@ al_trainer_sample_size_: 300                   # this specifies the amount of sa
 al_lr: 0.1
 al_optimizer: "SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
-do_al: True
+do_al: False
 al_path_loss_file: "al_path_loss.pkl"
 al_pretext_from_pretrain: True                # this enables the pretext task to be finetuned using the weights of the pretrained model
 al_train_maintask: False                      # this enables the training of the main task. If disabled, the generated pathloss from 'make_batch' is used for the second pretrain
