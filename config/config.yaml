@@ -96,7 +96,7 @@ log_step: 500
 ######################## target pretraining options
 target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 300                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 100
+target_image_size: 80
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True
 target_epoch_num: 40
