@@ -69,6 +69,8 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
+    assert args.target_dataset == args.lc_dataset
+
     main()
 
     logging.info("CASL ended.")
