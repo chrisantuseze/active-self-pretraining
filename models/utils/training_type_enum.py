@@ -16,6 +16,5 @@ class TrainingType(Enum):
     BASE_PRETRAIN = "Base"
     TARGET_PRETRAIN = "Target"
     ACTIVE_LEARNING = "Active Learning"
-    FINETUNING = "Finetuning"
-    AL_FINETUNING = "AL Finetuning"
+    LINEAR_CLASSIFIER = "Linear Classifier"
 

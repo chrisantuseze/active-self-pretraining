@@ -10,7 +10,7 @@ from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 
-class Finetune():
+class LinearClassifier():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
@@ -33,11 +33,11 @@ class Finetune():
 
         if pretrain_data:
             train_loader = PretextDataLoader(
-                self.args, pretrain_data, training_type=TrainingType.FINETUNING, 
+                self.args, pretrain_data, training_type=TrainingType.LINEAR_CLASSIFIER, 
                 is_val=False).get_loader()
 
             val_loader = PretextDataLoader(
-                self.args, pretrain_data, training_type=TrainingType.FINETUNING, 
+                self.args, pretrain_data, training_type=TrainingType.LINEAR_CLASSIFIER, 
                 is_val=True).get_loader()
 
             print(f"The size of the dataset is ({len(train_dataset)}, {len(val_dataset)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")

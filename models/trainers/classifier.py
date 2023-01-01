@@ -6,7 +6,7 @@ import copy
 import utils.logger as logging
 from datautils.dataset_enum import DatasetType, get_dataset_enum
 
-from datautils.finetune_dataset import Finetune
+from datautils.finetune_dataset import LinearClassifier
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
 from optim.optimizer import load_optimizer
@@ -38,21 +38,21 @@ class Classifier:
         num_classes, self.dir = get_ds_num_classes(self.args.lc_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
-        self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.FINETUNING, num_classes=num_classes)
+        self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.LINEAR_CLASSIFIER, num_classes=num_classes)
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
 
-        train_params = get_params(self.args, TrainingType.FINETUNING)
+        train_params = get_params(self.args, TrainingType.LINEAR_CLASSIFIER)
         self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
 
     def train_and_eval(self, pretrain_data=None) -> None:
-        train_loader, val_loader = Finetune(
+        train_loader, val_loader = LinearClassifier(
             self.args, dir=self.dir, 
-            training_type=TrainingType.FINETUNING).get_loader(pretrain_data=pretrain_data)
+            training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=pretrain_data)
 
         since = time.time()
 

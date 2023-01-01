@@ -25,7 +25,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
 
     # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
 
-    elif training_type == TrainingType.FINETUNING:
+    elif training_type == TrainingType.LINEAR_CLASSIFIER:
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
@@ -113,20 +113,11 @@ def get_params(args, training_type):
 
     params = {
         TrainingType.ACTIVE_LEARNING: Params(
-            batch_size=args.al_batch_size, 
-            image_size=target_image_size, 
-            lr=args.al_lr, 
-            epochs=args.al_epochs,
-            optimizer=args.al_optimizer,
-            weight_decay=args.al_weight_decay,
-            temperature=temperature
-            ),
-        TrainingType.AL_FINETUNING: Params(
             batch_size=args.al_finetune_batch_size, 
             image_size=target_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
-            optimizer=optimizer,
+            optimizer=args.al_optimizer,
             weight_decay=args.al_weight_decay,
             temperature=temperature
             ),
@@ -148,7 +139,7 @@ def get_params(args, training_type):
             weight_decay=args.weight_decay,
             temperature=temperature
             ),
-        TrainingType.FINETUNING: Params(
+        TrainingType.LINEAR_CLASSIFIER: Params(
             batch_size=args.lc_batch_size, 
             image_size=args.lc_image_size, 
             lr=args.lc_lr, 

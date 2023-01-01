@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
-from datautils.finetune_dataset import Finetune
+from datautils.finetune_dataset import LinearClassifier
 from models.self_sup.swav.utils import accuracy, initialize_exp
 from models.utils.commons import AverageMeter, get_ds_num_classes, get_params
 from models.utils.training_type_enum import TrainingType
@@ -49,15 +49,15 @@ class Classifier2():
         else:
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
-        train_params = get_params(self.args, TrainingType.FINETUNING)
+        train_params = get_params(self.args, TrainingType.LINEAR_CLASSIFIER)
         self.optimizer, self.scheduler = load_optimizer(self.args, self.linear_classifier.parameters(), train_params=train_params)
         
         cudnn.benchmark = True
 
     def train_and_eval(self):
-        train_loader, val_loader = Finetune(
+        train_loader, val_loader = LinearClassifier(
             self.args, dir=self.dir, 
-            training_type=TrainingType.FINETUNING).get_loader(pretrain_data=None)
+            training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=None)
             
         for epoch in range(0, self.args.lc_epochs):
 
