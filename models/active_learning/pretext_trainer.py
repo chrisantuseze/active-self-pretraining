@@ -417,7 +417,7 @@ class PretextTrainer():
 
             # this does a reverse active learning to pick only the most certain data
             samplek = samplek[::-1]
-            return samplek[: self.args.al_batches * self.args.al_trainer_sample_size_]
+            return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
 
         pretraining_sample_pool = []
         rebuild_al_model = True
@@ -433,10 +433,10 @@ class PretextTrainer():
                 main_task_model.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.batch_sampler(main_task_model, sample6400)[:self.args.al_trainer_sample_size_]
+                samplek = self.batch_sampler(main_task_model, sample6400)[:self.args.al_trainer_sample_size]
             else:
                 # first iteration: sample k at even intervals
-                samplek = sample6400[:self.args.al_trainer_sample_size_]
+                samplek = sample6400[:self.args.al_trainer_sample_size]
 
             pretraining_sample_pool.extend(samplek)
 
