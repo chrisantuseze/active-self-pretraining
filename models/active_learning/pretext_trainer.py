@@ -320,9 +320,10 @@ class PretextTrainer():
             
             # update learning rate
             if self.args.al_optimizer == "SwAV":
-                iteration = epoch * len(train_loader) + step
-                for param_group in optimizer.param_groups:
-                    param_group["lr"] = scheduler[iteration]
+                iteration = epoch * len(train_loader) + step 
+                if len(scheduler) > iteration:
+                    for param_group in optimizer.param_groups:
+                        param_group["lr"] = scheduler[iteration]
 
             inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
             targets, targets1 = targets.to(self.args.device), targets1.to(self.args.device)
