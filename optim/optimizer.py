@@ -18,13 +18,13 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         # this could be implemented to allow for a restart of the learning rate after a certain number of epochs. To do this, simply call
         # line 34 in the check for the number of epochs
-        scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
+        scheduler = CosineAnnealingLR(optimizer, train_params.epochs, eta_min=0, T_max=200)
 
     elif train_params.optimizer == "DCL":
         lr = train_params.lr * train_params.batch_size/256
         optimizer = SGD(params, lr=lr, momentum=args.momentum, nesterov=True)
     
-        scheduler = CosineAnnealingLR(optimizer, eta_min=0.001, T_max=200)
+        scheduler = CosineAnnealingLR(optimizer, train_params.epochs, eta_min=0, T_max=200)
 
     elif train_params.optimizer == "SGD-MultiStep":
         optimizer = SGD(params, lr=train_params.lr, momentum=args.momentum, weight_decay=train_params.weight_decay)
@@ -66,7 +66,7 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
             )
         elif args.scheduler_type == "cosine":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                optimizer, train_params.epochs, eta_min=args.final_lr
+                optimizer, train_params.epochs, eta_min=args.lc_final_lr
             )
 
     elif train_params.optimizer == "LARS":

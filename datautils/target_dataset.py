@@ -123,5 +123,17 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the FLOWERS dataset")
         return TargetDataset(args, "/flowers", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
+    elif args.target_dataset == dataset_enum.DatasetType.EUROSAT.value:
+        print("using the EUROSAT dataset")
+        return TargetDataset(args, "/eurosat", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.FOOD101.value:
+        print("using the FOOD101 dataset")
+        return TargetDataset(args, "/food101", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
+        print("using the CLIPART dataset")
+        return TargetDataset(args, "/clipart", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
     else:
         ValueError

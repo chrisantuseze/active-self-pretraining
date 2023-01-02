@@ -194,6 +194,18 @@ def get_ds_num_classes(dataset):
         num_classes = 5
         dir = "/flowers"
 
+    elif dataset == DatasetType.EUROSAT.value:
+        num_classes = 10
+        dir = "/eurosat"
+
+    elif dataset == DatasetType.FOOD101.value:
+        num_classes = 101
+        dir = "/food101"
+
+    elif dataset == DatasetType.CLIPART.value:
+        num_classes = 345
+        dir = "/clipart"
+
     else:
         num_classes = 10
         dir = "/cifar10"

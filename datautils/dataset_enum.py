@@ -7,6 +7,9 @@ class DatasetType(Enum):
     REAL = 3
     UCMERCED = 4
     FLOWERS = 5
+    EUROSAT = 6
+    FOOD101 = 7
+    CLIPART = 8
 
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
@@ -26,3 +29,12 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.FLOWERS.value:
         return "flowers"
+    
+    if value == DatasetType.EUROSAT.value:
+        return "eurosat"
+
+    if value == DatasetType.FOOD101.value:
+        return "food101"
+
+    if value == DatasetType.CLIPART.value:
+        return "clipart"
