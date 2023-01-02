@@ -1,6 +1,3 @@
-# Bootstrap Your Own Learning: An Active Learning Framework for Data-Efficient Learning Using Self-Supervision
-This is the code repository for our work where we proposed a framework that enables the pretraining of a model in a self-supervised fashion and subsequently using the learned weights to select samples to be used in kickstarting an active learning process in a low data budget regime whilst ensuring a good performance is achieved in the downstream task.
-
 ## Usage
 Run the following command to install the dependencies for the project:
 

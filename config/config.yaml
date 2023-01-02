@@ -95,7 +95,7 @@ log_step: 500
 
 ######################## target pretraining options
 target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-target_epochs: 400                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_epochs: 500                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True
@@ -136,15 +136,15 @@ lc_final_lr: 0
 
 ################################### AL ###########################################################
 al_method_: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
-al_finetune_trainer_epochs: 200
+al_finetune_trainer_epochs: 100
 al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20
-al_finetune_batch_size: 128 #256                            # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
+al_finetune_batch_size: 256                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_maintask_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_trainer_sample_size: 300                   # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_sample_percentage: 0.6                     # this specifies the percentage of the samples to be used for the target pretraining
-al_lr: 0.1
-al_optimizer: "SGD-MultiStepV2"
+al_lr: 2.4 #0.1
+al_optimizer: "SwAV" #"SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
 do_al: True
 al_path_loss_file: "al_path_loss.pkl"
