@@ -10,7 +10,7 @@ class DatasetType(Enum):
     EUROSAT = 6
     FOOD101 = 7
     CLIPART = 8
-    QUICKDRAW = 9
+    SKETCH = 9
 
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
@@ -40,5 +40,5 @@ def get_dataset_enum(value: int):
     if value == DatasetType.CLIPART.value:
         return "clipart"
 
-    if value == DatasetType.QUICKDRAW.value:
-        return "quickdraw"
+    if value == DatasetType.SKETCH.value:
+        return "sketch"
