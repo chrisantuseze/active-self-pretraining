@@ -60,7 +60,7 @@ epoch_queue_starts: 15
 #### optim parameters ###
 #########################
 swav_batch_size: 128 #64
-swav_base_lr: 2.4 ##4.8
+swav_base_lr: 4.8
 final_lr: 0
 swav_optimizer: "SwAV"
 freeze_prototypes_niters: 313
@@ -143,7 +143,7 @@ al_finetune_batch_size: 256                   # I would like to keep the default
 al_maintask_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_trainer_sample_size: 300                   # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_sample_percentage: 0.6                     # this specifies the percentage of the samples to be used for the target pretraining
-al_lr: 0.1
+al_lr: 3.6 #0.1
 al_optimizer: "SwAV" #"SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
 do_al: True
