@@ -206,6 +206,10 @@ def get_ds_num_classes(dataset):
         num_classes = 345
         dir = "/clipart"
 
+    elif dataset == DatasetType.QUICKDRAW.value:
+        num_classes = 345
+        dir = "/quickdraw"
+
     else:
         num_classes = 10
         dir = "/cifar10"
