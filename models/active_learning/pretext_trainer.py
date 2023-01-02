@@ -374,7 +374,10 @@ class PretextTrainer():
         model = model.to(self.args.device)
 
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-        optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
+        optimizer, scheduler = load_optimizer(
+            self.args, model.parameters(), 
+            state, train_params,
+            train_loader=train_loader)
 
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))

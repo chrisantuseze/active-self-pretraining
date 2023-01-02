@@ -62,7 +62,7 @@ class SwAVTrainer():
 
         self.train_params = get_params(self.args, training_type)
         self.optimizer, self.scheduler = load_optimizer(
-            self.args, params_to_update, #self.model.parameters(),
+            self.args, params_to_update,
             train_params=self.train_params, 
             train_loader=self.train_loader
         )
