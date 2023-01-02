@@ -394,7 +394,7 @@ class PretextTrainer():
             self.eval_finetuner(model, criterion, test_loader)
 
             # update learning rate
-            if train_params.optimizer is not "SwAV":
+            if self.args.al_optimizer != "SwAV":
                 scheduler.step()
 
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
