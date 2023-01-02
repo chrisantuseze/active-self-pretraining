@@ -309,7 +309,7 @@ class PretextTrainer():
                 batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_trainer_acc))
 
 
-    def train_finetuner(self, model, epoch, criterion, optimizer, train_loader):
+    def train_finetuner(self, model, epoch, criterion, optimizer, scheduler, train_loader):
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
@@ -317,9 +317,18 @@ class PretextTrainer():
         model.train()
         end = time.time()
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
-            inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
-            inputs2, inputs3, targets2, targets3 = inputs2.to(self.args.device), inputs3.to(self.args.device), targets2.to(self.args.device), targets3.to(self.args.device)
             
+            # update learning rate
+            if self.args.al_optimizer == "SwAV":
+                iteration = epoch * len(train_loader) + step
+                for param_group in optimizer.param_groups:
+                    param_group["lr"] = scheduler[iteration]
+
+            inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
+            targets, targets1 = targets.to(self.args.device), targets1.to(self.args.device)
+            inputs2, inputs3 = inputs2.to(self.args.device), inputs3.to(self.args.device)
+            targets2, targets3 = targets2.to(self.args.device), targets3.to(self.args.device)
+
             optimizer.zero_grad()
             outputs, outputs1, outputs2, outputs3 = model(inputs), model(inputs1), model(inputs2), model(inputs3)
 
@@ -342,12 +351,10 @@ class PretextTrainer():
                     "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
                     "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
                     "Lr: {lr:.4f}".format(
-                        epoch,
-                        step,
+                        epoch, step,
                         batch_time=batch_time,
                         data_time=data_time,
-                        loss=losses,
-                        lr=optimizer.param_groups[0]["lr"],
+                        loss=losses, lr=optimizer.param_groups[0]["lr"],
                     )
                 )
 
@@ -383,16 +390,11 @@ class PretextTrainer():
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
-            self.train_finetuner(model, epoch, criterion, optimizer, train_loader)
+            self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
             self.eval_finetuner(model, criterion, test_loader)
 
             # update learning rate
-            if train_params.optimizer == "SwAV":
-                iteration = epoch * len(train_loader) + epoch
-                for param_group in optimizer.param_groups:
-                    param_group["lr"] = scheduler[iteration]
-
-            else:
+            if train_params.optimizer is not "SwAV":
                 scheduler.step()
 
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
