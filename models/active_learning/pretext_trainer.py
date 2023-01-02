@@ -386,7 +386,14 @@ class PretextTrainer():
             self.train_finetuner(model, epoch, criterion, optimizer, train_loader)
             self.eval_finetuner(model, criterion, test_loader)
 
-            scheduler.step()
+            # update learning rate
+            if train_params.optimizer == "SwAV":
+                iteration = epoch * len(train_loader) + epoch
+                for param_group in optimizer.param_groups:
+                    param_group["lr"] = scheduler[iteration]
+
+            else:
+                scheduler.step()
 
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
