@@ -384,9 +384,9 @@ class PretextTrainer():
             state, train_params,
             train_loader=train_loader)
 
-        if self.args.al_optimizer == "SwAV":
-            scheduler = SwAVScheduler(self.args, train_params.lr, train_params.epochs, train_loader, optimizer)
-            scheduler.build_schedule()
+        # if self.args.al_optimizer == "SwAV":
+        #     scheduler = SwAVScheduler(self.args, train_params.lr, train_params.epochs, train_loader, optimizer)
+        #     scheduler.build_schedule()
 
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
