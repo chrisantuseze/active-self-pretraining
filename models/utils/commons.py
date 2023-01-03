@@ -5,7 +5,6 @@ from torch.utils.data import random_split
 import gc
 from datautils.dataset_enum import DatasetType
 
-from models.heads.nt_xent import NT_Xent
 from models.self_sup.simclr.loss.dcl_loss import DCL
 from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from models.self_sup.simclr.simclr import SimCLR

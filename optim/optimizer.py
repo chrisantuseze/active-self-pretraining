@@ -1,11 +1,12 @@
 import math
 import numpy as np
 import torch
-from torch.optim.lr_scheduler import StepLR, ExponentialLR, CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim import SGD, Adam
 
-from models.utils.training_type_enum import Params, TrainingType
+from models.utils.training_type_enum import Params
 from .lars import LARS
+import utils.logger as logging
 
 
 def load_optimizer(args, params, state=None, train_params: Params=None, train_loader=None):
@@ -108,8 +109,11 @@ class SwAVScheduler():
     def step(self, epoch, step):
         iteration = epoch * len(self.loader) + step
 
-        if self.optimizer.param_groups[0]["lr"] < 1.0e-3 or len(self.scheduler) >= iteration:
+        if self.optimizer.param_groups[0]["lr"] < 1.0e-3 or iteration >= len(self.scheduler):
             self.build_schedule()
 
-        for param_group in self.optimizer.param_groups:
-            param_group["lr"] = self.scheduler[iteration]
+        try:
+            for param_group in self.optimizer.param_groups:
+                param_group["lr"] = self.scheduler[iteration]
+        except:
+            logging.error(f"IndexError: iteration {iteration}, scheduler length {len(self.scheduler)}")
