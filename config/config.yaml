@@ -94,7 +94,7 @@ current_epoch: 0
 log_step: 500
 
 ######################## target pretraining options
-target_dataset: 9                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_dataset: 8                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 400                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 90
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
@@ -104,13 +104,8 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 
 ################################## LINEAR CLASSIFIER ###########################################
-lc_dataset: 9                           # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-# lc_batch_size: 64                      # 
-# lc_lr: 1.0e-3 #0.1                            # initial learning rate. This should be varied between 1.0e-3 to 1.0e-2 using LR scheduler
-lc_optimizer: "Classifier" #"Adam-DCL"                # if you use LARS, then the lr needs to be decayed
+lc_dataset: 8                           # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 lc_image_size: 80 ##40                       # this depends on the dataset used
-# lc_epochs: 50                           # this needs to be increased to 100
-
 
 #########################
 #### model parameters ###
@@ -121,6 +116,7 @@ use_bn: False
 #########################
 #### optim parameters ###
 #########################
+lc_optimizer: "Classifier" #"Adam-DCL"                # 
 lc_epochs: 100
 lc_batch_size: 32
 lc_lr: 0.3 #1.0e-2 
