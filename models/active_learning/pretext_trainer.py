@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torchvision import transforms
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
-from optim.optimizer import load_optimizer
+from optim.optimizer import SwAVScheduler, load_optimizer
 import utils.logger as logging
 from typing import List
 import copy
@@ -320,10 +320,7 @@ class PretextTrainer():
             
             # update learning rate
             if self.args.al_optimizer == "SwAV":
-                iteration = epoch * len(train_loader) + step 
-                if len(scheduler) > iteration:
-                    for param_group in optimizer.param_groups:
-                        param_group["lr"] = scheduler[iteration]
+                scheduler.step(epoch, step)
 
             inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
             targets, targets1 = targets.to(self.args.device), targets1.to(self.args.device)
@@ -386,6 +383,10 @@ class PretextTrainer():
             self.args, model.parameters(), 
             state, train_params,
             train_loader=train_loader)
+
+        if self.args.al_optimizer == "SwAV":
+            scheduler = SwAVScheduler(self.args, train_params.lr, train_params.epochs, train_loader, optimizer)
+            scheduler.build_schedule()
 
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))

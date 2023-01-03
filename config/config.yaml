@@ -143,8 +143,8 @@ al_finetune_batch_size: 256                   # I would like to keep the default
 al_maintask_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_trainer_sample_size: 300                   # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_sample_percentage: 0.5                     # this specifies the percentage of the samples to be used for the target pretraining
-al_lr: 1.2
-al_optimizer: "SGD-MultiStepV2"
+al_lr: 4.8
+al_optimizer: "SwAV" #"SGD-MultiStepV2"
 al_weight_decay: 5.0e-4
 do_al: True
 al_path_loss_file: "al_path_loss.pkl"
