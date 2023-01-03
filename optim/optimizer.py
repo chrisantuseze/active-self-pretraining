@@ -108,7 +108,7 @@ class SwAVScheduler():
     def step(self, epoch, step):
         iteration = epoch * len(self.loader) + step
 
-        if self.optimizer.param_groups[0]["lr"] < 1.0e-3 or len(self.scheduler) > iteration:
+        if self.optimizer.param_groups[0]["lr"] < 1.0e-3 or len(self.scheduler) >= iteration:
             self.build_schedule()
 
         for param_group in self.optimizer.param_groups:
