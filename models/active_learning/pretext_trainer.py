@@ -363,7 +363,7 @@ class PretextTrainer():
 
         test_loader = get_target_pretrain_ds(
             self.args, training_type=TrainingType.ACTIVE_LEARNING, 
-            is_train=False, batch_size=100).get_loader()
+            is_train=False, batch_size=256).get_loader() #100
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
 
