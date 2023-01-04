@@ -33,7 +33,7 @@ class SwAVTrainer():
         self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
-        zero_init_residual = False #True #TODO: They said that this improves the network by 0.2-0.3%
+        zero_init_residual = True #TODO: They said that this improves the network by 0.2-0.3%
         self.model = resnet_models.__dict__[args.backbone](
             zero_init_residual=zero_init_residual,
             normalize=True,
