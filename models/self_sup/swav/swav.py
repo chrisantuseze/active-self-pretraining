@@ -52,12 +52,12 @@ class SwAVTrainer():
                 self.model.load_state_dict(state['model'], strict=False)
 
             # freeze some layers
-            # for name, param in self.model.named_parameters():
-            #     if 'projection_head' in name or 'prototypes' in name:
-            #         continue
-            #     param.requires_grad = False
+            for name, param in self.model.named_parameters():
+                if 'projection_head' in name or 'prototypes' in name:
+                    continue
+                param.requires_grad = False
 
-            # params_to_update = get_params_to_update(self.model, feature_extract=True)
+            params_to_update = get_params_to_update(self.model, feature_extract=True)
 
         self.model = self.model.to(self.args.device)
 
