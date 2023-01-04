@@ -20,7 +20,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.linear = nn.Linear(n_features, num_classes)
-        print("using Regular for AL model")
+        print("using Regular model for AL ")
 
     # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
 
@@ -28,7 +28,7 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
-        print("using Regular for LC model")
+        print("using Regular model for LC")
 
     else:
         if args.method == SSL_Method.SIMCLR.value:
