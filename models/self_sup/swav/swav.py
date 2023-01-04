@@ -33,7 +33,9 @@ class SwAVTrainer():
         self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
+        zero_init_residual = False #True #TODO: They said that this improves the network by 0.2-0.3%
         self.model = resnet_models.__dict__[args.backbone](
+            zero_init_residual=zero_init_residual,
             normalize=True,
             hidden_mlp=args.hidden_mlp,
             output_dim=args.feat_dim,
@@ -43,12 +45,11 @@ class SwAVTrainer():
         params_to_update = self.model.parameters()
         # load weights
         if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-            # either this
-            # state = load_saved_state(self.args, pretrain_level="1")
-            # self.model.load_state_dict(state['model'], strict=False)
-
-            # or this
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+            if args.backbone == "resnet50":
+                self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+            else:
+                state = load_saved_state(self.args, pretrain_level="1")
+                self.model.load_state_dict(state['model'], strict=False)
 
             # freeze some layers
             # for name, param in self.model.named_parameters():

@@ -2,8 +2,8 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
-    zip_ref.extractall("datasets/clipart")  
+with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
+    zip_ref.extractall("datasets/eurosat")  
 
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]
