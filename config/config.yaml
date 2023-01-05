@@ -51,7 +51,7 @@ crops_for_assign: [0, 1]
 swav_temperature: 0.1
 epsilon: 0.05
 sinkhorn_iterations: 3
-feat_dim: 128
+feat_dim: 256 #128
 nmb_prototypes: 3000
 queue_length: 0
 epoch_queue_starts: 15

@@ -83,7 +83,7 @@ class SelfSupPretrainer(BasePretrainer):
                 trainer.scheduler.step()
                 lr = trainer.scheduler.get_last_lr()
 
-            if epoch > 0 and epoch % epochs//2 == 0:
+            if epoch > 1 and epoch % epochs//2 == 0:
                 save_state(self.args, model, optimizer, pretrain_level, train_params.optimizer)
 
             self.args.current_epoch += 1
