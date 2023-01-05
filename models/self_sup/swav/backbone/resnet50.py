@@ -206,8 +206,14 @@ class ResNet(nn.Module):
                 nn.Linear(num_out_filters * block.expansion, hidden_mlp),
                 nn.BatchNorm1d(hidden_mlp),
                 nn.ReLU(inplace=True),
-                # nn.Linear(hidden_mlp, hidden_mlp), #TODO: This is from Chris
-                nn.Linear(hidden_mlp, output_dim),
+
+                nn.Linear(hidden_mlp, hidden_mlp), #TODO: This is from Chris
+                nn.ReLU(inplace=True), #TODO: This is from Chris
+                nn.Linear(hidden_mlp, 512), #TODO: This is from Chris
+                nn.BatchNorm1d(512), #TODO: This is from Chris
+                nn.ReLU(inplace=True), #TODO: This is from Chris
+
+                nn.Linear(512, output_dim), #hidden_mlp
             )
 
         # prototype layer

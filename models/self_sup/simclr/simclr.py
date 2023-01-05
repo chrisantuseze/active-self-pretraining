@@ -19,7 +19,7 @@ class SimCLR(nn.Module):
         # We use a MLP with one hidden layer to obtain z_i = g(h_i) = W(2)σ(W(1)h_i) where σ is a ReLU non-linearity.
         self.contrastive_head = nn.Sequential(
             nn.Linear(self.n_features, self.n_features, bias=False),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             nn.Linear(self.n_features, projection_dim, bias=False),
         )
 
