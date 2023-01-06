@@ -60,7 +60,7 @@ class PretextDataLoader():
                 batch_size=self.args.swav_batch_size,
                 num_workers=self.args.workers,
                 pin_memory=True,
-                drop_last=True
+                # drop_last=True
             )
 
         else:
@@ -85,7 +85,8 @@ class PretextDataLoader():
                 dataset,
                 batch_size=self.batch_size,
                 shuffle=not self.is_val,
-                num_workers=self.args.workers#2
+                num_workers=self.args.workers,#2
+                pin_memory=True,
             )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
@@ -178,7 +179,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
             image = Image.open(path)
 
         multi_crops = list(map(lambda trans: trans(image), self.trans))
-        return multi_crops
+        return multi_crops #TODO: Check the len of this multi_crops. Also check if you can use a mined view and an aug view here instead of just aug views.
 
 
 class MakeBatchDataset(torch.utils.data.Dataset):

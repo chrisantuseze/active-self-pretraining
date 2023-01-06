@@ -46,8 +46,9 @@ class ImageNet():
             loader = torch.utils.data.DataLoader(
                 train_ds,
                 batch_size=self.batch_size,
-                drop_last=True, 
-                shuffle=True
+                pin_memory=True, 
+                shuffle=True,
+                num_workers=self.args.workers
             )
         
         else:

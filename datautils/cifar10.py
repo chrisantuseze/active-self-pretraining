@@ -49,8 +49,9 @@ class CIFAR10():
             loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=self.batch_size,
-                drop_last=True,
-                shuffle=True
+                pin_memory=True,
+                shuffle=True,
+                num_workers=self.args.workers
             )
 
         else:

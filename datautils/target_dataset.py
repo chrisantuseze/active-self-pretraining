@@ -84,9 +84,9 @@ class TargetDataset():
             loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=self.batch_size,
-                drop_last=True,
+                pin_memory=True,
                 shuffle=self.is_train, 
-                num_workers=2
+                num_workers=self.args.workers
             )
         
         else:
