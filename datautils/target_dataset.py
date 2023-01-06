@@ -98,7 +98,7 @@ class TargetDataset():
         return loader
     
 
-def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None):
+def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
         print("using the CHEST XRAY dataset")
         return TargetDataset(args, "/chest_xray", training_type, with_train=True, is_train=is_train, batch_size=batch_size)

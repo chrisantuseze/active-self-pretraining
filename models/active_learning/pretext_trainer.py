@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from torchvision import transforms
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
+from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import SwAVScheduler, load_optimizer
 import utils.logger as logging
 from typing import List
@@ -357,24 +358,25 @@ class PretextTrainer():
                 )
 
     def finetuner(self, model):
-        train_loader = get_target_pretrain_ds(
-            self.args, training_type=TrainingType.ACTIVE_LEARNING, 
-            is_train=True, batch_size=self.args.al_finetune_batch_size).get_loader()
+        train_loader, test_loader = get_target_pretrain_ds(
+            self.args, training_type=TrainingType.ACTIVE_LEARNING).get_finetuner_loaders(
+                train_batch_size=self.args.al_finetune_batch_size,
+                val_batch_size=128
+            )
 
-        test_loader = get_target_pretrain_ds(
-            self.args, training_type=TrainingType.ACTIVE_LEARNING, 
-            is_train=False, batch_size=128).get_loader() #100
+        # test_loader = get_target_pretrain_ds(
+        #     self.args, training_type=TrainingType.ACTIVE_LEARNING, 
+        #     is_train=False, batch_size=128).get_loader() #100
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
 
         state = None
         if self.args.al_pretext_from_pretrain:
-            # either this
-            # state = load_saved_state(self.args, pretrain_level="1")
-            # model.load_state_dict(state['model'], strict=False)
-
-            # or this
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", model)
+            if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
+                self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+            else:
+                state = load_saved_state(self.args, pretrain_level="1")
+                self.model.load_state_dict(state['model'], strict=False)
         
         model = model.to(self.args.device)
 
@@ -383,10 +385,6 @@ class PretextTrainer():
             self.args, model.parameters(), 
             state, train_params,
             train_loader=train_loader)
-
-        # if self.args.al_optimizer == "SwAV":
-        #     scheduler = SwAVScheduler(self.args, train_params.lr, train_params.epochs, train_loader, optimizer)
-        #     scheduler.build_schedule()
 
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
