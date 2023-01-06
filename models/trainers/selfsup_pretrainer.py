@@ -1,4 +1,3 @@
-from datautils.dataset_enum import get_dataset_enum
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.active_learning.pretext_trainer import PretextTrainer
