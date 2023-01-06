@@ -115,7 +115,7 @@ class PretextDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         path_loss = self.pathloss_list[idx]
 
-        if isinstance(path_loss.path, tuple, list):
+        if isinstance(path_loss.path, tuple) or isinstance(path_loss.path, list):
             path = path_loss.path[0]
         else:
             path = path_loss.path
@@ -168,7 +168,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         path_loss = self.pathloss_list[index]
-        if isinstance(path_loss.path, tuple, list):
+        if isinstance(path_loss.path, tuple) or isinstance(path_loss.path, list):
             path = path_loss.path[0]
         else:
             path = path_loss.path
