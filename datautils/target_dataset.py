@@ -6,7 +6,7 @@ from models.active_learning.pretext_dataloader import MakeBatchDataset
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
-from models.utils.commons import get_params, split_dataset
+from models.utils.commons import get_params, split_dataset2
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 
@@ -36,7 +36,8 @@ class TargetDataset():
 
     def get_finetuner_loaders(self, train_batch_size, val_batch_size):
         transforms = Transforms(self.image_size)
-        train_ds, val_ds = split_dataset(self.args, self.dir, transforms, 0.6, True)
+        dataset = self.get_dataset(transforms)
+        train_ds, val_ds = split_dataset2(dataset=dataset, ratio=0.7, is_classifier=True)
 
         train_loader = torch.utils.data.DataLoader(
                     train_ds, 

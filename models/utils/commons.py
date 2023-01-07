@@ -156,11 +156,14 @@ def accuracy(loss, corrects, loader):
 
     return epoch_loss, epoch_acc
 
-def split_dataset(args, dir, transforms, ratio=0.6, is_classifier=False):
+def split_dataset(dir, transforms, ratio=0.6, is_classifier=False):
     dataset = torchvision.datasets.ImageFolder(
         dir,
         transform=transforms)
 
+    return split_dataset2(dataset, ratio, is_classifier)
+
+def split_dataset2(dataset, ratio=0.6, is_classifier=False):
     train_ds = dataset
     val_ds = None
     if is_classifier:
