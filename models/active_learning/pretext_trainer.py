@@ -373,10 +373,10 @@ class PretextTrainer():
         state = None
         if self.args.al_pretext_from_pretrain:
             if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
-                self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+                model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", model)
             else:
                 state = load_saved_state(self.args, pretrain_level="1")
-                self.model.load_state_dict(state['model'], strict=False)
+                model.load_state_dict(state['model'], strict=False)
         
         model = model.to(self.args.device)
 
