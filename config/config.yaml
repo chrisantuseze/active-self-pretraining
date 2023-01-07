@@ -51,7 +51,7 @@ crops_for_assign: [0, 1]
 swav_temperature: 0.1
 epsilon: 0.05
 sinkhorn_iterations: 3
-feat_dim: 256 #128
+feat_dim: 128
 nmb_prototypes: 3000
 queue_length: 0
 epoch_queue_starts: 15
@@ -60,7 +60,7 @@ epoch_queue_starts: 15
 #### optim parameters ###
 #########################
 swav_batch_size: 128 #64
-swav_base_lr: 1.2 #4.8
+swav_base_lr: 2.4 #4.8
 final_lr: 0
 swav_optimizer: "SwAV"
 freeze_prototypes_niters: 313
@@ -95,8 +95,8 @@ log_step: 1000
 
 ######################## target pretraining options
 target_dataset: 2                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-target_epochs: 200                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
-target_image_size: 52
+target_epochs: 100                              # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_image_size: 90
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: False
 target_epoch_num: 40
@@ -105,7 +105,7 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 ################################## LINEAR CLASSIFIER ###########################################
 lc_dataset: 2                           # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-lc_image_size: 80 ##40                       # this depends on the dataset used
+lc_image_size: 90 ##40                       # this depends on the dataset used
 
 #########################
 #### model parameters ###
