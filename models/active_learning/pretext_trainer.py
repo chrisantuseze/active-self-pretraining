@@ -1,8 +1,8 @@
-import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import transforms
+import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
 from models.utils.ssl_method_enum import SSL_Method
