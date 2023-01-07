@@ -78,7 +78,7 @@ local_rank: 0
 #### other parameters ###
 #########################
 hidden_mlp: 2048
-workers: 4
+workers: 2
 checkpoint_freq: 25
 
 ################################ GENERAL ######################################
