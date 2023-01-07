@@ -74,9 +74,9 @@ parser.add_argument("--epoch_queue_starts", type=int, default=15,
 #########################
 #### optim parameters ###
 #########################
-parser.add_argument("--epochs", default=20, type=int, #100
+parser.add_argument("--epochs", default=100, type=int, 
                     help="number of total epochs to run")
-parser.add_argument("--batch_size", default=32, type=int, #64
+parser.add_argument("--batch_size", default=64, type=int,
                     help="batch size per gpu, i.e. how many unique instances per gpu")
 parser.add_argument("--base_lr", default=4.8, type=float, help="base learning rate")
 parser.add_argument("--final_lr", type=float, default=0, help="final learning rate")
