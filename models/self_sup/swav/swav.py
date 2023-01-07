@@ -5,16 +5,16 @@
 # LICENSE file in the root directory of this source tree.
 #
 import torch
-
-import os
-import time
-
-import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
+
+import os
+import time
+
+import numpy as np
 from models.self_sup.swav.utils import initialize_exp
 from models.utils.commons import get_params, AverageMeter, get_params_to_update
 from models.utils.training_type_enum import TrainingType
