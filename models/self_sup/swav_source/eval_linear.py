@@ -59,7 +59,7 @@ parser.add_argument("--use_bn", default=False, type=bool_flag,
 #########################
 #### optim parameters ###
 #########################
-parser.add_argument("--epochs", default=20, type=int, #100
+parser.add_argument("--epochs", default=100, type=int,
                     help="number of total epochs to run")
 parser.add_argument("--batch_size", default=32, type=int,
                     help="batch size per gpu, i.e. how many unique instances per gpu")
