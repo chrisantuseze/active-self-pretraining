@@ -42,8 +42,8 @@ class MultiCropDataset(datasets.ImageFolder):
         self.return_index = return_index
 
         color_transform = [get_color_distortion(), PILRandomGaussianBlur()]
-        mean = [0.485, 0.456, 0.406]
-        std = [0.228, 0.224, 0.225]
+        mean = [0.4914, 0.4822, 0.4465] #[0.485, 0.456, 0.406]
+        std = [0.2023, 0.1994, 0.2010] #[0.228, 0.224, 0.225]
         trans = []
         for i in range(len(size_crops)):
             randomresizedcrop = transforms.RandomResizedCrop(
@@ -95,7 +95,7 @@ class PILRandomGaussianBlur(object):
 
 def get_color_distortion(s=1.0):
     # s is the strength of color distortion.
-    color_jitter = transforms.ColorJitter(0.8*s, 0.8*s, 0.8*s, 0.2*s)
+    color_jitter = transforms.ColorJitter(0.4, 0.4, 0.4, 0.1) #transforms.ColorJitter(0.8*s, 0.8*s, 0.8*s, 0.2*s)
     rnd_color_jitter = transforms.RandomApply([color_jitter], p=0.8)
     rnd_gray = transforms.RandomGrayscale(p=0.2)
     color_distort = transforms.Compose([rnd_color_jitter, rnd_gray])
