@@ -314,7 +314,7 @@ class PretextTrainer():
             "Best Acc@1 so far {acc:.1f}".format(
                 batch_time=batch_time, loss=avg_loss, top1=epoch_acc, acc=self.best_trainer_acc))
 
-        return avg_loss
+        return epoch_acc, avg_loss
 
 
     def train_finetuner(self, model, epoch, criterion, optimizer, scheduler, train_loader):
@@ -400,20 +400,24 @@ class PretextTrainer():
             state, train_params,
             train_loader=train_loader)
 
-        early_stopping = EarlyStopping(tolerance=5, min_delta=0.0005)
+        counter = 0
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
             train_loss = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
-            eval_loss = self.eval_finetuner(model, criterion, test_loader)
+            epoch_acc, eval_loss = self.eval_finetuner(model, criterion, test_loader)
 
             # update learning rate
             if self.args.al_optimizer != "SwAV":
                 scheduler.step()
 
-            early_stopping(train_loss, eval_loss)
-            if early_stopping.early_stop:
+            if epoch_acc < self.best_trainer_acc:
+                counter += 1
+            else:
+                counter = 0
+
+            if counter > 10:
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
