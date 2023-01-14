@@ -60,7 +60,7 @@ class Classifier:
 
         val_acc_history = []
 
-        early_stopping = EarlyStopping(tolerance=5, min_delta=20)
+        early_stopping = EarlyStopping(tolerance=10, min_delta=20)
 
         for epoch in range(self.args.lc_epochs):
 

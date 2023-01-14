@@ -5,6 +5,7 @@ from torchvision import transforms
 import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
+from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import SwAVScheduler, load_optimizer
 import utils.logger as logging
@@ -17,7 +18,7 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import AverageMeter, get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
+from models.utils.commons import AverageMeter, accuracy, get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_chkpts, load_path_loss, load_saved_state, save_accuracy_to_file, save_path_loss, simple_load_model, simple_save_model
@@ -295,7 +296,10 @@ class PretextTrainer():
                 end = time.perf_counter()
 
         # Save checkpoint.
-        epoch_acc = 100. * correct / total
+        # epoch_acc = 100. * correct / total
+
+        epoch_loss, epoch_acc = accuracy(loss_avg.item(), correct, test_loader)
+        epoch_acc = epoch_acc * 100.0
 
         if epoch_acc > self.best_trainer_acc:
             self.best_model = copy.deepcopy(model)
@@ -304,10 +308,12 @@ class PretextTrainer():
         logging.info(
             "Test:\t"
             "Time {batch_time.avg:.3f}\t"
-            "Loss {loss.avg:.4f}\t"
+            "Loss {loss:.4f}\t"
             "Acc@1 {top1:.3f}\t"
             "Best Acc@1 so far {acc:.1f}".format(
-                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_trainer_acc))
+                batch_time=batch_time, loss=epoch_loss, top1=epoch_acc, acc=self.best_trainer_acc))
+
+        return epoch_loss, epoch_acc
 
 
     def train_finetuner(self, model, epoch, criterion, optimizer, scheduler, train_loader):
@@ -317,8 +323,9 @@ class PretextTrainer():
 
         model.train()
         end = time.time()
+        correct = 0
+
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
-            
             # update learning rate
             if self.args.al_optimizer == "SwAV":
                 scheduler.step(epoch, step)
@@ -336,6 +343,17 @@ class PretextTrainer():
             loss2 = criterion(outputs2, targets2)
             loss3 = criterion(outputs3, targets3)
             loss_avg = (loss + loss1 + loss2 + loss3) / 4.
+
+            _, predicted = outputs.max(1)
+            _, predicted1 = outputs1.max(1)
+            _, predicted2 = outputs2.max(1)
+            _, predicted3 = outputs3.max(1)
+
+            correct += predicted.eq(targets).sum().item()
+            correct += predicted1.eq(targets1).sum().item()
+            correct += predicted2.eq(targets2).sum().item()
+            correct += predicted3.eq(targets3).sum().item()
+
             loss_avg.backward()
             optimizer.step()
 
@@ -356,6 +374,13 @@ class PretextTrainer():
                         loss=losses, lr=optimizer.param_groups[0]["lr"],
                     )
                 )
+
+            epoch_loss, epoch_acc = accuracy(loss_avg.item(), correct, train_loader)
+            epoch_acc = epoch_acc * 100.0
+
+            logging.info("Train Loss {:.4f}", epoch_loss)
+
+        return epoch_loss, epoch_acc
 
     def finetuner(self, model):
         train_loader, test_loader = get_target_pretrain_ds(
@@ -386,16 +411,24 @@ class PretextTrainer():
             state, train_params,
             train_loader=train_loader)
 
+        early_stopping = EarlyStopping(tolerance=10, min_delta=20)
+
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
-            self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
-            self.eval_finetuner(model, criterion, test_loader)
+            train_loss, train_acc = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
+            val_loss, val_acc = self.eval_finetuner(model, criterion, test_loader)
 
             # update learning rate
             if self.args.al_optimizer != "SwAV":
                 scheduler.step()
+
+            # early stopping
+            early_stopping(train_loss, val_loss)
+            if early_stopping.early_stop:
+                logging.info("We are at epoch: {}".format(epoch))
+                break
 
         simple_save_model(self.args, self.best_model, 'finetuner.pth')
 
