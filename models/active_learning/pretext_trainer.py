@@ -5,6 +5,7 @@ from torchvision import transforms
 import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
+from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import SwAVScheduler, load_optimizer
 import utils.logger as logging
@@ -261,6 +262,7 @@ class PretextTrainer():
         end = time.time()
         total, correct = 0, 0
 
+        total_steps = 0
         with torch.no_grad():
             for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(test_loader):
                 inputs, inputs1, targets, targets1 = inputs.to(self.args.device), inputs1.to(self.args.device), targets.to(self.args.device), targets1.to(self.args.device)
@@ -294,6 +296,8 @@ class PretextTrainer():
                 batch_time.update(time.perf_counter() - end)
                 end = time.perf_counter()
 
+                total_steps = step
+
         # Save checkpoint.
         epoch_acc = 100. * correct / total
 
@@ -301,15 +305,16 @@ class PretextTrainer():
             self.best_model = copy.deepcopy(model)
             self.best_trainer_acc = epoch_acc
 
+        avg_loss = losses.sum/total_steps
         logging.info(
             "Test:\t"
             "Time {batch_time.avg:.3f}\t"
-            "Loss {loss.avg:.4f}\t"
+            "Loss {loss:.4f}\t"
             "Acc@1 {top1:.3f}\t"
             "Best Acc@1 so far {acc:.1f}".format(
-                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_trainer_acc))
+                batch_time=batch_time, loss=avg_loss, top1=epoch_acc, acc=self.best_trainer_acc))
 
-        return losses.avg
+        return avg_loss
 
 
     def train_finetuner(self, model, epoch, criterion, optimizer, scheduler, train_loader):
@@ -319,6 +324,7 @@ class PretextTrainer():
 
         model.train()
         end = time.time()
+        total_steps = 0
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
             
             # update learning rate
@@ -358,9 +364,12 @@ class PretextTrainer():
                         loss=losses, lr=optimizer.param_groups[0]["lr"],
                     )
                 )
+
+            total_steps = step
+        avg_loss = losses.sum/total_steps
             
-        logging.info("Train Loss: {:.4f}".format(losses.avg))
-        return losses.avg
+        logging.info("Train Loss: {:.4f}".format(avg_loss))
+        return avg_loss
 
     def finetuner(self, model):
         train_loader, test_loader = get_target_pretrain_ds(
@@ -391,8 +400,7 @@ class PretextTrainer():
             state, train_params,
             train_loader=train_loader)
 
-        counter = 0
-
+        early_stopping = EarlyStopping(tolerance=5, min_delta=0.0005)
         for epoch in range(self.args.al_finetune_trainer_epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
@@ -404,10 +412,8 @@ class PretextTrainer():
             if self.args.al_optimizer != "SwAV":
                 scheduler.step()
 
-            if eval_loss - train_loss > 0.0005:
-                counter += 1
-
-            if counter >= 8:
+            early_stopping(train_loss, eval_loss)
+            if early_stopping.early_stop:
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
