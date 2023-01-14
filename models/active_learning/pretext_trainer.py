@@ -378,7 +378,7 @@ class PretextTrainer():
             epoch_loss, epoch_acc = accuracy(loss_avg.item(), correct, train_loader)
             epoch_acc = epoch_acc * 100.0
 
-            logging.info("Train Loss {:.4f}", epoch_loss)
+            logging.info("Train Loss {:.4f}".format(epoch_loss))
 
         return epoch_loss, epoch_acc
 
