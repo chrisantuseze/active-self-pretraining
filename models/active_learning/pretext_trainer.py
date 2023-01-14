@@ -278,16 +278,16 @@ class PretextTrainer():
                 loss3 = criterion(outputs3, targets3)
                 loss_avg = (loss + loss1 + loss2 + loss3) / 4.
 
-                _, predicted = outputs.max(1)
-                _, predicted1 = outputs1.max(1)
-                _, predicted2 = outputs2.max(1)
-                _, predicted3 = outputs3.max(1)
+                _, predicted = torch.max(outputs, 1)
+                _, predicted1 = torch.max(outputs1, 1)
+                _, predicted2 = torch.max(outputs2, 1)
+                _, predicted3 = torch.max(outputs3, 1)
                 total += targets.size(0)*4
 
-                correct += predicted.eq(targets).sum().item()
-                correct += predicted1.eq(targets1).sum().item()
-                correct += predicted2.eq(targets2).sum().item()
-                correct += predicted3.eq(targets3).sum().item()
+                correct += torch.sum(predicted == targets)
+                correct += torch.sum(predicted1 == targets)
+                correct += torch.sum(predicted2 == targets)
+                correct += torch.sum(predicted3 == targets)
 
                 losses.update(loss_avg.item(), inputs[0].size(0))
                 
@@ -344,15 +344,15 @@ class PretextTrainer():
             loss3 = criterion(outputs3, targets3)
             loss_avg = (loss + loss1 + loss2 + loss3) / 4.
 
-            _, predicted = outputs.max(1)
-            _, predicted1 = outputs1.max(1)
-            _, predicted2 = outputs2.max(1)
-            _, predicted3 = outputs3.max(1)
+            _, predicted = torch.max(outputs, 1)
+            _, predicted1 = torch.max(outputs1, 1)
+            _, predicted2 = torch.max(outputs2, 1)
+            _, predicted3 = torch.max(outputs3, 1)
 
-            correct += predicted.eq(targets).sum().item()
-            correct += predicted1.eq(targets1).sum().item()
-            correct += predicted2.eq(targets2).sum().item()
-            correct += predicted3.eq(targets3).sum().item()
+            correct += torch.sum(predicted == targets)
+            correct += torch.sum(predicted1 == targets)
+            correct += torch.sum(predicted2 == targets)
+            correct += torch.sum(predicted3 == targets)
 
             loss_avg.backward()
             optimizer.step()
