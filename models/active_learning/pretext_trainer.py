@@ -412,7 +412,7 @@ class PretextTrainer():
             if self.args.al_optimizer != "SwAV":
                 scheduler.step()
 
-            if epoch_acc < self.best_trainer_acc:
+            if epoch_acc <= self.best_trainer_acc:
                 counter += 1
             else:
                 counter = 0
