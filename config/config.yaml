@@ -41,7 +41,7 @@ dcl_base_lr: 0.03                         # 0.03 * batch_size/256
 #########################
 nmb_crops: [2]                    
 size_crops: [224]
-min_scale_crops: [0.14]
+min_scale_crops: [0.14] #[0.2]
 max_scale_crops: [1]
 
 #########################

@@ -17,7 +17,7 @@ class TransformsDCL():
         )
         self.train_transform = transforms.Compose(
             [
-                transforms.RandomResizedCrop(size=size),
+                transforms.RandomResizedCrop(size, scale=(0.2, 1.0)),
                 transforms.RandomHorizontalFlip(p=0.5),  # with 0.5 probability
                 transforms.RandomApply([color_jitter], p=0.8),
                 transforms.RandomGrayscale(p=0.2),
