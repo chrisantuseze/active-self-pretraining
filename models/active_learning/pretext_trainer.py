@@ -417,7 +417,7 @@ class PretextTrainer():
             else:
                 counter = 0
 
-            if counter > 10:
+            if counter > 20:
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
