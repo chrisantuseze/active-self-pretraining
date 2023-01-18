@@ -10,7 +10,7 @@ from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 
-class LinearClassifier():
+class LCDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir

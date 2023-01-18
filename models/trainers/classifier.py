@@ -6,7 +6,7 @@ import copy
 import utils.logger as logging
 from datautils.dataset_enum import DatasetType, get_dataset_enum
 
-from datautils.finetune_dataset import LinearClassifier
+from datautils.lc_dataset import LCDataset
 from models.backbones.resnet import resnet_backbone
 from models.heads.logloss_head import LogLossHead
 from optim.optimizer import load_optimizer
@@ -52,7 +52,7 @@ class Classifier:
         self.best_acc = 0
 
     def train_and_eval(self, pretrain_data=None) -> None:
-        train_loader, val_loader = LinearClassifier(
+        train_loader, val_loader = LCDataset(
             self.args, dir=self.dir, 
             training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=pretrain_data)
 

@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
-from datautils.finetune_dataset import LinearClassifier
+from datautils.lc_dataset import LCDataset
 from models.self_sup.swav.utils import accuracy, initialize_exp
 from models.utils.commons import AverageMeter, get_ds_num_classes, get_params
 from models.utils.training_type_enum import TrainingType
@@ -55,7 +55,7 @@ class Classifier2():
         cudnn.benchmark = True
 
     def train_and_eval(self):
-        train_loader, val_loader = LinearClassifier(
+        train_loader, val_loader = LCDataset(
             self.args, dir=self.dir, 
             training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=None)
             
