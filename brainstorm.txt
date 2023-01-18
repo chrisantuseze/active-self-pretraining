@@ -21,12 +21,12 @@ second pretraining
 - Try to vary the lr and batch size to see if the performance can be improved
 - Why do literature care about number of iterations? Is the number of epochs and batch size not enough?
 
+- Check if catastrophic forgetting occurred by carrying out linear classification on the target model with imagenet ds.
+- Add to the target ds one example from each class of the source ds as episodic memory. Or, after training on the target ds, 
+train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
+- Cluster the ds and pick one example from each cluster
 
-TODO: 
-
-- Check out the Decoupled Contrastive Learning Loss paper and code for the proposed approach to improve accuracy even with small batch size and epochs
-- https://github.com/alibaba/EasyCV has a swav implementation that might work
-- https://github.com/HobbitLong/SupContrast has a good implementation of simclr
+- Why doesn't the performance improve when a new MLP is added? Perhaps it was frozen?
 
 ssh e_chrisantus@robcog.cs.okstate.edu
 Eze@33963003
