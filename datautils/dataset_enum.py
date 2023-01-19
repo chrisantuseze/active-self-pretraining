@@ -35,7 +35,7 @@ def get_dataset_enum(value: int):
         return "eurosat"
 
     if value == DatasetType.FOOD101.value:
-        return "food101"
+        return "food-101"
 
     if value == DatasetType.CLIPART.value:
         return "clipart"

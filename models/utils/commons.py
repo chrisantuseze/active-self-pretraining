@@ -202,7 +202,7 @@ def get_ds_num_classes(dataset):
 
     elif dataset == DatasetType.FOOD101.value:
         num_classes = 101
-        dir = "/food101"
+        dir = "/food-101/images"
 
     elif dataset == DatasetType.CLIPART.value:
         num_classes = 345

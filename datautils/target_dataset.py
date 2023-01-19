@@ -129,7 +129,7 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
 
     elif args.target_dataset == dataset_enum.DatasetType.FOOD101.value:
         print("using the FOOD101 dataset")
-        return TargetDataset(args, "/food101", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/food-101/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
         print("using the CLIPART dataset")
