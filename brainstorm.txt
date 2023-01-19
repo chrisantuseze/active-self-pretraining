@@ -28,6 +28,8 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 
 - Why doesn't the performance improve when a new MLP is added? Perhaps it was frozen?
 
+- Improved on SwAV by increasing the MLP ~ Lifelong Pretraining: Continually Adapting Language Models to Emerging Corpora
+
 ssh e_chrisantus@robcog.cs.okstate.edu
 Eze@33963003
 
