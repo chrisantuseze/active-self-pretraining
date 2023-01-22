@@ -365,7 +365,7 @@ def resnet50w5(**kwargs):
 
 class AdaptiveBatchNorm2d(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1, affine=True):
-        super(AdaptiveBatchNorm2d, self).__init__()
+        super(AdaptiveBatchNorm2d, self).__init__(num_features=num_features)
         self.bn = nn.BatchNorm2d(num_features, eps, momentum, affine)
         self.a = nn.Parameter(torch.FloatTensor(1, 1, 1, 1))
         self.b = nn.Parameter(torch.FloatTensor(1, 1, 1, 1))
