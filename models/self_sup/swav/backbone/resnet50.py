@@ -95,7 +95,7 @@ class Bottleneck(nn.Module):
     ):
         super(Bottleneck, self).__init__()
         if norm_layer is None:
-            norm_layer = AdaptiveBatchNorm2d #nn.BatchNorm2d
+            norm_layer = nn.BatchNorm2d
         width = int(planes * (base_width / 64.0)) * groups
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
@@ -150,7 +150,7 @@ class ResNet(nn.Module):
     ):
         super(ResNet, self).__init__()
         if norm_layer is None:
-            norm_layer = AdaptiveBatchNorm2d #nn.BatchNorm2d
+            norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
         self.eval_mode = eval_mode
