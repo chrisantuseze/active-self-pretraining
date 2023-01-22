@@ -363,7 +363,7 @@ def resnet50w5(**kwargs):
     return ResNet(Bottleneck, [3, 4, 6, 3], widen=5, **kwargs)
 
 
-class AdaptiveBatchNorm2d(nn.Module):
+class AdaptiveBatchNorm2d(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1, affine=True):
         super(AdaptiveBatchNorm2d, self).__init__()
         self.bn = nn.BatchNorm2d(num_features, eps, momentum, affine)
