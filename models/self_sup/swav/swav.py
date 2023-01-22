@@ -53,8 +53,8 @@ class SwAVTrainer():
                 self.model.load_state_dict(state['model'], strict=False)
 
             # freeze some layers
-            print(self.model.named_parameters())
             for name, param in self.model.named_parameters():
+                print(name, param)
                 if 'projection_head' in name or 'prototypes' in name:
                     continue
                 param.requires_grad = False
