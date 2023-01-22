@@ -57,7 +57,7 @@ class SwAVTrainer():
                 if 'projection_head' in name or 'prototypes' in name:
                     continue
 
-                if ('layer4' in name or 'layer3' in name) and 'bn' in name:
+                if 'bn' in name:
                     # print(name)
                     continue
 
