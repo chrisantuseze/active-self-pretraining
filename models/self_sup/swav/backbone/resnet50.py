@@ -95,7 +95,7 @@ class Bottleneck(nn.Module):
     ):
         super(Bottleneck, self).__init__()
         if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
+            norm_layer = AdaptiveBatchNorm2d #nn.BatchNorm2d
         width = int(planes * (base_width / 64.0)) * groups
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
@@ -150,7 +150,7 @@ class ResNet(nn.Module):
     ):
         super(ResNet, self).__init__()
         if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
+            norm_layer = AdaptiveBatchNorm2d #nn.BatchNorm2d
         self._norm_layer = norm_layer
 
         self.eval_mode = eval_mode
@@ -226,7 +226,7 @@ class ResNet(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm, AdaptiveBatchNorm2d)):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
 
@@ -361,3 +361,14 @@ def resnet50w4(**kwargs):
 
 def resnet50w5(**kwargs):
     return ResNet(Bottleneck, [3, 4, 6, 3], widen=5, **kwargs)
+
+
+class AdaptiveBatchNorm2d(nn.Module):
+    def __init__(self, num_features, eps=1e-5, momentum=0.1, affine=True):
+        super(AdaptiveBatchNorm2d, self).__init__()
+        self.bn = nn.BatchNorm2d(num_features, eps, momentum, affine)
+        self.a = nn.Parameter(torch.FloatTensor(1, 1, 1, 1))
+        self.b = nn.Parameter(torch.FloatTensor(1, 1, 1, 1))
+
+    def forward(self, x):
+        return self.a * x + self.b * self.bn(x)
