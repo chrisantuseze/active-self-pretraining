@@ -58,7 +58,7 @@ class SwAVTrainer():
                     continue
 
                 if ('layer4' in name or 'layer3' in name) and 'bn' in name:
-                    print(name)
+                    # print(name)
                     continue
 
                 param.requires_grad = False
