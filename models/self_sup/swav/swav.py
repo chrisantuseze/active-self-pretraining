@@ -57,8 +57,7 @@ class SwAVTrainer():
                 if 'projection_head' in name or 'prototypes' in name:
                     continue
 
-                if 'bn' in name:
-                    print(name, param)
+                if 'bn' in name and 'bias' in name:
                     continue
 
                 param.requires_grad = False
