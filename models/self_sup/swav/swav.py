@@ -58,6 +58,7 @@ class SwAVTrainer():
                     continue
 
                 if 'bn' in name and 'weight' in name:
+                    print(name)
                     continue
 
                 param.requires_grad = False
