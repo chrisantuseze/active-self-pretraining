@@ -54,11 +54,13 @@ class SwAVTrainer():
 
             # freeze some layers
             for name, param in self.model.named_parameters():
-                if 'projection_head' in name or 'prototypes' in name:
+                # if 'projection_head' in name or 'prototypes' in name:
+                #     continue
+
+                if 'prototypes' in name:
                     continue
 
-                if 'bn' in name and 'weight' in name:
-                    print(name)
+                if 'bn' in name and 'bias' in name:
                     continue
 
                 param.requires_grad = False
