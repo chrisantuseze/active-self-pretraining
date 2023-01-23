@@ -26,9 +26,13 @@ second pretraining
 train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 - Cluster the ds and pick one example from each cluster
 
-- Why doesn't the performance improve when a new MLP is added? Perhaps it was frozen?
+- Why doesn't the performance improve when a new MLP is added? Perhaps it was frozen? It actually does
 
 - Improved on SwAV by increasing the MLP ~ Lifelong Pretraining: Continually Adapting Language Models to Emerging Corpora
+
+- Unfreeze and train the bias parameters of the BN layers. This improved performance from 96.9 to 97.38 on UCMerced
+
+In the paper, include those BN equations
 
 ssh e_chrisantus@robcog.cs.okstate.edu
 Eze@33963003
