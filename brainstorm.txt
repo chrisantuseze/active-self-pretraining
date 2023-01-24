@@ -32,7 +32,15 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 
 - Unfreeze and train the bias parameters of the BN layers. This improved performance from 96.9 to 97.38 on UCMerced
 
-In the paper, include those BN equations
+- Freezing the MLP had a performance decline down to 92.62
+
+- In the paper, include those BN equations
+
+- Why I won't be using some GAN papers:
+1. Generate To Adapt: Aligning Domains using Generative Adversarial Networks - No pt model. Uses source data
+2. Transferring GANs: generating images from limited data - Uses TF
+3. Image Generation From Small Datasets via Batch Statistics Adaptation - This is old (3yrs)
+4. MineGAN: effective knowledge transfer from GANs to target domains with few images 
 
 ssh e_chrisantus@robcog.cs.okstate.edu
 Eze@33963003

@@ -12,3 +12,5 @@ lightning_logs/
 main.sublime-workspace
 *.log
 *.pem
+*.zip
+*.pth
