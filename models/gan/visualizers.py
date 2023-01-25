@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import truncnorm
 
 def reconstruct(model, out_path, num, add_small_noise=False):
-    for i in range(num):
+    for i in range(1, num+1):
         with torch.no_grad():
             model.eval()
             device = next(model.parameters()).device
@@ -33,7 +33,7 @@ def reconstruct(model, out_path, num, add_small_noise=False):
         
 #see https://github.com/nogu-atsu/SmallGAN/blob/2293700dce1e2cd97e25148543532814659516bd/gen_models/ada_generator.py#L37-L53
 def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
-    for i in range(num):
+    for i in range(1, num+1):
         with torch.no_grad():
             model.eval()
             device = next(model.parameters()).device
@@ -53,7 +53,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
 
 #from https://github.com/nogu-atsu/SmallGAN/blob/2293700dce1e2cd97e25148543532814659516bd/gen_models/ada_generator.py#L37-L53        
 def random(model, out_path, tmp=0.4, num=9, truncate=False):
-    for i in range(num):
+    for i in range(1, num+1):
         with torch.no_grad():
             model.eval()
             device = next(model.parameters()).device
