@@ -34,7 +34,7 @@ class AverageMeter(object):
 
 def argparse_setup():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default="anime", help = "dataset. anime or face. ")
+    parser.add_argument('--dataset', type=str, default="face", help = "dataset. anime or face. ")
     parser.add_argument('--pretrained', type=str, default="./data/G_ema.pth", help = "pretrained BigGAN model")
 
 
@@ -176,9 +176,9 @@ def main(args):
                 print(iteration,temp)
                 losses = AverageMeter()
                 
-            if iteration%eval_freq==0 and iteration>0:
-                img_prefix = os.path.join(checkpoint_dir, "%d_"%iteration) 
-                generate_samples(model, img_prefix, dataloader.batch_size)
+            # if iteration%eval_freq==0 and iteration>0:
+            #     img_prefix = os.path.join(checkpoint_dir, "%d_"%iteration) 
+            #     generate_samples(model, img_prefix, dataloader.batch_size)
                 
             if iteration%save_freq==0 and iteration>0:
                 # save_checkpoint(checkpoint_dir,device,model,iteration=iteration )
@@ -193,6 +193,9 @@ def main(args):
         if iteration > max_iteration:
             break
         epoch+=1
+
+    img_prefix = os.path.join(checkpoint_dir, "%d_"%iteration) 
+    generate_samples(model, img_prefix, dataloader.batch_size)
     
     log_save_path = os.path.join(checkpoint_dir,"train-log.json")
     # save_json(log,log_save_path)

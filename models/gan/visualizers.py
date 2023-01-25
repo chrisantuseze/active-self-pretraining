@@ -50,7 +50,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
                 torchvision.utils.save_image(
                     val,
                     f"{out_path}interpolate_{i}.jpg",
-                    nrow=1,#batch_size,
+                    nrow=1,
                     normalize=True,
                 )
 
@@ -72,6 +72,6 @@ def random(model, out_path, tmp=0.4, num=9, truncate=False):
             torchvision.utils.save_image(
                     image_tensors,
                     f"{out_path}random_{i}.jpg",
-                    nrow=1,#int(batch_size ** 0.5),
+                    nrow=1,
                     normalize=True,
                 )
