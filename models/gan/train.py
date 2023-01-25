@@ -98,7 +98,7 @@ def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed
 def main(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    checkpoint_dir = os.path.join(args.model_checkpoint_path)
+    checkpoint_dir = os.path.join(args.checkpoint_path)
     
     dataloader = setup_dataloader(name=args.dataset,
                                    batch_size=args.batch,
