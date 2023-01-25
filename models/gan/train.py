@@ -71,7 +71,7 @@ def argparse_setup():
 
     parser.add_argument('-p', '--print-freq', default=100, type=int, help='print frequency ')
 
-    parser.add_argument('--checkpoint_path', type=str, default="models/gan/data/checkpoints", help='model checkpoint path')
+    parser.add_argument('--checkpoint_path', type=str, default="./data/checkpoints", help='model checkpoint path')
     return parser.parse_args()
 
 
