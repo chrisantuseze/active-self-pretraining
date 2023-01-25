@@ -10,6 +10,8 @@ def reconstruct(model, out_path, num, add_small_noise=False):
             device = next(model.parameters()).device
             dataset_size = model.embeddings.weight.size()[0]
 
+            i = torch.arange(i)
+
             assert type(i) == torch.Tensor
 
             i = i.to(device)        

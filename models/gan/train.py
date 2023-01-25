@@ -76,8 +76,8 @@ def argparse_setup():
 
 
 
-def generate_samples(model,img_prefix,batch_size):
-    visualizers.reconstruct(model, img_prefix + "reconstruct.jpg", torch.arange(batch_size), True)
+def generate_samples(model,img_prefix, batch_size):
+    visualizers.reconstruct(model, img_prefix + "reconstruct.jpg", num=batch_size, add_small_noise=True)
     visualizers.interpolate(model, img_prefix + "interpolate.jpg", source=0, dist=1, trncate=0.3, num=7)
     visualizers.random(model, img_prefix + "random.jpg", tmp=0.3, num=9, truncate=True)
 
