@@ -46,6 +46,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
             image_tensors = model(embeddings)
 
             for i, val in enumerate(image_tensors):
+                print(val)
                 torchvision.utils.save_image(
                     val,
                     f"{out_path}interpolate_{i}.jpg",
