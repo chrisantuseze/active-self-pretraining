@@ -71,17 +71,17 @@ def argparse_setup():
 
     parser.add_argument('-p', '--print-freq', default=100, type=int, help='print frequency ')
 
-    parser.add_argument('--model_checkpoint_path', type=str, default="save/checkpoints", help='model checkpoint path')
+    parser.add_argument('--checkpoint_path', type=str, default="models/gan/data/checkpoints", help='model checkpoint path')
     return parser.parse_args()
 
 
 
 def generate_samples(model,img_prefix,batch_size):
-    visualizers.reconstruct(model,img_prefix+"reconstruct.jpg",torch.arange(batch_size),True)
-    visualizers.interpolate(model,img_prefix+"interpolate.jpg",source=0,dist=1,trncate=0.3, num=7)
-    visualizers.random(model,img_prefix+"random.jpg",tmp=0.3, n=9, truncate=True)
+    visualizers.reconstruct(model, img_prefix + "reconstruct.jpg", torch.arange(batch_size), True)
+    visualizers.interpolate(model, img_prefix + "interpolate.jpg", source=0, dist=1, trncate=0.3, num=7)
+    visualizers.random(model, img_prefix + "random.jpg", tmp=0.3, n=9, truncate=True)
 
-def setup_optimizer(model,lr_g_batch_stat,lr_g_linear,lr_bsa_linear,lr_embed,lr_class_cond_embed,step,step_facter=0.1):
+def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_facter=0.1):
     #group parameters by lr
     params = []
     params.append({"params":list(model.batch_stat_gen_params().values()), "lr":lr_g_batch_stat})
@@ -160,8 +160,8 @@ def main(args):
             #see https://github.com/nogu-atsu/SmallGAN/blob/f604cd17516963d8eec292f3faddd70c227b609a/gen_models/ada_generator.py#L29
             
             #forward
-            img_generated = model(embeddings+embeddings_eps)
-            loss = criterion(img_generated,img,embeddings,model.linear.weight)
+            img_generated = model(embeddings + embeddings_eps)
+            loss = criterion(img_generated, img, embeddings, model.linear.weight)
             losses.update(loss.item(), img.size(0))
 
             #compute gradient and do SGD step
@@ -178,7 +178,7 @@ def main(args):
                 
             if iteration%eval_freq==0 and iteration>0:
                 img_prefix = os.path.join(checkpoint_dir, "%d_"%iteration) 
-                generate_samples(model,img_prefix,dataloader.batch_size)
+                generate_samples(model, img_prefix, dataloader.batch_size)
                 
             if iteration%save_freq==0 and iteration>0:
                 # save_checkpoint(checkpoint_dir,device,model,iteration=iteration )

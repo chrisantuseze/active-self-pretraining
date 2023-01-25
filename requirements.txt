@@ -6,3 +6,4 @@ torchvision
 tensorboard
 PyYAML
 scipy
+tqdm

@@ -3,17 +3,21 @@ import torchvision
 import numpy as np
 from scipy.stats import truncnorm
 
-def reconstruct(model,out_path,indices,add_small_noise=False):
+def reconstruct(model, out_path, indices, add_small_noise=False):
     with torch.no_grad():
         model.eval()
         device = next(model.parameters()).device
         dataset_size = model.embeddings.weight.size()[0]
-        assert type(indices)==torch.Tensor
+
+        assert type(indices) == torch.Tensor
+
         indices = indices.to(device)        
         embeddings = model.embeddings(indices)
         batch_size = embeddings.size()[0]
+
         if add_small_noise:
-             embeddings += torch.randn(embeddings.size(),device=device)*0.01
+             embeddings += torch.randn(embeddings.size(), device=device) * 0.01
+
         image_tensors = model(embeddings)
         torchvision.utils.save_image(
             image_tensors,
