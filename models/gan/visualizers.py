@@ -10,12 +10,12 @@ def reconstruct(model, out_path, num, add_small_noise=False):
             device = next(model.parameters()).device
             dataset_size = model.embeddings.weight.size()[0]
 
-            i = torch.arange(i)
+            indices = torch.arange(i)
 
-            assert type(i) == torch.Tensor
+            assert type(indices) == torch.Tensor
 
-            i = i.to(device)        
-            embeddings = model.embeddings(i)
+            indices = indices.to(device)        
+            embeddings = model.embeddings(indices)
             batch_size = embeddings.size()[0]
 
             if add_small_noise:
@@ -26,7 +26,7 @@ def reconstruct(model, out_path, num, add_small_noise=False):
             print(len(image_tensors), image_tensors.shape)
             torchvision.utils.save_image(
                 image_tensors,
-                f"_{i}_" + out_path,
+                f"{out_path}reconstruct_{i}.jpg",
                 nrow=1,#int(batch_size ** 0.5),
                 normalize=True,
             )
@@ -46,7 +46,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
             image_tensors = model(embeddings)
             torchvision.utils.save_image(
                 image_tensors,
-                f"_{i}_" + out_path,
+                f"{out_path}interpolate_{i}.jpg",
                 nrow=1,#batch_size,
                 normalize=True,
             )
@@ -68,7 +68,7 @@ def random(model, out_path, tmp=0.4, num=9, truncate=False):
             image_tensors = model(embeddings)
             torchvision.utils.save_image(
                     image_tensors,
-                    f"_{i}_" + out_path,
+                    f"{out_path}random_{i}.jpg",
                     nrow=1,#int(batch_size ** 0.5),
                     normalize=True,
                 )
