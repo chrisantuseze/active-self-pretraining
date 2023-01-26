@@ -15,6 +15,8 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
         img_path_list = glob.glob("./data/anime/*.png")
     else:
         raise NotImplementedError("Unknown dataset %s"%name)
+
+    print(img_path_list)
         
     assert len(img_path_list) > 0
 
