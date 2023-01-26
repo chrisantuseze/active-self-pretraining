@@ -37,7 +37,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
             model.eval()
             device = next(model.parameters()).device
             dataset_size = model.embeddings.weight.size()[0]
-            indices = torch.tensor([source,dist],device=device)
+            indices = torch.tensor([source,dist], device=device)
 
             indices = indices.to(device) 
             embeddings = model.embeddings(indices)
