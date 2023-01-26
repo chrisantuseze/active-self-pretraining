@@ -11,7 +11,6 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
     '''
     if name == "face":
         img_path_list = glob.glob("./data/ucmerced/images/*/*")#"./data/face/*.png")
-        print(img_path_list)
     elif name=="anime":
         img_path_list = glob.glob("./data/anime/*.png")
     else:
