@@ -61,7 +61,7 @@ def argparse_setup():
     parser.add_argument('--step-facter', type=float, default=0.1, help="facter to multipy when decrease lr ")
 
     parser.add_argument('--iters', type=int, default=10000, help="number of iterations.")
-    parser.add_argument('--batch', type=int, default=32, help="batch size")
+    parser.add_argument('--batch', type=int, default=25, help="batch size")
     parser.add_argument('--workers', type=int, default=4, help="number of processes to make batch worker. default is 8")
     parser.add_argument('--model', type=str,default = "biggan128-ada", help = "model. biggan128-ada")
 
@@ -78,7 +78,7 @@ def argparse_setup():
 
 def generate_samples(model,img_prefix, batch_size):
     # visualizers.reconstruct(model, img_prefix, num=batch_size, add_small_noise=True)
-    visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=100)
+    visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=200)
     # visualizers.random(model, img_prefix, tmp=0.3, num=9, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_facter=0.1):
