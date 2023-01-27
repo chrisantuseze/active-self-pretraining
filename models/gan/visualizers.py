@@ -37,7 +37,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
             model.eval()
             device = next(model.parameters()).device
             dataset_size = model.embeddings.weight.size()[0]
-            indices = torch.tensor([source,dist], device=device)
+            indices = torch.tensor([source, dist], device=device)
 
             indices = indices.to(device) 
             embeddings = model.embeddings(indices)
@@ -55,22 +55,21 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
 
 #from https://github.com/nogu-atsu/SmallGAN/blob/2293700dce1e2cd97e25148543532814659516bd/gen_models/ada_generator.py#L37-L53        
 def random(model, out_path, tmp=0.4, num=9, truncate=False):
-    for i in range(1, num+1):
-        with torch.no_grad():
-            model.eval()
-            device = next(model.parameters()).device
-            dataset_size = model.embeddings.weight.size()[0]
-            dim_z = model.embeddings.weight.size(1)
-            if truncate:
-                embeddings = truncnorm(-tmp, tmp).rvs(i * dim_z).astype("float32").reshape(i, dim_z)
-            else:
-                embeddings = np.random.normal(0, tmp, size=(i, dim_z)).astype("float32")
-            embeddings = torch.tensor(embeddings,device=device)
-            batch_size = embeddings.size()[0]
-            image_tensors = model(embeddings)
+    with torch.no_grad():
+        model.eval()
+        device = next(model.parameters()).device
+        dim_z = model.embeddings.weight.size(1)
+        if truncate:
+            embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
+        else:
+            embeddings = np.random.normal(0, tmp, size=(num, dim_z)).astype("float32")
+        embeddings = torch.tensor(embeddings,device=device)
+
+        image_tensors = model(embeddings)
+        for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
-                    image_tensors,
-                    f"{out_path}random_{i}.jpg",
-                    nrow=1,
-                    normalize=True,
-                )
+                val,
+                f"{out_path}random_{i}.jpg",
+                nrow=1,
+                normalize=True,
+            )

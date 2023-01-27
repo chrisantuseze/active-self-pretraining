@@ -22,7 +22,7 @@ bigagn128config = {'dataset': 'I128_hdf5',
  'D_depth': 1,
  'D_wide': True,
  'G_shared': True,
- 'shared_dim': 128,
+ 'shared_dim': 256,#128,
  'dim_z': 120,
  'z_var': 1.0,
  'hier': True,
@@ -111,12 +111,12 @@ bigagn128config = {'dataset': 'I128_hdf5',
  'no_optim': True,
  'device': 'cpu'}
 
-def setup_model(name,dataset_size,resume=None,biggan_imagenet_pretrained_model_path="./data/G_ema.pth"):
+def setup_model(name, dataset_size, resume=None, model_path="./data/G_ema.pth"):
     print("model name:",name)
     if name=="biggan128-ada":
         G = biggan.Generator(**bigagn128config)
-        G.load_state_dict(torch.load(biggan_imagenet_pretrained_model_path,map_location=lambda storage, loc: storage))
-        model = AdaBIGGAN(G,dataset_size=dataset_size)
+        G.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
+        model = AdaBIGGAN(G, dataset_size=dataset_size)
     else:
         print("%s (model name) is not defined"%name)
         raise NotImplementedError()

@@ -78,8 +78,8 @@ def argparse_setup():
 
 def generate_samples(model,img_prefix, batch_size):
     # visualizers.reconstruct(model, img_prefix, num=batch_size, add_small_noise=True)
-    visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=200)
-    # visualizers.random(model, img_prefix, tmp=0.3, num=9, truncate=True)
+    # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=200)
+    visualizers.random(model, img_prefix, tmp=0.3, num=9, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_facter=0.1):
     #group parameters by lr
@@ -108,7 +108,7 @@ def main(args):
     dataset_size = len(dataloader.dataset)
     print("number of images (dataset size): ",dataset_size)
     
-    model = setup_model(args.model,dataset_size=dataset_size,resume=args.resume,biggan_imagenet_pretrained_model_path=args.pretrained)
+    model = setup_model(args.model, dataset_size=dataset_size, resume=args.resume, model_path=args.pretrained)
     model.eval()
     #this has to be eval() even if it's training time
     #because we want to fix batchnorm running mean and var
@@ -156,7 +156,7 @@ def main(args):
             
             #embeddings (i.e. z) + noise (i.e. epsilon) 
             embeddings = model.embeddings(indices)
-            embeddings_eps = torch.randn(embeddings.size(),device=device)*0.01
+            embeddings_eps = torch.randn(embeddings.size(), device=device)*0.01
             #see https://github.com/nogu-atsu/SmallGAN/blob/f604cd17516963d8eec292f3faddd70c227b609a/gen_models/ada_generator.py#L29
             
             #forward
