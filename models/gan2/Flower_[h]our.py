@@ -86,7 +86,7 @@ image_path = main_path + 'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
-epochs = 2 #500 *10000
+epochs = 10 #500 *10000
 
 load_dir = './pretrained_model/'
 
@@ -170,10 +170,10 @@ for choose in range(1):
         ''' --------- Choose the fixed layer ---------------'''
         generator, discriminator = build_models(config)
 
-        # dict_G = torch.load(load_dir + DATA_FIX + 'Pre_generator')
-        # generator = model_equal_part(generator, dict_G)
-        # dict_D = torch.load(load_dir + DATA_FIX + 'Pre_discriminator')
-        # discriminator = model_equal_part(discriminator, dict_D)
+        dict_G = torch.load(load_dir + DATA_FIX + 'Pre_generator')
+        generator = model_equal_part(generator, dict_G)
+        dict_D = torch.load(load_dir + DATA_FIX + 'Pre_discriminator')
+        discriminator = model_equal_part(discriminator, dict_D)
 
         for name, param in generator.named_parameters():
             if name.find('small') >= 0:
@@ -190,16 +190,9 @@ for choose in range(1):
         #toggle_grad_G(generator, True, G_Layer_FIX)
         toggle_grad_D(discriminator, True, D_Layer_FIX)
 
-
-
-
-
         # Put models on gpu if needed
         generator, discriminator = generator.to(device), discriminator.to(device)
         g_optimizer, d_optimizer = build_optimizers(generator, discriminator, config)
-
-        # summary(generator, input_size=[(256,), (1,)])
-        # summary(discriminator, input_size=[(3, 128, 128), (1,)])
 
         # Register modules to checkpoint
         checkpoint_io.register_modules(
@@ -328,26 +321,6 @@ for choose in range(1):
                             dlr=dlr
                         )
                     )
-                    
-                    info('Creating samples...')
-                    x, _ = evaluator.create_samples(ztest, ytest)
-                    logger.add_imgs(x, 'all', step, nrow=10)
-
-                # (ii) Compute inception if necessary
-                # if inception_every > 0 and ((it + 2) % inception_every) == 0:
-                #     inception_mean, inception_std, fid = evaluator.compute_inception_score()
-                #     inception_mean_all.append(inception_mean)
-                #     inception_std_all.append(inception_std)
-                #     fid_all.append(fid)
-                #     print('test it %d: IS: mean %.2f, std %.2f, FID: mean %.2f, time: %2f' % (
-                #         it, inception_mean, inception_std, fid, time.time() - tstart))
-
-                #     FID = np.stack(fid_all)
-                #     Inception_mean = np.stack(inception_mean_all)
-                #     Inception_std = np.stack(inception_std_all)
-                #     sio.savemat(config['training']['out_dir'] + DATA + 'base_FID_IS.mat', {'FID': FID,
-                #                                            'Inception_mean': Inception_mean,
-                #                                            'Inception_std': Inception_std})
 
                 # (iii) Backup if necessary
                 if ((step + 1) % backup_every) == 0:
@@ -356,5 +329,9 @@ for choose in range(1):
                     TrainModeSave = DATA + '_%08d_' % step
                     torch.save(generator_test.state_dict(), save_dir + TrainModeSave + 'Pre_generator')
                     torch.save(discriminator.state_dict(), save_dir + TrainModeSave + 'Pre_discriminator')
+
+    info('Creating samples...')
+    x, _ = evaluator.create_samples(ztest, ytest)
+    logger.add_imgs(x, 'all', step, nrow=10)
 
 

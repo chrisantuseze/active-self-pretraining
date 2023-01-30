@@ -61,7 +61,6 @@ class Logger(object):
             os.makedirs(outdir)
         outfile = os.path.join(outdir, '%08d' % it)
 
-        imgs = imgs / 2 + 0.5
         # imgs = torchvision.utils.make_grid(imgs, nrow=nrow)
 
         for i, val in enumerate(imgs):
