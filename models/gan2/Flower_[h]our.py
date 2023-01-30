@@ -88,7 +88,7 @@ is_control_kernel = True
 DATA_FIX = 'ImageNet'
 epochs = 10 #500 *10000
 
-load_dir = './pretrained_model/'
+load_dir = main_path + 'pretrained_model/'
 
 if is_control_kernel:
     out_path = main_path + 'save/' + DATA + '_our_AdaFM/'
@@ -170,10 +170,11 @@ for choose in range(1):
         ''' --------- Choose the fixed layer ---------------'''
         generator, discriminator = build_models(config)
 
-        dict_G = torch.load(load_dir + DATA_FIX + 'Pre_generator')
-        generator = model_equal_part(generator, dict_G)
-        dict_D = torch.load(load_dir + DATA_FIX + 'Pre_discriminator')
-        discriminator = model_equal_part(discriminator, dict_D)
+        if os.path.exists(load_dir + DATA_FIX):
+            dict_G = torch.load(load_dir + DATA_FIX + 'Pre_generator')
+            generator = model_equal_part(generator, dict_G)
+            dict_D = torch.load(load_dir + DATA_FIX + 'Pre_discriminator')
+            discriminator = model_equal_part(discriminator, dict_D)
 
         for name, param in generator.named_parameters():
             if name.find('small') >= 0:
