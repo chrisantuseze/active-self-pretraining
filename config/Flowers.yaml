@@ -36,7 +36,7 @@ training:
   model_average_beta: 0.999
   model_average_reinit: false
   monitoring: none
-  sample_every: 100
+  sample_every: 500
   sample_nlabels: 10
   inception_every: 50
   backup_every: 5000

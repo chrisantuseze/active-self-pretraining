@@ -83,7 +83,7 @@ image_path = main_path + 'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
-Num_epoch = 500 *10000
+Num_epoch = 10 #500 *10000
 
 load_dir = './pretrained_model/'
 
@@ -268,7 +268,7 @@ for choose in range(1):
 
 
     # Training loop
-    print('Start training...')
+    print(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epoches = {Num_epoch}')
     save_dir = config['training']['out_dir'] + '/models/'
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
@@ -278,9 +278,9 @@ for choose in range(1):
     inception_std_all = []
     fid_all = []
 
-    for epoch_idx in range(Num_epoch):
+    for epoch in range(Num_epoch):
         # epoch_idx += 1
-        print('Start epoch %d...' % epoch_idx)
+        print('Start epoch %d...' % epoch)
 
         for x_real, y in train_loader:
             it += 1
@@ -289,8 +289,6 @@ for choose in range(1):
 
             d_lr = d_optimizer.param_groups[0]['lr']
             g_lr = g_optimizer.param_groups[0]['lr']
-            # logger.add('learning_rates', 'discriminator', d_lr, it=it)
-            # logger.add('learning_rates', 'generator', g_lr, it=it)
 
             x_real, y = x_real.to(device), y.to(device)
             y.clamp_(None, nlabels-1)

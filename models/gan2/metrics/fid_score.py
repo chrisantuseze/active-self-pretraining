@@ -69,7 +69,8 @@ def get_activations(images,
         end = start + batch_size
 
         batch = torch.from_numpy(images[start:end]).type(torch.FloatTensor)
-        batch = Variable(batch, volatile=True)
+        with torch.no_grad():
+            batch = Variable(batch)
         if cuda:
             batch = batch.cuda()
 
