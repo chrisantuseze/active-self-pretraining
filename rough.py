@@ -2,8 +2,8 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
-    zip_ref.extractall("datasets/ucmerced")  
+with zipfile.ZipFile("datasets/102flowers.zip", 'r') as zip_ref:
+    zip_ref.extractall("datasets/102flowers")  
 
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]
