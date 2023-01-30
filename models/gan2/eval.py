@@ -2,6 +2,7 @@ import torch
 from metrics import inception_score
 from metrics.fid_score import calculate_fid_given_images
 import numpy as np
+from scipy.stats import truncnorm
 
 class Evaluator(object):
     def __init__(self, generator, zdist, ydist, batch_size=64,
@@ -54,6 +55,18 @@ class Evaluator(object):
             y = torch.full((batch_size,), y,
                            device=self.device, dtype=torch.int64)
         # Sample x
-        with torch.no_grad():
-            x = self.generator(z, y)
-        return x
+        # with torch.no_grad():
+        #     x = self.generator(z, y)
+
+        device = next(self.generator.parameters()).device
+        dim_z = self.generator.embeddings.weight.size(1)
+
+        tmp=0.3
+        num=200
+        
+        embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
+        embeddings = torch.tensor(embeddings,device=device)
+
+        image_tensors = self.generator(embeddings)
+
+        return image_tensors
