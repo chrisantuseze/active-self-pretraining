@@ -59,11 +59,11 @@ class Evaluator(object):
         #     x = self.generator(z, y)
 
         device = next(self.generator.parameters()).device
-        dim_z = self.generator.embeddings.weight.size(1)
+        dim_z = self.generator.embedding.weight.size(1)
 
         tmp=0.3
         num=200
-        
+
         embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
         embeddings = torch.tensor(embeddings,device=device)
 
