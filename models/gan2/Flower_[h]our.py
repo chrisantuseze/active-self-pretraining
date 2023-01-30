@@ -83,7 +83,7 @@ image_path = main_path + 'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
-Num_epoch = 10 #500 *10000
+Num_epoch = 2 #500 *10000
 
 load_dir = './pretrained_model/'
 
