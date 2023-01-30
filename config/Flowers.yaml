@@ -38,7 +38,7 @@ training:
   monitoring: none
   sample_every: 500
   sample_nlabels: 10
-  inception_every: 50
+  inception_every: 500
   backup_every: 5000
   restart_every: -1
   optimizer: adam

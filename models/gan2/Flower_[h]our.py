@@ -10,6 +10,7 @@ import random
 # from torchsummary import summary
 import shutil
 import scipy.io as sio
+import utils.logger as logging
 
 
 def seed_torch(seed=1029):
@@ -83,7 +84,7 @@ image_path = main_path + 'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
-Num_epoch = 2 #500 *10000
+epochs = 2 #500 *10000
 
 load_dir = './pretrained_model/'
 
@@ -244,17 +245,14 @@ for choose in range(1):
         # Train
         tstart = t0 = time.time()
 
-
-        it = -1
-
         # Reinitialize model average if needed
         if (config['training']['take_model_average']
                 and config['training']['model_average_reinit']):
             update_average(generator_test, generator, 0.)
 
         # Learning rate anneling
-        g_scheduler = build_lr_scheduler(g_optimizer, config, last_epoch=it)
-        d_scheduler = build_lr_scheduler(d_optimizer, config, last_epoch=it)
+        g_scheduler = build_lr_scheduler(g_optimizer, config)
+        d_scheduler = build_lr_scheduler(d_optimizer, config)
 
         # Trainer
         trainer = Trainer(
@@ -267,7 +265,7 @@ for choose in range(1):
 
 
     # Training loop
-    print(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epochs = {Num_epoch}')
+    logging.info(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epochs = {epochs}')
     save_dir = config['training']['out_dir'] + '/models/'
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
@@ -277,14 +275,13 @@ for choose in range(1):
     inception_std_all = []
     fid_all = []
 
-    for epoch in range(Num_epoch):
-        print('Start epoch %d...' % epoch)
+    for epoch in range(epochs):
+        logging.info('\nEpoch {}/{}'.format(epoch, epochs))
+        logging.info('-' * 20)
 
-        for x_real, y in train_loader:
-            it += 1
-        
-            d_lr = d_optimizer.param_groups[0]['lr']
-            g_lr = g_optimizer.param_groups[0]['lr']
+        for step, (x_real, y) in enumerate(train_loader):        
+            dlr = d_optimizer.param_groups[0]['lr']
+            glr = g_optimizer.param_groups[0]['lr']
 
             x_real, y = x_real.to(device), y.to(device)
             y.clamp_(None, nlabels-1)
@@ -295,14 +292,13 @@ for choose in range(1):
             FLAG = FLAG * 0.9995
 
             if config['training']['take_model_average']:
-                update_average(generator_test, generator,
-                               beta=config['training']['model_average_beta'])
+                update_average(generator_test, generator, beta=config['training']['model_average_beta'])
 
             # Discriminator updates
             dloss, reg = trainer.discriminator_trainstep(x_real, y, x_fake)
 
             if is_control_kernel:
-                if it == 10000:
+                if step == 10000:
                     for name, param in generator.named_parameters():
                         if name.find('small_adafm_') >= 0:
                             param.requires_grad = True
@@ -313,37 +309,49 @@ for choose in range(1):
 
             with torch.no_grad():
                 # (i) Sample if necessary
-                if (it % config['training']['sample_every']) == 0:
+                if (step % config['training']['sample_every']) == 0:
                     d_fix, d_update = discriminator.conv_img.weight[1, 1, 1, 1], discriminator.fc.weight[0, 1]
                     g_fix, g_update = generator.conv_img.weight[1, 1, 1, 1], 0.0
 
-                    print('[epoch %0d, it %4d] g_loss = %.4f, d_loss = %.4f, reg=%.4f, d_fix=%.4f, d_update=%.4f, g_fix=%.4f, g_update=%.4f'
-                          % (epoch, it, gloss, dloss, reg, d_fix, d_update, g_fix, g_update))
-                    # print('Creating samples...')
+                    logging.info(
+                        "Epoch: [{0}][{1}]\t"
+                        "Loss - G|D: {gloss:.4f} | {dloss:.4f}\t"
+                        "Reg {reg:.4f}\t"
+                        "Lr - G|D: {glr:.4f} | {dlr:.4f}".format(
+                            epoch, step,
+                            gloss=gloss,
+                            dloss=dloss,
+                            reg=reg,
+                            glr=glr,
+                            dlr=dlr
+                        )
+                    )
+                    
+                    logging.info('Creating samples...')
                     x, _ = evaluator.create_samples(ztest, ytest)
-                    logger.add_imgs(x, 'all', it, nrow=10)
+                    logger.add_imgs(x, 'all', step, nrow=10)
 
                 # (ii) Compute inception if necessary
-                if inception_every > 0 and ((it + 2) % inception_every) == 0:
-                    inception_mean, inception_std, fid = evaluator.compute_inception_score()
-                    inception_mean_all.append(inception_mean)
-                    inception_std_all.append(inception_std)
-                    fid_all.append(fid)
-                    print('test it %d: IS: mean %.2f, std %.2f, FID: mean %.2f, time: %2f' % (
-                        it, inception_mean, inception_std, fid, time.time() - tstart))
+                # if inception_every > 0 and ((it + 2) % inception_every) == 0:
+                #     inception_mean, inception_std, fid = evaluator.compute_inception_score()
+                #     inception_mean_all.append(inception_mean)
+                #     inception_std_all.append(inception_std)
+                #     fid_all.append(fid)
+                #     print('test it %d: IS: mean %.2f, std %.2f, FID: mean %.2f, time: %2f' % (
+                #         it, inception_mean, inception_std, fid, time.time() - tstart))
 
-                    FID = np.stack(fid_all)
-                    Inception_mean = np.stack(inception_mean_all)
-                    Inception_std = np.stack(inception_std_all)
-                    sio.savemat(config['training']['out_dir'] + DATA + 'base_FID_IS.mat', {'FID': FID,
-                                                           'Inception_mean': Inception_mean,
-                                                           'Inception_std': Inception_std})
+                #     FID = np.stack(fid_all)
+                #     Inception_mean = np.stack(inception_mean_all)
+                #     Inception_std = np.stack(inception_std_all)
+                #     sio.savemat(config['training']['out_dir'] + DATA + 'base_FID_IS.mat', {'FID': FID,
+                #                                            'Inception_mean': Inception_mean,
+                #                                            'Inception_std': Inception_std})
 
                 # (iii) Backup if necessary
-                if ((it + 1) % backup_every) == 0:
+                if ((step + 1) % backup_every) == 0:
                     print('Saving backup...')
 
-                    TrainModeSave = DATA + '_%08d_' % it
+                    TrainModeSave = DATA + '_%08d_' % step
                     torch.save(generator_test.state_dict(), save_dir + TrainModeSave + 'Pre_generator')
                     torch.save(discriminator.state_dict(), save_dir + TrainModeSave + 'Pre_discriminator')
 
