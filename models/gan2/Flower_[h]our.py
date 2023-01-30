@@ -88,9 +88,9 @@ Num_epoch = 10 #500 *10000
 load_dir = './pretrained_model/'
 
 if is_control_kernel:
-    out_path = main_path + 'save' + DATA + '_our_AdaFM/'
+    out_path = main_path + 'save/' + DATA + '_our_AdaFM/'
 else:
-    out_path = main_path + 'save' + DATA + '_not_AdaFM/'
+    out_path = main_path + 'save/' + DATA + '_not_AdaFM/'
 
 config_path = main_path + 'config/' +DATA+ '.yaml'
 
@@ -246,7 +246,6 @@ for choose in range(1):
 
 
         it = -1
-        epoch_idx = -1
 
         # Reinitialize model average if needed
         if (config['training']['take_model_average']
@@ -268,7 +267,7 @@ for choose in range(1):
 
 
     # Training loop
-    print(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epoches = {Num_epoch}')
+    print(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epochs = {Num_epoch}')
     save_dir = config['training']['out_dir'] + '/models/'
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
@@ -279,14 +278,11 @@ for choose in range(1):
     fid_all = []
 
     for epoch in range(Num_epoch):
-        # epoch_idx += 1
         print('Start epoch %d...' % epoch)
 
         for x_real, y in train_loader:
             it += 1
-            g_scheduler.step()
-            d_scheduler.step()
-
+        
             d_lr = d_optimizer.param_groups[0]['lr']
             g_lr = g_optimizer.param_groups[0]['lr']
 
@@ -312,6 +308,9 @@ for choose in range(1):
                             param.requires_grad = True
                     get_parameter_number(generator)
 
+            g_scheduler.step()
+            d_scheduler.step()
+
             with torch.no_grad():
                 # (i) Sample if necessary
                 if (it % config['training']['sample_every']) == 0:
@@ -319,7 +318,7 @@ for choose in range(1):
                     g_fix, g_update = generator.conv_img.weight[1, 1, 1, 1], 0.0
 
                     print('[epoch %0d, it %4d] g_loss = %.4f, d_loss = %.4f, reg=%.4f, d_fix=%.4f, d_update=%.4f, g_fix=%.4f, g_update=%.4f'
-                          % (epoch_idx, it, gloss, dloss, reg, d_fix, d_update, g_fix, g_update))
+                          % (epoch, it, gloss, dloss, reg, d_fix, d_update, g_fix, g_update))
                     # print('Creating samples...')
                     x, _ = evaluator.create_samples(ztest, ytest)
                     logger.add_imgs(x, 'all', it, nrow=10)
