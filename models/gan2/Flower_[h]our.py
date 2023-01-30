@@ -10,8 +10,6 @@ import random
 # from torchsummary import summary
 import shutil
 import scipy.io as sio
-import utils.logger as logging
-
 
 def seed_torch(seed=1029):
     random.seed(seed)
@@ -38,7 +36,11 @@ from eval import Evaluator
 from config import (
     load_config, build_models, build_optimizers, build_lr_scheduler, build_models_PRE,
 )
+import logging
 
+def info(message: str):
+    print(message)
+    logging.info(message)
 
 def get_parameter_number(net):
     total_num = sum(p.numel() for p in net.parameters())
@@ -265,7 +267,7 @@ for choose in range(1):
 
 
     # Training loop
-    logging.info(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epochs = {epochs}')
+    info(f'Training starts: Dataset size = {len(train_dataset)}, Iterations per epoch (batches) = {train_loader.__len__()}, Epochs = {epochs}')
     save_dir = config['training']['out_dir'] + '/models/'
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
@@ -276,8 +278,8 @@ for choose in range(1):
     fid_all = []
 
     for epoch in range(epochs):
-        logging.info('\nEpoch {}/{}'.format(epoch, epochs))
-        logging.info('-' * 20)
+        info('\nEpoch {}/{}'.format(epoch, epochs))
+        info('-' * 20)
 
         for step, (x_real, y) in enumerate(train_loader):        
             dlr = d_optimizer.param_groups[0]['lr']
@@ -313,7 +315,7 @@ for choose in range(1):
                     d_fix, d_update = discriminator.conv_img.weight[1, 1, 1, 1], discriminator.fc.weight[0, 1]
                     g_fix, g_update = generator.conv_img.weight[1, 1, 1, 1], 0.0
 
-                    logging.info(
+                    info(
                         "Epoch: [{0}][{1}]\t"
                         "Loss - G|D: {gloss:.4f} | {dloss:.4f}\t"
                         "Reg {reg:.4f}\t"
@@ -327,7 +329,7 @@ for choose in range(1):
                         )
                     )
                     
-                    logging.info('Creating samples...')
+                    info('Creating samples...')
                     x, _ = evaluator.create_samples(ztest, ytest)
                     logger.add_imgs(x, 'all', step, nrow=10)
 
