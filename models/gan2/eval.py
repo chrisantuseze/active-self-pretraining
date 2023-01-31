@@ -55,18 +55,20 @@ class Evaluator(object):
             y = torch.full((batch_size,), y,
                            device=self.device, dtype=torch.int64)
         # Sample x
-        # with torch.no_grad():
-        #     x = self.generator(z, y)
+        with torch.no_grad():
+            x = self.generator(z, y)
 
-        device = next(self.generator.parameters()).device
-        dim_z = self.generator.embedding.weight.size(1)
+        # device = next(self.generator.parameters()).device
+        # dim_z = self.generator.embedding.weight.size(1)
 
-        tmp=0.3
-        num=200
+        # tmp=0.3
+        # num=200
 
-        embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
-        embeddings = torch.tensor(embeddings,device=device)
+        # embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
+        # embeddings = torch.tensor(embeddings,device=device)
 
-        image_tensors = self.generator(embeddings)
+        # image_tensors = self.generator(embeddings, y)
 
-        return image_tensors
+        # return image_tensors
+
+        return x

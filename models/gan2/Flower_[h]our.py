@@ -82,7 +82,7 @@ G_Layer_FIX, D_Layer_FIX: number of layers to fix
 DATA = 'Flowers'
 main_path = '../../'
 
-image_path = main_path + 'datasets/102flowers/'
+image_path = main_path + 'datasets/ucmerced/images' #'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
@@ -159,8 +159,8 @@ for choose in range(1):
         )
 
         # Number of labels
-        nlabels = min(nlabels, config['data']['nlabels'])
-        sample_nlabels = min(nlabels, sample_nlabels)
+        # nlabels = min(nlabels, config['data']['nlabels'])
+        # sample_nlabels = min(nlabels, sample_nlabels)
 
 
 
@@ -171,6 +171,8 @@ for choose in range(1):
         generator, discriminator = build_models(config)
 
         if os.path.exists(load_dir + DATA_FIX):
+            info("Using saved models...")
+            
             dict_G = torch.load(load_dir + DATA_FIX + 'Pre_generator')
             generator = model_equal_part(generator, dict_G)
             dict_D = torch.load(load_dir + DATA_FIX + 'Pre_discriminator')
@@ -217,7 +219,7 @@ for choose in range(1):
                           device=device)
 
         # Save for tests
-        ntest = 100
+        ntest = 16 #100
         x_real, ytest = utils.get_nsamples(train_loader, ntest)
         ytest.clamp_(None, nlabels-1)
         ytest = ytest.to(device)
@@ -233,7 +235,7 @@ for choose in range(1):
 
         # Evaluator
 
-        NNN = 8000
+        NNN = 251 #8000
         x_real, _ = utils.get_nsamples(train_loader, NNN)
         evaluator = Evaluator(generator_test, zdist, ydist,
                               batch_size=batch_size, device=device,
