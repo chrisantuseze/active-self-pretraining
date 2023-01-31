@@ -382,7 +382,7 @@ class Generator(nn.Module):
         small_nf = self.small_nf = 64
 
         # Submodules
-        self.small_embedding = nn.Embedding(nlabels, embed_size)
+        self.embedding = nn.Embedding(nlabels, embed_size)
         self.small_fc = nn.Linear(z_dim, 8 * small_nf * s0 * s0)
 
         # self.small_net_1 = StyleBlock_firstLayer(8 * small_nf, 8 * small_nf, initial=True)
@@ -430,7 +430,7 @@ class Generator(nn.Module):
         batch_size = z.size(0)
 
         if y.dtype is torch.int64:
-            yembed = self.small_embedding(y)
+            yembed = self.embedding(y)
         else:
             yembed = y
 
