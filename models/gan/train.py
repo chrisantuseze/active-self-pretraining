@@ -60,7 +60,7 @@ def argparse_setup():
     parser.add_argument('--step', type=int, default=3000, help="Decrease lr by a factor of args.step_facter every <step> iterations")
     parser.add_argument('--step-facter', type=float, default=0.1, help="facter to multipy when decrease lr ")
 
-    parser.add_argument('--iters', type=int, default=3000, help="number of iterations.")
+    parser.add_argument('--iters', type=int, default=30000, help="number of iterations.")
     parser.add_argument('--batch', type=int, default=25, help="batch size")
     parser.add_argument('--workers', type=int, default=4, help="number of processes to make batch worker. default is 8")
     parser.add_argument('--model', type=str,default = "biggan128-ada", help = "model. biggan128-ada")
