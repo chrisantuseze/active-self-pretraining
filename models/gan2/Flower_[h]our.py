@@ -159,8 +159,8 @@ for choose in range(1):
         )
 
         # Number of labels
-        # nlabels = min(nlabels, config['data']['nlabels'])
-        # sample_nlabels = min(nlabels, sample_nlabels)
+        nlabels = min(nlabels, config['data']['nlabels'])
+        sample_nlabels = min(nlabels, sample_nlabels)
 
 
 
