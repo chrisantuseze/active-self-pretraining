@@ -66,10 +66,16 @@ def random(model, out_path, tmp=0.4, num=9, truncate=False):
         embeddings = torch.tensor(embeddings,device=device)
 
         image_tensors = model(embeddings)
-        for i, val in enumerate(image_tensors):
-            torchvision.utils.save_image(
-                val,
-                f"{out_path}random_{i}.jpg",
+        torchvision.utils.save_image(
+                image_tensors,
+                f"{out_path}random.jpg",
                 nrow=1,
                 normalize=True,
             )
+        # for i, val in enumerate(image_tensors):
+        #     torchvision.utils.save_image(
+        #         val,
+        #         f"{out_path}random_{i}.jpg",
+        #         nrow=1,
+        #         normalize=True,
+        #     )
