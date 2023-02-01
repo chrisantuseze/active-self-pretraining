@@ -8,3 +8,6 @@ PyYAML
 scipy
 tqdm
 # lmdb
+
+h5py
+Pillow
