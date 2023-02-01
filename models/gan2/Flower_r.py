@@ -327,9 +327,9 @@ def main():
                         torch.save(generator_test.state_dict(), save_dir + TrainModeSave + 'Pre_generator')
                         torch.save(discriminator.state_dict(), save_dir + TrainModeSave + 'Pre_discriminator')
 
-        info('Creating samples...')
-        x, _ = evaluator.create_samples(ztest, ytest)
-        logger.add_imgs(x, 'all', step, nrow=10)
+    info('Creating samples...')
+    x, _ = evaluator.create_samples(ztest, ytest)
+    logger.add_imgs(x, 'all', step, nrow=10)
 
 
 if __name__ == "__main__":
