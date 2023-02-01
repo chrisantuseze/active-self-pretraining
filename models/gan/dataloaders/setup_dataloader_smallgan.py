@@ -10,7 +10,7 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
     because this is for small dataset
     '''
     if name == "face":
-        img_path_list = glob.glob("./models/gan/data/face/*.png")
+        img_path_list = glob.glob("./datasets/ucmerced/images/*/*") #glob.glob("./models/gan/data/face/*.png")
     elif name=="anime":
         img_path_list = glob.glob("./models/gan/data/anime/*.png")
     else:
@@ -23,6 +23,8 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
         transforms.CenterCrop((h, w)),
         transforms.ToTensor(),
     ])
+
+    img_path_list = img_path_list[:50]
     
     img_path_list = [[path, i] for i, path in enumerate(sorted(img_path_list))]
     dataset = ImageListDataset(img_path_list, transform=transform)

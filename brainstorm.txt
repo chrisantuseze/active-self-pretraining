@@ -39,8 +39,9 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 - Why I won't be using some GAN papers:
 1. Generate To Adapt: Aligning Domains using Generative Adversarial Networks - No pt model. Uses source data
 2. Transferring GANs: generating images from limited data - Uses TF
-3. Image Generation From Small Datasets via Batch Statistics Adaptation - This is old (3yrs)
-4. MineGAN: effective knowledge transfer from GANs to target domains with few images 
+3. Image Generation From Small Datasets via Batch Statistics Adaptation - This is old (3yrs), but it works
+4. MineGAN: effective knowledge transfer from GANs to target domains with few images does not work. Throws an error
+5. On Leveraging Pretrained GANs for Generation with Limited Data - Generates very shitty images
 
 - Got 96.67 when generated images were added
 
