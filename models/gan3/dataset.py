@@ -34,7 +34,6 @@ class MultiResolutionDataset(Dataset):
             img_bytes = txn.get(key)
 
         buffer = BytesIO(img_bytes)
-        print(buffer)
         img = Image.open(buffer)
         img = self.transform(img)
 
