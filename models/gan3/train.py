@@ -45,9 +45,10 @@ def adjust_lr(optimizer, lr):
 def train(args, dataset, generator, discriminator, g_optimizer, d_optimizer, g_running, code_size, n_critic):
     step = int(math.log2(args.init_size)) - 2
     resolution = 4 * 2 ** step
-    loader = sample_data(
-        dataset, args.batch.get(resolution, args.batch_default), resolution
-    )
+    # loader = sample_data(
+    #     dataset, args.batch.get(resolution, args.batch_default), resolution
+    # )
+    loader = DataLoader(dataset, shuffle=True, batch_size=args.batch.get(resolution, args.batch_default), num_workers=1)
     data_loader = iter(loader)
 
     adjust_lr(g_optimizer, args.lr.get(resolution, 0.001))
@@ -255,7 +256,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Progressive Growing of GANs')
 
-    parser.add_argument('--path', type=str, default='./datasets/AnimalFace_lmdb', help='path of specified dataset')
+    parser.add_argument('--path', type=str, default='./datasets/AnimalFace', help='path of specified dataset')
     parser.add_argument(
         '--phase',
         type=int,
@@ -324,9 +325,9 @@ def main():
         ]
     )
 
-    dataset = MultiResolutionDataset(args.path, transform)
+    # dataset = MultiResolutionDataset(args.path, transform)
 
-    # dataset = datasets.ImageFolder(args.path, transform=transform)
+    dataset = datasets.ImageFolder(args.path, transform=transform)
 
     if args.sched:
         args.lr = {128: 0.0015, 256: 0.002, 512: 0.003, 1024: 0.003}
