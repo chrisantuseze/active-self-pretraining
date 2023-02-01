@@ -13,7 +13,7 @@ from torch.autograd import Variable, grad
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, utils
 
-# from dataset import MultiResolutionDataset
+from dataset import MultiResolutionDataset
 from models.gan3.model import StyledGenerator, Discriminator
 import lmdb
 
@@ -325,9 +325,9 @@ def main():
         ]
     )
 
-    # dataset = MultiResolutionDataset(args.path, transform)
+    dataset = MultiResolutionDataset(args.path, transform)
 
-    dataset = datasets.ImageFolder(args.path, transform=transform)
+    # dataset = datasets.ImageFolder(args.path, transform=transform)
 
     if args.sched:
         args.lr = {128: 0.0015, 256: 0.002, 512: 0.003, 1024: 0.003}
