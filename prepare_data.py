@@ -84,7 +84,7 @@ if __name__ == "__main__":
         default="lanczos",
         help="resampling methods for resizing images",
     )
-    parser.add_argument("path", type=str, default='./dataset/AnimalFace', help="path to the image dataset")
+    parser.add_argument("path", type=str, default='./datasets/AnimalFace', help="path to the image dataset")
 
     args = parser.parse_args()
 
