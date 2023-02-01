@@ -1,7 +1,10 @@
+import glob
 import torch
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
+
+from models.gan.dataloaders.ImageListDataset import ImageListDataset
 
 
 def get_dataset(name, data_dir, size=64, lsun_categories=None):
@@ -15,8 +18,13 @@ def get_dataset(name, data_dir, size=64, lsun_categories=None):
     ])
 
     if name == 'image':
-        dataset = datasets.ImageFolder(data_dir, transform)
-        nlabels = len(dataset.classes)
+        # dataset = datasets.ImageFolder(data_dir, transform)
+
+        img_path_list = glob.glob(data_dir + "/*.png")
+        img_path_list = [[path, i] for i, path in enumerate(sorted(img_path_list))]
+        dataset = ImageListDataset(img_path_list, transform=transform)
+
+        nlabels = 1 #len(dataset.classes)
         
     elif name == 'cifar10':
         dataset = datasets.CIFAR10(root=data_dir, train=True, download=False,

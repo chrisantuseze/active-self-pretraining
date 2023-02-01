@@ -82,7 +82,7 @@ G_Layer_FIX, D_Layer_FIX: number of layers to fix
 DATA = 'Flowers'
 main_path = '../../'
 
-image_path = main_path + 'datasets/ucmerced/images' #'datasets/102flowers/'
+image_path = main_path + 'datasets/face' #'datasets/102flowers/'
 is_control_kernel = True
 
 DATA_FIX = 'ImageNet'
@@ -152,7 +152,8 @@ for choose in range(1):
             lsun_categories=config['data']['lsun_categories_train']
         )
         train_loader = torch.utils.data.DataLoader(
-                train_dataset,
+                # train_dataset,
+                [data for data in  train_dataset],
                 batch_size=batch_size,
                 num_workers=config['training']['nworkers'],
                 shuffle=True, pin_memory=True, sampler=None, drop_last=True
