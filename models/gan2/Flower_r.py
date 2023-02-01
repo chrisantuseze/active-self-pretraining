@@ -87,7 +87,7 @@ def main():
     is_control_kernel = True
 
     DATA_FIX = 'ImageNet'
-    epochs = 50 #500 *10000
+    epochs = 500# *10000
 
     load_dir = main_path + 'pretrained_model/'
     out_path = 'save/generated'
