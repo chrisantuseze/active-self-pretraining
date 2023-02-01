@@ -90,11 +90,7 @@ def main():
     epochs = 50 #500 *10000
 
     load_dir = main_path + 'pretrained_model/'
-
-    if is_control_kernel:
-        out_path = main_path + 'save/' + DATA + '_our_AdaFM/'
-    else:
-        out_path = main_path + 'save/' + DATA + '_not_AdaFM/'
+    out_path = 'save/generated'
 
     config_path = main_path + 'config/' +DATA+ '.yaml'
 
@@ -111,7 +107,7 @@ def main():
     config['generator']['name'] = 'resnet2_AdaFM'
     config['discriminator']['name'] = 'resnet2_AdaFM'
 
-    config['training']['out_dir'] = out_path + 'G_%d_D_%d/'%(-G_Layer_FIX, D_Layer_FIX)
+    config['training']['out_dir'] = out_path
     if not os.path.isdir(config['training']['out_dir']):
         os.makedirs(config['training']['out_dir'])
 
