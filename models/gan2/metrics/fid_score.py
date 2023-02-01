@@ -11,7 +11,7 @@ from scipy import linalg
 from torch.autograd import Variable
 from torch.nn.functional import adaptive_avg_pool2d
 
-from metrics.inception import InceptionV3
+from models.gan2.metrics.inception import InceptionV3
 
 parser = ArgumentParser(formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument(

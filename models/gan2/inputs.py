@@ -6,7 +6,6 @@ import numpy as np
 
 from models.gan.dataloaders.ImageListDataset import ImageListDataset
 
-
 def get_dataset(name, data_dir, size=64, lsun_categories=None):
     transform = transforms.Compose([
         transforms.Resize(size),

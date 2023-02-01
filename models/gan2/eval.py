@@ -1,6 +1,6 @@
 import torch
-from metrics import inception_score
-from metrics.fid_score import calculate_fid_given_images
+from models.gan2.metrics import inception_score
+from models.gan2.metrics.fid_score import calculate_fid_given_images
 import numpy as np
 from scipy.stats import truncnorm
 

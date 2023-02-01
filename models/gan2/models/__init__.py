@@ -1,4 +1,4 @@
-from models import (
+from models.gan2.models import (
     resnet2,
     resnet2_AdaFM,
 )

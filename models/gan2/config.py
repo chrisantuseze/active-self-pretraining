@@ -1,7 +1,7 @@
 import yaml
 from torch import optim
 from os import path
-from models import generator_dict, discriminator_dict, encoder_dict
+from models.gan2.models import generator_dict, discriminator_dict, encoder_dict
 
 # General config
 def load_config(path, default_path):

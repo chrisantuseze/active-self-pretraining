@@ -4,7 +4,7 @@ from torch.nn import functional as F
 import torch.utils.data
 import torch.utils.data.distributed
 from torch import autograd
-from toggle_ImageNet import toggle_grad_D
+from models.gan2.toggle_ImageNet import toggle_grad_D
 TH = 1500.0
 
 
