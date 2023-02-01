@@ -7,35 +7,16 @@ import os
 import argparse
 import time
 
-import visualizers
-# from models.self_sup.swav.utils import initialize_exp
-# from models.utils.commons import get_params, AverageMeter, get_params_to_update
-from dataloaders.setup_dataloader_smallgan import setup_dataloader 
-from nets.setup_model import setup_model
-from losses.AdaBIGGANLoss import AdaBIGGANLoss
-
-class AverageMeter(object):
-    """computes and stores the average and current value"""
-
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
+import models.gan.visualizers as visualizers
+from models.utils.commons import get_params, AverageMeter, get_params_to_update
+from models.gan.dataloaders.setup_dataloader_smallgan import setup_dataloader 
+from models.gan.nets.setup_model import setup_model
+from models.gan.losses.AdaBIGGANLoss import AdaBIGGANLoss
 
 def argparse_setup():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default="face", help = "dataset. anime or face. ")
-    parser.add_argument('--pretrained', type=str, default="./data/G_ema.pth", help = "pretrained BigGAN model")
+    parser.add_argument('--pretrained', type=str, default="./models/gan/data/G_ema.pth", help = "pretrained BigGAN model")
 
 
     parser.add_argument('--eval-freq', type=int, default=500, help = "save frequency in iteration. currently no eval is implemented and just model saving and sample generation is performed" )
@@ -71,7 +52,8 @@ def argparse_setup():
 
     parser.add_argument('-p', '--print-freq', default=500, type=int, help='print frequency ')
 
-    parser.add_argument('--checkpoint_path', type=str, default="../../save/generated", help='model checkpoint path')
+    parser.add_argument('--checkpoint_path', type=str, default="./save/generated", help='model checkpoint path')
+    
     return parser.parse_args()
 
 
@@ -95,7 +77,9 @@ def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step, gamma=step_facter)
     return optimizer,scheduler
 
-def main(args):
+def main():
+    args = argparse_setup()
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     checkpoint_dir = os.path.join(args.checkpoint_path)
@@ -203,5 +187,4 @@ def main(args):
     # save_json(log,log_save_path)
 
 if __name__ == '__main__':
-    args = argparse_setup()
-    main(args)
+    main()
