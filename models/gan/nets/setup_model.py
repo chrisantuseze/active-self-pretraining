@@ -2,8 +2,8 @@ import torch
 import torchvision
 import torch.nn as nn
 
-from . import BigGAN as biggan
-from .AdaBIGGAN import AdaBIGGAN
+import models.gan.nets.BigGAN as biggan
+from models.gan.nets.AdaBIGGAN import AdaBIGGAN
 
 # taken from https://github.com/ajbrock/BigGAN-PyTorch/issues/8
 bigagn128config = {'dataset': 'I128_hdf5',

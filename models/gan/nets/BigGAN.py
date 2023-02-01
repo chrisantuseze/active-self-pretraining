@@ -11,7 +11,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.nn import Parameter as P
 
-from . import layers
+import models.gan.nets.layers as layers
 #from sync_batchnorm import SynchronizedBatchNorm2d as SyncBatchNorm2d
 
 

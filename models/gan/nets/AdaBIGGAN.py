@@ -5,7 +5,7 @@ import torch
 import torchvision
 import torch.nn as nn
 
-import utils
+import models.gan.utils as utils
 
 
 class AdaBIGGAN(nn.Module):
