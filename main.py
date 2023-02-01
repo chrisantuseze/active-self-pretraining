@@ -19,7 +19,7 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-from models.gan2.Flower_r import main
+from models.gan3.train import main
 
 logging.init()
 
