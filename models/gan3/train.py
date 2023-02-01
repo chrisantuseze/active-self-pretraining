@@ -255,7 +255,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Progressive Growing of GANs')
 
-    parser.add_argument('--path', type=str, default='./datasets/AnimalFace', help='path of specified dataset')
+    parser.add_argument('--path', type=str, default='./datasets/AnimalFace_lmdb', help='path of specified dataset')
     parser.add_argument(
         '--phase',
         type=int,
