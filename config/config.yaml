@@ -83,7 +83,7 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 200
+base_epochs: 100
 base_image_size: 40
 base_dataset: 2                                    # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
@@ -94,8 +94,8 @@ current_epoch: 0
 log_step: 1000
 
 ######################## target pretraining options
-target_dataset: 4                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-target_epochs: 200                               # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
+target_dataset: 2                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_epochs: 200                            # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80 #224
 target_lr: 1.0e-3                              # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: True
