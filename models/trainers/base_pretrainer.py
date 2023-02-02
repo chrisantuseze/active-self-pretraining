@@ -6,6 +6,7 @@ from models.backbones.resnet import resnet_backbone
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
 from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import TrainingType
+from models.utils.transformations import Transforms
 from utils.commons import load_path_loss
 from datautils import dataset_enum, cifar10, imagenet
 
@@ -27,9 +28,12 @@ class BasePretrainer():
         else:
             #  train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
             # 
+
+            transforms = Transforms(80)
             dataset = MakeBatchDataset(
                                     self.args,
-                                    f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=False, is_train=False, generated=True) 
+                                    f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=False, 
+                                    is_train=False, generated=True, transform=transforms) 
             
             pretrain_data = [PathLoss(path=sample, loss=0) for sample in dataset]
 
