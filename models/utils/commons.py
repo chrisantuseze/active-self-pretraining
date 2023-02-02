@@ -95,6 +95,7 @@ def get_params(args, training_type):
         temperature = args.dcl_temperature
         optimizer = args.dcl_optimizer
         base_lr = args.dcl_base_lr
+        target_lr = args.dcl_base_lr
 
     elif args.method == SSL_Method.SIMCLR.value:
         batch_size = args.simclr_batch_size
@@ -102,13 +103,15 @@ def get_params(args, training_type):
         temperature = args.simclr_temperature
         optimizer = args.simclr_optimizer
         base_lr = args.simclr_base_lr
+        target_lr = args.simclr_base_lr
 
     elif args.method == SSL_Method.SWAV.value:
         batch_size = args.swav_batch_size
         epochs = args.base_epochs
         temperature = args.swav_temperature
         optimizer = args.swav_optimizer
-        base_lr = args.swav_base_lr
+        base_lr = 1.2
+        target_lr = args.swav_base_lr
 
 
     params = {
@@ -133,7 +136,7 @@ def get_params(args, training_type):
         TrainingType.TARGET_PRETRAIN: Params(
             batch_size=batch_size, 
             image_size=target_image_size, 
-            lr=base_lr, 
+            lr=target_lr, 
             epochs=args.target_epochs,
             optimizer=optimizer,
             weight_decay=args.weight_decay,
@@ -223,24 +226,26 @@ def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
 
     # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
-    if args.epoch_num != args.base_epochs:
-        if args.backbone == "resnet50":
-            model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
-        else:
-            state = load_saved_state(args, pretrain_level="1")
-            model.load_state_dict(state['model'], strict=False)
+    if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
+        # if args.backbone == "resnet50":
+        #     model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+        model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
-        # freeze some layers
-        for name, param in model.named_parameters():
-            if 'projection_head' in name or 'prototypes' in name:
-                continue
+    else:
+        state = load_saved_state(args, pretrain_level="1")
+        model.load_state_dict(state['model'], strict=False)
 
-            if 'bn' in name and 'bias' in name:
-                continue
+    # freeze some layers
+    for name, param in model.named_parameters():
+        if 'projection_head' in name or 'prototypes' in name:
+            continue
 
-            param.requires_grad = False
+        if 'bn' in name and 'bias' in name:
+            continue
 
-        params_to_update = get_params_to_update(model, feature_extract=True)
+        param.requires_grad = False
+
+    params_to_update = get_params_to_update(model, feature_extract=True)
 
     return model, params_to_update
 

@@ -28,8 +28,6 @@ class BasePretrainer():
             
             pretrain_data = [PathLoss(path=sample, loss=0) for sample in img_path]
 
-            print(pretrain_data[0])
-
             train_loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
 
         return encoder, train_loader
