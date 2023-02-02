@@ -1,5 +1,6 @@
+from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
-from models.active_learning.pretext_dataloader import PretextDataLoader
+from models.active_learning.pretext_dataloader import MakeBatchDataset, PretextDataLoader
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
@@ -24,7 +25,15 @@ class BasePretrainer():
             train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         else:
-             train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader() 
+            #  train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
+            # 
+            dataset = MakeBatchDataset(
+                                    self.args,
+                                    f'{self.args.dataset_dir}/{self.args.base_dataset}', self.with_train, self.is_train, generated=True) 
+            
+            pretrain_data = [PathLoss(path=sample, loss=0) for sample in dataset]
+
+            train_loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
 
         return encoder, train_loader
 

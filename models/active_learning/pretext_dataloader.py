@@ -29,13 +29,16 @@ class PretextDataLoader():
 
         self.dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
 
+        # This is done to ensure that the dataset used for validation is only a subset of the entire datasets used for training
         if is_val:
             val_path_loss_list = []
 
             if self.args.target_dataset in [DatasetType.IMAGENET.value, DatasetType.CHEST_XRAY.value]:
                 img_paths = glob.glob(self.dir + '/train/*/*')# img_paths = glob.glob(self.dir + '/train/*/*/*')
+            
             elif self.args.target_dataset == DatasetType.CIFAR10.value:
                 img_paths = glob.glob(self.args.dataset_dir + '/cifar10v2/train/*/*')
+            
             else:
                 img_paths = glob.glob(self.dir + '/*/*')
 
@@ -184,7 +187,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
 
 
 class MakeBatchDataset(torch.utils.data.Dataset):
-    def __init__(self, args, dir, with_train, is_train, transform=None):
+    def __init__(self, args, dir, with_train, is_train, generated=False, transform=None):
         self.args = args
         params = get_params(args, TrainingType.ACTIVE_LEARNING)
         self.image_size = params.image_size
@@ -200,8 +203,12 @@ class MakeBatchDataset(torch.utils.data.Dataset):
                 self.img_path = glob.glob(self.dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
             else:
                 self.img_path = glob.glob(self.dir + '/train/*/*')
+
+        elif generated:
+            self.img_path = glob.glob(self.dir + '/*')
         else:
             self.img_path = glob.glob(self.dir + '/*/*')
+
         self.transform = transform
 
     def __len__(self):

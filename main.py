@@ -44,6 +44,8 @@ def main_():
 
     else:
         if args.base_pretrain:
+            main()
+            
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
 
@@ -77,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main()
+    main_()
 
     logging.info("CASL ended.")
 
