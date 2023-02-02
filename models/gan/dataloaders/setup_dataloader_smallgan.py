@@ -24,7 +24,7 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
         transforms.ToTensor(),
     ])
 
-    img_path_list = img_path_list[:200]
+    img_path_list = img_path_list[:50]
     
     img_path_list = [[path, i] for i, path in enumerate(sorted(img_path_list))]
     dataset = ImageListDataset(img_path_list, transform=transform)
