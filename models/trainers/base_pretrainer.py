@@ -29,7 +29,7 @@ class BasePretrainer():
             # 
             dataset = MakeBatchDataset(
                                     self.args,
-                                    f'{self.args.dataset_dir}/{self.args.base_dataset}', self.with_train, self.is_train, generated=True) 
+                                    f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=False, is_train=False, generated=True) 
             
             pretrain_data = [PathLoss(path=sample, loss=0) for sample in dataset]
 
