@@ -59,7 +59,7 @@ def argparse_setup():
 
 
 def generate_samples(model,img_prefix, batch_size):
-    visualizers.reconstruct(model, img_prefix, num=100, add_small_noise=True)
+    # visualizers.reconstruct(model, img_prefix, num=100, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=200)
     visualizers.random(model, img_prefix, tmp=0.3, num=700, truncate=True)
 
