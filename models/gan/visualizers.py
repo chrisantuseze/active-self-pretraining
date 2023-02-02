@@ -22,14 +22,20 @@ def reconstruct(model, out_path, num, add_small_noise=False):
                 embeddings += torch.randn(embeddings.size(), device=device) * 0.01
 
             image_tensors = model(embeddings)
+            # torchvision.utils.save_image(
+            #     image_tensors,
+            #     f"{out_path}reconstruct_{i}.jpg",
+            #     nrow=1,#int(batch_size ** 0.5),
+            #     normalize=True,
+            # )
 
-            print(len(image_tensors), image_tensors)
-            torchvision.utils.save_image(
-                image_tensors,
-                f"{out_path}reconstruct_{i}.jpg",
-                nrow=1,#int(batch_size ** 0.5),
-                normalize=True,
-            )
+            for i, val in enumerate(image_tensors):
+                torchvision.utils.save_image(
+                    val,
+                    f"{out_path}reconstruct_{i}.jpg",
+                    nrow=1,
+                    normalize=True,
+                )
         
 #see https://github.com/nogu-atsu/SmallGAN/blob/2293700dce1e2cd97e25148543532814659516bd/gen_models/ada_generator.py#L37-L53
 def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
@@ -66,16 +72,16 @@ def random(model, out_path, tmp=0.4, num=9, truncate=False):
         embeddings = torch.tensor(embeddings,device=device)
 
         image_tensors = model(embeddings)
-        torchvision.utils.save_image(
-                image_tensors,
-                f"{out_path}random.jpg",
-                nrow=1,
-                normalize=True,
-            )
-        # for i, val in enumerate(image_tensors):
-        #     torchvision.utils.save_image(
-        #         val,
-        #         f"{out_path}random_{i}.jpg",
+        # torchvision.utils.save_image(
+        #         image_tensors,
+        #         f"{out_path}random.jpg",
         #         nrow=1,
         #         normalize=True,
         #     )
+        for i, val in enumerate(image_tensors):
+            torchvision.utils.save_image(
+                val,
+                f"{out_path}random_{i}.jpg",
+                nrow=1,
+                normalize=True,
+            )
