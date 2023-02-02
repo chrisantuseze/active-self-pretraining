@@ -10,7 +10,7 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
     because this is for small dataset
     '''
     if name == "face":
-        img_path_list = glob.glob("./datasets/chest_xray/train/*/*") #glob.glob("./models/gan/data/face/*.png")
+        img_path_list = glob.glob(f"./datasets/chest_xray/train/*/*")
     elif name=="anime":
         img_path_list = glob.glob("./models/gan/data/anime/*.png")
     else:
@@ -28,6 +28,10 @@ def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
     
     img_path_list = [[path, i] for i, path in enumerate(sorted(img_path_list))]
     dataset = ImageListDataset(img_path_list, transform=transform)
+
+    # dataset = MakeBatchDataset(
+    #         self.args,
+    #         self.dir, self.with_train, self.is_train, transforms)
     
     return DataLoader(
             [data for data in  dataset], 

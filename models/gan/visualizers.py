@@ -59,7 +59,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
                 )
 
 #from https://github.com/nogu-atsu/SmallGAN/blob/2293700dce1e2cd97e25148543532814659516bd/gen_models/ada_generator.py#L37-L53        
-def random(model, out_path, tmp=0.4, num=9, truncate=False):
+def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
     with torch.no_grad():
         model.eval()
         device = next(model.parameters()).device
@@ -80,7 +80,7 @@ def random(model, out_path, tmp=0.4, num=9, truncate=False):
         for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
                 val,
-                f"{out_path}random_{i}.jpg",
+                f"{out_path}random_{prefix}_{i}.jpg",
                 nrow=1,
                 normalize=True,
             )

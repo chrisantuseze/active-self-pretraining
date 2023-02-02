@@ -1,3 +1,4 @@
+from sys import prefix
 import torch
 import torchvision
 import torch.optim as optim
@@ -6,6 +7,7 @@ from torch.optim import lr_scheduler
 import os
 import argparse
 import time
+from datautils.dataset_enum import get_dataset_enum
 
 import models.gan.visualizers as visualizers
 from models.utils.commons import get_params, AverageMeter, get_params_to_update
@@ -52,7 +54,7 @@ def argparse_setup():
 
     parser.add_argument('-p', '--print-freq', default=500, type=int, help='print frequency ')
 
-    parser.add_argument('--checkpoint_path', type=str, default="./save/generated", help='model checkpoint path')
+    parser.add_argument('--checkpoint_path', type=str, default="./datasets/generated", help='model checkpoint path')
     
     return parser.parse_args()
 
@@ -61,8 +63,8 @@ def argparse_setup():
 def generate_samples(model,img_prefix, batch_size):
     # visualizers.reconstruct(model, img_prefix, num=100, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=400)
-    for _ in range(5):
-        visualizers.random(model, img_prefix, tmp=0.3, num=400, truncate=True)
+    for i in range(1, 6):
+        visualizers.random(model, img_prefix, tmp=0.3, num=400, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_facter=0.1):
     #group parameters by lr
@@ -83,7 +85,7 @@ def main():
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    checkpoint_dir = os.path.join(args.checkpoint_path)
+    checkpoint_dir = os.path.join(f'{args.checkpoint_path}_{get_dataset_enum(2)}')
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
     
