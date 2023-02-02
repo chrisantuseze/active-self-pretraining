@@ -187,7 +187,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
 
 
 class MakeBatchDataset(torch.utils.data.Dataset):
-    def __init__(self, args, dir, with_train, is_train, generated=False, transform=None):
+    def __init__(self, args, dir, with_train, is_train, transform=None):
         self.args = args
         params = get_params(args, TrainingType.ACTIVE_LEARNING)
         self.image_size = params.image_size
@@ -203,9 +203,6 @@ class MakeBatchDataset(torch.utils.data.Dataset):
                 self.img_path = glob.glob(self.dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
             else:
                 self.img_path = glob.glob(self.dir + '/train/*/*')
-
-        elif generated:
-            self.img_path = glob.glob(self.dir + '/*')
         else:
             self.img_path = glob.glob(self.dir + '/*/*')
 
