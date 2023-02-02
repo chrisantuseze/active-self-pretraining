@@ -16,7 +16,7 @@ import time
 
 import numpy as np
 from models.self_sup.swav.utils import initialize_exp
-from models.utils.commons import get_params, AverageMeter, get_params_to_update
+from models.utils.commons import get_params, AverageMeter, get_params_to_update, prepare_model
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
 from utils.commons import load_chkpts, load_saved_state
@@ -43,26 +43,8 @@ class SwAVTrainer():
             nmb_prototypes=args.nmb_prototypes,
         )
 
-        params_to_update = self.model.parameters()
         # load weights
-        if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-            if args.backbone == "resnet50":
-                self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
-            else:
-                state = load_saved_state(self.args, pretrain_level="1")
-                self.model.load_state_dict(state['model'], strict=False)
-
-            # freeze some layers
-            for name, param in self.model.named_parameters():
-                if 'projection_head' in name or 'prototypes' in name:
-                    continue
-
-                if 'bn' in name and 'bias' in name:
-                    continue
-
-                param.requires_grad = False
-
-            params_to_update = get_params_to_update(self.model, feature_extract=True)
+        self.model, params_to_update = prepare_model(self.args, training_type, self.model)
 
         self.model = self.model.to(self.args.device)
 

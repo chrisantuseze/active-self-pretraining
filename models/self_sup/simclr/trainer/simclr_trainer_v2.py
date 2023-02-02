@@ -3,7 +3,7 @@ from datautils.dataset_enum import DatasetType
 import utils.logger as logging
 from models.self_sup.simclr.loss.dcl_loss import DCL
 from optim.optimizer import load_optimizer
-from models.utils.commons import get_model_criterion, get_params, AverageMeter, get_params_to_update
+from models.utils.commons import get_model_criterion, get_params, AverageMeter, get_params_to_update, prepare_model
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_chkpts, load_saved_state
 
@@ -26,19 +26,8 @@ class SimCLRTrainerV2():
             self.args.temperature = 0.07
 
         self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
-        params_to_update = self.model.parameters()
-        if training_type != TrainingType.BASE_PRETRAIN or self.args.epoch_num != self.args.base_epochs:
-            # state = load_saved_state(self.args, pretrain_level="1")
-            # self.model.load_state_dict(state['model'], strict=False)
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
-
-            # freeze some layers
-            for name, param in self.model.named_parameters():
-                if 'projection_head' in name or 'prototypes' in name:
-                    continue
-                param.requires_grad = False
-
-            params_to_update = get_params_to_update(self.model, feature_extract=True)
+        
+        self.model, params_to_update = prepare_model(self.args, training_type, self.model)
 
         self.model = self.model.to(self.args.device)
 

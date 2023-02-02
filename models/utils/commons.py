@@ -11,6 +11,7 @@ from models.self_sup.simclr.simclr import SimCLR
 from models.self_sup.simclr.simclr_v2 import SimCLRV2
 from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
+from utils.commons import load_chkpts, load_saved_state
 
 
 def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNING, num_classes=4):
@@ -217,6 +218,31 @@ def get_ds_num_classes(dataset):
         dir = "/cifar10"
     
     return num_classes, dir
+
+def prepare_model(args, trainingType, model):
+    params_to_update = model.parameters()
+
+    # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
+    if args.epoch_num != args.base_epochs:
+        if args.backbone == "resnet50":
+            model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+        else:
+            state = load_saved_state(args, pretrain_level="1")
+            model.load_state_dict(state['model'], strict=False)
+
+        # freeze some layers
+        for name, param in model.named_parameters():
+            if 'projection_head' in name or 'prototypes' in name:
+                continue
+
+            if 'bn' in name and 'bias' in name:
+                continue
+
+            param.requires_grad = False
+
+        params_to_update = get_params_to_update(model, feature_extract=True)
+
+    return model, params_to_update
 
 class AverageMeter(object):
     """computes and stores the average and current value"""
