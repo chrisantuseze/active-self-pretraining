@@ -7,6 +7,7 @@ import argparse
 
 # import cv2
 from torch.utils.tensorboard import SummaryWriter
+from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
@@ -72,6 +73,9 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     assert args.target_dataset == args.lc_dataset
+    assert args.base_dataset == args.target_dataset
+
+    args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
     main()
 
