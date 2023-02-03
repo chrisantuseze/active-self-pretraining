@@ -46,8 +46,9 @@ def main_():
         if args.base_pretrain:
             # main()
 
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.first_pretrain()
+            # pretrainer = SelfSupPretrainer(args, writer)
+            # pretrainer.first_pretrain()
+            pass
 
         if args.target_pretrain:
             pretrainer = SelfSupPretrainer(args, writer)
