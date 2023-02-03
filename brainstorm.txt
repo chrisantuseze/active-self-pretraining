@@ -50,7 +50,7 @@ So the generated images are not added to the target dataset, but rather used sol
 
 - Things to do:
 1. Do LC using pt1 (pretrained using generated images) - Done
-2. Add generated images to target dataset and do single Pretraining.
+2. Add generated images to target dataset and do single Pretraining. - Done (90.61)
 3. Train pt with images generated on fewer epochs.
 
 
