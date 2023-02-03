@@ -20,11 +20,11 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-from models.gan.train import main
+from models.gan.train import do_gen_ai
 
 logging.init()
 
-def main_():
+def main():
     writer = SummaryWriter()
 
     if args.ml_project:
@@ -44,11 +44,10 @@ def main_():
 
     else:
         if args.base_pretrain:
-            # main()
+            do_gen_ai()
 
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
-            pass
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.first_pretrain()
 
         if args.target_pretrain:
             pretrainer = SelfSupPretrainer(args, writer)
@@ -80,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main_()
+    main()
 
     logging.info("CASL ended.")
 
