@@ -110,7 +110,7 @@ def get_params(args, training_type):
         epochs = args.base_epochs
         temperature = args.swav_temperature
         optimizer = args.swav_optimizer
-        base_lr = 1.2
+        base_lr = 4.8
         target_lr = args.swav_base_lr
 
 
@@ -194,7 +194,7 @@ def get_ds_num_classes(dataset):
 
     elif dataset == DatasetType.CHEST_XRAY.value:
         num_classes = 100
-        dir = "/chest_xray"
+        dir = "/chest_xray_real"
 
     elif dataset == DatasetType.FLOWERS.value:
         num_classes = 5

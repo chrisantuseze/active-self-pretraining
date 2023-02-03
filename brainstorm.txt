@@ -48,7 +48,10 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 - How about we introduce another pretraining layer before the target pretraining using the generated images? 
 So the generated images are not added to the target dataset, but rather used solely to pretrain the intermediate model.
 
-
+- Things to do:
+1. Do LC using pt1 (pretrained using generated images) - Done
+2. Add generated images to target dataset and do single Pretraining.
+3. Train pt with images generated on fewer epochs.
 
 
 
