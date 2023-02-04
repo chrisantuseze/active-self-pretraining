@@ -240,7 +240,7 @@ def prepare_model(args, trainingType, model):
         if 'projection_head' in name or 'prototypes' in name:
             continue
 
-        if trainingType == TrainingType.TARGET_PRETRAIN and 'bn' in name and 'bias' in name:
+        if 'bn' in name and 'bias' in name:
             continue
 
         param.requires_grad = False
