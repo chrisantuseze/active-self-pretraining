@@ -110,7 +110,7 @@ def get_params(args, training_type):
         epochs = args.base_epochs
         temperature = args.swav_temperature
         optimizer = args.swav_optimizer
-        base_lr = 0.6
+        base_lr = 0.3
         target_lr = args.swav_base_lr
 
 
@@ -240,7 +240,7 @@ def prepare_model(args, trainingType, model):
         if 'projection_head' in name or 'prototypes' in name:
             continue
 
-        if 'bn' in name and 'bias' in name:
+        if trainingType == TrainingType.TARGET_PRETRAIN and 'bn' in name and 'bias' in name:
             continue
 
         param.requires_grad = False
