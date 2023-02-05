@@ -237,11 +237,10 @@ def prepare_model(args, trainingType, model):
 
     # freeze some layers
     for name, param in model.named_parameters():
-        print(name)
         if 'projection_head' in name or 'prototypes' in name:
             continue
 
-        if 'bn' in name and 'bias' in name:
+        if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name):
             continue
 
         param.requires_grad = False
