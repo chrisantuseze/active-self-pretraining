@@ -101,7 +101,7 @@ class TargetDataset():
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
         print("using the CHEST XRAY dataset")
-        return TargetDataset(args, "/chest_xray", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/chest_xray_gen", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.REAL.value:
         print("using the REAL dataset")
