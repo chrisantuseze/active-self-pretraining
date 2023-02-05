@@ -223,6 +223,7 @@ def get_ds_num_classes(dataset):
     return num_classes, dir
 
 def prepare_model(args, trainingType, model):
+    print(model)
     params_to_update = model.parameters()
 
     # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
