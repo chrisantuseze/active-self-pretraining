@@ -39,7 +39,7 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
         # build optimizer
         optimizer = torch.optim.SGD(
             params,
-            lr=0.001,#train_params.lr,
+            lr=0.0001,#0.001,#train_params.lr,
             momentum=args.momentum,
             weight_decay=args.weight_decay,
         )
