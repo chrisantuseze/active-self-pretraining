@@ -223,7 +223,6 @@ def get_ds_num_classes(dataset):
     return num_classes, dir
 
 def prepare_model(args, trainingType, model):
-    print(model)
     params_to_update = model.parameters()
 
     # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
@@ -238,6 +237,7 @@ def prepare_model(args, trainingType, model):
 
     # freeze some layers
     for name, param in model.named_parameters():
+        print(name)
         if 'projection_head' in name or 'prototypes' in name:
             continue
 
