@@ -44,7 +44,7 @@ def main():
 
     else:
         if args.base_pretrain:
-            do_gen_ai()
+            # do_gen_ai()
 
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
