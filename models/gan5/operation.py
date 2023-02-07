@@ -12,7 +12,6 @@ import json
 def InfiniteSampler(n):
     """Data sampler"""
 
-    print("n =", n)
     i = n - 1
     order = np.random.permutation(n)
     while True:
