@@ -11,7 +11,7 @@ tqdm
 h5py
 Pillow
 
-scikit-image==0.18.2
+scikit-image
 ipdb==0.13.4
 lmdb==1.0.0
 opencv-python==4.5.1.48
