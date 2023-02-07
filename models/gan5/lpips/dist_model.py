@@ -18,8 +18,8 @@ from tqdm import tqdm
 
 from IPython import embed
 
-from . import networks_basic as networks
-import lpips as util
+from models.gan5.lpips import networks_basic as networks
+import models.gan5.lpips as util
 
 class DistModel(BaseModel):
     def name(self):

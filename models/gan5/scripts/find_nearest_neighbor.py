@@ -12,8 +12,8 @@ import random
 import argparse
 from tqdm import tqdm
 
-from models import Generator
-from operation import load_params, InfiniteSamplerWrapper
+from models.gan5.models import Generator
+from models.gan5.operation import load_params, InfiniteSamplerWrapper
 
 noise_dim = 256
 device = torch.device('cuda:%d'%(0))

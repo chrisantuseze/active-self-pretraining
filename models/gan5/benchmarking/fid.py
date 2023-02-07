@@ -11,7 +11,7 @@ from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 
-from calc_inception import load_patched_inception_v3
+from models.gan5.benchmarking.calc_inception import load_patched_inception_v3
 import os
 
 @torch.no_grad()

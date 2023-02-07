@@ -10,9 +10,9 @@ import numpy as np
 from pdb import set_trace as st
 from skimage import color
 from IPython import embed
-from . import pretrained_networks as pn
+from models.gan5.lpips import pretrained_networks as pn
 
-import lpips as util
+import models.gan5.lpips as util
 
 def spatial_average(in_tens, keepdim=True):
     return in_tens.mean([2,3],keepdim=keepdim)

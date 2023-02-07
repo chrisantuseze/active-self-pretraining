@@ -9,12 +9,12 @@ from torchvision import utils as vutils
 import argparse
 from tqdm import tqdm
 
-from models import weights_init, Discriminator, Generator, SimpleDecoder
-from operation import copy_G_params, load_params, get_dir
-from operation import ImageFolder, InfiniteSamplerWrapper
-from diffaug import DiffAugment
+from models.gan5.models import weights_init, Discriminator, Generator, SimpleDecoder
+from models.gan5.operation import copy_G_params, load_params, get_dir
+from models.gan5.operation import ImageFolder, InfiniteSamplerWrapper
+from models.gan5.diffaug import DiffAugment
 policy = 'color,translation'
-import lpips
+import models.gan5.lpips as lpips
 percept = lpips.PerceptualLoss(model='net-lin', net='vgg', use_gpu=True)
 
 
