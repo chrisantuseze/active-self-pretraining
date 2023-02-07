@@ -104,8 +104,6 @@ def train(args):
     netG = Generator(ngf=ngf, nz=nz, im_size=im_size)
     netG.apply(weights_init)
 
-    print("Here")
-
     netD = Discriminator(ndf=ndf, im_size=im_size)
     netD.apply(weights_init)
 
