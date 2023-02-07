@@ -90,6 +90,7 @@ def train(args):
         dataset = ImageFolder(root=data_root, transform=trans)
 
    
+    print(len(dataset))
     dataloader = iter(DataLoader(dataset, batch_size=batch_size, shuffle=False,
                       sampler=InfiniteSamplerWrapper(dataset), num_workers=dataloader_workers, pin_memory=True))
     '''
