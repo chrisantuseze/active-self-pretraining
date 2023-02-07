@@ -118,6 +118,7 @@ def train(args):
     optimizerD = optim.Adam(netD.parameters(), lr=nlr, betas=(nbeta1, 0.999))
 
     if checkpoint != 'None':
+        print("Downloading checkpoint")
         ckpt = torch.load(checkpoint)
         netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
         netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
