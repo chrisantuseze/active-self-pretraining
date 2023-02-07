@@ -87,10 +87,10 @@ def train(args):
         from operation import MultiResolutionDataset
         dataset = MultiResolutionDataset(data_root, trans, 1024)
     else:
-        dataset = ImageFolder(root=data_root, transform=trans)
+        dataset = ImageFolder(data_root, transform=trans)
 
    
-    print(len(dataset))
+    print(data_root, "length is", len(dataset))
     dataloader = iter(DataLoader(dataset, batch_size=batch_size, shuffle=False,
                       sampler=InfiniteSamplerWrapper(dataset), num_workers=dataloader_workers, pin_memory=True))
     '''
