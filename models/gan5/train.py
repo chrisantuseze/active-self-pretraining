@@ -104,6 +104,8 @@ def train(args):
     netG = Generator(ngf=ngf, nz=nz, im_size=im_size)
     netG.apply(weights_init)
 
+    print("Here")
+
     netD = Discriminator(ndf=ndf, im_size=im_size)
     netD.apply(weights_init)
 
@@ -118,7 +120,7 @@ def train(args):
     optimizerD = optim.Adam(netD.parameters(), lr=nlr, betas=(nbeta1, 0.999))
 
     if checkpoint != 'None':
-        print("Downloading checkpoint")
+        print("Loading checkpoint")
         ckpt = torch.load(checkpoint)
         netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
         netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
