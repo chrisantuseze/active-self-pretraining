@@ -13,7 +13,7 @@ from tqdm import tqdm
 from models.gan5.models import weights_init, Discriminator, Generator
 from models.gan5.operation import copy_G_params, load_params, get_dir, ImageFolder, InfiniteSamplerWrapper
 from models.gan5.diffaug import DiffAugment
-import lpips
+import models.gan5.lpips as lpips
 
 
 policy = 'color,translation'
