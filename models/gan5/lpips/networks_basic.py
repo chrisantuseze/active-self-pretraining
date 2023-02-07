@@ -10,7 +10,9 @@ import numpy as np
 from pdb import set_trace as st
 from skimage import color
 from IPython import embed
-from models.gan5.lpips import l2, normalize_tensor, tensor2np, tensor2tensorlab, tensor2im, dssim, pretrained_networks as pn
+from models.gan5.lpips import pretrained_networks as pn
+
+from models.gan5.lpips import utils as util
 
 def spatial_average(in_tens, keepdim=True):
     return in_tens.mean([2,3],keepdim=keepdim)
@@ -66,7 +68,7 @@ class PNetLin(nn.Module):
         feats0, feats1, diffs = {}, {}, {}
 
         for kk in range(self.L):
-            feats0[kk], feats1[kk] = normalize_tensor(outs0[kk]), normalize_tensor(outs1[kk]) 
+            feats0[kk], feats1[kk] = util.normalize_tensor(outs0[kk]), util.normalize_tensor(outs1[kk])
             diffs[kk] = (feats0[kk]-feats1[kk])**2
 
         if(self.lpips):
@@ -155,8 +157,8 @@ class L2(FakeNet):
             value = torch.mean(torch.mean(torch.mean((in0-in1)**2,dim=1).view(N,1,X,Y),dim=2).view(N,1,1,Y),dim=3).view(N)
             return value
         elif(self.colorspace=='Lab'):
-            value = l2(tensor2np(tensor2tensorlab(in0.data,to_norm=False)),
-                tensor2np(tensor2tensorlab(in1.data,to_norm=False)), range=100.).astype('float')
+            value = util.l2(util.tensor2np(util.tensor2tensorlab(in0.data,to_norm=False)), 
+                util.tensor2np(util.tensor2tensorlab(in1.data,to_norm=False)), range=100.).astype('float')
             ret_var = Variable( torch.Tensor((value,) ) )
             if(self.use_gpu):
                 ret_var = ret_var.cuda()
@@ -168,10 +170,10 @@ class DSSIM(FakeNet):
         assert(in0.size()[0]==1) # currently only supports batchSize 1
 
         if(self.colorspace=='RGB'):
-            value = dssim(1.*tensor2im(in0.data), 1.*tensor2im(in1.data), range=255.).astype('float')
+            value = util.dssim(1.*util.tensor2im(in0.data), 1.*util.tensor2im(in1.data), range=255.).astype('float')
         elif(self.colorspace=='Lab'):
-            value = dssim(tensor2np(tensor2tensorlab(in0.data,to_norm=False)), 
-                tensor2np(tensor2tensorlab(in1.data,to_norm=False)), range=100.).astype('float')
+            value = util.dssim(util.tensor2np(util.tensor2tensorlab(in0.data,to_norm=False)), 
+                util.tensor2np(util.tensor2tensorlab(in1.data,to_norm=False)), range=100.).astype('float')
         ret_var = Variable( torch.Tensor((value,) ) )
         if(self.use_gpu):
             ret_var = ret_var.cuda()
