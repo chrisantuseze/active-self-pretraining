@@ -20,7 +20,7 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-from models.gan.train import do_gen_ai
+from models.gan5.train import do_gen_ai
 
 logging.init()
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main()
+    do_gen_ai()
 
     logging.info("CASL ended.")
 
