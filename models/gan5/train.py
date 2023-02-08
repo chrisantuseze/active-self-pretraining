@@ -68,7 +68,7 @@ def train(args):
     multi_gpu = False
     dataloader_workers = 8
     current_iteration = args.start_iter
-    save_interval = 100
+    save_interval = 1000
     saved_model_folder, saved_image_folder = get_dir(args)
     
     device = torch.device("cpu")
@@ -193,9 +193,9 @@ def do_gen_ai():
     parser.add_argument('--path', type=str, default='datasets/anime', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')#50000
+    parser.add_argument('--iter', type=int, default=20000, help='number of iterations')#50000
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
-    parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
+    parser.add_argument('--batch_size', type=int, default=16, help='mini batch number of images')#8
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
     parser.add_argument('--ckpt', type=str, default='None', help='checkpoint weight path if have one')
 
