@@ -190,7 +190,7 @@ def train(args):
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
 
-    parser.add_argument('--path', type=str, default='datasets/anime', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
+    parser.add_argument('--path', type=str, default='datasets/AnimalFace', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
     parser.add_argument('--iter', type=int, default=20000, help='number of iterations')#50000
