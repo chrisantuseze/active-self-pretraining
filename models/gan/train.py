@@ -74,9 +74,9 @@ def do_gen_ai(args):
     dataloader = setup_dataloader(dir=dir, batch_size=args.gan_batch_size, num_workers=args.workers)
     
     dataset_size = len(dataloader.dataset)
-    print("number of images (dataset size): ",dataset_size)
     
     model_path = os.path.join(args.model_checkpoint_path, args.pretrained)
+    print(args.model_checkpoint_path, args.pretrained)
     model = setup_model(args.model_name, dataset_size=dataset_size, resume=args.resume, model_path=model_path)
     model.eval()
     #this has to be eval() even if it's training time
