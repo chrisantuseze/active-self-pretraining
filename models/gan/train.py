@@ -87,7 +87,7 @@ def do_gen_ai(args):
                                 lr_embed = args.lr_embed,
                                 lr_class_cond_embed = args.lr_c_embed,
                                 step= args.step,
-                                step_facter = args.step_facter,
+                                step_factor = args.step_factor,
                             )
     
     criterion = AdaBIGGANLoss(
@@ -169,7 +169,7 @@ def generate_samples(model,img_prefix, batch_size):
     for i in range(1, 2):
         visualizers.random(model, img_prefix, tmp=0.3, num=400, prefix=i, truncate=True)
 
-def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_facter=0.1):
+def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):
     #group parameters by lr
     params = []
     params.append({"params": list(model.batch_stat_gen_params().values()), "lr": lr_g_batch_stat})
@@ -180,7 +180,7 @@ def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed
     
     #setup optimizer
     optimizer = optim.Adam(params, lr=0)#0 is okay because sepcific lr is set by `params`
-    scheduler = lr_scheduler.StepLR(optimizer, step_size=step, gamma=step_facter)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=step, gamma=step_factor)
     return optimizer, scheduler
     
 if __name__ == '__main__':
