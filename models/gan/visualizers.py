@@ -94,8 +94,11 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         
         preds = torch.cat(_preds).numpy()
 
-        probs = preds.max(axis=1)
-        indices = probs.argsort(axis=0)
+        # probs = preds.max(axis=1)
+        # indices = probs.argsort(axis=0)
+
+        entropy = (np.log(preds) * preds).sum(axis=1) * -1.
+        indices = entropy.argsort(axis=0)[::-1]
 
         print(indices)
 
