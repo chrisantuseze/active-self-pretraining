@@ -101,6 +101,7 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         indices = probs.argsort(axis=0)
 
         print(indices)
+        print(indices.shape)
 
         # new_samples = []
         # for item in indices:
