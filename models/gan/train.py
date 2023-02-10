@@ -185,8 +185,11 @@ def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed
     return optimizer, scheduler
 
 def standalone_image_gen(args):
-    state = simple_load_model(args, 'gan_model_10000.000000.pth')
-    model.load_state_dict(state['model'], strict=False)
+    model_path = os.path.join(args.model_checkpoint_path, 'gan_model_10000.000000.pth')
+    model = setup_model(args.model_name, dataset_size=25, resume=args.gan_resume, model_path=model_path)
+
+    # state = simple_load_model(args, 'gan_model_10000.000000.pth')
+    # model.load_state_dict(state['model'], strict=False)
     model = model.to(args.device)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
