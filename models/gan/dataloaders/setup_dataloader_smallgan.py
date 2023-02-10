@@ -3,18 +3,22 @@ from models.gan.dataloaders.ImageListDataset import ImageListDataset
 from torchvision import transforms
 from torch.utils.data import  DataLoader
 
-def setup_dataloader(name, h=128, w=128, batch_size=4, num_workers=4):
+def setup_dataloader(dir, h=128, w=128, batch_size=4, num_workers=4):
     '''
     instead of setting up dataloader that read raw image from file, 
     let's use store all images on cpu memmory
     because this is for small dataset
     '''
-    if name == "face":
-        img_path_list = glob.glob(f"./datasets/chest_xray/train/*/*")
-    elif name=="anime":
-        img_path_list = glob.glob("./models/gan/data/anime/*.png")
+
+    with_train = True if dir in ["./datasets/chest_xray"] else False
+    
+    if with_train:
+        if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
+            img_path_list = glob.glob(dir + '/train/*/*')
+        else:
+            img_path_list = glob.glob(dir + '/train/*/*')
     else:
-        raise NotImplementedError("Unknown dataset %s"%name)
+        img_path_list = glob.glob(dir + '/*/*')
         
     assert len(img_path_list) > 0
 

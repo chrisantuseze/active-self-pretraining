@@ -70,7 +70,8 @@ def do_gen_ai(args):
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
     
-    dataloader = setup_dataloader(name=get_dataset_enum(args.target_dataset), batch_size=args.batch, num_workers=args.workers)
+    dir = f'{args.dataset_dir}/{get_dataset_enum(args.target_dataset)}'
+    dataloader = setup_dataloader(name=dir, batch_size=args.batch, num_workers=args.workers)
     
     dataset_size = len(dataloader.dataset)
     print("number of images (dataset size): ",dataset_size)
