@@ -152,7 +152,7 @@ do_al_for_ml_project: False                   # switches between AL and regular 
 
 
 ################################### GAN ###########################################################
-pretrained: "/G_ema.pth"
+pretrained: "G_ema.pth"
 
 lr_g_l: 0.0000001                             # lr for original linear layer in generator. default is 0.0000001
 lr_g_batch_stat: 0.0005                       # lr for linear layer to generate scale and bias in generator
@@ -177,4 +177,4 @@ gan_batch_size: 25                                     # batch size
 gan_epoch: 100
 model_name: "biggan128-ada"                   # model. biggan128-ada
 
-gen_images_path: "/generated"                 # model checkpoint path
+gen_images_path: "generated"                 # model checkpoint path
