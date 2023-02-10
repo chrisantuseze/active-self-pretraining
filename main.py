@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    do_gen_ai()
+    do_gen_ai(args)
 
     logging.info("CASL ended.")
 
