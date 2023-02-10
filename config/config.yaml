@@ -177,4 +177,5 @@ gan_batch_size: 25                                     # batch size
 gan_epoch: 100
 model_name: "biggan128-ada"                   # model. biggan128-ada
 
-gen_images_path: "generated"                 # model checkpoint path
+gen_images_path: "generated"                  # model checkpoint path
+gan_resume: ''                                # path to resume training from
