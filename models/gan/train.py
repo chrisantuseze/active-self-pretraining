@@ -205,7 +205,7 @@ def standalone_image_gen(args):
     )
 
     # load weights
-    features_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+    features_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", features_model)
     features_model = features_model.to(args.device)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
