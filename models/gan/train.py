@@ -14,7 +14,7 @@ from models.utils.commons import get_params, AverageMeter, get_params_to_update
 from models.gan.dataloaders.setup_dataloader_smallgan import setup_dataloader 
 from models.gan.nets.setup_model import setup_model
 from models.gan.losses.AdaBIGGANLoss import AdaBIGGANLoss
-from utils.commons import simple_save_model
+from utils.commons import simple_load_model, simple_save_model
 import utils.logger as logging
 
 
@@ -157,13 +157,14 @@ def do_gen_ai(args):
             break
         epoch+=1
 
+    logging("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
-    generate_samples(model, img_prefix, dataloader.batch_size)
+    generate_samples(model, img_prefix)
 
-    simple_save_model(args, model, 'gan_model_{:4f}.pth'.format(epoch))
+    simple_save_model(args, model, f'gan_model_{epoch}.pth')
 
 
-def generate_samples(model,img_prefix, batch_size):
+def generate_samples(model, img_prefix):
     # visualizers.reconstruct(model, img_prefix, num=100, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=400)
     for i in range(1, 2):
@@ -182,6 +183,12 @@ def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed
     optimizer = optim.Adam(params, lr=0)#0 is okay because sepcific lr is set by `params`
     scheduler = lr_scheduler.StepLR(optimizer, step_size=step, gamma=step_factor)
     return optimizer, scheduler
+
+def standalone_image_gen(args):
+    model = simple_load_model('gan_model_10000.000000.pth')
+
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
+    generate_samples(model, gen_images_path)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()

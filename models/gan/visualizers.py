@@ -1,5 +1,7 @@
 import torch
 import torchvision
+import torch.nn.functional as F
+
 import numpy as np
 from scipy.stats import truncnorm
 
@@ -77,10 +79,20 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         #         nrow=1,
         #         normalize=True,
         #     )
+
         for i, val in enumerate(image_tensors):
-            torchvision.utils.save_image(
-                val,
-                f"{out_path}random_{prefix}_{i}.jpg",
-                nrow=1,
-                normalize=True,
-            )
+            preds = get_predictions(val)
+            print(preds)
+            
+            # torchvision.utils.save_image(
+            #     val,
+            #     f"{out_path}random_{prefix}_{i}.jpg",
+            #     nrow=1,
+            #     normalize=True,
+            # )
+
+def get_predictions(outputs):
+    dist1 = F.softmax(outputs, dim=1)
+    preds = dist1.detach().cpu()
+
+    return preds

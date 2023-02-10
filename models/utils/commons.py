@@ -33,7 +33,6 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
 
     else:
         if args.method == SSL_Method.SIMCLR.value:
-            # criterion = NT_Xent(batch_size, args.temperature, args.world_size)
             criterion = NTXentLoss(args)
             model = SimCLR(encoder, args.projection_dim, n_features)
             print("using SIMCLR")
