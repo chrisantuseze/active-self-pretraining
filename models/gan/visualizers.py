@@ -80,7 +80,7 @@ def random(model, features_model, out_path, tmp=0.4, num=9, prefix=1, truncate=F
         #         normalize=True,
         #     )
 
-        outputs = features_model(embeddings)
+        outputs = features_model(image_tensors)
         _preds = []
         for i, val in enumerate(outputs):
             _preds.append(get_predictions(val))
