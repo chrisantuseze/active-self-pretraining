@@ -150,3 +150,31 @@ al_train_maintask: False                      # this enables the training of the
 ml_project: False                             # switches to ML Final Project mode 
 do_al_for_ml_project: False                   # switches between AL and regular classification
 
+
+################################### GAN ###########################################################
+pretrained: "/G_ema.pth"
+
+lr_g_l: 0.0000001                             # lr for original linear layer in generator. default is 0.0000001
+lr_g_batch_stat: 0.0005                       # lr for linear layer to generate scale and bias in generator
+lr_embed: 0.05                                # lr for image embeddings
+lr_bsa_l: 0.0005                              # lr for statistic (scale and bias) parameter for the original fc layer in generator. This is newly intoroduced learnable parameter for the pretrained GAN
+lr_c_embed: 0.001                             # lr for class conditional embeddings
+    
+    
+#loss settings
+loss_per: 0.1                                 # scaling factor for perceptural loss. 
+loss_emd: 0.1                                 # scaling factor for earth mover distance loss. 
+loss_re: 0.02                                 # scaling factor for regularizer loss.
+loss_norm_img: 1                              # normalize img loss or not
+loss_norm_per: 1                              # normalize perceptural loss or not
+loss_dist_per: "l2"                           # distance function for perceptual loss. l1 or l2
+
+step: 3000                                    # Decrease lr by a factor of args.step_facter every <step> iterations
+step_factor: 0.1                              # facter to multipy when decrease lr 
+
+iters: 10000                                  # number of iterations.
+batch: 25                                     # batch size
+epoch: 100
+model_name: "biggan128-ada"                   # model. biggan128-ada
+
+gen_images_path: "/generated"                 # model checkpoint path

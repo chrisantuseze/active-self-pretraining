@@ -231,12 +231,12 @@ def run(config):
     state_dict['epoch'] += 1
 
 
-def main():
+def do_gen_ai():
   # parse command line and run
   parser = utils.prepare_parser()
   config = vars(parser.parse_args())
-  print(config)
+  # print(config)
   run(config)
 
 if __name__ == '__main__':
-  main()
+  do_gen_ai()
