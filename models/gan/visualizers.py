@@ -101,9 +101,9 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
 
         print(indices)
 
-        new_samples = []
-        for item in indices:
-            new_samples.append(image_tensors[item])
+        # new_samples = []
+        # for item in indices:
+        #     new_samples.append(image_tensors[item])
 
         # image_tensors = new_samples[: new_samples // 2]
         # for i, val in enumerate(image_tensors):

@@ -193,7 +193,7 @@ def standalone_image_gen(args):
     model = model.to(args.device)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
-    generate_samples(model, gen_images_path, size=10)
+    generate_samples(model, gen_images_path, size=3)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()
