@@ -173,8 +173,8 @@ step: 3000                                    # Decrease lr by a factor of args.
 step_factor: 0.1                              # facter to multipy when decrease lr 
 
 iters: 10000                                  # number of iterations.
-batch: 25                                     # batch size
-epoch: 100
+gan_batch_size: 25                                     # batch size
+gan_epoch: 100
 model_name: "biggan128-ada"                   # model. biggan128-ada
 
 gen_images_path: "/generated"                 # model checkpoint path
