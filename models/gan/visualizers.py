@@ -95,6 +95,7 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         preds = torch.cat(_preds).numpy()
 
         print(preds)
+        print(preds.shape)
 
         probs = preds.max(axis=1)
         indices = probs.argsort(axis=0)
