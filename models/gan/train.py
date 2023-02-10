@@ -66,11 +66,11 @@ def do_gen_ai(args):
     device = args.device
 
     gen_images_path = os.path.join(f'{args.dataset_dir}{args.gen_images_path}_{get_dataset_enum(2)}')
-    print(args.dataset_dir, gen_images_path)
+    print(gen_images_path)
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
     
-    dataloader = setup_dataloader(name=args.dataset, batch_size=args.batch, num_workers=args.workers)
+    dataloader = setup_dataloader(name=get_dataset_enum(args.target_dataset), batch_size=args.batch, num_workers=args.workers)
     
     dataset_size = len(dataloader.dataset)
     print("number of images (dataset size): ",dataset_size)
