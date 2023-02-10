@@ -66,6 +66,7 @@ def do_gen_ai(args):
     device = args.device
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
+    print(gen_images_path)
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
     
