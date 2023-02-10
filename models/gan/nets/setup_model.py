@@ -121,7 +121,7 @@ def setup_model(name, dataset_size, resume=None, model_path="./data/G_ema.pth"):
         print("%s (model name) is not defined"%name)
         raise NotImplementedError()
 
-    if resume is not None:
+    if not resume:
         print("resuming trained weights from %s"%resume)
         checkpoint_dict = torch.load(resume)
         model.load_state_dict(checkpoint_dict["model"])
