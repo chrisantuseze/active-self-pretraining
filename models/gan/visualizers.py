@@ -80,9 +80,10 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         #         normalize=True,
         #     )
 
+        _preds = []
         for i, val in enumerate(image_tensors):
-            preds = get_predictions(val)
-            print(preds)
+            _preds.append(get_predictions(val))
+            
             
             # torchvision.utils.save_image(
             #     val,
@@ -90,6 +91,26 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
             #     nrow=1,
             #     normalize=True,
             # )
+        
+        preds = torch.cat(_preds).numpy()
+
+        probs = preds.max(axis=1)
+        indices = probs.argsort(axis=0)
+
+        print(indices)
+
+        # new_samples = []
+        # for item in indices:
+        #     new_samples.append(image_tensors[item])
+
+        # image_tensors = new_samples[: new_samples // 2]
+        # for i, val in enumerate(image_tensors):
+        #     torchvision.utils.save_image(
+        #         val,
+        #         f"{out_path}random_{prefix}_{i}.jpg",
+        #         nrow=1,
+        #         normalize=True,
+        #     )
 
 def get_predictions(outputs):
     dist1 = F.softmax(outputs, dim=1)
