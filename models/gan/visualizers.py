@@ -66,11 +66,12 @@ def random(model, features_model, out_path, tmp=0.4, num=9, prefix=1, truncate=F
         model.eval()
         device = next(model.parameters()).device
         dim_z = model.embeddings.weight.size(1)
+        print("dim_z", dim_z)
         if truncate:
             embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
         else:
             embeddings = np.random.normal(0, tmp, size=(num, dim_z)).astype("float32")
-        embeddings = torch.tensor(embeddings,device=device)
+        embeddings = torch.tensor(embeddings, device=device)
 
         image_tensors = model(embeddings)
         # torchvision.utils.save_image(
@@ -80,10 +81,11 @@ def random(model, features_model, out_path, tmp=0.4, num=9, prefix=1, truncate=F
         #         normalize=True,
         #     )
 
-        outputs = features_model(image_tensors)
+        
         _preds = []
-        for i, val in enumerate(outputs):
-            _preds.append(get_predictions(val))
+        for i, val in enumerate(image_tensors):
+            outputs = features_model(val)
+            _preds.append(get_predictions(outputs))
         
         preds = torch.cat(_preds).numpy()
 
