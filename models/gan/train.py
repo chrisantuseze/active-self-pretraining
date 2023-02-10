@@ -14,8 +14,9 @@ from models.utils.commons import get_params, AverageMeter, get_params_to_update
 from models.gan.dataloaders.setup_dataloader_smallgan import setup_dataloader 
 from models.gan.nets.setup_model import setup_model
 from models.gan.losses.AdaBIGGANLoss import AdaBIGGANLoss
-from utils.commons import simple_load_model, simple_save_model
+from utils.commons import load_chkpts, simple_load_model, simple_save_model
 import utils.logger as logging
+import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 
 def argparse_setup():
@@ -164,11 +165,11 @@ def do_gen_ai(args):
     simple_save_model(args, model, f'gan_model_{epoch}.pth')
 
 
-def generate_samples(model, img_prefix, size):
+def generate_samples(model, features_model, img_prefix, size):
     # visualizers.reconstruct(model, img_prefix, num=size, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=size)
     for i in range(1, 2):
-        visualizers.random(model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
+        visualizers.random(model, features_model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):
     #group parameters by lr
@@ -192,8 +193,23 @@ def standalone_image_gen(args):
     model.load_state_dict(state['model'], strict=False)
     model = model.to(args.device)
 
+
+    # build model
+    zero_init_residual = True #TODO: They said that this improves the network by 0.2-0.3%
+    features_model = resnet_models.__dict__[args.backbone](
+        zero_init_residual=zero_init_residual,
+        normalize=True,
+        hidden_mlp=args.hidden_mlp,
+        output_dim=args.feat_dim,
+        nmb_prototypes=args.nmb_prototypes,
+    )
+
+    # load weights
+    features_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+    features_model = features_model.to(args.device)
+
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
-    generate_samples(model, gen_images_path, size=3)
+    generate_samples(model, features_model, gen_images_path, size=3)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()
