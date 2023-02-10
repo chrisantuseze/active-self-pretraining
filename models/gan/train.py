@@ -159,16 +159,16 @@ def do_gen_ai(args):
 
     logging("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
-    generate_samples(model, img_prefix)
+    generate_samples(model, img_prefix, size=400)
 
     simple_save_model(args, model, f'gan_model_{epoch}.pth')
 
 
-def generate_samples(model, img_prefix):
-    # visualizers.reconstruct(model, img_prefix, num=100, add_small_noise=True)
-    # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=400)
+def generate_samples(model, img_prefix, size):
+    # visualizers.reconstruct(model, img_prefix, num=size, add_small_noise=True)
+    # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=size)
     for i in range(1, 2):
-        visualizers.random(model, img_prefix, tmp=0.3, num=400, prefix=i, truncate=True)
+        visualizers.random(model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):
     #group parameters by lr
@@ -193,7 +193,7 @@ def standalone_image_gen(args):
     model = model.to(args.device)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
-    generate_samples(model, gen_images_path)
+    generate_samples(model, gen_images_path, size=10)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()
