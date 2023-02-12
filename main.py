@@ -44,7 +44,7 @@ def main():
 
     else:
         if args.base_pretrain:
-            # do_gen_ai()
+            do_gen_ai()
 
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    standalone_image_gen(args)
+    main(args)
 
     logging.info("CASL ended.")
 
