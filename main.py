@@ -24,7 +24,7 @@ from models.gan.train import do_gen_ai, standalone_image_gen
 
 logging.init()
 
-def main():
+def main(args):
     writer = SummaryWriter()
 
     if args.ml_project:
@@ -44,7 +44,7 @@ def main():
 
     else:
         if args.base_pretrain:
-            do_gen_ai()
+            do_gen_ai(args)
 
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main()
+    main(args)
 
     logging.info("CASL ended.")
 
