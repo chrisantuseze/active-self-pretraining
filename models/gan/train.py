@@ -158,7 +158,7 @@ def do_gen_ai(args):
             break
         epoch+=1
 
-    logging("Generating images...")
+    logging.info("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
     generate_samples(model, img_prefix, size=400)
 
