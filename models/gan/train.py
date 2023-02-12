@@ -165,11 +165,11 @@ def do_gen_ai(args):
     simple_save_model(args, model, f'gan_model_{epoch}.pth')
 
 
-def generate_samples(model, features_model, img_prefix, size):
+def generate_samples(model, img_prefix, size):
     # visualizers.reconstruct(model, img_prefix, num=size, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=size)
     for i in range(1, 2):
-        visualizers.random(model, features_model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
+        visualizers.random(model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):
     #group parameters by lr
