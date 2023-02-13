@@ -66,10 +66,12 @@ def argparse_setup():
 def do_gen_ai(args):
     device = args.device
 
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
     
+    logging.info(f"Using {get_dataset_enum(args.target_dataset)} dataset")
+
     dir = f'{args.dataset_dir}/{get_dataset_enum(args.target_dataset)}'
     dataloader = setup_dataloader(dir=dir, batch_size=args.gan_batch_size, num_workers=args.workers)
     dataset_size = len(dataloader.dataset)

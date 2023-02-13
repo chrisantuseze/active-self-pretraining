@@ -66,7 +66,6 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         model.eval()
         device = next(model.parameters()).device
         dim_z = model.embeddings.weight.size(1)
-        print("dim_z", dim_z)
         if truncate:
             embeddings = truncnorm(-tmp, tmp).rvs(num * dim_z).astype("float32").reshape(num, dim_z)
         else:
