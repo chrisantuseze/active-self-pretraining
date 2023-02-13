@@ -70,6 +70,7 @@ class SelfSupPretrainer(BasePretrainer):
         model = trainer.model
         optimizer = trainer.optimizer
 
+        self.args.current_epoch = 0
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)

@@ -37,7 +37,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
             epoch_num = args.base_epochs
 
         out = args.resume if recent and args.resume else os.path.join(
-                args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+                args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, 600)
             )
 
         return torch.load(out, map_location=args.device.type)
