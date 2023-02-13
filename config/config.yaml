@@ -172,7 +172,7 @@ loss_dist_per: "l2"                           # distance function for perceptual
 step: 3000                                    # Decrease lr by a factor of args.step_factor every <step> iterations
 step_factor: 0.1                              # facter to multipy when decrease lr 
 
-iters: 1000                                  # number of iterations.
+iters: 10000                                  # number of iterations.
 gan_batch_size: 25                                     # batch size
 gan_epoch: 100
 model_name: "biggan128-ada"                   # model. biggan128-ada
