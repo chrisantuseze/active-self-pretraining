@@ -957,7 +957,7 @@ class Trainer():
         self,
         name = 'default',
         results_dir = './save/misc/results',
-        models_dir = 'save/checkpoint/models',
+        models_dir = 'save/checkpoints/models',
         base_dir = './',
         optimizer = 'adam',
         num_workers = None,
