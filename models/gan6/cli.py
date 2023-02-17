@@ -68,7 +68,7 @@ def run_training(rank, world_size, model_args, data, load_from, new, num_train_s
         model.train()
         progress_bar.n = model.steps
         progress_bar.refresh()
-        if is_main and model.steps % 50 == 0:
+        if is_main and model.steps % 500 == 0:
             model.print_log()
 
     model.save(model.checkpoint_num)
