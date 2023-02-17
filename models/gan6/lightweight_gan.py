@@ -373,6 +373,8 @@ class ImageDataset(Dataset):
         self.paths = [p for ext in EXTS for p in Path(f'{folder}').glob(f'**/*.{ext}')]
         self.paths = self.paths[0:1000] #TODO: This was added by me.
 
+        print(f"Training GAN using {len(self.paths)} images from {folder}")
+
         assert len(self.paths) > 0, f'No images were found in {folder} for training'
 
         if transparent:
