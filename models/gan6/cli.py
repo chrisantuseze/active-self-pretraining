@@ -79,7 +79,7 @@ def run_training(rank, world_size, model_args, data, load_from, new, num_train_s
 def train_from_folder(
     data = './datasets/flowers',
     results_dir = './save/misc/results',
-    models_dir = './models',
+    models_dir = 'save/checkpoint/models',
     name = 'default',
     new = False,
     load_from = -1,
@@ -94,7 +94,7 @@ def train_from_folder(
     learning_rate = 2e-4,
     save_every = 1000,
     evaluate_every = 1000,
-    generate = False,
+    generate = True,#False,
     generate_types = ['default', 'ema'],
     generate_interpolation = False,
     aug_test = False,

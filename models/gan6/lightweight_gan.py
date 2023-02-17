@@ -371,6 +371,8 @@ class ImageDataset(Dataset):
         self.folder = folder
         self.image_size = image_size
         self.paths = [p for ext in EXTS for p in Path(f'{folder}').glob(f'**/*.{ext}')]
+        self.paths = self.paths[0:1000] #TODO: This was added by me.
+        
         assert len(self.paths) > 0, f'No images were found in {folder} for training'
 
         if transparent:
@@ -955,7 +957,7 @@ class Trainer():
         self,
         name = 'default',
         results_dir = './save/misc/results',
-        models_dir = 'models',
+        models_dir = 'save/checkpoint/models',
         base_dir = './',
         optimizer = 'adam',
         num_workers = None,
