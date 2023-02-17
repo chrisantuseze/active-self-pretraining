@@ -82,7 +82,7 @@ def train_from_folder(
     models_dir = 'save/checkpoint/models',
     name = 'default',
     new = False,
-    load_from = -1,
+    load_from = 21,#-1,
     image_size = 256,
     optimizer = 'adam',
     fmap_max = 512,

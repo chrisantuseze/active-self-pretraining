@@ -372,7 +372,7 @@ class ImageDataset(Dataset):
         self.image_size = image_size
         self.paths = [p for ext in EXTS for p in Path(f'{folder}').glob(f'**/*.{ext}')]
         self.paths = self.paths[0:1000] #TODO: This was added by me.
-        
+
         assert len(self.paths) > 0, f'No images were found in {folder} for training'
 
         if transparent:
@@ -1635,6 +1635,7 @@ class Trainer():
 
         self.steps = name * self.save_every
 
+        print("Loading GAN checkpoint from", self.model_name(name))
         load_data = torch.load(self.model_name(name))
 
         if print_version and 'version' in load_data and self.is_main:
