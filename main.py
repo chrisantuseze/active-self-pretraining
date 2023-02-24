@@ -20,7 +20,7 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-from models.gan6.train import do_gen_ai
+from models.gan5.train import do_gen_ai
 
 logging.init()
 
@@ -44,7 +44,7 @@ def main(args):
 
     else:
         if args.base_pretrain:
-            do_gen_ai(args)
+            do_gen_ai()
 
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
