@@ -95,7 +95,7 @@ def train_from_folder(
     save_every = 1000,
     evaluate_every = 1000,
     generate = True,
-    generate_types = ['default', 'ema'],
+    generate_types = ['ema'],#['default', 'ema'],
     generate_interpolation = False,
     aug_test = False,
     aug_prob=None,
