@@ -49,7 +49,6 @@ def train(args):
 
     data_root = args.path
     total_iterations = args.iter
-    checkpoint = args.ckpt
     batch_size = args.batch_size
     im_size = args.im_size
     ndf = 64
@@ -66,6 +65,8 @@ def train(args):
     policy = 'color,translation'
 
     args.ckpt = f'{saved_model_folder}/50000.pth'
+    checkpoint = args.ckpt
+
     percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
 
     device = torch.device("cpu")
@@ -114,7 +115,7 @@ def train(args):
     optimizerD = optim.Adam(netD.parameters(), lr=nlr, betas=(nbeta1, 0.999))
 
     if checkpoint != 'None':
-        print("Loading checkpoint")
+        print(f"Loading checkpoint from {checkpoint}")
         ckpt = torch.load(checkpoint)
         netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
         netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
@@ -210,7 +211,7 @@ def generate_images(args):
     fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
 
     print("Generating images...")
-    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{50000}.jpg', nrow=4)
+    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.iter}.jpg', nrow=4)
 
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
@@ -218,7 +219,7 @@ def do_gen_ai():
     parser.add_argument('--path', type=str, default='datasets/100-shot-obama', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=10000, help='number of iterations')#50000
+    parser.add_argument('--iter', type=int, default=30000, help='number of iterations')#50000
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
@@ -227,7 +228,7 @@ def do_gen_ai():
     args = parser.parse_args()
     # print(args)
 
-    # train(args)
+    train(args)
     generate_images(args)
 
 if __name__ == "__main__":
