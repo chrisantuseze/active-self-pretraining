@@ -26,13 +26,12 @@ def crop_image_by_part(image, part):
     if part==3:
         return image[:,:,hw:,hw:]
 
-def train_d(args, net, data, label="real"):
+def train_d(args, net, data, percept, label="real"):
     """Train function of discriminator"""
     if label=="real":
         part = random.randint(0, 3)
         pred, [rec_all, rec_small, rec_part] = net(data, label, part=part)
 
-        percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
         err = F.relu(  torch.rand_like(pred) * 0.2 + 0.8 -  pred).mean() + \
             percept( rec_all, F.interpolate(data, rec_all.shape[2]) ).sum() +\
             percept( rec_small, F.interpolate(data, rec_small.shape[2]) ).sum() +\
@@ -67,6 +66,7 @@ def train(args):
     policy = 'color,translation'
 
     args.ckpt = f'{saved_model_folder}/50000.pth'
+    percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
 
     device = torch.device("cpu")
     if use_cuda:
@@ -142,8 +142,8 @@ def train(args):
         ## 2. train Discriminator
         netD.zero_grad()
 
-        err_dr, rec_img_all, rec_img_small, rec_img_part = train_d(args, netD, real_image, label="real")
-        train_d(args, netD, [fi.detach() for fi in fake_images], label="fake")
+        err_dr, rec_img_all, rec_img_small, rec_img_part = train_d(args, netD, real_image, percept, label="real")
+        train_d(args, netD, [fi.detach() for fi in fake_images], percept, label="fake")
         optimizerD.step()
         
         ## 3. train Generator
@@ -157,7 +157,7 @@ def train(args):
         for p, avg_p in zip(netG.parameters(), avg_param_G):
             avg_p.mul_(0.999).add_(0.001 * p.data)
 
-        if iteration % 100 == 0:
+        if iteration % save_interval == 0:
             print("GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item()))
           
         if iteration % (save_interval*10) == 0:
