@@ -64,7 +64,7 @@ def train(args):
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
-    args.ckpt = f'{saved_model_folder}/50000.pth'
+    args.ckpt = f'{saved_model_folder}/gan5_model_10000.pth'
     checkpoint = args.ckpt
 
     percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
@@ -117,11 +117,11 @@ def train(args):
     if checkpoint != 'None':
         print(f"Loading checkpoint from {checkpoint}")
         ckpt = torch.load(checkpoint)
-        netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
-        netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
+        netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()}, strict=False)
+        netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()}, strict=False)
         avg_param_G = ckpt['g_ema']
-        optimizerG.load_state_dict(ckpt['opt_g'])
-        optimizerD.load_state_dict(ckpt['opt_d'])
+        optimizerG.load_state_dict(ckpt['opt_g'], strict=False)
+        optimizerD.load_state_dict(ckpt['opt_d'], strict=False)
         current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
         del ckpt
         
@@ -175,13 +175,13 @@ def train(args):
         if iteration % (save_interval*50) == 0 or iteration == total_iterations:
             backup_para = copy_G_params(netG)
             load_params(netG, avg_param_G)
-            torch.save({'g':netG.state_dict(),'d':netD.state_dict()}, saved_model_folder+'/%d.pth'%iteration)
+            # torch.save({'g':netG.state_dict(),'d':netD.state_dict()}, saved_model_folder+'/%d.pth'%iteration)
             load_params(netG, backup_para)
             torch.save({'g':netG.state_dict(),
                         'd':netD.state_dict(),
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
-                        'opt_d': optimizerD.state_dict()}, saved_model_folder+'/all_%d.pth'%iteration)
+                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_model_{iteration}.pth')
 
 def generate_images(args):
     ndf = 64
@@ -203,7 +203,7 @@ def generate_images(args):
 
     print("Loading checkpoint")
 
-    args.ckpt = f'{model_path}/{args.iter}.pth'
+    args.ckpt = f'{model_path}/gan5_model_{args.iter}.pth'
     ckpt = torch.load(args.ckpt)
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
@@ -219,7 +219,7 @@ def do_gen_ai():
     parser.add_argument('--path', type=str, default='datasets/100-shot-obama', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=30000, help='number of iterations')#50000
+    parser.add_argument('--iter', type=int, default=80000, help='number of iterations')#50000
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
