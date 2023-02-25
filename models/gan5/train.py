@@ -120,8 +120,8 @@ def train(args):
         netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()}, strict=False)
         netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()}, strict=False)
         avg_param_G = ckpt['g_ema']
-        optimizerG.load_state_dict(ckpt['opt_g'], strict=False)
-        optimizerD.load_state_dict(ckpt['opt_d'], strict=False)
+        optimizerG.load_state_dict(ckpt['opt_g'])
+        optimizerD.load_state_dict(ckpt['opt_d'])
         current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
         del ckpt
         
