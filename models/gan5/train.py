@@ -15,14 +15,6 @@ from models.gan5.operation import copy_G_params, load_params, get_dir, ImageFold
 from models.gan5.diffaug import DiffAugment
 import models.gan5.lpips.utils as lpips
 
-
-policy = 'color,translation'
-percept = lpips.PerceptualLoss(model='net-lin', net='vgg', use_gpu=True)
-
-
-#torch.backends.cudnn.benchmark = True
-
-
 def crop_image_by_part(image, part):
     hw = image.shape[2]//2
     if part==0:
@@ -34,11 +26,13 @@ def crop_image_by_part(image, part):
     if part==3:
         return image[:,:,hw:,hw:]
 
-def train_d(net, data, label="real"):
+def train_d(args, net, data, label="real"):
     """Train function of discriminator"""
     if label=="real":
         part = random.randint(0, 3)
         pred, [rec_all, rec_small, rec_part] = net(data, label, part=part)
+
+        percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
         err = F.relu(  torch.rand_like(pred) * 0.2 + 0.8 -  pred).mean() + \
             percept( rec_all, F.interpolate(data, rec_all.shape[2]) ).sum() +\
             percept( rec_small, F.interpolate(data, rec_small.shape[2]) ).sum() +\
@@ -70,7 +64,10 @@ def train(args):
     current_iteration = args.start_iter
     save_interval = 1000
     saved_model_folder, saved_image_folder = get_dir(args)
-    
+    policy = 'color,translation'
+
+    args.ckpt = f'{saved_model_folder}/{args.iter}.pth'
+
     device = torch.device("cpu")
     if use_cuda:
         device = torch.device("cuda:0")
@@ -112,8 +109,6 @@ def train(args):
     netD.to(device)
 
     avg_param_G = copy_G_params(netG)
-
-    fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
     
     optimizerG = optim.Adam(netG.parameters(), lr=nlr, betas=(nbeta1, 0.999))
     optimizerD = optim.Adam(netD.parameters(), lr=nlr, betas=(nbeta1, 0.999))
@@ -147,8 +142,8 @@ def train(args):
         ## 2. train Discriminator
         netD.zero_grad()
 
-        err_dr, rec_img_all, rec_img_small, rec_img_part = train_d(netD, real_image, label="real")
-        train_d(netD, [fi.detach() for fi in fake_images], label="fake")
+        err_dr, rec_img_all, rec_img_small, rec_img_part = train_d(args, netD, real_image, label="real")
+        train_d(args, netD, [fi.detach() for fi in fake_images], label="fake")
         optimizerD.step()
         
         ## 3. train Generator
@@ -214,7 +209,8 @@ def generate_images(args):
 
     fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
 
-    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{5000}.jpg', nrow=4)
+    print("Generating images...")
+    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{50000}.jpg', nrow=4)
 
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
@@ -222,7 +218,7 @@ def do_gen_ai():
     parser.add_argument('--path', type=str, default='datasets/100-shot-obama', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
+    parser.add_argument('--iter', type=int, default=10000, help='number of iterations')#50000
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
@@ -231,8 +227,8 @@ def do_gen_ai():
     args = parser.parse_args()
     # print(args)
 
-    # train(args)
-    generate_images(args)
+    train(args)
+    # generate_images(args)
 
 if __name__ == "__main__":
     do_gen_ai()

@@ -46,15 +46,15 @@ def main(args):
         if args.base_pretrain:
             do_gen_ai()
 
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.first_pretrain()
+        #     pretrainer = SelfSupPretrainer(args, writer)
+        #     pretrainer.first_pretrain()
 
-        if args.target_pretrain:
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.second_pretrain()
+        # if args.target_pretrain:
+        #     pretrainer = SelfSupPretrainer(args, writer)
+        #     pretrainer.second_pretrain()
 
-        classifier = Classifier(args, pretrain_level="2")
-        classifier.train_and_eval()
+        # classifier = Classifier(args, pretrain_level="2")
+        # classifier.train_and_eval()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
