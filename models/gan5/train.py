@@ -227,8 +227,8 @@ def do_gen_ai():
     args = parser.parse_args()
     # print(args)
 
-    train(args)
-    # generate_images(args)
+    # train(args)
+    generate_images(args)
 
 if __name__ == "__main__":
     do_gen_ai()
