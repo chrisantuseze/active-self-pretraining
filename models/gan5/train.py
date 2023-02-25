@@ -168,12 +168,12 @@ def train(args):
         if iteration % (save_interval*10) == 0:
             backup_para = copy_G_params(netG)
             load_params(netG, avg_param_G)
-            with torch.no_grad():
-                vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5), saved_image_folder+'/%d.jpg'%iteration, nrow=4)
-                vutils.save_image( torch.cat([
-                        F.interpolate(real_image, 128), 
-                        rec_img_all, rec_img_small,
-                        rec_img_part]).add(1).mul(0.5), saved_image_folder+'/rec_%d.jpg'%iteration )
+            # with torch.no_grad():
+                # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5), saved_image_folder+'/%d.jpg'%iteration, nrow=4)
+                # vutils.save_image( torch.cat([
+                #         F.interpolate(real_image, 128), 
+                #         rec_img_all, rec_img_small,
+                #         rec_img_part]).add(1).mul(0.5), saved_image_folder+'/rec_%d.jpg'%iteration )
             load_params(netG, backup_para)
 
         if iteration % (save_interval*50) == 0 or iteration == total_iterations:
@@ -186,6 +186,35 @@ def train(args):
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, saved_model_folder+'/all_%d.pth'%iteration)
+
+def generate_images(args):
+    ndf = 64
+    ngf = 64
+    nz = 256
+
+    #from model_s import Generator, Discriminator
+    netG = Generator(ngf=ngf, nz=nz, im_size=args.im_size)
+    netG.apply(weights_init)
+
+    netD = Discriminator(ndf=ndf, im_size=args.im_size)
+    netD.apply(weights_init)
+
+    device = torch.device("cuda:0")
+    netG.to(device)
+    netD.to(device)
+
+    model_path, saved_image_folder = get_dir(args)
+
+    print("Loading checkpoint")
+
+    args.ckpt = f'{model_path}/{args.iter}.pth'
+    ckpt = torch.load(args.ckpt)
+    netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
+    netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
+
+    fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
+
+    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{5000}.jpg', nrow=4)
 
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
@@ -202,7 +231,8 @@ def do_gen_ai():
     args = parser.parse_args()
     # print(args)
 
-    train(args)
+    # train(args)
+    generate_images(args)
 
 if __name__ == "__main__":
     do_gen_ai()
