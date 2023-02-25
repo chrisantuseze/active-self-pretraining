@@ -66,7 +66,7 @@ def train(args):
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
-    args.ckpt = f'{saved_model_folder}/{args.iter}.pth'
+    args.ckpt = f'{saved_model_folder}/50000.pth'
 
     device = torch.device("cpu")
     if use_cuda:
