@@ -87,6 +87,8 @@ class  ImageFolder(Dataset):
 
         img_path = img_path[0:2000]
 
+        print(img_path)
+
         return img_path
 
     def __len__(self):
