@@ -61,7 +61,7 @@ class  ImageFolder(Dataset):
     def __init__(self, dataset, transform=None):
         super( ImageFolder, self).__init__()
         self.dataset = dataset
-        self.dir = f'dataset/{dataset}'
+        self.dir = f'datasets/{dataset}'
 
         self.frame = self._parse_frame()
         self.transform = transform
@@ -86,8 +86,6 @@ class  ImageFolder(Dataset):
         # img_path.sort()
 
         img_path = img_path[0:2000]
-
-        print(img_path)
 
         return img_path
 
