@@ -209,7 +209,7 @@ def generate_images(args, images_path, iter):
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
 
-    fixed_noise = torch.FloatTensor(400, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
+    fixed_noise = torch.FloatTensor(20, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
 
     print("Generating images...")
     # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
@@ -245,7 +245,7 @@ def do_gen_ai(args):
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
 
-    for i in range(1):
+    for i in range(2):
         generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
