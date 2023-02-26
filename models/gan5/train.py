@@ -219,7 +219,7 @@ def generate_images(args, images_path, iter):
                 val,
                 # f"{out_path}random_{prefix}_{i}.jpg",
                 # f'{saved_image_folder}/{args.path}_{iter}_{i}.jpg',
-                f'{images_path}{args.path}_{iter}_{i}.jpg',
+                f'{images_path}/{args.path}_{iter}_{i}.jpg',
                 nrow=1,
                 normalize=True,
             )
