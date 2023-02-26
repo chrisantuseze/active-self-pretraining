@@ -78,7 +78,9 @@ class  ImageFolder(Dataset):
         # return frame
 
         img_path = glob.glob(self.root + '/*/*')
-        img_path.sort()
+        # img_path.sort()
+
+        img_path = img_path[:2000]
 
         return img_path
 
