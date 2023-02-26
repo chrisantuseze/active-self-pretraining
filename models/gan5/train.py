@@ -223,7 +223,7 @@ def do_gen_ai():
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
-    parser.add_argument('--ckpt', type=str, default='None', help='checkpoint weight path if have one')
+    parser.add_argument('--ckpt', type=str, default=None, help='checkpoint weight path if have one')
 
     args = parser.parse_args()
     # print(args)
