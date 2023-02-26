@@ -245,7 +245,7 @@ def do_gen_ai(args):
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
 
-    for i in range(2):
+    for i in range(1):
         generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
