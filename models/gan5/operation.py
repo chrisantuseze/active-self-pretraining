@@ -81,10 +81,11 @@ class  ImageFolder(Dataset):
         if self.dataset == 'chest_xray':
             self.dir = f'{self.dir}/train'
         
+        print(self.dir)
         img_path = glob.glob(self.dir + '/*/*')
         # img_path.sort()
 
-        img_path = img_path[:2000]
+        img_path = img_path[0:2000]
 
         return img_path
 
