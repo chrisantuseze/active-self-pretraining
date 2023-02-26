@@ -179,7 +179,7 @@ def train(args):
                         'd':netD.state_dict(),
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
-                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_model_{iteration}.pth')
+                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_{args.path}_model_{iteration}.pth')
 
 def generate_images(args):
     ndf = 64
@@ -209,7 +209,7 @@ def generate_images(args):
     fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
 
     print("Generating images...")
-    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.iter}.jpg', nrow=4)
+    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
 
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
@@ -226,7 +226,7 @@ def do_gen_ai():
     args = parser.parse_args()
     # print(args)
 
-    train(args)
+    # train(args)
     generate_images(args)
 
 if __name__ == "__main__":
