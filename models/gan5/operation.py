@@ -58,26 +58,30 @@ def get_dir(args):
 
 class  ImageFolder(Dataset):
     """docstring for ArtDataset"""
-    def __init__(self, root, transform=None):
+    def __init__(self, dataset, transform=None):
         super( ImageFolder, self).__init__()
-        self.root = root
+        self.dataset = dataset
+        self.dir = f'dataset/{dataset}'
 
         self.frame = self._parse_frame()
         self.transform = transform
 
     def _parse_frame(self):
         # frame = []
-        # img_names = os.listdir(self.root)
+        # img_names = os.listdir(self.dataset)
         # img_names.sort()
         # for i in range(len(img_names)):
-        #     image_path = os.path.join(self.root, img_names[i])
+        #     image_path = os.path.join(self.dataset, img_names[i])
         #     print("Here", image_path, image_path[-4:])
         #     if image_path[-4:] == '.jpg' or image_path[-4:] == '.png' or image_path[-5:] == '.jpeg': 
         #         print(image_path)
         #         frame.append(image_path)
         # return frame
 
-        img_path = glob.glob(self.root + '/*/*')
+        if self.dataset == 'chest_xray':
+            self.dir = f'{self.dir}/train'
+        
+        img_path = glob.glob(self.dir + '/*/*')
         # img_path.sort()
 
         img_path = img_path[:2000]

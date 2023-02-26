@@ -46,8 +46,6 @@ def train_d(args, net, data, percept, label="real"):
         
 
 def train(args):
-
-    data_root = f'dataset/{args.path}'
     total_iterations = args.iter
     batch_size = args.batch_size
     im_size = args.im_size
@@ -81,14 +79,14 @@ def train(args):
         ]
     trans = transforms.Compose(transform_list)
     
-    if 'lmdb' in data_root:
+    if 'lmdb' in args.path:
         from operation import MultiResolutionDataset
-        dataset = MultiResolutionDataset(data_root, trans, 1024)
+        dataset = MultiResolutionDataset(args.path, trans, 1024)
     else:
-        dataset = ImageFolder(data_root, transform=trans)
+        dataset = ImageFolder(args.path, transform=trans)
 
    
-    print(data_root, "length is", len(dataset))
+    print(args.path, "length is", len(dataset))
     dataloader = iter(DataLoader(dataset, batch_size=batch_size, shuffle=False,
                       sampler=InfiniteSamplerWrapper(dataset), num_workers=dataloader_workers, pin_memory=True))
     '''
