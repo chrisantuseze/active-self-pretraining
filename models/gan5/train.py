@@ -3,6 +3,7 @@ from torch import nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
+import torchvision
 from torchvision import transforms
 from torchvision import utils as vutils
 
@@ -206,10 +207,19 @@ def generate_images(args):
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
 
-    fixed_noise = torch.FloatTensor(8, nz).normal_(0, 1).to(device)
+    fixed_noise = torch.FloatTensor(20, nz).normal_(0, 1).to(device)#8
 
     print("Generating images...")
-    vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
+    # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
+
+    for i, val in enumerate(netG(fixed_noise)[0].add(1).mul(0.5)):
+            torchvision.utils.save_image(
+                val,
+                # f"{out_path}random_{prefix}_{i}.jpg",
+                f'{saved_image_folder}/{args.path}_{i}.jpg',
+                nrow=1,
+                normalize=True,
+            )
 
 def do_gen_ai():
     parser = argparse.ArgumentParser(description='region gan')
@@ -217,7 +227,7 @@ def do_gen_ai():
     parser.add_argument('--path', type=str, default='chest_xray', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')#50000
+    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
