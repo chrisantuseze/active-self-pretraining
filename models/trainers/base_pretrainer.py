@@ -25,6 +25,7 @@ class BasePretrainer():
             # 
 
             img_path = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
+            print("Base pretrain image path", img_path)
             
             pretrain_data = [PathLoss(path=sample, loss=0) for sample in img_path]
 
