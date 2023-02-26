@@ -1,3 +1,4 @@
+import os
 import torch
 from torch import nn
 import torch.optim as optim
@@ -10,6 +11,7 @@ from torchvision import utils as vutils
 import argparse
 import random
 from tqdm import tqdm
+from datautils.dataset_enum import get_dataset_enum
 
 from models.gan5.models import weights_init, Discriminator, Generator
 from models.gan5.operation import copy_G_params, load_params, get_dir, ImageFolder, InfiniteSamplerWrapper
@@ -182,7 +184,7 @@ def train(args):
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_{args.path}_model_{iteration}.pth')
 
-def generate_images(args):
+def generate_images(args, images_path, iter):
     ndf = 64
     ngf = 64
     nz = 256
@@ -207,7 +209,7 @@ def generate_images(args):
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
 
-    fixed_noise = torch.FloatTensor(20, nz).normal_(0, 1).to(device)#8
+    fixed_noise = torch.FloatTensor(400, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
 
     print("Generating images...")
     # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
@@ -216,12 +218,13 @@ def generate_images(args):
             torchvision.utils.save_image(
                 val,
                 # f"{out_path}random_{prefix}_{i}.jpg",
-                f'{saved_image_folder}/{args.path}_{i}.jpg',
+                # f'{saved_image_folder}/{args.path}_{iter}_{i}.jpg',
+                f'{images_path}{args.path}_{iter}_{i}.jpg',
                 nrow=1,
                 normalize=True,
             )
 
-def do_gen_ai():
+def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
 
     parser.add_argument('--path', type=str, default='chest_xray', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
@@ -233,11 +236,17 @@ def do_gen_ai():
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint weight path if have one')
 
-    args = parser.parse_args()
-    # print(args)
+    gen_args = parser.parse_args()
+    # print(gen_args)
 
     # train(args)
-    generate_images(args)
+
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
+    if not os.path.exists(gen_images_path):
+        os.makedirs(gen_images_path)
+
+    for i in range(2):
+        generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
     do_gen_ai()
