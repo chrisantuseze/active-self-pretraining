@@ -7,7 +7,7 @@ import numpy as np
 from datautils.dataset_enum import get_dataset_enum
 from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
-from optim.optimizer import SwAVScheduler, load_optimizer
+from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
 import copy

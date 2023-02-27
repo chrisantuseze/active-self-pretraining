@@ -89,31 +89,3 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
         raise ValueError
 
     return optimizer, scheduler
-
-class SwAVScheduler():
-    def __init__(self, args, lr, epochs, loader, optimizer) -> None:
-        self.args = args
-        self.lr = lr
-        self.epochs = epochs
-        self.loader = loader
-        self.optimizer = optimizer
-        self.build_schedule()
-
-    def build_schedule(self):
-        warmup_lr_schedule = np.linspace(self.args.start_warmup, self.lr, len(self.loader) * self.args.warmup_epochs)
-        iters = np.arange(len(self.loader) * (self.epochs - self.args.warmup_epochs))
-        cosine_lr_schedule = np.array([self.args.final_lr + 0.5 * (self.lr - self.args.final_lr) * (1 + \
-                            math.cos(math.pi * t / (len(self.loader) * (self.epochs - self.args.warmup_epochs)))) for t in iters])
-        self.scheduler = np.concatenate((warmup_lr_schedule, cosine_lr_schedule))
-
-    def step(self, epoch, step):
-        iteration = epoch * len(self.loader) + step
-
-        if self.optimizer.param_groups[0]["lr"] < 1.0e-3 or iteration >= len(self.scheduler):
-            self.build_schedule()
-
-        try:
-            for param_group in self.optimizer.param_groups:
-                param_group["lr"] = self.scheduler[iteration]
-        except:
-            logging.error(f"IndexError: iteration {iteration}, scheduler length {len(self.scheduler)}")
