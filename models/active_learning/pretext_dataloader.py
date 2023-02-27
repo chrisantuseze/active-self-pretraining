@@ -60,7 +60,7 @@ class PretextDataLoader():
 
             loader = torch.utils.data.DataLoader(
                 dataset,
-                batch_size=self.args.swav_batch_size,
+                batch_size=self.batch_size,
                 num_workers=self.args.workers,
                 pin_memory=True,
                 # drop_last=True

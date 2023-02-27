@@ -24,12 +24,10 @@ class BasePretrainer():
             #  train_loader = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
             # 
 
-            img_path = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
-            print("Base pretrain image path", f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
-            
+            img_path = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')            
             pretrain_data = [PathLoss(path=sample, loss=0) for sample in img_path]
 
-            train_loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
+            train_loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         return encoder, train_loader
 
