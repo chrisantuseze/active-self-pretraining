@@ -23,3 +23,6 @@ The datasets are available from this link: https://drive.google.com/drive/folder
 
 You also need to create a folder named "save" in the project root folder where the checkpoints and other code generated files would be saved in.
 
+$200 I will be carrying sufficiient clothing since I would be a 5 days trip.
+
+Ask Prof. Crick if we need to pay for registration
