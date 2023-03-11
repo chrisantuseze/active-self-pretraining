@@ -131,7 +131,7 @@ lc_gamma: 0.1
 lc_final_lr: 0
 
 ################################### AL ###########################################################
-al_method_: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
+al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
 al_finetune_trainer_epochs: 100
 al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 10                                # the default should be kept at 10, however due to compute limitations, I would use 20

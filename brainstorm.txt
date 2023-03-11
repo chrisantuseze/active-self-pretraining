@@ -54,7 +54,17 @@ So the generated images are not added to the target dataset, but rather used sol
 3. Train pt with images generated on fewer epochs.
 
 
+- New Things to do:
 
+- How to carry out various experimentations:
+0.1. Similarity in the latent space between target, source and generated images (use t-sne. check "Improve Unsupervised Pretraining for Few-label Transfer"
+for idea of how to do that.)
+0.2. Compare the visualization of the generated images using the source pretrained model and the generated images using the target-source pretrained images
+1. Target pretraining -> linear evaluation
+2. Source pretraining -> linear evaluation
+3. Source -> Target -> linear evaluation
+4. Source -> Target + AL -> linear evaluation
+5. Source -> Image Generation + AL -> intermediate pretraining -> Target + AL -> linear evaluation
 
 
 

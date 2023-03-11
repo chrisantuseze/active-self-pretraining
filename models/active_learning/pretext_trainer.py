@@ -155,7 +155,7 @@ class PretextTrainer():
     def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
-        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method_)}")
+        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
         _preds = []
 
         model.eval()
@@ -180,15 +180,15 @@ class PretextTrainer():
         return preds
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        if self.args.al_method_ == AL_Method.LEAST_CONFIDENCE.value:
+        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
             probs = preds.max(axis=1)
             indices = probs.argsort(axis=0)
 
-        elif self.args.al_method_ == AL_Method.ENTROPY.value:
+        elif self.args.al_method == AL_Method.ENTROPY.value:
             entropy = (np.log(preds) * preds).sum(axis=1) * -1.
             indices = entropy.argsort(axis=0)[::-1]
 
-        elif self.args.al_method_ == AL_Method.BOTH.value:
+        elif self.args.al_method == AL_Method.BOTH.value:
             probs = preds.max(axis=1)
             indices1 = probs.argsort(axis=0)
 
@@ -200,7 +200,7 @@ class PretextTrainer():
             indices = indices[: (len(indices)//2)]
 
         else:
-            raise ValueError(f"'{self.args.al_method_}' method doesn't exist")
+            raise ValueError(f"'{self.args.al_method}' method doesn't exist")
 
         new_samples = []
         for item in indices:
@@ -208,11 +208,11 @@ class PretextTrainer():
 
         return new_samples
 
-    def make_batches(self, model):
-        loader = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
+    def make_batches(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
+        loader = get_target_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        state = simple_load_model(self.args, path='finetuner.pth')
+        state = simple_load_model(self.args, path=f'{prefix}_finetuner.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -371,9 +371,9 @@ class PretextTrainer():
         logging.info("Train Loss: {:.4f}".format(avg_loss))
         return avg_loss
 
-    def finetuner(self, model):
+    def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
         train_loader, test_loader = get_target_pretrain_ds(
-            self.args, training_type=TrainingType.ACTIVE_LEARNING).get_finetuner_loaders(
+            self.args, training_type=training_type).get_finetuner_loaders(
                 train_batch_size=self.args.al_finetune_batch_size,
                 val_batch_size=100
             )
@@ -417,35 +417,55 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        simple_save_model(self.args, self.best_model, 'finetuner.pth')
+        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner.pth')
 
+
+    def distill_gen_dataset(self) -> List[PathLoss]:
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
+        self.finetuner(encoder, prefix='second', training_type=TrainingType.BASE_PRETRAIN)
+        path_loss = self.make_batches(encoder, prefix='second', training_type=TrainingType.BASE_PRETRAIN)
+
+        model, _ = get_model_criterion(self.args, encoder, num_classes=4)
+        state = simple_load_model(self.args, path='second_finetuner.pth')
+        model.load_state_dict(state['model'], strict=False)
+        model = model.to(self.args.device)
+
+        samplek = self.batch_sampler(model, path_loss)
+
+        # this does a reverse active learning to pick only the most certain data
+        # samplek = samplek[::-1] # commenting this because I want to pick only the uninformative samples
+        return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
 
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        main_task_model = encoder
-
-        state = simple_load_model(self.args, path='finetuner.pth')
+        state = simple_load_model(self.args, path='first_finetuner.pth')
         if not state:
-            self.finetuner(encoder)
+            self.finetuner(encoder, prefix='first')
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
-            path_loss = self.make_batches(encoder)
+            path_loss = self.make_batches(encoder, prefix='first')
 
         # Do not train main task iteratively. Proceed to 2nd pretraining
         if not self.args.al_train_maintask:
-            model, _ = get_model_criterion(self.args, encoder, num_classes=4)
-            state = simple_load_model(self.args, path='finetuner.pth')
-            model.load_state_dict(state['model'], strict=False)
-            model = model.to(self.args.device)
+            return self.ds_distillation(encoder, path_loss)
 
-            samplek = self.batch_sampler(model, path_loss)
+        return self.active_learning(path_loss)
 
-            # this does a reverse active learning to pick only the most certain data
-            samplek = samplek[::-1]
-            return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
+    def ds_distillation(self, encoder, path_loss):
+        model, _ = get_model_criterion(self.args, encoder, num_classes=4)
+        state = simple_load_model(self.args, path='first_finetuner.pth')
+        model.load_state_dict(state['model'], strict=False)
+        model = model.to(self.args.device)
 
+        samplek = self.batch_sampler(model, path_loss)
+
+        # this does a reverse active learning to pick only the most certain data
+        samplek = samplek[::-1]
+        return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
+    
+    def active_learning(self, path_loss):
         pretraining_sample_pool = []
         rebuild_al_model = True
 
@@ -474,9 +494,9 @@ class PretextTrainer():
 
                 rebuild_al_model=False
 
-        logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method_)))
+        logging.info('Best main task val accuracy: {:3f} for {}'.format(self.best_proxy_acc, get_al_method_enum(self.args.al_method)))
         save_accuracy_to_file(
                 self.args, accuracies=self.val_acc_history, best_accuracy=self.best_proxy_acc, 
-                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method_)}_batch_{self.args.al_epochs}_{self.args.al_trainer_sample_size}.txt")
+                filename=f"main_task_{get_dataset_enum(self.args.target_dataset)}_{get_al_method_enum(self.args.al_method)}_batch_{self.args.al_epochs}_{self.args.al_trainer_sample_size}.txt")
         save_path_loss(self.args, self.args.pretrain_path_loss_file, pretraining_sample_pool)
         return pretraining_sample_pool

@@ -1,3 +1,5 @@
+import glob
+from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.active_learning.pretext_trainer import PretextTrainer
@@ -92,23 +94,33 @@ class SelfSupPretrainer(BasePretrainer):
 
 
     def first_pretrain(self) -> None:
-        encoder, train_loader = super().first_pretrain()
+        loader = self.get_loader(self.args.do_al, training_type=TrainingType.TARGET_PRETRAIN)
+        encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        self.base_pretrain(encoder, train_loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+        self.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
 
     def second_pretrain(self) -> None:
-        if self.args.do_al:
-            pretrain_data = load_path_loss(self.args, self.args.pretrain_path_loss_file)
-            if pretrain_data is None:
-                pretext = PretextTrainer(self.args, self.writer)
-                pretrain_data = pretext.do_active_learning()
+        distilled_ds = load_path_loss(self.args, self.args.pretrain_path_loss_file)
 
-            loader = PretextDataLoader(self.args, pretrain_data, training_type=TrainingType.TARGET_PRETRAIN).get_loader()
-        else:
-            loader = get_target_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loader()        
-
+        loader = self.get_loader(self.args.do_al, distilled_ds=distilled_ds, training_type=TrainingType.TARGET_PRETRAIN)
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
 
 
         self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
+
+    def get_loader(self, do_al, distilled_ds=None, training_type=None):
+        if do_al:
+            if distilled_ds is None:
+                pretext = PretextTrainer(self.args, self.writer)
+
+                if training_type == TrainingType.BASE_PRETRAIN:
+                    distilled_ds = pretext.distill_gen_dataset()
+                else:
+                    distilled_ds = pretext.do_active_learning()
+
+            loader = PretextDataLoader(self.args, distilled_ds, training_type=training_type).get_loader()
+        else:
+            loader = get_target_pretrain_ds(self.args, training_type=training_type).get_loader()  
+
+        return loader
