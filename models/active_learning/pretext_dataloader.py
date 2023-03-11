@@ -198,6 +198,8 @@ class MakeBatchDataset(torch.utils.data.Dataset):
 
         self.is_train = is_train
 
+        print(self.dir)
+
         if with_train:
             if self.dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
                 self.img_path = glob.glob(self.dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
