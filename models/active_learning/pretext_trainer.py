@@ -433,8 +433,8 @@ class PretextTrainer():
         samplek = self.batch_sampler(model, path_loss)
 
         # this does a reverse active learning to pick only the most certain data
-        # samplek = samplek[::-1] # commenting this because I want to pick only the uninformative samples
-        return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
+        samplek = samplek[::-1] # commenting this because I want to pick only the uninformative samples
+        return samplek[: int(len(samplek) * self.args.al_gen_sample_percentage)]
 
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
