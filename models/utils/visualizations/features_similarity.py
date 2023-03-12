@@ -120,11 +120,14 @@ class FeatureSimilarity():
 
     def visualize_latent_reps(self, latent_reps, filename):
         tsne = TSNE(n_components=2, perplexity=30, init='pca', random_state=0)
+        latent_reps = latent_reps.cpu()
         latent_reps_2d = tsne.fit_transform(latent_reps)
         plt.scatter(latent_reps_2d[:, 0], latent_reps_2d[:, 1])#, c=labels)
         plt.colorbar()
 
         plt.savefig(filename)
+
+        logging.info(f"T-SNE plot saved in {filename}")
 
     def calculate_similarity(latent_reps_1, latent_reps_2):
         return F.cosine_similarity(latent_reps_1, latent_reps_2, dim=1)
