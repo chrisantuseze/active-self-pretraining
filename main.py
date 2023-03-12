@@ -9,6 +9,7 @@ import argparse
 from torch.utils.tensorboard import SummaryWriter
 from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
+from models.utils.visualizations.features_similarity import FeatureSimilarity
 from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
 
@@ -27,34 +28,36 @@ logging.init()
 def main(args):
     writer = SummaryWriter()
 
-    if args.ml_project:
-        state = load_saved_state(args, pretrain_level="1")
-        if not state:
-            pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer = SupPretrainer(args, writer)
-            pretrainer.first_pretrain()
+    FeatureSimilarity(args).visualize_features()
 
-        if args.do_al_for_ml_project:
-            pretext = PretextTrainer(args, writer)
-            pretrain_data = pretext.do_active_learning()
+    # if args.ml_project:
+    #     state = load_saved_state(args, pretrain_level="1")
+    #     if not state:
+    #         pretrainer = SelfSupPretrainer(args, writer)
+    #         # pretrainer = SupPretrainer(args, writer)
+    #         pretrainer.first_pretrain()
 
-        else: 
-            classifier = Classifier(args, writer, pretrain_level="1")
-            classifier.train_and_eval() 
+    #     if args.do_al_for_ml_project:
+    #         pretext = PretextTrainer(args, writer)
+    #         pretrain_data = pretext.do_active_learning()
 
-    else:
-        if args.base_pretrain:
-            # do_gen_ai(args)
+    #     else: 
+    #         classifier = Classifier(args, writer, pretrain_level="1")
+    #         classifier.train_and_eval() 
 
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.first_pretrain()
+    # else:
+    #     if args.base_pretrain:
+    #         # do_gen_ai(args)
 
-        if args.target_pretrain:
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.second_pretrain()
+    #         pretrainer = SelfSupPretrainer(args, writer)
+    #         pretrainer.first_pretrain()
 
-        classifier = Classifier(args, pretrain_level="2")
-        classifier.train_and_eval()
+    #     if args.target_pretrain:
+    #         pretrainer = SelfSupPretrainer(args, writer)
+    #         pretrainer.second_pretrain()
+
+    #     classifier = Classifier(args, pretrain_level="2")
+    #     classifier.train_and_eval()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

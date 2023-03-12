@@ -160,8 +160,8 @@ class PretextTrainer():
 
         model.eval()
         with torch.no_grad():
-            for step, (inputs, targets) in enumerate(loader):
-                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
+            for step, (inputs, _) in enumerate(loader):
+                inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
 
                 _preds.append(self.get_predictions(outputs))
