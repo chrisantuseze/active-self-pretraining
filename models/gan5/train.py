@@ -209,7 +209,7 @@ def generate_images(args, images_path, iter):
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
 
-    fixed_noise = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
+    fixed_noise = torch.FloatTensor(50, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
 
     print("Generating images...")
     # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
@@ -233,7 +233,7 @@ def do_gen_ai(args):
     parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
-    parser.add_argument('--im_size', type=int, default=1024, help='image resolution')
+    parser.add_argument('--im_size', type=int, default=512, help='image resolution')#1024
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint weight path if have one')
 
     gen_args = parser.parse_args()

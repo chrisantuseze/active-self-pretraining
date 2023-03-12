@@ -86,7 +86,7 @@ seed: 42                                      # sacred handles automatic seeding
 base_epochs: 600
 base_image_size: 40
 base_dataset: 2                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-base_pretrain: False
+base_pretrain: True
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
 global_step: 0
