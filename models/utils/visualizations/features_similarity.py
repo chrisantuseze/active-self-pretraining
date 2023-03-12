@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from datautils.target_dataset import get_target_pretrain_ds
 
 from models.backbones.resnet import resnet_backbone
-from models.utils.commons import AverageMeter, get_model_criterion, get_params
+from models.utils.commons import AverageMeter, get_model_criterion, get_params, prepare_model
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
 from utils.commons import load_chkpts
@@ -22,6 +22,9 @@ class FeatureSimilarity():
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", encoder)
 
+        # load weights
+        self.model, self.params_to_update = prepare_model(self.args, TrainingType.ACTIVE_LEARNING, self.model)
+
     def visualize_features(self):
         loader1, loader2 = self.get_loaders()
 
@@ -31,17 +34,18 @@ class FeatureSimilarity():
         latents1 = self.get_reps(model1, loader1)
         latents2 = self.get_reps(model2, loader2)
 
-        self.visualize_latent_reps(latents1)
-        self.visualize_latent_reps(latents2)
+        self.visualize_latent_reps(latents1, filename='gen_ds.png')
+        self.visualize_latent_reps(latents2, filename='target_ds.png')
         
 
     def train_model(self, model, loader):
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-        optimizer, scheduler = load_optimizer(
-            self.args, model.parameters(), 
-            None, train_params,
-            train_loader=loader)
+        optimizer, self.scheduler = load_optimizer(
+            self.args, self.params_to_update,
+            train_params=train_params, 
+            train_loader=loader
+        )
 
         batch_time = AverageMeter()
         data_time = AverageMeter()
@@ -52,7 +56,7 @@ class FeatureSimilarity():
         model.train()
         end = time.time()
         total_steps = 0
-        for epoch in range(50):
+        for epoch in range(10):
             for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(loader):
             
                 inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
@@ -114,11 +118,13 @@ class FeatureSimilarity():
                 latent_reps.append(outputs)
         return torch.cat(latent_reps, dim=0)
 
-    def visualize_latent_reps(self, latent_reps, labels=None):
+    def visualize_latent_reps(self, latent_reps, filename):
         tsne = TSNE(n_components=2, perplexity=30, init='pca', random_state=0)
         latent_reps_2d = tsne.fit_transform(latent_reps)
         plt.scatter(latent_reps_2d[:, 0], latent_reps_2d[:, 1])#, c=labels)
         plt.colorbar()
+
+        plt.savefig(filename)
 
     def calculate_similarity(latent_reps_1, latent_reps_2):
         return F.cosine_similarity(latent_reps_1, latent_reps_2, dim=1)

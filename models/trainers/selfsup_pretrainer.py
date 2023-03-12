@@ -94,7 +94,7 @@ class SelfSupPretrainer(BasePretrainer):
 
 
     def first_pretrain(self) -> None:
-        loader = self.get_loader(do_al=True, training_type=TrainingType.BASE_PRETRAIN)
+        loader = self.get_loader(do_al=False, training_type=TrainingType.BASE_PRETRAIN)
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         self.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
