@@ -19,3 +19,5 @@ easing-functions==1.0.4
 
 einops
 kornia
+
+scikit-learn

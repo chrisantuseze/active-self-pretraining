@@ -23,7 +23,7 @@ class FeatureSimilarity():
 
     def visualize_features(self):
         loader1, loader2 = self.get_loaders()
-        
+
         model1 = self.train_model(self.model, loader1)
         model2 = self.train_model(self.model, loader2)
 
@@ -41,6 +41,8 @@ class FeatureSimilarity():
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
+
+        model.to(self.args.device)
 
         model.train()
         end = time.time()
@@ -88,6 +90,8 @@ class FeatureSimilarity():
         return model
 
     def get_reps(self, model, loader):
+        model.to(self.args.device)
+
         model.eval()
         latent_reps = []
 
