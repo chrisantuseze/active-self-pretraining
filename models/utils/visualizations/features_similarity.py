@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 from datautils.target_dataset import get_target_pretrain_ds
 
 from models.backbones.resnet import resnet_backbone
-from models.utils.commons import AverageMeter
+from models.utils.commons import AverageMeter, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
+from optim.optimizer import load_optimizer
 from utils.commons import load_chkpts
 import utils.logger as logging
 
@@ -35,8 +36,12 @@ class FeatureSimilarity():
         
 
     def train_model(self, model, loader):
-        criterion = nn.MSELoss()
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        model, criterion = get_model_criterion(self.args, model, num_classes=4)
+        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
+        optimizer, scheduler = load_optimizer(
+            self.args, model.parameters(), 
+            None, train_params,
+            train_loader=loader)
 
         batch_time = AverageMeter()
         data_time = AverageMeter()
