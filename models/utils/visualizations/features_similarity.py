@@ -31,13 +31,13 @@ class FeatureSimilarity():
     def visualize_features(self):
         loader1, loader2 = self.get_loaders()
 
-        model1 = self.train_model(self.model, loader1)
+        # model1 = self.train_model(self.model, loader1)
         model2 = self.train_model(self.model, loader2)
 
-        latents1 = self.get_reps(model1, loader1)
+        # latents1 = self.get_reps(model1, loader1)
         latents2 = self.get_reps(model2, loader2)
 
-        self.visualize_latent_reps(latents1, filename='gen_ds.png')
+        # self.visualize_latent_reps(latents1, filename='gen_ds.png')
         self.visualize_latent_reps(latents2, filename='target_ds.png')
         
 
