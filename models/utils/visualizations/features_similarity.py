@@ -1,3 +1,4 @@
+import os
 import time
 import torch
 import torch.optim as optim
@@ -24,6 +25,8 @@ class FeatureSimilarity():
 
         # load weights
         self.model, self.params_to_update = prepare_model(self.args, TrainingType.ACTIVE_LEARNING, self.model)
+
+        os.makedirs(f'{args.model_misc_path}/plots/', exist_ok=True)
 
     def visualize_features(self):
         loader1, loader2 = self.get_loaders()
@@ -125,7 +128,7 @@ class FeatureSimilarity():
         plt.scatter(latent_reps_2d[:, 0], latent_reps_2d[:, 1])#, c=labels)
         plt.colorbar()
 
-        plt.savefig(filename)
+        plt.savefig(f'{self.args.model_misc_path}/plots/{filename}')
 
         logging.info(f"T-SNE plot saved in {filename}")
 
