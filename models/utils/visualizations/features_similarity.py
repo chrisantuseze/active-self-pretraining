@@ -58,6 +58,8 @@ class FeatureSimilarity():
                 optimizer.zero_grad()
                 outputs, outputs1, outputs2, outputs3 = model(inputs), model(inputs1), model(inputs2), model(inputs3)
 
+                print(outputs.shape(), targets.shape())
+
                 loss = criterion(outputs, targets)
                 loss1 = criterion(outputs1, targets1)
                 loss2 = criterion(outputs2, targets2)
