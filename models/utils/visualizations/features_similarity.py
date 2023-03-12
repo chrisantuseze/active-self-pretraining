@@ -31,13 +31,13 @@ class FeatureSimilarity():
     def visualize_features(self):
         loader1, loader2 = self.get_loaders()
 
-        # model1 = self.train_model(self.model, loader1)
+        model1 = self.train_model(self.model, loader1)
         model2 = self.train_model(self.model, loader2)
 
-        # latents1 = self.get_reps(model1, loader1)
+        latents1 = self.get_reps(model1, loader1)
         latents2 = self.get_reps(model2, loader2)
 
-        # self.visualize_latent_reps(latents1, filename='gen_ds.png')
+        self.visualize_latent_reps(latents1, filename='gen_ds.png')
         self.visualize_latent_reps(latents2, filename='target_ds.png')
         
 
@@ -122,13 +122,14 @@ class FeatureSimilarity():
         return torch.cat(latent_reps, dim=0)
 
     def visualize_latent_reps(self, latent_reps, filename):
-        tsne = TSNE(n_components=2, perplexity=30, init='pca', random_state=0)
+        tsne = TSNE(n_components=2, perplexity=30, random_state=0)
         latent_reps = latent_reps.cpu()
         latent_reps_2d = tsne.fit_transform(latent_reps)
         plt.scatter(latent_reps_2d[:, 0], latent_reps_2d[:, 1])#, c=labels)
         plt.colorbar()
 
         plt.savefig(f'{self.args.model_misc_path}/plots/{filename}')
+        plt.grid()
 
         logging.info(f"T-SNE plot saved in {filename}")
 
