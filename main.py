@@ -28,36 +28,38 @@ logging.init()
 def main(args):
     writer = SummaryWriter()
 
-    FeatureSimilarity(args).visualize_features()
+    # FeatureSimilarity(args).visualize_features()
 
-    # if args.ml_project:
-    #     state = load_saved_state(args, pretrain_level="1")
-    #     if not state:
-    #         pretrainer = SelfSupPretrainer(args, writer)
-    #         # pretrainer = SupPretrainer(args, writer)
-    #         pretrainer.first_pretrain()
+    if args.ml_project:
+        state = load_saved_state(args, pretrain_level="1")
+        if not state:
+            pretrainer = SelfSupPretrainer(args, writer)
+            # pretrainer = SupPretrainer(args, writer)
+            pretrainer.first_pretrain()
 
-    #     if args.do_al_for_ml_project:
-    #         pretext = PretextTrainer(args, writer)
-    #         pretrain_data = pretext.do_active_learning()
+        if args.do_al_for_ml_project:
+            pretext = PretextTrainer(args, writer)
+            pretrain_data = pretext.do_active_learning()
 
-    #     else: 
-    #         classifier = Classifier(args, writer, pretrain_level="1")
-    #         classifier.train_and_eval() 
+        else: 
+            classifier = Classifier(args, writer, pretrain_level="1")
+            classifier.train_and_eval() 
 
-    # else:
-    #     if args.base_pretrain:
-    #         # do_gen_ai(args)
+    else:
+        if args.base_pretrain:
+            # do_gen_ai(args)
 
-    #         pretrainer = SelfSupPretrainer(args, writer)
-    #         pretrainer.first_pretrain()
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.first_pretrain()
 
-    #     if args.target_pretrain:
-    #         pretrainer = SelfSupPretrainer(args, writer)
-    #         pretrainer.second_pretrain()
+        if args.target_pretrain:
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.second_pretrain()
 
-    #     classifier = Classifier(args, pretrain_level="2")
-    #     classifier.train_and_eval()
+        classifier = Classifier(args, pretrain_level="2")
+        classifier.train_and_eval()
+
+        pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
