@@ -85,8 +85,8 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    # main(args)
-    FeatureSim(args).compute_similarity()
+    main(args)
+    # FeatureSim(args).compute_similarity()
 
     logging.info("CASL ended.")
 
