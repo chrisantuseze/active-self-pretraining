@@ -96,6 +96,8 @@ class SwAVTrainer():
             # measure data loading time
             data_time.update(time.time() - end)
 
+            print(type(inputs))
+
             # update learning rate
             iteration = epoch * len(train_loader) + it
             for param_group in self.optimizer.param_groups:
