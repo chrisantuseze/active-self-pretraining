@@ -68,7 +68,7 @@ class DistModel(BaseModel):
                 import inspect
                 model_path = os.path.abspath(os.path.join(inspect.getfile(self.initialize), '..', 'weights/v%s/%s.pth'%(version,net)))
 
-            if(not is_train and model_path is not None):
+            if(not is_train and model_path is not None and os.path.exists(model_path)):
                 print('Loading model from: %s'%model_path)
                 self.net.load_state_dict(torch.load(model_path, **kw), strict=False)
 
