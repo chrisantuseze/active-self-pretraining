@@ -1,3 +1,4 @@
+from enum import Enum
 import torch
 import torchvision.transforms as transforms
 from typing import List
@@ -187,7 +188,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
 
 
 class MakeBatchDataset(torch.utils.data.Dataset):
-    def __init__(self, args, dir, with_train, is_train, transform=None):
+    def __init__(self, args, dir, with_train, is_train, is_tsne=False, transform=None):
         self.args = args
         params = get_params(args, TrainingType.ACTIVE_LEARNING)
         self.image_size = params.image_size
@@ -197,6 +198,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         # self.dir = args.dataset_dir + dir
 
         self.is_train = is_train
+        self.is_tnse = is_tsne
 
         if "./datasets/generated" in self.dir.split('_'):
             self.img_path = glob.glob(self.dir + '/*')
@@ -225,6 +227,9 @@ class MakeBatchDataset(torch.utils.data.Dataset):
             label = path.split('/')[-2]# label = path.split('/')[-3]
         else:
             label = path.split('/')[-2]
+
+        if self.is_tnse:
+            return img, label
         
         save_class_names(self.args, label)
         

@@ -27,10 +27,10 @@ class TargetDataset():
         self.batch_size = params.batch_size if not batch_size else batch_size
 
     
-    def get_dataset(self, transforms):
+    def get_dataset(self, transforms, is_tsne=False):
         return MakeBatchDataset(
             self.args,
-            self.dir, self.with_train, self.is_train, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
+            self.dir, self.with_train, self.is_train, is_tsne, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir,
                                                                                                 transform=transforms)
 

@@ -21,3 +21,7 @@ def acc_pretrain_data_plots():
     # 2. cifar10(ssl = DCL)-sketch(al = EN)-quickdraw
     # 3. cifar10(ssl = DCL)-sketch(al = BOTH)-quickdraw
     None
+
+#blue - #7089b8
+#orange - #f69a2a
+#pink - #ea9295

@@ -10,6 +10,7 @@ from torch.utils.tensorboard import SummaryWriter
 from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.utils.visualizations.features_similarity import FeatureSimilarity
+from models.utils.visualizations.t_sne import FeatureSim
 from utils.commons import load_path_loss, load_saved_state, simple_load_model
 from utils.random_seeders import set_random_seeds
 
@@ -84,7 +85,8 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main(args)
+    # main(args)
+    FeatureSim(args).compute_similarity()
 
     logging.info("CASL ended.")
 
