@@ -29,8 +29,6 @@ logging.init()
 def main(args):
     writer = SummaryWriter()
 
-    # FeatureSimilarity(args).visualize_features()
-
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
         if not state:
