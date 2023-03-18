@@ -53,6 +53,8 @@ class PretextDataLoader():
         self.batch_size = params.batch_size if not batch_size else batch_size
 
     def get_loader(self):
+
+        # this handles the 2nd pretraining (after AL)
         if self.args.method == SSL_Method.SWAV.value and self.training_type is not TrainingType.ACTIVE_LEARNING:
             dataset = PretextMultiCropDataset(
                 self.args,
