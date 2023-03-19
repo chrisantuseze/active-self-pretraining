@@ -96,15 +96,10 @@ class SelfSupPretrainer(BasePretrainer):
     def first_pretrain(self) -> None:
         do_al = False
         training_type = TrainingType.BASE_AL if do_al else TrainingType.BASE_PRETRAIN
-        
+
         loader = self.get_loader(do_al=do_al, training_type=training_type)
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
 
-        for it, inputs in enumerate(loader):
-            # measure data loading time
-
-            print(type(inputs))
-        
         self.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
 
