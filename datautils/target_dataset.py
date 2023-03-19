@@ -1,8 +1,10 @@
+import glob
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
+from datautils.path_loss import PathLoss
 
-from models.active_learning.pretext_dataloader import MakeBatchDataset
+from models.active_learning.pretext_dataloader import MakeBatchDataset, PretextMultiCropDataset
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
@@ -59,9 +61,19 @@ class TargetDataset():
         return train_loader, val_loader
 
     def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value or self.training_type == TrainingType.ACTIVE_LEARNING:
+        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING, TrainingType.BASE_PRETRAIN]:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
+                dataset = self.get_dataset(transforms)
+
+            elif self.training_type == TrainingType.BASE_PRETRAIN:
+                img_path = glob.glob(self.dir + '/*')
+                path_loss_list = [PathLoss(path, 0) for path in img_path]
+                
+                dataset = PretextMultiCropDataset(
+                    self.args,
+                    path_loss_list,
+                )
 
             else:
                 if self.method == SSL_Method.SIMCLR.value:
@@ -79,7 +91,7 @@ class TargetDataset():
                 else:
                     ValueError
 
-            dataset = self.get_dataset(transforms)
+                dataset = self.get_dataset(transforms)
 
             loader = torch.utils.data.DataLoader(
                 dataset,
