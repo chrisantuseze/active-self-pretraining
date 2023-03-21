@@ -17,6 +17,7 @@ from models.gan5.models import weights_init, Discriminator, Generator
 from models.gan5.operation import copy_G_params, load_params, get_dir, ImageFolder, InfiniteSamplerWrapper
 from models.gan5.diffaug import DiffAugment
 import models.gan5.lpips.utils as lpips
+import utils.logger as logging
 
 def crop_image_by_part(image, part):
     hw = image.shape[2]//2
@@ -57,18 +58,18 @@ def train(args):
     nz = 256
     nlr = 0.0002
     nbeta1 = 0.5
-    use_cuda = True
+    use_cuda = torch.cuda.is_available()
     multi_gpu = False
     dataloader_workers = 8
     current_iteration = args.start_iter
-    save_interval = 1000
+    save_interval = 500
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
     # args.ckpt = f'{saved_model_folder}/gan5_{args.path}_model_10000.pth'
     checkpoint = args.ckpt
 
-    percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=True)
+    percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=use_cuda)
 
     device = torch.device("cpu")
     if use_cuda:
@@ -116,7 +117,7 @@ def train(args):
     optimizerD = optim.Adam(netD.parameters(), lr=nlr, betas=(nbeta1, 0.999))
 
     if checkpoint is not None:
-        print(f"Loading checkpoint from {checkpoint}")
+        logging.info(f"Loading checkpoint from {checkpoint}")
         ckpt = torch.load(checkpoint)
         netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()}, strict=False)
         netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()}, strict=False)
@@ -160,7 +161,8 @@ def train(args):
             avg_p.mul_(0.999).add_(0.001 * p.data)
 
         if iteration % save_interval == 0:
-            print("GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item()))
+            v = "GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item())
+            logging.info(str(v))
           
         if iteration % (save_interval*10) == 0:
             backup_para = copy_G_params(netG)
@@ -202,7 +204,7 @@ def generate_images(args, images_path, iter):
 
     model_path, saved_image_folder = get_dir(args)
 
-    print("Loading checkpoint")
+    logging.info("Loading checkpoint")
 
     args.ckpt = f'{model_path}/gan5_{args.path}_model_{args.iter}.pth'
     ckpt = torch.load(args.ckpt)
@@ -211,7 +213,7 @@ def generate_images(args, images_path, iter):
 
     fixed_noise = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
 
-    print("Generating images...")
+    logging.info("Generating images...")
     # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
 
     for i, val in enumerate(netG(fixed_noise)[0].add(1).mul(0.5)):
@@ -245,7 +247,7 @@ def do_gen_ai(args):
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
 
-    print("Generated images path", gen_images_path)
+    logging.info(f"Generated images path {gen_images_path}")
     for i in range(128):
         generate_images(gen_args, gen_images_path, i)
 
