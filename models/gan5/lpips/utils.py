@@ -11,10 +11,10 @@ from torch.autograd import Variable
 from models.gan5.lpips import dist_model
 
 
-if skimage.__version__ == '0.14.3':
-    from skimage.measure import compare_ssim
-else:
-    from skimage.metrics import structural_similarity as compare_ssim
+# if skimage.__version__ == '0.14.3':
+#     from skimage.measure import compare_ssim
+# else:
+#     from skimage.metrics import structural_similarity as compare_ssim
 
 
 
