@@ -8,7 +8,7 @@ from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
 from models.utils.commons import get_params
 import utils.logger as logging
-from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
+# from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 from models.utils.training_type_enum import TrainingType
@@ -58,13 +58,14 @@ class SelfSupPretrainer(BasePretrainer):
             )
 
         elif self.args.method == SSL_Method.MYOW.value:
-            trainer = get_myow_trainer(
-                self.args, self.writer, 
-                encoder, train_loader, 
-                pretrain_level=pretrain_level, 
-                trainingType=trainingType, 
-                log_step=log_step
-            )
+            # trainer = get_myow_trainer(
+            #     self.args, self.writer, 
+            #     encoder, train_loader, 
+            #     pretrain_level=pretrain_level, 
+            #     trainingType=trainingType, 
+            #     log_step=log_step
+            # )
+            pass
 
         else:
             ValueError
