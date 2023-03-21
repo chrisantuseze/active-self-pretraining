@@ -2,7 +2,7 @@
 #SBATCH -p bullet
 #SBATCH -t 120:00:00
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=10
 #SBATCH --mail-user=chrisantus.eze@okstate.edu
 #SBATCH --mail-type=end
 #SBATCH --gres=gpu:1
