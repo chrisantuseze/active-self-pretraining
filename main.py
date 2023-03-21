@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import numpy as np
 import torch
@@ -6,7 +8,7 @@ import torchvision
 import argparse
 
 # import cv2
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.utils.visualizations.features_similarity import FeatureSimilarity
@@ -27,7 +29,7 @@ from models.gan5.train import do_gen_ai
 logging.init()
 
 def main(args):
-    writer = SummaryWriter()
+    writer = None #SummaryWriter()
 
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
