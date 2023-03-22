@@ -78,9 +78,9 @@ class  ImageFolder(Dataset):
         #         frame.append(image_path)
         # return frame
 
-        if self.dataset == 'chest_xray':
+        if self.dataset in ['chest_xray', 'imagenet']:
             self.dir = f'{self.dir}/train'
-        
+
         print(self.dir)
         img_path = glob.glob(self.dir + '/*/*')
         # img_path.sort()

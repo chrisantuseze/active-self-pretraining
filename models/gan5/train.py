@@ -240,8 +240,6 @@ def do_gen_ai(args):
 
     gen_args = parser.parse_args()
 
-    gen_args.path = get_dataset_enum(args.base_dataset)
-
     # print(gen_args)
 
     train(gen_args)
