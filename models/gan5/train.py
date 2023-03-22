@@ -60,9 +60,9 @@ def train(args):
     nbeta1 = 0.5
     use_cuda = torch.cuda.is_available()
     multi_gpu = False
-    dataloader_workers = 2#8
+    dataloader_workers = 8
     current_iteration = args.start_iter
-    save_interval = 500
+    save_interval = 1000
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
@@ -229,7 +229,7 @@ def generate_images(args, images_path, iter):
 def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
 
-    parser.add_argument('--path', type=str, default='chest_xray', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
+    parser.add_argument('--path', type=str, default='imagenet', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
     parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
