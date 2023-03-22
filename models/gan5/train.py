@@ -60,7 +60,7 @@ def train(args):
     nbeta1 = 0.5
     use_cuda = torch.cuda.is_available()
     multi_gpu = False
-    dataloader_workers = 8
+    dataloader_workers = 2#8
     current_iteration = args.start_iter
     save_interval = 500
     saved_model_folder, saved_image_folder = get_dir(args)
@@ -239,6 +239,9 @@ def do_gen_ai(args):
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint weight path if have one')
 
     gen_args = parser.parse_args()
+
+    gen_args.path = get_dataset_enum(args.base_dataset)
+
     # print(gen_args)
 
     train(gen_args)
