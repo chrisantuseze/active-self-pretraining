@@ -2,7 +2,7 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("/datasets/imagewang.zip", 'r') as zip_ref:
+with zipfile.ZipFile("datasets/imagewang.zip", 'r') as zip_ref:
     zip_ref.extractall("imagenet")  
 
 # arr = [3, 4, 1, 0, 6]
