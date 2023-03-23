@@ -128,15 +128,15 @@ def train(args):
 
 
         # freeze some layers
-        print("netD params")
+        logging.info("netD params")
         for name, param in netD.named_parameters():
-            print(name)
+            logging.info(name)
             param.requires_grad = False
             pass
 
-        print("netG params\n")
+        logging.info("netG params\n")
         for name, param in netG.named_parameters():
-            print(name)
+            logging.info(name)
             param.requires_grad = False
             pass
 
