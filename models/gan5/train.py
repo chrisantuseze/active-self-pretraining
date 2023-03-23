@@ -93,13 +93,6 @@ def train(args):
     print(args.path, "length is", len(dataset))
     dataloader = iter(DataLoader(dataset, batch_size=batch_size, shuffle=False,
                       sampler=InfiniteSamplerWrapper(dataset), num_workers=dataloader_workers, pin_memory=True))
-    '''
-    loader = MultiEpochsDataLoader(dataset, batch_size=batch_size, 
-                               shuffle=True, num_workers=dataloader_workers, 
-                               pin_memory=True)
-    dataloader = CudaDataLoader(loader, 'cuda')
-    '''
-    
     
     #from model_s import Generator, Discriminator
     netG = Generator(ngf=ngf, nz=nz, im_size=im_size)
@@ -128,24 +121,38 @@ def train(args):
 
 
         # freeze some layers
-        logging.info("netD params")
         for name, param in netD.named_parameters():
-            logging.info(name)
-            param.requires_grad = False
-            pass
+            name_ = name.split(".")
+            if ('decoder_big' in name_ and 'bias' in name_) or ('decoder_big' in name_ and 'weight' in name_):
+                continue
 
-        logging.info("netG params\n")
-        for name, param in netG.named_parameters():
-            logging.info(name)
+            if ('decoder_part' in name_ and 'bias' in name_) or ('decoder_part' in name_ and 'weight' in name_):
+                continue
+
+            if ('decoder_small' in name_ and 'bias' in name_) or ('decoder_small' in name_ and 'weight' in name_):
+                continue
+
             param.requires_grad = False
-            pass
+
+        for name, param in netG.named_parameters():
+            name_ = name.split(".")
+            if ('feat_1024' in name_ and 'bias' in name_) or ('feat_1024' in name_ and 'weight' in name_):
+                continue
+
+            if ('feat_512' in name_ and 'bias' in name_) or ('feat_512' in name_ and 'weight' in name_):
+                continue
+
+            if ('feat_256' in name_ and 'bias' in name_) or ('feat_256' in name_ and 'weight' in name_):
+                continue        
+
+            param.requires_grad = False
 
         del ckpt
         
     if multi_gpu:
         netG = nn.DataParallel(netG.to(device))
         netD = nn.DataParallel(netD.to(device))
-    '''
+
     for iteration in tqdm(range(current_iteration, total_iterations+1)):
         real_image = next(dataloader)
         real_image = real_image.to(device)
@@ -200,7 +207,7 @@ def train(args):
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_{args.path}_model_{iteration}.pth')
-'''
+
 def generate_images(args, images_path, iter):
     ndf = 64
     ngf = 64
@@ -259,13 +266,13 @@ def do_gen_ai(args):
 
     train(gen_args)
 
-    # gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
-    # if not os.path.exists(gen_images_path):
-    #     os.makedirs(gen_images_path)
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
+    if not os.path.exists(gen_images_path):
+        os.makedirs(gen_images_path)
 
-    # logging.info(f"Generated images path {gen_images_path}")
-    # for i in range(128):
-    #     generate_images(gen_args, gen_images_path, i)
+    logging.info(f"Generated images path {gen_images_path}")
+    for i in range(128):
+        generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
     do_gen_ai()
