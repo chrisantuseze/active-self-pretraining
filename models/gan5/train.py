@@ -124,7 +124,7 @@ def train(args):
         avg_param_G = ckpt['g_ema']
         optimizerG.load_state_dict(ckpt['opt_g'])
         optimizerD.load_state_dict(ckpt['opt_d'])
-        current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
+        # current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
         del ckpt
         
     if multi_gpu:
