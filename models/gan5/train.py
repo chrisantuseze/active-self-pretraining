@@ -125,12 +125,27 @@ def train(args):
         optimizerG.load_state_dict(ckpt['opt_g'])
         optimizerD.load_state_dict(ckpt['opt_d'])
         # current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
+
+
+        # freeze some layers
+        print("netD params")
+        for name, param in netD.named_parameters():
+            print(name)
+            param.requires_grad = False
+            pass
+
+        print("netG params\n")
+        for name, param in netG.named_parameters():
+            print(name)
+            param.requires_grad = False
+            pass
+
         del ckpt
         
     if multi_gpu:
         netG = nn.DataParallel(netG.to(device))
         netD = nn.DataParallel(netD.to(device))
-    
+    '''
     for iteration in tqdm(range(current_iteration, total_iterations+1)):
         real_image = next(dataloader)
         real_image = real_image.to(device)
@@ -185,7 +200,7 @@ def train(args):
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_{args.path}_model_{iteration}.pth')
-
+'''
 def generate_images(args, images_path, iter):
     ndf = 64
     ngf = 64
