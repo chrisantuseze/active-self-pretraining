@@ -92,6 +92,10 @@ cp filename /destination directory
 
 ssh-keygen -R 192.5.87.74 #Removes all keys belonging to hostname from a known_hosts file.
 
+ls -lh gan5_imagenet_model_50000.pth gets size of the file
+
+squeue -u echris checks the status of a pete job
+
 https://github.com/fastai/imagenette
 
 

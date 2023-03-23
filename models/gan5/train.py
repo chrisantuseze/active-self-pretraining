@@ -66,7 +66,7 @@ def train(args):
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
-    # args.ckpt = f'{saved_model_folder}/gan5_{args.path}_model_10000.pth'
+    args.ckpt = f'{saved_model_folder}/gan5_imagenet_model_50000' #gan5_{args.path}_model_50000.pth'
     checkpoint = args.ckpt
 
     percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=use_cuda)
@@ -161,7 +161,7 @@ def train(args):
             avg_p.mul_(0.999).add_(0.001 * p.data)
 
         if iteration % save_interval == 0:
-            v = "GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item())
+            v = iteration + " - GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item())
             logging.info(str(v))
           
         if iteration % (save_interval*10) == 0:
@@ -175,7 +175,7 @@ def train(args):
                 #         rec_img_part]).add(1).mul(0.5), saved_image_folder+'/rec_%d.jpg'%iteration )
             load_params(netG, backup_para)
 
-        if iteration % (save_interval*50) == 0 or iteration == total_iterations:
+        if iteration > 0 and (iteration % (save_interval*50) == 0 or iteration == total_iterations):
             backup_para = copy_G_params(netG)
             load_params(netG, avg_param_G)
             # torch.save({'g':netG.state_dict(),'d':netD.state_dict()}, saved_model_folder+'/%d.pth'%iteration)
@@ -240,7 +240,7 @@ def do_gen_ai(args):
 
     gen_args = parser.parse_args()
 
-    # print(gen_args)
+    gen_args.path = get_dataset_enum(args.target_dataset)
 
     train(gen_args)
 
