@@ -161,7 +161,7 @@ def train(args):
             avg_p.mul_(0.999).add_(0.001 * p.data)
 
         if iteration % save_interval == 0:
-            v = iteration + " - GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item())
+            v = str(iteration) + " - GAN: loss d: %.5f    loss g: %.5f"%(err_dr, -err_g.item())
             logging.info(str(v))
           
         if iteration % (save_interval*10) == 0:
