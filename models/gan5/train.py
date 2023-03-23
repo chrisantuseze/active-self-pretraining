@@ -259,13 +259,13 @@ def do_gen_ai(args):
 
     train(gen_args)
 
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
-    if not os.path.exists(gen_images_path):
-        os.makedirs(gen_images_path)
+    # gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
+    # if not os.path.exists(gen_images_path):
+    #     os.makedirs(gen_images_path)
 
-    logging.info(f"Generated images path {gen_images_path}")
-    for i in range(128):
-        generate_images(gen_args, gen_images_path, i)
+    # logging.info(f"Generated images path {gen_images_path}")
+    # for i in range(128):
+    #     generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
     do_gen_ai()
