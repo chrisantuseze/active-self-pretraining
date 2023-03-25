@@ -69,7 +69,7 @@ def do_gen_ai(args):
     dataset = 'imagenet_gan' #get_dataset_enum(args.target_dataset)
 
     # gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
-    gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}')
+    gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}/')
 
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
@@ -199,10 +199,10 @@ def standalone_image_gen(args):
     # model.load_state_dict(state['model'], strict=False)
     model = model.to(args.device)
 
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}/')
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
-        
+
     generate_samples(model, gen_images_path, size=50)
     
 if __name__ == '__main__':
