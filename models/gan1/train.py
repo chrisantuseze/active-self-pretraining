@@ -22,7 +22,7 @@ import models.self_sup.swav.backbone.resnet50 as resnet_models
 def argparse_setup():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default="face", help = "dataset. anime or face. ")
-    parser.add_argument('--pretrained', type=str, default="./models/gan/data/G_ema.pth", help = "pretrained BigGAN model")
+    parser.add_argument('--pretrained', type=str, default="./save/checkpoints/G_ema.pth", help = "pretrained BigGAN model")
 
 
     parser.add_argument('--eval-freq', type=int, default=500, help = "save frequency in iteration. currently no eval is implemented and just model saving and sample generation is performed" )
@@ -195,27 +195,12 @@ def standalone_image_gen(args):
     model_path = os.path.join(args.model_checkpoint_path, args.pretrained)
     model = setup_model(args.model_name, dataset_size=25, resume=args.gan_resume, model_path=model_path)
 
-    state = simple_load_model(args, 'gan_model_10000.000000.pth')
-    model.load_state_dict(state['model'], strict=False)
+    # state = simple_load_model(args, 'gan_model_10000.000000.pth')
+    # model.load_state_dict(state['model'], strict=False)
     model = model.to(args.device)
 
-
-    # build model
-    zero_init_residual = True #TODO: They said that this improves the network by 0.2-0.3%
-    features_model = resnet_models.__dict__[args.backbone](
-        zero_init_residual=zero_init_residual,
-        normalize=True,
-        hidden_mlp=args.hidden_mlp,
-        output_dim=args.feat_dim,
-        nmb_prototypes=args.nmb_prototypes,
-    )
-
-    # load weights
-    features_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", features_model)
-    features_model = features_model.to(args.device)
-
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(2)}')
-    generate_samples(model, features_model, gen_images_path, size=3)
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
+    generate_samples(model, gen_images_path, size=50)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()

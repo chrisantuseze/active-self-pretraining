@@ -25,13 +25,13 @@ import utils.logger as logging
 # import logging
 
 # from models.gan5.train import do_gen_ai
-from models.gan1.train import do_gen_ai
+from models.gan1.train import standalone_image_gen
 
 logging.init()
 
 def main(args):
     writer = None #SummaryWriter()
-    do_gen_ai(args)
+    standalone_image_gen(args)
 
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
