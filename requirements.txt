@@ -8,16 +8,16 @@ PyYAML
 scipy
 tqdm
 
-h5py
-Pillow
+# h5py
+# Pillow
 
 scikit-image
-ipdb==0.13.4
+# ipdb==0.13.4
 lmdb==1.0.0
 opencv-python==4.5.1.48
-easing-functions==1.0.4
+# easing-functions==1.0.4
 
-einops
-kornia
+# einops
+# kornia
 
 scikit-learn

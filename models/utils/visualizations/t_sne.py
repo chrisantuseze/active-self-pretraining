@@ -44,7 +44,7 @@ class FeatureSim():
 
     def compute_similarity(self):
         # Load a pre-trained model (e.g. a convolutional neural network)
-        model = torch.hub.load('pytorch/vision:v0.9.0', 'resnet18', pretrained=True)
+        model = torchvision.models.resnet18(pretrained=True)
 
         # Remove the last layer of the model to obtain feature vectors
         model = torch.nn.Sequential(*list(model.children())[:-1])
