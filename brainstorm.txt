@@ -45,6 +45,7 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 6. Large-Scale GAN Training for High Fidelity Natural Image Synthesis - Poor images (gan4)
 7. Lightweight GAN - Terrible images (gan6)
 8. TOWARDS FASTER AND STABILIZED GAN TRAINING FOR HIGH-FIDELITY FEW-SHOT IMAGE SYNTHESIS - Wasn't terrible, but not good enough (gan5)
+9. Image Generation From Small Datasets via Batch Statistics Adaptation - This is worse than gan5 (gan1)
 
 - Got 96.67 when generated images were added
 

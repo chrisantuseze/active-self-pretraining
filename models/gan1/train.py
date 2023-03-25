@@ -68,8 +68,8 @@ def do_gen_ai(args):
 
     dataset = 'imagenet_gan' #get_dataset_enum(args.target_dataset)
 
-    # gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
-    gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}')
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
+    # gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}')
 
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
