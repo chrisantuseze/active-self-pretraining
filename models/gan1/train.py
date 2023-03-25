@@ -164,11 +164,11 @@ def do_gen_ai(args):
             break
         epoch+=1
 
+    simple_save_model(args, model, f'gan_{dataset}_model_{epoch}.pth')
+
     logging.info("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
     generate_samples(model, img_prefix, size=400)
-
-    simple_save_model(args, model, f'gan_{dataset}_model_{epoch}.pth')
 
 
 def generate_samples(model, img_prefix, size):
