@@ -200,6 +200,9 @@ def standalone_image_gen(args):
     model = model.to(args.device)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
+    if not os.path.exists(gen_images_path):
+        os.makedirs(gen_images_path)
+        
     generate_samples(model, gen_images_path, size=50)
     
 if __name__ == '__main__':
