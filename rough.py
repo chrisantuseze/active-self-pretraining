@@ -2,8 +2,8 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/imagewang.zip", 'r') as zip_ref:
-    zip_ref.extractall("imagenet")  
+with zipfile.ZipFile("cifar10v2.zip", 'r') as zip_ref:
+    zip_ref.extractall("cifar10v2")  
 
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]

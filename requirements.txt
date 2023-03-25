@@ -7,6 +7,7 @@ tensorboard
 PyYAML
 scipy
 tqdm
+Pillow
 
 # h5py
 # Pillow

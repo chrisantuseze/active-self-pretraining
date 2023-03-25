@@ -42,6 +42,9 @@ train on episodic memory for one epoch. https://arxiv.org/pdf/1902.10486.pdf
 3. Image Generation From Small Datasets via Batch Statistics Adaptation - This is old (3yrs), but it works
 4. MineGAN: effective knowledge transfer from GANs to target domains with few images does not work. Throws an error
 5. On Leveraging Pretrained GANs for Generation with Limited Data - Generates very shitty images
+6. Large-Scale GAN Training for High Fidelity Natural Image Synthesis - Poor images (gan4)
+7. Lightweight GAN - Terrible images (gan6)
+8. TOWARDS FASTER AND STABILIZED GAN TRAINING FOR HIGH-FIDELITY FEW-SHOT IMAGE SYNTHESIS - Wasn't terrible, but not good enough (gan5)
 
 - Got 96.67 when generated images were added
 
@@ -95,6 +98,8 @@ ssh-keygen -R 192.5.87.74 #Removes all keys belonging to hostname from a known_h
 ls -lh gan5_imagenet_model_50000.pth gets size of the file
 
 squeue -u echris checks the status of a pete job
+
+ssh echris@pete.hpc.okstate.edu
 
 https://github.com/fastai/imagenette
 
