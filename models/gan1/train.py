@@ -9,11 +9,11 @@ import argparse
 import time
 from datautils.dataset_enum import get_dataset_enum
 
-import models.gan.visualizers as visualizers
+import models.gan1.visualizers as visualizers
 from models.utils.commons import get_params, AverageMeter, get_params_to_update
-from models.gan.dataloaders.setup_dataloader_smallgan import setup_dataloader 
-from models.gan.nets.setup_model import setup_model
-from models.gan.losses.AdaBIGGANLoss import AdaBIGGANLoss
+from models.gan1.dataloaders.setup_dataloader_smallgan import setup_dataloader 
+from models.gan1.nets.setup_model import setup_model
+from models.gan1.losses.AdaBIGGANLoss import AdaBIGGANLoss
 from utils.commons import load_chkpts, simple_load_model, simple_save_model
 import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
@@ -66,13 +66,17 @@ def argparse_setup():
 def do_gen_ai(args):
     device = args.device
 
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
+    dataset = 'imagenet_gan' #get_dataset_enum(args.target_dataset)
+
+    # gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
+    gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}')
+
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
     
-    logging.info(f"Using {get_dataset_enum(args.target_dataset)} dataset")
+    logging.info(f"Using {dataset} dataset")
 
-    dir = f'{args.dataset_dir}/{get_dataset_enum(args.target_dataset)}'
+    dir = f'{args.dataset_dir}/{dataset}'
     dataloader = setup_dataloader(dir=dir, batch_size=args.gan_batch_size, num_workers=args.workers)
     dataset_size = len(dataloader.dataset)
     
@@ -164,7 +168,7 @@ def do_gen_ai(args):
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
     generate_samples(model, img_prefix, size=400)
 
-    simple_save_model(args, model, f'gan_model_{epoch}.pth')
+    simple_save_model(args, model, f'gan_{dataset}_model_{epoch}.pth')
 
 
 def generate_samples(model, img_prefix, size):

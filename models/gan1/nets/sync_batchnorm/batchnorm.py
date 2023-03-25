@@ -16,7 +16,7 @@ import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 from torch.nn.parallel._functions import ReduceAddCoalesced, Broadcast
 
-from models.gan.nets.sync_batchnorm.comm import SyncMaster
+from models.gan1.nets.sync_batchnorm.comm import SyncMaster
 
 __all__ = ['SynchronizedBatchNorm1d', 'SynchronizedBatchNorm2d', 'SynchronizedBatchNorm3d']
 

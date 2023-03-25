@@ -3,7 +3,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.gan.losses.Vgg16PerceptualLoss import Vgg16PerceptualLoss
+from models.gan1.losses.Vgg16PerceptualLoss import Vgg16PerceptualLoss
 
 class AdaBIGGANLoss(nn.Module):
     def __init__(self,perceptual_loss = "vgg",

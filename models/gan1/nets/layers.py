@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.nn import Parameter as P
 
-from models.gan.nets.sync_batchnorm import SynchronizedBatchNorm2d as SyncBN2d
+from models.gan1.nets.sync_batchnorm import SynchronizedBatchNorm2d as SyncBN2d
 
 
 # Projection of x onto y
