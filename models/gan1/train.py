@@ -203,7 +203,9 @@ def standalone_image_gen(args):
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
 
-    generate_samples(model, gen_images_path, size=50)
+    logging.info(f"The path to save the generated images is {gen_images_path}")
+
+    generate_samples(model, f'{gen_images_path}/', size=50)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()

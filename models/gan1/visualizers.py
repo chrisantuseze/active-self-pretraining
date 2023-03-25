@@ -33,7 +33,7 @@ def reconstruct(model, out_path, num, add_small_noise=False):
         for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
                 val,
-                f"{out_path}/reconstruct_{i}.jpg",
+                f"{out_path}reconstruct_{i}.jpg",
                 nrow=1,
                 normalize=True,
             )
@@ -55,7 +55,7 @@ def interpolate(model, out_path, source, dist, trncate=0.4, num=5):
             for i, val in enumerate(image_tensors):
                 torchvision.utils.save_image(
                     val,
-                    f"{out_path}/interpolate_{i}.jpg",
+                    f"{out_path}interpolate_{i}.jpg",
                     nrow=1,
                     normalize=True,
                 )
@@ -106,7 +106,7 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
                 val,
-                f"{out_path}/random_{prefix}_{i}.jpg",
+                f"{out_path}random_{prefix}_{i}.jpg",
                 nrow=1,
                 normalize=True,
             )
