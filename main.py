@@ -24,8 +24,7 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-# from models.gan5.train import do_gen_ai
-from models.gan1.train import do_gen_ai
+from models.gan5.train import do_gen_ai
 
 logging.init()
 

@@ -66,7 +66,7 @@ def train(args):
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
-    args.ckpt = f'{saved_model_folder}/gan5_imagenet_model_50000.pth' #gan5_{args.path}_model_50000.pth'
+    # args.ckpt = f'{saved_model_folder}/gan5_imagenet_model_50000.pth' #gan5_{args.path}_model_50000.pth'
     checkpoint = args.ckpt
 
     percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=use_cuda)
@@ -189,12 +189,6 @@ def train(args):
         if iteration % (save_interval*10) == 0:
             backup_para = copy_G_params(netG)
             load_params(netG, avg_param_G)
-            # with torch.no_grad():
-                # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5), saved_image_folder+'/%d.jpg'%iteration, nrow=4)
-                # vutils.save_image( torch.cat([
-                #         F.interpolate(real_image, 128), 
-                #         rec_img_all, rec_img_small,
-                #         rec_img_part]).add(1).mul(0.5), saved_image_folder+'/rec_%d.jpg'%iteration )
             load_params(netG, backup_para)
 
         if iteration > 0 and (iteration % (save_interval*50) == 0 or iteration == total_iterations):
@@ -213,7 +207,6 @@ def generate_images(args, images_path, iter):
     ngf = 64
     nz = 256
 
-    #from model_s import Generator, Discriminator
     netG = Generator(ngf=ngf, nz=nz, im_size=args.im_size)
     netG.apply(weights_init)
 
@@ -236,13 +229,10 @@ def generate_images(args, images_path, iter):
     fixed_noise = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
 
     logging.info("Generating images...")
-    # vutils.save_image(netG(fixed_noise)[0].add(1).mul(0.5),  f'{saved_image_folder}/{args.path}_{args.iter}.jpg', nrow=4)
 
     for i, val in enumerate(netG(fixed_noise)[0].add(1).mul(0.5)):
             torchvision.utils.save_image(
                 val,
-                # f"{out_path}random_{prefix}_{i}.jpg",
-                # f'{saved_image_folder}/{args.path}_{iter}_{i}.jpg',
                 f'{images_path}/{args.path}_{iter}_{i}.jpg',
                 nrow=1,
                 normalize=True,
@@ -251,10 +241,10 @@ def generate_images(args, images_path, iter):
 def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
 
-    parser.add_argument('--path', type=str, default='imagenet', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
+    parser.add_argument('--path', type=str, default='imagenet_gan', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
+    parser.add_argument('--iter', type=int, default=40000, help='number of iterations')#50000
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')#1024
@@ -262,9 +252,7 @@ def do_gen_ai(args):
 
     gen_args = parser.parse_args()
 
-    # train(gen_args)
-
-    gen_args.path = get_dataset_enum(args.target_dataset)
+    # gen_args.path = get_dataset_enum(args.target_dataset)
 
     train(gen_args)
 
