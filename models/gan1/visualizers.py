@@ -23,13 +23,6 @@ def reconstruct(model, out_path, num, add_small_noise=False):
             embeddings += torch.randn(embeddings.size(), device=device) * 0.01
 
         image_tensors = model(embeddings)
-        # torchvision.utils.save_image(
-        #     image_tensors,
-        #     f"{out_path}reconstruct_{i}.jpg",
-        #     nrow=1,#int(batch_size ** 0.5),
-        #     normalize=True,
-        # )
-
         for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
                 val,
@@ -73,36 +66,7 @@ def random(model, out_path, tmp=0.4, num=9, prefix=1, truncate=False):
         embeddings = torch.tensor(embeddings, device=device)
 
         image_tensors = model(embeddings)
-        # torchvision.utils.save_image(
-        #         image_tensors,
-        #         f"{out_path}random.jpg",
-        #         nrow=1,
-        #         normalize=True,
-        #     )
-
         
-        # _preds = []
-        # for i, val in enumerate(image_tensors):
-        #     print(val.shape)
-        #     outputs = features_model(val)
-        #     _preds.append(get_predictions(outputs))
-        
-        # preds = torch.cat(_preds).numpy()
-
-        # print(preds)
-        # print(preds.shape)
-
-        # probs = preds.max(axis=1)
-        # indices = probs.argsort(axis=0)
-
-        # print(indices)
-        # print(indices.shape)
-
-        # new_samples = []
-        # for item in indices:
-        #     new_samples.append(image_tensors[item])
-
-        # image_tensors = new_samples[: new_samples // 2]
         for i, val in enumerate(image_tensors):
             torchvision.utils.save_image(
                 val,
