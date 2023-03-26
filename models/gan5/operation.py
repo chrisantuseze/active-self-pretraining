@@ -8,6 +8,7 @@ from PIL import Image
 from copy import deepcopy
 import shutil
 import json
+import random
 
 def InfiniteSampler(n):
     """Data sampler"""
@@ -79,6 +80,7 @@ class  ImageFolder(Dataset):
         # img_path = glob.glob(self.dir + '/*/*')
         img_path = glob.glob(self.dir + '/*')
         # img_path.sort()
+        random.shuffle(img_path)
 
         if len(img_path) >= 2000:
             img_path = img_path[0:2000]
