@@ -2,13 +2,15 @@ import glob
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
+import random
+
 from datautils.path_loss import PathLoss
 
 from models.active_learning.pretext_dataloader import MakeBatchDataset, PretextMultiCropDataset
 from models.self_sup.simclr.transformation import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
-from models.utils.commons import get_params, split_dataset2
+from models.utils.commons import get_images_pathlist, get_params, split_dataset2
 from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 
@@ -68,6 +70,11 @@ class TargetDataset():
 
             elif self.training_type == TrainingType.BASE_PRETRAIN:
                 img_path = glob.glob(self.dir + '/*')
+                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
+                random.shuffle(real_target)
+
+                img_path.extend(real_target[0:1000])
+
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
                 dataset = PretextMultiCropDataset(

@@ -9,7 +9,7 @@ from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
-from models.utils.commons import get_params
+from models.utils.commons import get_images_pathlist, get_params
 from models.utils.transformations import Transforms
 from utils.commons import load_class_names, pil_loader, save_class_names
 from models.utils.training_type_enum import TrainingType
@@ -202,16 +202,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         self.is_train = is_train
         self.is_tnse = is_tsne
 
-        if "./datasets/generated" in self.dir.split('_'):
-            self.img_path = glob.glob(self.dir + '/*')
-
-        elif with_train:
-            if self.dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
-                self.img_path = glob.glob(self.dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
-            else:
-                self.img_path = glob.glob(self.dir + '/train/*/*')
-        else:
-            self.img_path = glob.glob(self.dir + '/*/*')
+        self.img_path = get_images_pathlist(self.dir, with_train)
 
         self.transform = transform
 

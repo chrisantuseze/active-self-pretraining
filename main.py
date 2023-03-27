@@ -30,7 +30,7 @@ logging.init()
 
 def main(args):
     writer = None #SummaryWriter()
-    do_gen_ai(args)
+    # do_gen_ai(args)
 
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
@@ -48,18 +48,18 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        # if args.base_pretrain:
-        #     do_gen_ai(args)
+        if args.base_pretrain:
+            # do_gen_ai(args)
 
-        #     pretrainer = SelfSupPretrainer(args, writer)
-        #     pretrainer.first_pretrain()
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.first_pretrain()
 
-        # if args.target_pretrain:
-        #     pretrainer = SelfSupPretrainer(args, writer)
-        #     pretrainer.second_pretrain()
+        if args.target_pretrain:
+            pretrainer = SelfSupPretrainer(args, writer)
+            pretrainer.second_pretrain()
 
-        # classifier = Classifier(args, pretrain_level="2")
-        # classifier.train_and_eval()
+        classifier = Classifier(args, pretrain_level="2")
+        classifier.train_and_eval()
 
         pass
 

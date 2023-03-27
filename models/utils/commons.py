@@ -1,3 +1,4 @@
+import glob
 import torch.nn as nn
 import torch
 import torchvision
@@ -247,6 +248,20 @@ def prepare_model(args, trainingType, model):
     params_to_update = get_params_to_update(model, feature_extract=True)
 
     return model, params_to_update
+
+def get_images_pathlist(dir, with_train):
+    if "./datasets/generated" in dir.split('_'):
+        img_path = glob.glob(dir + '/*')
+
+    elif with_train:
+        if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
+            img_path = glob.glob(dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
+        else:
+            img_path = glob.glob(dir + '/train/*/*')
+    else:
+        img_path = glob.glob(dir + '/*/*')
+
+    return img_path
 
 class AverageMeter(object):
     """computes and stores the average and current value"""
