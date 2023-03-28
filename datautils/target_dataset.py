@@ -1,4 +1,5 @@
 import glob
+import logging
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
@@ -70,10 +71,21 @@ class TargetDataset():
 
             elif self.training_type == TrainingType.BASE_PRETRAIN:
                 img_path = glob.glob(self.dir + '/*')
+
                 real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
                 random.shuffle(real_target)
 
-                img_path.extend(real_target[0:1000])
+                augment_size = 1000
+                logging.info(f"Augmenting {augment_size} real target images to the generated dataset")
+                img_path.extend(real_target[0:augment_size])
+
+                #TODO: This is only for gan1
+                source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
+                random.shuffle(source_proxy)
+
+                augment_size = 500
+                logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
+                img_path.extend(source_proxy[0:augment_size])
 
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
