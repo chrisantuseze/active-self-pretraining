@@ -1,5 +1,4 @@
 import glob
-import logging
 import torch
 import torchvision
 from torchvision.transforms import ToTensor, Compose
@@ -17,6 +16,8 @@ from models.utils.ssl_method_enum import SSL_Method
 
 from datautils import dataset_enum
 from models.utils.transformations import Transforms
+
+import utils.logger as logging
 
 class TargetDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:

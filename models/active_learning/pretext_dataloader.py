@@ -16,6 +16,7 @@ from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 from datautils.dataset_enum import DatasetType, get_dataset_enum
 # import cv2
+import utils.logger as logging
 
 labels = {}
 index = 0
@@ -186,6 +187,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
             image = Image.open(path)
 
         multi_crops = list(map(lambda trans: trans(image), self.trans))
+        logging.info(f'The length of the multi_crops is {len(multi_crops)}')
         return multi_crops #TODO: Check the len of this multi_crops. Also check if you can use a mined view and an aug view here instead of just aug views.
 
 
