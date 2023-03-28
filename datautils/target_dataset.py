@@ -131,7 +131,7 @@ class TargetDataset():
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
     if training_type == TrainingType.BASE_AL:
-        print("using the Generated dataset")
+        print("using the Generated dataset after AL")
         return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
     
     if training_type == TrainingType.BASE_PRETRAIN:
