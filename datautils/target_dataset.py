@@ -72,6 +72,7 @@ class TargetDataset():
 
             elif self.training_type == TrainingType.BASE_PRETRAIN:
                 img_path = glob.glob(self.dir + '/*')
+                logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
                 real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
                 random.shuffle(real_target)

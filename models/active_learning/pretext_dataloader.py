@@ -187,7 +187,6 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
             image = Image.open(path)
 
         multi_crops = list(map(lambda trans: trans(image), self.trans))
-        logging.info(f'The length of the multi_crops is {len(multi_crops)}')
         return multi_crops #TODO: Check the len of this multi_crops. Also check if you can use a mined view and an aug view here instead of just aug views.
 
 
