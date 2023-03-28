@@ -126,7 +126,7 @@ class TargetDataset():
             swav = TransformsSwAV(self.args, self.batch_size, self.dir)
             loader, dataset = swav.train_loader, swav.train_dataset
         
-        print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
+        logging.info(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
 
         return loader
     

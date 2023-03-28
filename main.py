@@ -49,10 +49,10 @@ def main(args):
 
     else:
         if args.base_pretrain:
-            standalone_image_gen(args)
+            # standalone_image_gen(args)
 
             pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.first_pretrain()
+            # pretrainer.first_pretrain()
 
         if args.target_pretrain:
             pretrainer = SelfSupPretrainer(args, writer)
