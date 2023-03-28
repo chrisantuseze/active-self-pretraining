@@ -261,7 +261,7 @@ def do_gen_ai(args):
         os.makedirs(gen_images_path)
 
     logging.info(f"Generated images path {gen_images_path}")
-    for i in range(115):
+    for i in range(100):
         generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":

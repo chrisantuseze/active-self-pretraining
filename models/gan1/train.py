@@ -66,7 +66,7 @@ def argparse_setup():
 def do_gen_ai(args):
     device = args.device
 
-    dataset = 'imagenet_gan' #get_dataset_enum(args.target_dataset)
+    dataset = get_dataset_enum(args.target_dataset)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.base_dataset}')
     # gen_images_path = os.path.join(args.dataset_dir, f'generated_{dataset}')
@@ -168,13 +168,13 @@ def do_gen_ai(args):
 
     logging.info("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
-    generate_samples(model, img_prefix, size=100)
+    generate_samples(model, img_prefix, size=600)
 
 
 def generate_samples(model, img_prefix, size):
     # visualizers.reconstruct(model, img_prefix, num=size, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=size)
-    for i in range(1, 2):
+    for i in range(1, 4):
         visualizers.random(model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):

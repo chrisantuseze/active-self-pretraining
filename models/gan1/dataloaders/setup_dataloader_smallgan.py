@@ -12,16 +12,16 @@ def setup_dataloader(dir, h=128, w=128, batch_size=4, num_workers=4):
 
     with_train = True if dir in ["./datasets/chest_xray"] else False
     
-    # if with_train:
-    #     if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
-    #         img_path_list = glob.glob(dir + '/train/*/*')
-    #     else:
-    #         img_path_list = glob.glob(dir + '/train/*/*')
-    # else:
-    #     img_path_list = glob.glob(dir + '/*/*')
+    if with_train:
+        if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
+            img_path_list = glob.glob(dir + '/train/*/*')
+        else:
+            img_path_list = glob.glob(dir + '/train/*/*')
+    else:
+        img_path_list = glob.glob(dir + '/*/*')
 
     #for imagenet_gan
-    img_path_list = glob.glob(dir + '/*')
+    # img_path_list = glob.glob(dir + '/*')
 
         
     assert len(img_path_list) > 0
@@ -32,15 +32,11 @@ def setup_dataloader(dir, h=128, w=128, batch_size=4, num_workers=4):
         transforms.ToTensor(),
     ])
 
-    # img_path_list = img_path_list[:25]
+    img_path_list = img_path_list[:25]
     
     img_path_list = [[path, i] for i, path in enumerate(sorted(img_path_list))]
     dataset = ImageListDataset(img_path_list, transform=transform)
 
-    # dataset = MakeBatchDataset(
-    #         self.args,
-    #         self.dir, self.with_train, self.is_train, transforms)
-    
     return DataLoader(
             [data for data in  dataset], 
             batch_size=batch_size, 
