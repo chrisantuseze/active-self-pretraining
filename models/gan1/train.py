@@ -168,13 +168,13 @@ def do_gen_ai(args):
 
     logging.info("Generating images...")
     img_prefix = os.path.join(gen_images_path, "%d_"%iteration) 
-    generate_samples(model, img_prefix, size=600)
+    generate_samples(model, img_prefix, size=400)
 
 
 def generate_samples(model, img_prefix, size):
     # visualizers.reconstruct(model, img_prefix, num=size, add_small_noise=True)
     # visualizers.interpolate(model, img_prefix, source=0, dist=1, trncate=0.3, num=size)
-    for i in range(1, 4):
+    for i in range(1, 6):
         visualizers.random(model, img_prefix, tmp=0.3, num=size, prefix=i, truncate=True)
 
 def setup_optimizer(model, lr_g_batch_stat, lr_g_linear, lr_bsa_linear, lr_embed, lr_class_cond_embed, step,   step_factor=0.1):
@@ -205,7 +205,7 @@ def standalone_image_gen(args):
 
     logging.info(f"The path to save the generated images is {gen_images_path}")
 
-    generate_samples(model, f'{gen_images_path}/', size=50)
+    generate_samples(model, f'{gen_images_path}/', size=400)
     
 if __name__ == '__main__':
     gan_args = argparse_setup()
