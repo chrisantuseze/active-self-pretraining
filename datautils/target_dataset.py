@@ -28,7 +28,7 @@ class TargetDataset():
         self.with_train = with_train
         self.is_train = is_train
         
-        params = get_params(args, TrainingType.TARGET_PRETRAIN)
+        params = get_params(args, training_type)
         self.image_size = params.image_size
         self.batch_size = params.batch_size if not batch_size else batch_size
 
