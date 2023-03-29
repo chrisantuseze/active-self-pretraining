@@ -58,7 +58,7 @@ def main(args):
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.second_pretrain()
 
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        classifier = Classifier(args, pretrain_level="2")
         classifier.train_and_eval()
 
         pass

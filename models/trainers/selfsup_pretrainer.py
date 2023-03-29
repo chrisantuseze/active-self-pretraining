@@ -107,9 +107,8 @@ class SelfSupPretrainer(BasePretrainer):
     def second_pretrain(self) -> None:
         distilled_ds = load_path_loss(self.args, self.args.pretrain_path_loss_file)
 
-        loader = self.get_loader(self.args.do_al, distilled_ds=distilled_ds, training_type=TrainingType.TARGET_PRETRAIN)
+        loader = self.get_loader(self.args.do_al, distilled_ds=distilled_ds, training_type=TrainingType.BASE_PRETRAIN)#TODO: Change to TARGET
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
-
 
         self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
 
