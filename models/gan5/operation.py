@@ -80,14 +80,14 @@ class  ImageFolder(Dataset):
         img_path = glob.glob(self.dir + '/*/*')
 
         # mixing the dataset with some source proxy
-        source_proxy = glob.glob(f'datasets/cifar10/train/*/*')
-        random.shuffle(source_proxy)
-        img_path.extend(source_proxy[0:500])
+        # source_proxy = glob.glob(f'datasets/cifar10/train/*/*')
+        # random.shuffle(source_proxy)
+        # img_path.extend(source_proxy[0:500])
 
         random.shuffle(img_path)
 
         if len(img_path) >= 2000:
-            img_path = img_path[0:1500]
+            img_path = img_path[0:2000]
 
         return img_path
 

@@ -254,7 +254,7 @@ def do_gen_ai(args):
 
     gen_args.path = get_dataset_enum(args.target_dataset)
 
-    # train(gen_args)
+    train(gen_args)
 
     gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
     if not os.path.exists(gen_images_path):
