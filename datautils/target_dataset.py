@@ -74,20 +74,20 @@ class TargetDataset():
                 img_path = glob.glob(self.dir + '/*')
                 logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
-                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
-                random.shuffle(real_target)
+                # real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
+                # random.shuffle(real_target)
 
-                augment_size = len(real_target) #1000
-                logging.info(f"Augmenting {augment_size} real target images to the generated dataset")
-                img_path.extend(real_target[0:augment_size])
+                # augment_size = len(real_target) #1000
+                # logging.info(f"Augmenting {augment_size} real target images to the generated dataset")
+                # img_path.extend(real_target[0:augment_size])
 
-                #TODO: This is only for gan1
-                source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
-                random.shuffle(source_proxy)
+                # #TODO: This is only for gan1
+                # source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
+                # random.shuffle(source_proxy)
 
-                augment_size = 2000 #500
-                logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
-                img_path.extend(source_proxy[0:augment_size])
+                # augment_size = 2000 #500
+                # logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
+                # img_path.extend(source_proxy[0:augment_size])
 
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 

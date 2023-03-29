@@ -59,7 +59,7 @@ So the generated images are not added to the target dataset, but rather used sol
 
 4. Add real target + proxy source and pass it through a GAN to generate target samples then use for intermediate pretraining
 5. Add real target + proxy source and pass it through a GAN to generate target samples, add some real target to it then use for intermediate pretraining
-6. Add gen target + real target + proxy source and use to pretrain target for 600 epochs
+6. Add gen target + real target + proxy source and use to pretrain target for 600 epochs - 89.68
 
 - New Things to do:
 
