@@ -77,7 +77,7 @@ class TargetDataset():
                 real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
                 random.shuffle(real_target)
 
-                augment_size = 1000
+                augment_size = len(real_target) #1000
                 logging.info(f"Augmenting {augment_size} real target images to the generated dataset")
                 img_path.extend(real_target[0:augment_size])
 
@@ -85,7 +85,7 @@ class TargetDataset():
                 source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
                 random.shuffle(source_proxy)
 
-                augment_size = 500
+                augment_size = 2000 #500
                 logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
                 img_path.extend(source_proxy[0:augment_size])
 
