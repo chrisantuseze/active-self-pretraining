@@ -496,7 +496,7 @@ class PretextTrainer():
         # if not self.args.al_train_maintask:
         #     return self.ds_distillation(encoder, path_loss)
 
-        return self.active_learning_new(path_loss)
+        return self.active_learning_new(path_loss, encoder)
 
     def ds_distillation(self, encoder, path_loss):
         model, _ = get_model_criterion(self.args, encoder, num_classes=4)
