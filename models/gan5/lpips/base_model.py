@@ -2,11 +2,10 @@ import os
 import torch
 from torch.autograd import Variable
 from pdb import set_trace as st
-from IPython import embed
 
 class BaseModel():
     def __init__(self):
-        pass;
+        pass
         
     def name(self):
         return 'BaseModel'
