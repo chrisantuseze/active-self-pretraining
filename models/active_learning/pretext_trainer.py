@@ -249,6 +249,9 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(loader)}]\t Loss: {loss}")
 
+                if isinstance(path, tuple) or isinstance(path, list):
+                    path = path[0]
+
                 pathloss.append(PathLoss(path, loss))
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
