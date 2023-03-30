@@ -22,17 +22,17 @@ class FeatureSim():
         ])
 
         # # Load the two datasets
-        dataset1 = torchvision.datasets.CIFAR10(root='data', train=True, download=True, transform=transform)
+        # dataset1 = torchvision.datasets.CIFAR10(root='data', train=True, download=True, transform=transform)
         # # dataset1 = Dataset(dataset1)
 
-        dataset2 = torchvision.datasets.CIFAR10(root='data', train=True, download=True, transform=transform)
+        # dataset2 = torchvision.datasets.CIFAR10(root='data', train=True, download=True, transform=transform)
         # # dataset2 = Dataset(dataset2)
 
-        # ds_1 = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN)
-        # dataset1 = ds_1.get_dataset(transform, is_tsne=True)
+        ds_1 = get_target_pretrain_ds(self.args, training_type=TrainingType.BASE_PRETRAIN)
+        dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
-        # ds_2 = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING)
-        # dataset2 = ds_2.get_dataset(transform, is_tsne=True)
+        ds_2 = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING)
+        dataset2 = ds_2.get_dataset(transform, is_tsne=True)
 
         # Combine the datasets into a single tensor
         combined_data = torch.utils.data.ConcatDataset([dataset1, dataset2])
@@ -62,8 +62,8 @@ class FeatureSim():
         embeddings = tsne.fit_transform(features)
 
         # Plot the t-SNE embeddings, coloring the data points based on their original dataset label
-        plt.scatter(embeddings[labels==0, 0], embeddings[labels==0, 1], color='#7089b8', label='MNIST')
-        plt.scatter(embeddings[labels==1, 0], embeddings[labels==1, 1], color='#f69a2a', label='FashionMNIST')
+        plt.scatter(embeddings[labels==0, 0], embeddings[labels==0, 1], color='#7089b8', label='Generated')
+        plt.scatter(embeddings[labels==1, 0], embeddings[labels==1, 1], color='#f69a2a', label='Real Target')
         plt.legend()
         plt.savefig('tsne.png')
         # plt.show()

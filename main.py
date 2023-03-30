@@ -24,7 +24,7 @@ from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
 # import logging
 
-from models.gan1.train import do_gen_ai, standalone_image_gen
+from models.gan5.train import do_gen_ai#, standalone_image_gen
 
 logging.init()
 
@@ -49,7 +49,7 @@ def main(args):
 
     else:
         if args.base_pretrain:
-            # standalone_image_gen(args)
+            # do_gen_ai(args)
 
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.first_pretrain()
