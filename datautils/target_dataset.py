@@ -44,7 +44,7 @@ class TargetDataset():
         dataset = MakeBatchDataset(
             self.args, self.dir, self.with_train, self.is_train, 
             is_tsne=False, transform=transforms, path_list=path_list)
-            
+
         train_ds, val_ds = split_dataset2(dataset=dataset, ratio=0.7, is_classifier=True)
 
         train_loader = torch.utils.data.DataLoader(
@@ -134,13 +134,13 @@ class TargetDataset():
     
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
-    if training_type == TrainingType.BASE_AL:
-        print("using the Generated dataset after AL")
-        return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
+    # if training_type == TrainingType.BASE_AL:
+    #     print("using the Generated dataset after AL")
+    #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
     
-    if training_type == TrainingType.BASE_PRETRAIN:
-        print("using the Generated dataset")
-        return TargetDataset(args, f"/{args.base_dataset}", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
+    # if training_type == TrainingType.BASE_PRETRAIN:
+    #     print("using the Generated dataset")
+    #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
         
 
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
