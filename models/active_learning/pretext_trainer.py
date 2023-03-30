@@ -377,7 +377,6 @@ class PretextTrainer():
         if path_list is not None:
             path_list = [path.path for path in path_list]
 
-            logging.info(len(path_list))
             train_loader, test_loader = get_target_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
                 train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100, path_list=path_list
             )
