@@ -1,3 +1,4 @@
+import glob
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -5,6 +6,7 @@ from torchvision import transforms
 import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
+from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import load_optimizer
@@ -371,6 +373,49 @@ class PretextTrainer():
         logging.info("Train Loss: {:.4f}".format(avg_loss))
         return avg_loss
 
+    def finetuner_new(self, model, prefix, path_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING):
+        if path_list is not None:
+            path_list = [path.path for path in path_list]
+            train_loader, test_loader = get_target_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
+                train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100, path_list=path_list
+            )
+
+        else:
+            train_loader, test_loader = get_target_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
+                train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100
+            )
+
+        model, criterion = get_model_criterion(self.args, model, num_classes=4)
+        model = model.to(self.args.device)
+
+        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
+        optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params=train_params, train_loader=train_loader)
+
+        counter = 0
+        epochs = 25
+        logging.info("Running finetuner")
+        for epoch in range(epochs):
+            logging.info('\nEpoch {}/{}'.format(epoch, epochs))
+            logging.info('-' * 20)
+
+            train_loss = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
+            epoch_acc, eval_loss = self.eval_finetuner(model, criterion, test_loader)
+
+            # update learning rate
+            if self.args.al_optimizer != "SwAV":
+                scheduler.step()
+
+            if epoch_acc <= self.best_trainer_acc:
+                counter += 1
+            else:
+                counter = 0
+
+            if counter > 20:
+                logging.info("Early stopped at epoch {}:".format(epoch))
+                break
+
+        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner.pth')
+
     def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
         train_loader, test_loader = get_target_pretrain_ds(
             self.args, training_type=training_type).get_finetuner_loaders(
@@ -448,10 +493,10 @@ class PretextTrainer():
             path_loss = self.make_batches(encoder, prefix='first')
 
         # Do not train main task iteratively. Proceed to 2nd pretraining
-        if not self.args.al_train_maintask:
-            return self.ds_distillation(encoder, path_loss)
+        # if not self.args.al_train_maintask:
+        #     return self.ds_distillation(encoder, path_loss)
 
-        return self.active_learning(path_loss)
+        return self.active_learning_new(path_loss)
 
     def ds_distillation(self, encoder, path_loss):
         model, _ = get_model_criterion(self.args, encoder, num_classes=4)
@@ -464,6 +509,46 @@ class PretextTrainer():
         # this does a reverse active learning to pick only the most certain data
         samplek = samplek[::-1]
         return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
+
+    def active_learning_new(self, path_loss, encoder):
+        gen_images = glob.glob(self.args.dataset_dir + '/generated_chest_xray/*')
+        pretraining_sample_pool = [PathLoss(path, 0) for path in gen_images]
+
+
+        path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
+        path_loss = path_loss[0:len(path_loss)//2] # half it
+        sample_per_batch = len(path_loss)//self.args.al_batches
+
+        batch_sampler_encoder = encoder
+        for batch in range(self.args.al_batches):
+            sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
+
+            if batch > 0:
+                logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
+
+                state = simple_load_model(self.args, path=f'{batch-1}_finetuner.pth')
+
+                batch_sampler_encoder.load_state_dict(state['model'], strict=False)
+
+                # sampling
+                samplek = self.batch_sampler(batch_sampler_encoder, sample6400)[:self.args.al_trainer_sample_size]
+                batch_sampler_encoder = encoder
+            else:
+                # first iteration: sample k at even intervals
+                samplek = sample6400[:self.args.al_trainer_sample_size]
+
+            pretraining_sample_pool.extend(samplek)
+
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
+                pretrainer = SelfSupPretrainer(self.args, self.writer)
+                pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+
+
+            self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, trainingType=TrainingType.BASE_PRETRAIN)
+
+        
+        return pretraining_sample_pool
     
     def active_learning(self, path_loss):
         pretraining_sample_pool = []

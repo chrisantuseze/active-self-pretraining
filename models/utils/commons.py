@@ -220,9 +220,12 @@ def prepare_model(args, trainingType, model):
 
     # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
     if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
-        # if args.backbone == "resnet50":
-        #     model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
-        model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+        if not args.do_gradual_base_pretrain:
+            model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+            
+        elif load_saved_state(args, pretrain_level="1") is not None:
+            state = load_saved_state(args, pretrain_level="1")
+            model.load_state_dict(state['model'], strict=False)
 
     else:
         state = load_saved_state(args, pretrain_level="1")
