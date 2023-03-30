@@ -392,7 +392,7 @@ class PretextTrainer():
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params=train_params, train_loader=train_loader)
 
         counter = 0
-        epochs = 25
+        epochs = 5 #25
         logging.info("Running finetuner")
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
