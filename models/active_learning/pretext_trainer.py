@@ -249,6 +249,8 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(loader)}]\t Loss: {loss}")
 
+                print(path)
+
                 pathloss.append(PathLoss(path, loss))
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
@@ -493,9 +495,6 @@ class PretextTrainer():
         if path_loss is None:
             path_loss = self.make_batches(encoder, prefix='first')
 
-        logging.info(path_loss)
-        print("\n")
-
         # Do not train main task iteratively. Proceed to 2nd pretraining
         # if not self.args.al_train_maintask:
         #     return self.ds_distillation(encoder, path_loss)
@@ -541,12 +540,7 @@ class PretextTrainer():
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
 
-            logging.info(pretraining_sample_pool)
-
-            print("\n")
             pretraining_sample_pool.extend(samplek)
-
-            logging.info(pretraining_sample_pool)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
