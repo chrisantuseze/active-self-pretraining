@@ -226,6 +226,8 @@ class MakeBatchDataset(torch.utils.data.Dataset):
             return img, label
         
         save_class_names(self.args, label)
+
+        print(path)
         
         if self.is_train:
             img = self.transform.__call__(img)
