@@ -396,7 +396,7 @@ class PretextTrainer():
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params=train_params, train_loader=train_loader)
 
         counter = 0
-        epochs = 5 #25
+        epochs = self.args.al_finetune_trainer_epochs
         logging.info("Running finetuner")
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
@@ -520,7 +520,6 @@ class PretextTrainer():
 
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
-        path_loss = path_loss[0:len(path_loss)//2] # half it
         sample_per_batch = len(path_loss)//self.args.al_batches
 
         batch_sampler_encoder = encoder
@@ -543,13 +542,12 @@ class PretextTrainer():
 
             pretraining_sample_pool.extend(samplek)
 
+            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
+            pretrainer = SelfSupPretrainer(self.args, self.writer)
+            pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
-                pretrainer = SelfSupPretrainer(self.args, self.writer)
-                pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
-
-
-            self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
+                self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
 
         
         return pretraining_sample_pool
