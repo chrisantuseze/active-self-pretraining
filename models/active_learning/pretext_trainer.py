@@ -545,7 +545,7 @@ class PretextTrainer():
                 pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
 
-            self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, trainingType=TrainingType.BASE_PRETRAIN)
+            self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
 
         
         return pretraining_sample_pool
