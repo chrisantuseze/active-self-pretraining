@@ -493,6 +493,9 @@ class PretextTrainer():
         if path_loss is None:
             path_loss = self.make_batches(encoder, prefix='first')
 
+        logging.info(path_loss)
+        print("\n")
+
         # Do not train main task iteratively. Proceed to 2nd pretraining
         # if not self.args.al_train_maintask:
         #     return self.ds_distillation(encoder, path_loss)
