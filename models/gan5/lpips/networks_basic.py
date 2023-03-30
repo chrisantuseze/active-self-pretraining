@@ -7,9 +7,6 @@ import torch.nn as nn
 import torch.nn.init as init
 from torch.autograd import Variable
 import numpy as np
-from pdb import set_trace as st
-from skimage import color
-from IPython import embed
 from models.gan5.lpips import pretrained_networks as pn
 
 from models.gan5.lpips import utils as util

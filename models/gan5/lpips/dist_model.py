@@ -13,10 +13,7 @@ from .base_model import BaseModel
 from scipy.ndimage import zoom
 import fractions
 import functools
-import skimage.transform
 from tqdm import tqdm
-
-from IPython import embed
 
 from models.gan5.lpips import networks_basic as networks
 from models.gan5.lpips import utils as util
