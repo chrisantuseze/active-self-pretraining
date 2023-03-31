@@ -526,6 +526,8 @@ class PretextTrainer():
         for batch in range(self.args.al_batches):
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
+            print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
+
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
