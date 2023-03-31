@@ -6,7 +6,7 @@ from torchvision import transforms
 import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
-from models.trainers.selfsup_pretrainer import SelfSupPretrainer
+# from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import load_optimizer
