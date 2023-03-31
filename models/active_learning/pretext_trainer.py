@@ -542,6 +542,8 @@ class PretextTrainer():
 
             pretraining_sample_pool.extend(samplek)
 
+            print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
+
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
