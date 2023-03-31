@@ -518,6 +518,7 @@ class PretextTrainer():
         gen_images = glob.glob(self.args.dataset_dir + '/generated_chest_xray/*')
         pretraining_sample_pool = [PathLoss(path, 0) for path in gen_images]
 
+        print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
         sample_per_batch = len(path_loss)//self.args.al_batches
@@ -525,8 +526,6 @@ class PretextTrainer():
         batch_sampler_encoder = encoder
         for batch in range(self.args.al_batches):
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
-
-            print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
 
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
