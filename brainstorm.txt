@@ -63,6 +63,7 @@ So the generated images are not added to the target dataset, but rather used sol
 6. Add gen target + real target + proxy source and use for target pretraining for 600 epochs - 89.68 (gan1)
 7. Use only generated images (3200) for intermediate pretraining - 89.16 (gan1)
 8. Add gen target + real target + proxy source intermediate pretraining - 89.02 (gan5)
+9. Only gen target for intermediate pretraining - 89.59 (gan5)
 
 - New Things to do:
 
