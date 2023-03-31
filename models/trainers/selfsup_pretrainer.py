@@ -2,7 +2,7 @@ import glob
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
-from models.active_learning.pretext_trainer import PretextTrainer
+# from models.active_learning.pretext_trainer import PretextTrainer
 from models.backbones.resnet import resnet_backbone
 from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
@@ -115,13 +115,13 @@ class SelfSupPretrainer(BasePretrainer):
     def get_loader(self, do_al, distilled_ds=None, training_type=None):
         if do_al:
             if distilled_ds is None:
-                pretext = PretextTrainer(self.args, self.writer)
+                # pretext = PretextTrainer(self.args, self.writer)
 
-                if training_type == TrainingType.BASE_PRETRAIN:
-                    distilled_ds = pretext.distill_gen_dataset()
-                else:
-                    distilled_ds = pretext.do_active_learning()
-                # pass
+                # if training_type == TrainingType.BASE_PRETRAIN:
+                #     distilled_ds = pretext.distill_gen_dataset()
+                # else:
+                #     distilled_ds = pretext.do_active_learning()
+                pass
 
             loader = PretextDataLoader(self.args, distilled_ds, training_type=training_type).get_loader()
         else:

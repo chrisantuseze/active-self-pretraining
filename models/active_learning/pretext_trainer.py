@@ -6,7 +6,7 @@ from torchvision import transforms
 import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_enum
-# from models.trainers.selfsup_pretrainer import SelfSupPretrainer
+from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.utils.early_stopping import EarlyStopping
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import load_optimizer
@@ -546,8 +546,8 @@ class PretextTrainer():
             print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
 
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
-            # pretrainer = SelfSupPretrainer(self.args, self.writer)
-            # pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+            pretrainer = SelfSupPretrainer(self.args, self.writer)
+            pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
