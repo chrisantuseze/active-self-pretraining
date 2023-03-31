@@ -56,7 +56,7 @@ class PretextDataLoader():
     def get_loader(self):
 
         # this handles the 2nd pretraining (after AL)
-        if self.args.method == SSL_Method.SWAV.value and self.training_type is not TrainingType.ACTIVE_LEARNING:
+        if self.args.method == SSL_Method.SWAV.value and (self.training_type is not TrainingType.ACTIVE_LEARNING or self.training_type is not TrainingType.BASE_PRETRAIN):
             dataset = PretextMultiCropDataset(
                 self.args,
                 self.path_loss_list,
@@ -92,7 +92,7 @@ class PretextDataLoader():
                 dataset,
                 batch_size=self.batch_size,
                 shuffle=not self.is_val,
-                num_workers=self.args.workers,#2
+                num_workers=self.args.workers,
                 pin_memory=True,
             )
 
