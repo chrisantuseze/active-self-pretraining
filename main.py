@@ -49,7 +49,7 @@ def main(args):
 
     else:
         if args.base_pretrain:
-            # do_gen_ai(args)
+            do_gen_ai(args)
 
             # pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer.first_pretrain()
@@ -84,8 +84,8 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
-    # assert args.target_dataset == args.lc_dataset
-    # assert args.base_dataset == args.target_dataset
+    assert args.target_dataset == args.lc_dataset
+    assert args.base_dataset == args.target_dataset
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 

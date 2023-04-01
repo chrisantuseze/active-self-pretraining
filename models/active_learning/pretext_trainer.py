@@ -515,7 +515,7 @@ class PretextTrainer():
         return samplek[: int(len(samplek) * self.args.al_sample_percentage)]
 
     def active_learning_new(self, path_loss, encoder):
-        gen_images = glob.glob(self.args.dataset_dir + '/generated_chest_xray/*')
+        gen_images = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
         pretraining_sample_pool = [PathLoss(path, 0) for path in gen_images]
 
         print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
