@@ -88,7 +88,7 @@ base_image_size: 40
 base_dataset: 2 #6                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: False
 
-do_gradual_base_pretrain: True
+do_gradual_base_pretrain: False
 
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
