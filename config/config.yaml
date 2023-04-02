@@ -85,7 +85,7 @@ checkpoint_freq: 25
 seed: 42                                      # sacred handles automatic seeding when passed in the config
 base_epochs: 600
 base_image_size: 40
-base_dataset: 4                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+base_dataset: 8                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: False
 
 do_gradual_base_pretrain: False
@@ -97,7 +97,7 @@ current_epoch: 0
 log_step: 1000
 
 ######################## target pretraining options
-target_dataset: 4                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_dataset: 8                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 200                            # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80 #224
 target_lr: 1.0e-3                             # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
@@ -107,7 +107,7 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 
 ################################## LINEAR CLASSIFIER ###########################################
-lc_dataset: 4                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+lc_dataset: 8                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 lc_image_size: 90 ##40                        # this depends on the dataset used
 
 #########################
