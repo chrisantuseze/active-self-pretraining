@@ -252,6 +252,8 @@ class PretextTrainer():
                 if isinstance(path, tuple) or isinstance(path, list):
                     path = path[0]
 
+                logging.info(f"Make batches: {path}")
+
                 pathloss.append(PathLoss(path, loss))
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss, reverse=True)
@@ -540,6 +542,8 @@ class PretextTrainer():
             else:
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
+
+                logging.info(f"active-learning {samplek}")
 
             pretraining_sample_pool.extend(samplek)
 
