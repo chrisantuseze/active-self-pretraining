@@ -27,10 +27,10 @@ class Classifier:
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
         else:
-            logging.info("Using pretrained model weights")
+            logging.info(f"Using pretrained {pretrain_level} model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        if self.args.target_pretrain:
+        if self.args.target_pretrain or self.args.base_pretrain:
             logging.info("<Target Pretrain>")
             self.model.load_state_dict(state['model'], strict=False)
         else:

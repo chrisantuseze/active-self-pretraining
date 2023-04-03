@@ -76,6 +76,9 @@ class  ImageFolder(Dataset):
         if self.dataset in ['chest_xray', 'imagenet']:
             self.dir = f'{self.dir}/train'
 
+        elif self.dataset in ['ucmerced']:
+            self.dir = f'{self.dir}/images'
+
         print(self.dir)
         img_path = glob.glob(self.dir + '/*/*')
 

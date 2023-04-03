@@ -518,7 +518,7 @@ class PretextTrainer():
         gen_images = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
         pretraining_sample_pool = [PathLoss(path, 0) for path in gen_images]
 
-        print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
+        logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
         sample_per_batch = len(path_loss)//self.args.al_batches
@@ -543,7 +543,7 @@ class PretextTrainer():
 
             pretraining_sample_pool.extend(samplek)
 
-            print("Size of pretraining_sample_pool is ", len(pretraining_sample_pool))
+            logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
