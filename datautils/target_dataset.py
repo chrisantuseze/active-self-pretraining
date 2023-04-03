@@ -134,7 +134,7 @@ class TargetDataset():
     
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
-    # comment the two if's for gradually pretraining
+    # comment out the two if's for gradually pretraining
 
     # if training_type == TrainingType.BASE_AL:
     #     print("using the Generated dataset after AL")
