@@ -48,27 +48,27 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        if args.base_pretrain:
-            do_gen_ai(args)
+        # if args.base_pretrain:
+        #     do_gen_ai(args)
 
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
+        #     # pretrainer = SelfSupPretrainer(args, writer)
+        #     # pretrainer.first_pretrain()
 
-            pretext = PretextTrainer(args, writer)
-            pretext.do_active_learning()
+        #     pretext = PretextTrainer(args, writer)
+        #     pretext.do_active_learning()
 
-        if args.target_pretrain:
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.second_pretrain()
+        # if args.target_pretrain:
+        #     pretrainer = SelfSupPretrainer(args, writer)
+        #     pretrainer.second_pretrain()
 
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        classifier.train_and_eval()
+        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        # classifier.train_and_eval()
 
-        # datasets = [5, 6, 4, 8]
-        # for ds in datasets:
-        #     args.lc_dataset = ds
-        #     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        #     classifier.train_and_eval()
+        datasets = [2, 4, 5, 6, 8, 9, 10] #[5, 6, 4, 8]
+        for ds in datasets:
+            args.lc_dataset = ds
+            classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+            classifier.train_and_eval()
 
         pass
 

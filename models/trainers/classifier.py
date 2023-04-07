@@ -30,12 +30,12 @@ class Classifier:
             logging.info(f"Using pretrained {pretrain_level} model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        if self.args.target_pretrain or self.args.base_pretrain:
-            logging.info("<Target Pretrain>")
-            self.model.load_state_dict(state['model'], strict=False)
-        else:
-            logging.info("<SwAV Weights>")
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
+        # if self.args.target_pretrain or self.args.base_pretrain:
+        #     logging.info("<Target Pretrain>")
+        #     self.model.load_state_dict(state['model'], strict=False)
+        # else:
+        #     logging.info("<SwAV Weights>")
+        #     self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
         num_classes, self.dir = get_ds_num_classes(self.args.lc_dataset)
 
