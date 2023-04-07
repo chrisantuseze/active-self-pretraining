@@ -2,8 +2,8 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
-    zip_ref.extractall("sketch")  
+with zipfile.ZipFile("datasets/quickdraw.zip", 'r') as zip_ref:
+    zip_ref.extractall("quickdraw")  
 
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]
