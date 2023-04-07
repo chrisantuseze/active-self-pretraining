@@ -62,6 +62,8 @@ class Classifier:
 
         early_stopping = EarlyStopping(tolerance=10, min_delta=20)
 
+        logging.info(f"Performing linear eval on {get_dataset_enum(self.args.lc_dataset)}")
+
         for epoch in range(self.args.lc_epochs):
 
             lr = 0
