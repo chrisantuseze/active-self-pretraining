@@ -210,9 +210,9 @@ def get_ds_num_classes(dataset):
         num_classes = 345
         dir = "/sketch"
 
-    elif dataset == DatasetType.QUICKDRAW.value:
-        num_classes = 345
-        dir = "/quickdraw"
+    elif dataset == DatasetType.MODERN_OFFICE_31.value:
+        num_classes = 31
+        dir = "/modern_office_31/synthetic"
 
     else:
         num_classes = 10
@@ -255,12 +255,15 @@ def prepare_model(args, trainingType, model):
     return model, params_to_update
 
 def get_images_pathlist(dir, with_train):
+    if dir == "./datasets/modern_office_31":
+        return glob.glob(dir + '/*/*/*')
+
     if "./datasets/generated" in dir.split('_'):
         img_path = glob.glob(dir + '/*')
 
     elif with_train:
         if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
-            img_path = glob.glob(dir + '/train/*/*')# self.img_path = glob.glob(self.dir + '/train/*/*/*')
+            img_path = glob.glob(dir + '/train/*/*')
         else:
             img_path = glob.glob(dir + '/train/*/*')
     else:

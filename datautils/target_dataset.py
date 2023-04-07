@@ -84,12 +84,12 @@ class TargetDataset():
                 # img_path.extend(real_target[0:augment_size])
 
                 # #TODO: This is only for gan1
-                source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
-                random.shuffle(source_proxy)
+                # source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
+                # random.shuffle(source_proxy)
 
-                augment_size = 500
-                logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
-                img_path.extend(source_proxy[0:augment_size])
+                # augment_size = 500
+                # logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
+                # img_path.extend(source_proxy[0:augment_size])
 
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
@@ -185,9 +185,9 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the SKETCH dataset")
         return TargetDataset(args, "/sketch", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif args.target_dataset == dataset_enum.DatasetType.QUICKDRAW.value:
-        print("using the QUICKDRAW dataset")
-        return TargetDataset(args, "/quickdraw", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+    elif args.target_dataset == dataset_enum.DatasetType.MODERN_OFFICE_31.value:
+        print("using the MODERN_OFFICE_31 dataset")
+        return TargetDataset(args, "/modern_office_31", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError

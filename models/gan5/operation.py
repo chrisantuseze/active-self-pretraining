@@ -80,7 +80,11 @@ class  ImageFolder(Dataset):
             self.dir = f'{self.dir}/images'
 
         print(self.dir)
-        img_path = glob.glob(self.dir + '/*/*')
+
+        if self.dataset == "modern_office_31":
+            img_path = glob.glob(self.dir + '/*/*/*')
+        else:
+            img_path = glob.glob(self.dir + '/*/*')
 
         # mixing the dataset with some source proxy
         # source_proxy = glob.glob(f'datasets/cifar10/train/*/*')
