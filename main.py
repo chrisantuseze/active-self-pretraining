@@ -57,23 +57,23 @@ def main(args):
             pretext = PretextTrainer(args, writer)
             pretext.do_active_learning()
 
-        # if args.target_pretrain:
-        #     pretrainer = SelfSupPretrainer(args, writer)
-        #     pretrainer.second_pretrain()
-
-        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        # classifier.train_and_eval()
-
-        datasets = [2, 4, 5, 6, 8, 10, 9] #[5, 6, 4, 8]
-        for ds in datasets:
-            args.lc_dataset = ds
-            args.target_dataset = ds
-
+        if args.target_pretrain:
             pretrainer = SelfSupPretrainer(args, writer)
             pretrainer.second_pretrain()
 
-            classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-            classifier.train_and_eval()
+        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        classifier.train_and_eval()
+
+        # datasets = [2, 4, 5, 6, 8, 10, 9] #[5, 6, 4, 8]
+        # for ds in datasets:
+        #     args.lc_dataset = ds
+        #     args.target_dataset = ds
+
+        #     pretrainer = SelfSupPretrainer(args, writer)
+        #     pretrainer.second_pretrain()
+
+        #     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        #     classifier.train_and_eval()
 
         pass
 

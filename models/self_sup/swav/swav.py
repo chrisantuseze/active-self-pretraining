@@ -44,7 +44,7 @@ class SwAVTrainer():
         )
 
         # load weights
-        self.model, params_to_update = self.model, self.model.parameters() #prepare_model(self.args, training_type, self.model) #TODO PLEASE REMOVE COMMENT
+        self.model, params_to_update = prepare_model(self.args, training_type, self.model) 
 
         self.model = self.model.to(self.args.device)
 
