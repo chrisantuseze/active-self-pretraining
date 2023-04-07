@@ -64,7 +64,7 @@ def main(args):
         # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
         # classifier.train_and_eval()
 
-        datasets = [2, 4, 5, 6, 8, 9, 10] #[5, 6, 4, 8]
+        datasets = [4, 5, 6, 8, 10, 2, 9] #[5, 6, 4, 8]
         for ds in datasets:
             args.lc_dataset = ds
             classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
