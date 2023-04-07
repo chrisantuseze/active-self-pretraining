@@ -30,7 +30,7 @@ class Classifier:
             logging.info(f"Using pretrained {pretrain_level} model weights")
             state = load_saved_state(self.args, pretrain_level=pretrain_level)
             
-        # if self.args.target_pretrain or self.args.base_pretrain:
+        # if self.args.target_pretrain or self.args.base_pretrain: #TODO PLEASE UNCCOMMENT
         #     logging.info("<Target Pretrain>")
         #     self.model.load_state_dict(state['model'], strict=False)
         # else:
@@ -39,11 +39,12 @@ class Classifier:
 
         num_classes, self.dir = get_ds_num_classes(self.args.lc_dataset)
 
-        set_parameter_requires_grad(self.model, feature_extract=True)
+        # set_parameter_requires_grad(self.model, feature_extract=True) #TODO PLEASE UNCCOMMENT
         self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.LINEAR_CLASSIFIER, num_classes=num_classes)
         self.model = self.model.to(self.args.device)
 
-        params_to_update = get_params_to_update(self.model, feature_extract=True)
+        feature_extract = False #TODO PLEASE REMOVE OR SET IT TO TRUE
+        params_to_update = get_params_to_update(self.model, feature_extract=feature_extract)
 
         train_params = get_params(self.args, TrainingType.LINEAR_CLASSIFIER)
         self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
