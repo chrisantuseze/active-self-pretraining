@@ -183,6 +183,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
+        logging.info(path)
 
         if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
             image = pil_loader(path)
