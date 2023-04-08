@@ -130,13 +130,15 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value]:
+        logging.info(path)
+
+        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
             img = pil_loader(path)
         else:
             img = Image.open(path)
 
         if self.args.target_dataset == DatasetType.IMAGENET.value:
-            label = path.split('/')[-2]# label = path.split('/')[-3]
+            label = path.split('/')[-2]
         else:
             label = path.split('/')[-2]
 
@@ -182,8 +184,6 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
             path = path_loss.path[0]
         else:
             path = path_loss.path
-
-        logging.info(path)
 
         if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
             image = pil_loader(path)
