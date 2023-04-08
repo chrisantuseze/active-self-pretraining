@@ -2,8 +2,41 @@
 import sys
 
 import zipfile
+with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
+    zip_ref.extractall("sketch") 
+
 with zipfile.ZipFile("datasets/modern_office_31.zip", 'r') as zip_ref:
     zip_ref.extractall("modern_office_31") 
+
+with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
+    zip_ref.extractall("clipart") 
+
+with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
+    zip_ref.extractall("ucmerced") 
+
+with zipfile.ZipFile("datasets/flowers.zip", 'r') as zip_ref:
+    zip_ref.extractall("flowers") 
+
+with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
+    zip_ref.extractall("eurosat") 
+
+with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
+    zip_ref.extractall("chest_xray") 
+
+with zipfile.ZipFile("datasets/generated_modern_office_31.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_modern_office_31") 
+
+with zipfile.ZipFile("datasets/generated_clipart.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_clipart") 
+
+with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_eurosat") 
+
+with zipfile.ZipFile("datasets/generated_flowers.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_flowers") 
+
+with zipfile.ZipFile("datasets/generated_chest_xray.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_chest_xray") 
 
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]
