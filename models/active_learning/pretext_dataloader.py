@@ -43,6 +43,9 @@ class PretextDataLoader():
 
             elif self.args.target_dataset in [DatasetType.UCMERCED.value, DatasetType.FOOD101.value]:
                 img_paths = glob.glob(self.dir + '/images/*/*')
+
+            elif self.args.target_dataset == DatasetType.MODERN_OFFICE_31.value:
+                img_paths = glob.glob(self.dir + '/*/*/*')
             
             else:
                 img_paths = glob.glob(self.dir + '/*/*')
@@ -129,8 +132,6 @@ class PretextDataset(torch.utils.data.Dataset):
             path = path_loss.path[0]
         else:
             path = path_loss.path
-
-        logging.info(path)
 
         if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
             img = pil_loader(path)
