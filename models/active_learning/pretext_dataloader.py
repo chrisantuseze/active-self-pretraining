@@ -184,7 +184,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
             path = path_loss.path
 
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value]:
+        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
             image = pil_loader(path)
         else:
             image = Image.open(path)
@@ -214,7 +214,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir in ["./datasets/chest_xray", "./datasets/imagenet", "./datasets/food"]:
+        if self.dir in ["./datasets/chest_xray", "./datasets/imagenet", "./datasets/food", "./datasets/modern_office_31"]:
             img = pil_loader(self.img_path[idx])
         else:
             img = Image.open(self.img_path[idx])

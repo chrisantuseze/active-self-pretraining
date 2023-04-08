@@ -14,8 +14,6 @@ from PIL import ImageFilter, Image
 import numpy as np
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-from utils.commons import pil_loader
-
 
 class MultiCropDataset(datasets.ImageFolder):
     def __init__(
