@@ -14,11 +14,11 @@ with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
 # with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
 #     zip_ref.extractall("ucmerced") 
 
-# with zipfile.ZipFile("datasets/flowers.zip", 'r') as zip_ref:
-#     zip_ref.extractall("flowers") 
+with zipfile.ZipFile("datasets/flowers.zip", 'r') as zip_ref:
+    zip_ref.extractall("flowers") 
 
-# with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
-#     zip_ref.extractall("eurosat") 
+with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
+    zip_ref.extractall("eurosat") 
 
 # with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
 #     zip_ref.extractall("chest_xray") 
