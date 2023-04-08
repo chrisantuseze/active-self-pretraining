@@ -83,7 +83,7 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 2 #75 #600
+base_epochs: 75 #600
 base_image_size: 40
 base_dataset: 10                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
@@ -135,7 +135,7 @@ lc_final_lr: 0
 
 ################################### AL ###########################################################
 al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
-al_finetune_trainer_epochs: 2 #25 #100
+al_finetune_trainer_epochs: 25 #100
 al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 5 #10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_finetune_batch_size: 256                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
