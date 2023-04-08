@@ -109,6 +109,8 @@ squeue -u echris checks the status of a pete job
 
 ssh echris@pete.hpc.okstate.edu
 
+sudo yum install nano -y
+
 https://github.com/fastai/imagenette
 
 
