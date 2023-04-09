@@ -5,15 +5,6 @@ import zipfile
 with zipfile.ZipFile("datasets/modern_office_31.zip", 'r') as zip_ref:
     zip_ref.extractall("modern_office_31") 
 
-with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
-    zip_ref.extractall("clipart") 
-
-with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
-    zip_ref.extractall("ucmerced") 
-
-with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
-    zip_ref.extractall("chest_xray") 
-
 # arr = [3, 4, 1, 0, 6]
 # arr = arr[::-1]
 # print(arr)
