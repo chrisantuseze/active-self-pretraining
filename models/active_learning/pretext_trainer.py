@@ -527,7 +527,7 @@ class PretextTrainer():
         random.shuffle(source_proxy)
         pretraining_source_proxy = [PathLoss(path, 0) for path in source_proxy]
 
-        augment_size = 1000
+        augment_size = 2800
         logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
         pretraining_sample_pool.extend(pretraining_source_proxy[0:augment_size])
         ###################
