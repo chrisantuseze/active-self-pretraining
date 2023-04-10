@@ -16,7 +16,8 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
         os.makedirs(args.model_checkpoint_path)
 
     prefix = get_ssl_method(args.method)
-    out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, args.current_epoch))
+    dataset = get_dataset_enum(args.target_dataset)
+    out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, args.current_epoch))
 
     state = {
         'model': model.state_dict(),
@@ -36,8 +37,9 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         else:
             epoch_num = args.base_epochs
 
+        dataset = get_dataset_enum(args.target_dataset)
         out = args.resume if recent and args.resume else os.path.join(
-                args.model_checkpoint_path, "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+                args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
             )
 
         logging.info(f"Loading checkpoint from {out}")
@@ -55,7 +57,8 @@ def load_classifier_chkpts(args, model, pretrain_level="1"):
     else:
         epoch_num = args.base_epochs
 
-    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, epoch_num)
+    dataset = get_dataset_enum(args.target_dataset)
+    filename = "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
     return load_chkpts(args, filename, model)
 
 def load_chkpts(args, filename, model):

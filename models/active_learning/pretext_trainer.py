@@ -522,15 +522,15 @@ class PretextTrainer():
         pretraining_sample_pool.extend(pretraining_gen_images)
 
 
-        # adding proxy images
-        source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
-        random.shuffle(source_proxy)
-        pretraining_source_proxy = [PathLoss(path, 0) for path in source_proxy]
+        # # adding proxy images
+        # source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
+        # random.shuffle(source_proxy)
+        # pretraining_source_proxy = [PathLoss(path, 0) for path in source_proxy]
 
-        augment_size = 2800
-        logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
-        pretraining_sample_pool.extend(pretraining_source_proxy[0:augment_size])
-        ###################
+        # augment_size = 2800
+        # logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
+        # pretraining_sample_pool.extend(pretraining_source_proxy[0:augment_size])
+        # ###################
 
         logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
