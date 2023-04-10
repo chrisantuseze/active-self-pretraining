@@ -78,7 +78,7 @@ for idea of how to do that.)
 5. Source -> Image Generation + AL -> intermediate pretraining -> Target + AL -> linear evaluation
 
 
-
+- First work to explore the effect of using GAN, Self-Supervised Contrastive learning, and AL jointly for domain adaptation.
 
 
 

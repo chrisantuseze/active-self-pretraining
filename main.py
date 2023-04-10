@@ -49,7 +49,7 @@ def main(args):
 
     else:
         if args.base_pretrain:
-            # do_gen_ai(args)
+            do_gen_ai(args)
 
             # pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer.first_pretrain()
@@ -64,9 +64,9 @@ def main(args):
         classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
         classifier.train_and_eval()
 
-        # args.target_pretrain = False
-        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
-        # classifier.train_and_eval()
+        args.target_pretrain = False
+        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
+        classifier.train_and_eval()
 
         # datasets = [2, 4, 5, 6, 8, 10, 9] #[5, 6, 4, 8]
         # for ds in datasets:
