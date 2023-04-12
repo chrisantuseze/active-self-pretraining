@@ -85,7 +85,7 @@ checkpoint_freq: 25
 seed: 42                                      # sacred handles automatic seeding when passed in the config
 base_epochs: 75 #600
 base_image_size: 40
-base_dataset: 9                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+base_dataset: 5                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
 
 do_gradual_base_pretrain: True
@@ -97,7 +97,7 @@ current_epoch: 0
 log_step: 1000
 
 ######################## target pretraining options
-target_dataset: 9                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_dataset: 5                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 200                            # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 80 #224
 target_lr: 1.0e-3                             # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
@@ -107,7 +107,7 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 
 ################################## LINEAR CLASSIFIER ###########################################
-lc_dataset: 9                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+lc_dataset: 5                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 lc_image_size: 90 ##40                        # this depends on the dataset used
 
 #########################
@@ -140,7 +140,7 @@ al_epochs: 20                                 # the default should be kept at 10
 al_batches: 5 #10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_finetune_batch_size: 256                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
 al_maintask_batch_size: 128                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error
-al_trainer_sample_size: 13000 #9000                   # this specifies the amount of samples to be added to the training pool after each AL iteration
+al_trainer_sample_size: 800 #9000                   # this specifies the amount of samples to be added to the training pool after each AL iteration
 al_sample_percentage: 0.95                    # this specifies the percentage of the samples to be used for the target pretraining
 al_gen_sample_percentage: 1
 al_lr: 0.1

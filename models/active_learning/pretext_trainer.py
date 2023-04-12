@@ -519,7 +519,7 @@ class PretextTrainer():
 
         gen_images = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
-        pretraining_sample_pool.extend(pretraining_gen_images)
+        # pretraining_sample_pool.extend(pretraining_gen_images) #TODO Uncomment this if new idea does not work
 
 
         # # adding proxy images
@@ -538,8 +538,18 @@ class PretextTrainer():
         sample_per_batch = len(path_loss)//self.args.al_batches
 
         batch_sampler_encoder = encoder
+
+        ratio = len(pretraining_gen_images)//self.args.al_batches
+        target_pool = []
+
         for batch in range(self.args.al_batches):
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
+
+            # this is for the new idea
+            length = ratio * (self.args.al_batches - batch)
+            pretraining_gen_images = pretraining_gen_images[:length]
+            pretraining_sample_pool = []
+            ################################
 
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
@@ -555,7 +565,13 @@ class PretextTrainer():
                 # first iteration: sample k at even intervals
                 samplek = sample6400[:self.args.al_trainer_sample_size]
 
-            pretraining_sample_pool.extend(samplek)
+            # this is for the new idea
+            target_pool.extend(samplek)
+            pretraining_sample_pool.extend(pretraining_gen_images)
+            pretraining_sample_pool.extend(target_pool)
+            ################################
+
+            # pretraining_sample_pool.extend(samplek) #TODO Uncomment this if new idea does not work
 
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
