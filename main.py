@@ -68,7 +68,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        al_trainer_sample_size = [8446, 4223]
+        al_trainer_sample_size = [5859, 2929] #[8446, 4223]
 
         for ratio in al_trainer_sample_size:
             args.al_trainer_sample_size = ratio
