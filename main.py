@@ -35,6 +35,8 @@ def pretrain_budget(args, writer):
             # pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer.first_pretrain()
 
+            logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+
             pretext = PretextTrainer(args, writer)
             pretext.do_active_learning()
 
