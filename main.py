@@ -48,14 +48,14 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        if args.base_pretrain:
-            # do_gen_ai(args)
+        # if args.base_pretrain:
+        #     # do_gen_ai(args)
 
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
+        #     # pretrainer = SelfSupPretrainer(args, writer)
+        #     # pretrainer.first_pretrain()
 
-            pretext = PretextTrainer(args, writer)
-            pretext.do_active_learning()
+        #     pretext = PretextTrainer(args, writer)
+        #     pretext.do_active_learning()
 
         if args.target_pretrain:
             pretrainer = SelfSupPretrainer(args, writer)
