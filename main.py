@@ -28,6 +28,24 @@ from models.gan5.train import do_gen_ai#, standalone_image_gen
 
 logging.init()
 
+def pretrain_budget(args, writer):
+    if args.base_pretrain:
+            # do_gen_ai(args)
+
+            # pretrainer = SelfSupPretrainer(args, writer)
+            # pretrainer.first_pretrain()
+
+            pretext = PretextTrainer(args, writer)
+            pretext.do_active_learning()
+
+    if args.target_pretrain:
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
+    classifier.train_and_eval()
+
+
 def main(args):
     writer = None #SummaryWriter()
     # do_gen_ai(args)
@@ -48,21 +66,11 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        # if args.base_pretrain:
-        #     # do_gen_ai(args)
+        al_trainer_sample_size = [8446, 4223]
 
-        #     # pretrainer = SelfSupPretrainer(args, writer)
-        #     # pretrainer.first_pretrain()
-
-        #     pretext = PretextTrainer(args, writer)
-        #     pretext.do_active_learning()
-
-        if args.target_pretrain:
-            pretrainer = SelfSupPretrainer(args, writer)
-            pretrainer.second_pretrain()
-
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
-        classifier.train_and_eval()
+        for ratio in al_trainer_sample_size:
+            args.al_trainer_sample_size = ratio
+            pretrain_budget(args, writer)
 
         # args.target_pretrain = False
         # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
