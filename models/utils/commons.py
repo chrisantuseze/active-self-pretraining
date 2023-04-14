@@ -177,10 +177,6 @@ def get_ds_num_classes(dataset):
     if dataset == DatasetType.REAL.value:
         num_classes = 345
         dir = "/real"
-        
-    elif dataset == DatasetType.UCMERCED.value:
-        num_classes = 22#21
-        dir = "/ucmerced/images"
 
     elif dataset == DatasetType.IMAGENET.value:
         num_classes = 10#200
@@ -190,17 +186,21 @@ def get_ds_num_classes(dataset):
         num_classes = 100
         dir = "/chest_xray"
 
-    elif dataset == DatasetType.FLOWERS.value:
-        num_classes = 5
-        dir = "/flowers"
+    elif dataset == DatasetType.UCMERCED.value:
+        num_classes = 22#21
+        dir = "/ucmerced/images"
 
     elif dataset == DatasetType.EUROSAT.value:
         num_classes = 10
         dir = "/eurosat"
 
-    elif dataset == DatasetType.FOOD101.value:
-        num_classes = 101
-        dir = "/food-101/images"
+    elif dataset == DatasetType.FLOWERS.value:
+        num_classes = 5
+        dir = "/flowers"
+
+    elif dataset == DatasetType.HAM10000.value:
+        num_classes = 2
+        dir = "/ham10000"
 
     elif dataset == DatasetType.CLIPART.value:
         num_classes = 345
@@ -209,6 +209,10 @@ def get_ds_num_classes(dataset):
     elif dataset == DatasetType.SKETCH.value:
         num_classes = 345
         dir = "/sketch"
+
+    elif dataset == DatasetType.QUICKDRAW.value:
+        num_classes = 345
+        dir = "/quickdraw"
 
     elif dataset == DatasetType.MODERN_OFFICE_31.value:
         num_classes = 31
