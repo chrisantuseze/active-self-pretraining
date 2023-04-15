@@ -30,7 +30,7 @@ logging.init()
 
 def pretrain_budget(args, writer):
     if args.base_pretrain:
-            do_gen_ai(args)
+            # do_gen_ai(args)
 
             # pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer.first_pretrain()
