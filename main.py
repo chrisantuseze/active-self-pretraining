@@ -68,13 +68,13 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        # al_trainer_sample_size = [5859, 2929] #[8446, 4223]
+        al_trainer_sample_size = [9000, 8446, 4223] #[5859, 2929]
 
-        # for ratio in al_trainer_sample_size:
-        #     args.al_trainer_sample_size = ratio
-        #     pretrain_budget(args, writer)
+        for ratio in al_trainer_sample_size:
+            args.al_trainer_sample_size = ratio
+            pretrain_budget(args, writer)
 
-        pretrain_budget(args, writer)
+        # pretrain_budget(args, writer)
 
         # args.target_pretrain = False
         # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
