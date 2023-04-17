@@ -22,13 +22,12 @@ from models.trainers.sup_pretrainer import SupPretrainer
 from models.trainers.classifier import Classifier
 from models.trainers.classifier2 import Classifier2
 import utils.logger as logging
-# import logging
 
-from models.gan5.train import do_gen_ai#, standalone_image_gen
+from models.gan5.train import do_gen_ai
 
 logging.init()
 
-def pretrain_budget(args, writer):
+def run_sequence(args, writer):
     if args.base_pretrain:
             # do_gen_ai(args)
 
@@ -47,10 +46,31 @@ def pretrain_budget(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
     classifier.train_and_eval()
 
+def pretrain_budget(args, writer):
+    al_trainer_sample_size = [9000, 8446, 4223] #[5859, 2929]
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence(args, writer)
+
+def b_bt_gpt_gp(args, writer):
+    args.target_pretrain = False
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
+    classifier.train_and_eval()
+
+    args.target_pretrain = True
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
+    classifier.train_and_eval()
+
+    args.base_pretrain = True
+    pretrain_budget(args, writer) #Do GP-T-F
+
+    args.target_pretrain = False
+    classifier = Classifier(args, pretrain_level="1") #Do GP-F
+    classifier.train_and_eval()
 
 def main(args):
     writer = None #SummaryWriter()
-    # do_gen_ai(args)
 
     if args.ml_project:
         state = load_saved_state(args, pretrain_level="1")
@@ -68,28 +88,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        al_trainer_sample_size = [9000, 8446, 4223] #[5859, 2929]
-
-        # for ratio in al_trainer_sample_size:
-        #     args.al_trainer_sample_size = ratio
-        #     pretrain_budget(args, writer)
-
-        pretrain_budget(args, writer)
-
-        # args.target_pretrain = False
-        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
-        # classifier.train_and_eval()
-
-        # datasets = [2, 4, 5, 6, 8, 10, 9] #[5, 6, 4, 8]
-        # for ds in datasets:
-        #     args.lc_dataset = ds
-        #     args.target_dataset = ds
-
-        #     pretrainer = SelfSupPretrainer(args, writer)
-        #     pretrainer.second_pretrain()
-
-        #     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        #     classifier.train_and_eval()
+        b_bt_gpt_gp(args, writer)
 
         pass
 
