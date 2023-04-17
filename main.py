@@ -55,10 +55,15 @@ def pretrain_budget(args, writer):
 
 def b_bt_gpt_gp(args, writer):
     args.target_pretrain = False
+    args.base_pretrain = False
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
     classifier.train_and_eval()
 
+
     args.target_pretrain = True
+    pretrainer = SelfSupPretrainer(args, writer)
+    pretrainer.second_pretrain()
+
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
     classifier.train_and_eval()
 
