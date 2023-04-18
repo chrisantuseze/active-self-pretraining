@@ -29,7 +29,7 @@ logging.init()
 
 def run_sequence(args, writer):
     if args.base_pretrain:
-            # do_gen_ai(args)
+            do_gen_ai(args)
 
             # pretrainer = SelfSupPretrainer(args, writer)
             # pretrainer.first_pretrain()
@@ -47,7 +47,7 @@ def run_sequence(args, writer):
     classifier.train_and_eval()
 
 def pretrain_budget(args, writer):
-    al_trainer_sample_size = [9000, 8446, 4223] #[5859, 2929]
+    al_trainer_sample_size = [1800, 1080, 540] #[5859, 2929]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
@@ -93,6 +93,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
+        pretrain_budget(args, writer)
         b_bt_gpt_gp(args, writer)
 
         pass
