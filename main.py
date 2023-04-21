@@ -36,8 +36,8 @@ def run_sequence(args, writer):
 
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
-            # pretext = PretextTrainer(args, writer)
-            # pretext.do_active_learning()
+            pretext = PretextTrainer(args, writer)
+            pretext.do_active_learning()
 
     if args.target_pretrain:
         pretrainer = SelfSupPretrainer(args, writer)
