@@ -47,11 +47,20 @@ def run_sequence(args, writer):
     classifier.train_and_eval()
 
 def pretrain_budget(args, writer):
-    al_trainer_sample_size = [1080, 540] #[5859, 2929]
+    al_trainer_sample_size = [1620, 3240, 5000]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
         run_sequence(args, writer)
+
+    args.base_pretrain = False
+    args.do_gradual_base_pretrain = True
+    args.target_pretrain = True
+    pretrainer = SelfSupPretrainer(args, writer)
+    pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do G-T-F
+    classifier.train_and_eval()
 
 def b_bt_gpt_gp(args, writer):
     # run_sequence(args, writer)

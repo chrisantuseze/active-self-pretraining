@@ -212,3 +212,9 @@ def pil_loader(path):
         with open(path, 'rb') as f:
             img = Image.open(f)
             return img.convert('RGB')
+
+def get_accuracy_file_ext(args):
+    if args.do_gradual_base_pretrain and args.base_pretrain:
+        return f'_{args.al_trainer_sample_size}'
+
+    return ''
