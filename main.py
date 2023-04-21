@@ -109,16 +109,8 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        # pretrain_budget(args, writer)
+        pretrain_budget(args, writer)
         # b_bt_gpt_gp(args, writer)
-        args.base_pretrain = False
-        args.do_gradual_base_pretrain = False
-        args.target_pretrain = True
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
-        classifier.train_and_eval()
 
         pass
 
