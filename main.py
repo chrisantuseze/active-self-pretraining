@@ -47,7 +47,7 @@ def run_sequence(args, writer):
     classifier.train_and_eval()
 
 def pretrain_budget(args, writer):
-    al_trainer_sample_size = [1200, 600] #[1620, 3240, 5000]
+    al_trainer_sample_size = [800, 400] #[1200, 600] #[1620, 3240, 5000]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
