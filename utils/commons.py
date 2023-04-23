@@ -224,6 +224,8 @@ def pil_loader(path):
 
 def get_accuracy_file_ext(args):
     if args.do_gradual_base_pretrain and args.base_pretrain:
+        logging.info(f"Appending the extension, {args.al_trainer_sample_size}")
+        
         return f'_{args.al_trainer_sample_size}'
 
     return ''
