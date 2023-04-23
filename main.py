@@ -43,6 +43,17 @@ def run_sequence(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
+def pretrain_budget_eurosat(args, writer):
+
+    # Now evaluating eurosat GASP-DA + T
+    args.target_pretrain = True
+
+    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence(args, writer)
+
 def pretrain_budget(args, writer):
 
     # Now evaluating eurosat GASP-DA + T
@@ -112,7 +123,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pretrain_budget(args, writer)
+        pretrain_budget_eurosat(args, writer)
         # b_bt_gpt_gp(args, writer)
 
         pass

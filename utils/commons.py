@@ -43,12 +43,8 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         dataset = get_dataset_enum(args.target_dataset)
         additional_ext = get_accuracy_file_ext(args)
 
-        # out = args.resume if recent and args.resume else os.path.join(
-        #         args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
-        #     )
-
-        out = os.path.join(
-                args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
+        out = args.resume if recent and args.resume else os.path.join(
+                args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
             )
 
         logging.info(f"Loading checkpoint from - {out}")
@@ -225,7 +221,7 @@ def pil_loader(path):
 def get_accuracy_file_ext(args):
     if args.do_gradual_base_pretrain and args.base_pretrain:
         logging.info(f"Appending the extension, {args.al_trainer_sample_size}")
-        
+
         return f'_{args.al_trainer_sample_size}'
 
     return ''
