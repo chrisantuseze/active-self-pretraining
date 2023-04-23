@@ -51,7 +51,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
                 args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
             )
 
-        logging.info(f"Loading checkpoint from {out}")
+        logging.info(f"Loading checkpoint from - {out}")
         return torch.load(out, map_location=args.device.type)
 
     except IOError as er:
