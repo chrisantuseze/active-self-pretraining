@@ -33,8 +33,8 @@ def run_sequence(args, writer):
 
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
-            pretext = PretextTrainer(args, writer)
-            pretext.do_active_learning()
+            # pretext = PretextTrainer(args, writer)
+            # pretext.do_active_learning()
 
     if args.target_pretrain:
         pretrainer = SelfSupPretrainer(args, writer)
@@ -44,7 +44,10 @@ def run_sequence(args, writer):
     classifier.train_and_eval()
 
 def pretrain_budget(args, writer):
-    al_trainer_sample_size = [800, 400] #[1200, 600] #[1620, 3240, 5000]
+
+    # Now evaluating eurosat GASP-DA + T
+    args.target_pretrain = True
+    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
