@@ -47,6 +47,9 @@ def pretrain_budget(args, writer):
 
     # Now evaluating eurosat GASP-DA + T
     args.target_pretrain = True
+    args.base_pretrain = True
+    args.do_gradual_base_pretrain = True
+
     al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
 
     for ratio in al_trainer_sample_size:
