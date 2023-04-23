@@ -31,19 +31,16 @@ def run_sequence(args, writer):
     if args.base_pretrain:
             # do_gen_ai(args)
 
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
-
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
-            pretext = PretextTrainer(args, writer)
-            pretext.do_active_learning()
+            # pretext = PretextTrainer(args, writer)
+            # pretext.do_active_learning()
 
     if args.target_pretrain:
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
 def pretrain_budget(args, writer):
