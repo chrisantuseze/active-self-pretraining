@@ -126,7 +126,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pretrain_budget_eurosat(args, writer)
+        pretrain_budget_ham(args, writer)
         # b_bt_gpt_gp(args, writer)
 
         pass
