@@ -38,6 +38,7 @@ class PretextTrainer():
 
         self.num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
         self.n_features = get_feature_dimensions_backbone(self.args)
+        self.dataset = get_dataset_enum(self.target_dataset)
 
     def eval_main_task(self, model, epoch, criterion, batch, test_loader):
         batch_time = AverageMeter()
@@ -418,7 +419,7 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner.pth')
+        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
 
     def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
         train_loader, test_loader = get_target_pretrain_ds(
@@ -466,7 +467,7 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner.pth')
+        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
 
 
     def distill_gen_dataset(self) -> List[PathLoss]:
@@ -488,7 +489,7 @@ class PretextTrainer():
     def do_active_learning(self) -> List[PathLoss]:
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        state = simple_load_model(self.args, path='first_finetuner.pth')
+        state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
         if not state:
             self.finetuner(encoder, prefix='first')
 
@@ -554,7 +555,7 @@ class PretextTrainer():
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
-                state = simple_load_model(self.args, path=f'{batch-1}_finetuner.pth')
+                state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
 
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
