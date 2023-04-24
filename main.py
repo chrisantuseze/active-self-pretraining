@@ -105,6 +105,10 @@ def tacc(args, writer):
 
 def uc(args, writer):
     # this is for source-proxy hierarchical pretraining
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = True
+    args.target_pretrain = True
+
     datasets = [2, 4, 6, 7, 11]
 
     for ds in datasets:
