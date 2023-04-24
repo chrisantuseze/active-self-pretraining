@@ -1,4 +1,5 @@
 import glob
+import os
 import torch.nn as nn
 import torch
 import torchvision
@@ -10,7 +11,7 @@ from models.self_sup.simclr.loss.dcl_loss import DCL
 from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from models.self_sup.simclr.simclr import SimCLR
 from models.self_sup.simclr.simclr_v2 import SimCLRV2
-from models.utils.ssl_method_enum import SSL_Method
+from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
 from models.utils.training_type_enum import Params, TrainingType
 from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
@@ -239,6 +240,17 @@ def prepare_model(args, trainingType, model):
             logging.info("Using downloaded swav pretrained model")
             
             model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+
+    elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "uc":
+        prefix = get_ssl_method(args.method)
+        pretrain_level = "1"
+        dataset = "cifar10"
+        epoch_num = args.base_epochs
+
+        out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num))
+        state = torch.load(out)
+        
+        model.load_state_dict(state['model'], strict=False)
 
     else:
         state = load_saved_state(args, pretrain_level="1")

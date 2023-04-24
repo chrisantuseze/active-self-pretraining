@@ -110,6 +110,8 @@ def uc(args, writer):
     args.target_pretrain = True
     args.base_epochs = 400
 
+    args.training_type = "uc"
+
     datasets = [2, 4, 6, 7, 11]
 
     pretrainer = SelfSupPretrainer(args, writer)

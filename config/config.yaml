@@ -183,3 +183,6 @@ model_name: "biggan128-ada"                   # model. biggan128-ada
 
 gen_images_path: "generated"                  # model checkpoint path
 gan_resume: ""                                # path to resume training from
+
+
+training_type: "uc"
