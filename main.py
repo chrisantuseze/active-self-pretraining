@@ -43,6 +43,53 @@ def run_sequence(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
+def pretrain_budget(args, writer):
+
+    # Now evaluating eurosat GASP-DA + T
+    args.target_pretrain = True
+    args.base_pretrain = True
+    args.do_gradual_base_pretrain = True
+
+    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence(args, writer)
+
+def b_bt_gpt_gp(args, writer):
+    # run_sequence(args, writer)
+
+    args.base_pretrain = True
+    args.target_pretrain = True
+    run_sequence(args, writer) #Do GP-T-F
+
+
+    args.base_pretrain = False
+    args.do_gradual_base_pretrain = False
+    args.target_pretrain = True
+    pretrainer = SelfSupPretrainer(args, writer)
+    pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
+    classifier.train_and_eval()
+
+    args.target_pretrain = False
+    args.base_pretrain = False
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
+    classifier.train_and_eval()
+
+
+
+def eurosat(args, writer):
+    # Now evaluating eurosat GASP-DA + T
+    args.target_pretrain = True
+
+    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence_eurosat(args, writer)
+
 def run_sequence_eurosat(args, writer):
     if args.base_pretrain:
             # do_gen_ai(args)
@@ -59,21 +106,11 @@ def run_sequence_eurosat(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def pretrain_budget_eurosat(args, writer):
 
-    # Now evaluating eurosat GASP-DA + T
+
+def ham(args, writer):
+    # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
-
-    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
-
-    for ratio in al_trainer_sample_size:
-        args.al_trainer_sample_size = ratio
-        run_sequence_eurosat(args, writer)
-
-def pretrain_budget_ham(args, writer):
-
-    # Now evaluating ham GASP-DA
-    args.target_pretrain = False
 
     al_trainer_sample_size = [1800, 1200, 600]
 
@@ -83,8 +120,6 @@ def pretrain_budget_ham(args, writer):
 
 def run_sequence_ham(args, writer):
     if args.base_pretrain:
-            # do_gen_ai(args)
-
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
             # pretext = PretextTrainer(args, writer)
@@ -97,12 +132,9 @@ def run_sequence_ham(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def tacc(args, writer):
-    # args.target_pretrain = False
-    # args.al_trainer_sample_size = 33500
-    # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    # classifier.train_and_eval()
 
+
+def tacc(args, writer):
     # this is for source-proxy (instead of gan) gradual pretraining
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
@@ -134,6 +166,8 @@ def run_sequence_tacc(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
+
+
 
 def uc(args, writer):
     # this is for source-proxy hierarchical pretraining
@@ -171,41 +205,6 @@ def run_sequence_uc(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def pretrain_budget(args, writer):
-
-    # Now evaluating eurosat GASP-DA + T
-    args.target_pretrain = True
-    args.base_pretrain = True
-    args.do_gradual_base_pretrain = True
-
-    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
-
-    for ratio in al_trainer_sample_size:
-        args.al_trainer_sample_size = ratio
-        run_sequence(args, writer)
-
-
-def b_bt_gpt_gp(args, writer):
-    # run_sequence(args, writer)
-
-    args.base_pretrain = True
-    args.target_pretrain = True
-    run_sequence(args, writer) #Do GP-T-F
-
-
-    args.base_pretrain = False
-    args.do_gradual_base_pretrain = False
-    args.target_pretrain = True
-    pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
-    classifier.train_and_eval()
-
-    args.target_pretrain = False
-    args.base_pretrain = False
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
-    classifier.train_and_eval()
 
 def main(args):
     writer = None #SummaryWriter()
@@ -226,12 +225,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        # pretrain_budget_ham(args, writer)
-        # b_bt_gpt_gp(args, writer)
-
-        tacc(args, writer)
-
-        pass
+        ham(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
