@@ -229,7 +229,7 @@ def main(args):
         # pretrain_budget_ham(args, writer)
         # b_bt_gpt_gp(args, writer)
 
-        run_sequence_tacc(args, writer)
+        tacc(args, writer)
 
         pass
 
