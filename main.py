@@ -188,7 +188,7 @@ def main(args):
         # pretrain_budget_ham(args, writer)
         # b_bt_gpt_gp(args, writer)
 
-        tacc(args, writer)
+        uc(args, writer)
 
         pass
 
