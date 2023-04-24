@@ -38,7 +38,7 @@ class PretextTrainer():
 
         self.num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
         self.n_features = get_feature_dimensions_backbone(self.args)
-        self.dataset = get_dataset_enum(self.target_dataset)
+        self.dataset = get_dataset_enum(self.args.target_dataset)
 
     def eval_main_task(self, model, epoch, criterion, batch, test_loader):
         batch_time = AverageMeter()

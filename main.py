@@ -122,7 +122,8 @@ def tacc(args, writer):
 
 def run_sequence_tacc(args, writer):
     if args.base_pretrain:
-        logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+        dataset = get_dataset_enum(args.target_dataset)
+        logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch for {dataset}.")
 
         pretext = PretextTrainer(args, writer)
         pretext.do_active_learning()
