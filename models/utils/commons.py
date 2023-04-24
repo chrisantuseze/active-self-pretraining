@@ -120,7 +120,7 @@ def get_params(args, training_type):
             temperature=temperature
             ),
         TrainingType.BASE_PRETRAIN: Params(
-            batch_size=16, #32,#batch_size 
+            batch_size= 32, #16
             image_size=base_image_size, 
             lr=base_lr, 
             epochs=epochs,
@@ -249,7 +249,7 @@ def prepare_model(args, trainingType, model):
 
         out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num))
         state = torch.load(out)
-        
+
         model.load_state_dict(state['model'], strict=False)
 
     else:
