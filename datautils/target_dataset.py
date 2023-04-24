@@ -67,7 +67,7 @@ class TargetDataset():
         return train_loader, val_loader
 
     def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING, TrainingType.BASE_PRETRAIN]:
+        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING]:#, TrainingType.BASE_PRETRAIN]:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
                 dataset = self.get_dataset(transforms)
@@ -140,9 +140,9 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
     #     print("using the Generated dataset after AL")
     #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
     
-    # if training_type == TrainingType.BASE_PRETRAIN:
-    #     print("using the Generated dataset")
-    #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
+    if training_type == TrainingType.BASE_PRETRAIN:
+        print("using the proxy dataset")
+        return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
         
 
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:

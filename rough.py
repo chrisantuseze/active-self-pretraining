@@ -2,8 +2,23 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/quickdraw.zip", 'r') as zip_ref:
-    zip_ref.extractall("quickdraw") 
+with zipfile.ZipFile("datasets/cifar10v2.zip", 'r') as zip_ref:
+    zip_ref.extractall("cifar10") 
+
+with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
+    zip_ref.extractall("chest_xray") 
+
+with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
+    zip_ref.extractall("ucmerced") 
+
+with zipfile.ZipFile("datasets/ham10000_clean.zip", 'r') as zip_ref:
+    zip_ref.extractall("ham10000") 
+
+with zipfile.ZipFile("datasets/flowers.zip", 'r') as zip_ref:
+    zip_ref.extractall("flowers") 
+
+with zipfile.ZipFile("datasets/modern_office_31.zip", 'r') as zip_ref:
+    zip_ref.extractall("modern_office_31") 
 
 
 # arr = [3, 4, 1, 0, 6]
