@@ -67,7 +67,7 @@ def pretrain_budget_ham(args, writer):
 
 def tacc(args, writer):
     args.target_pretrain = False
-
+    args.al_trainer_sample_size = 33500
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
