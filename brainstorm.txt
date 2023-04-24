@@ -113,6 +113,8 @@ sudo yum install nano -y
 
 nvidia-smi
 
+ssh cc@129.114.108.175
+
 https://github.com/fastai/imagenette
 
 

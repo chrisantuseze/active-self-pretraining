@@ -56,10 +56,10 @@ def pretrain_budget_eurosat(args, writer):
 
 def pretrain_budget_ham(args, writer):
 
-    # Now evaluating eurosat GASP-DA + T
+    # Now evaluating ham GASP-DA
     args.target_pretrain = False
 
-    al_trainer_sample_size = [1200, 600]
+    al_trainer_sample_size = [600]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
