@@ -120,7 +120,7 @@ def get_params(args, training_type):
             temperature=temperature
             ),
         TrainingType.BASE_PRETRAIN: Params(
-            batch_size= batch_size, #16
+            batch_size= 16,
             image_size=base_image_size, 
             lr=base_lr, 
             epochs=epochs,
