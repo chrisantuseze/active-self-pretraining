@@ -108,7 +108,7 @@ def uc(args, writer):
     args.do_gradual_base_pretrain = False
     args.base_pretrain = True
     args.target_pretrain = True
-    args.base_epochs = 500
+    args.base_epochs = 400
 
     datasets = [2, 4, 6, 7, 11]
 
