@@ -2,11 +2,8 @@
 import sys
 
 import zipfile
-with zipfile.ZipFile("datasets/generated_modern_office_31.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_modern_office_31") 
-
-with zipfile.ZipFile("datasets/modern_office_31.zip", 'r') as zip_ref:
-    zip_ref.extractall("modern_office_31") 
+with zipfile.ZipFile("datasets/quickdraw.zip", 'r') as zip_ref:
+    zip_ref.extractall("quickdraw") 
 
 
 # arr = [3, 4, 1, 0, 6]
