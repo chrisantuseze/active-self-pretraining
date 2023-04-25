@@ -141,7 +141,7 @@ def tacc(args, writer):
     # this is for source-proxy (instead of gan) gradual pretraining
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
-    args.target_pretrain = True
+    args.target_pretrain = False
 
     datasets = [2, 4, 5, 6, 7, 11]
 
@@ -228,7 +228,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        ham(args, writer)
+        tacc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
