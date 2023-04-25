@@ -225,7 +225,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        ham(args, writer)
+        tacc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

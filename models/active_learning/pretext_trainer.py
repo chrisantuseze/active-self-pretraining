@@ -215,7 +215,7 @@ class PretextTrainer():
         loader = get_target_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        state = simple_load_model(self.args, path=f'{prefix}_finetuner.pth')
+        state = simple_load_model(self.args, path=f'{prefix}_finetuner_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -476,7 +476,7 @@ class PretextTrainer():
         path_loss = self.make_batches(encoder, prefix='second', training_type=TrainingType.BASE_PRETRAIN)
 
         model, _ = get_model_criterion(self.args, encoder, num_classes=4)
-        state = simple_load_model(self.args, path='second_finetuner.pth')
+        state = simple_load_model(self.args, path=f'second_finetuner_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -505,7 +505,7 @@ class PretextTrainer():
 
     def ds_distillation(self, encoder, path_loss):
         model, _ = get_model_criterion(self.args, encoder, num_classes=4)
-        state = simple_load_model(self.args, path='first_finetuner.pth')
+        state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
