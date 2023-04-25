@@ -2,26 +2,11 @@
 import sys
 
 import zipfile
-# with zipfile.ZipFile("datasets/cifar10v2.zip", 'r') as zip_ref:
-#     zip_ref.extractall("cifar10") 
+with zipfile.ZipFile("datasets/generated_ucmerced.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_ucmerced") 
 
-# with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
-#     zip_ref.extractall("chest_xray") 
-
-with zipfile.ZipFile("datasets/UCMerced_LandUse.zip", 'r') as zip_ref:
-    zip_ref.extractall("ucmerced") 
-
-with zipfile.ZipFile("datasets/ham10000_clean.zip", 'r') as zip_ref:
-    zip_ref.extractall("ham10000") 
-
-# with zipfile.ZipFile("datasets/flowers.zip", 'r') as zip_ref:
-#     zip_ref.extractall("flowers") 
-
-# with zipfile.ZipFile("datasets/modern_office_31.zip", 'r') as zip_ref:
-#     zip_ref.extractall("modern_office_31") 
-
-with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
-    zip_ref.extractall("eurosat") 
+with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_sketch") 
 
 
 # arr = [3, 4, 1, 0, 6]

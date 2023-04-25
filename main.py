@@ -80,11 +80,47 @@ def b_bt_gpt_gp(args, writer):
 
 
 
-def eurosat(args, writer):
+def pete_1(args, writer):
+    # this is for single iteration pretraining with GAN (B-T-F)
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
+
+    args.training_type = "pete_1"
+
+    datasets = [2, 5, 6, 7, 8, 11, 9, 4] # copy generated_ucmerced and generated_sketch to pete 1
+
+    pretrainer = SelfSupPretrainer(args, writer)
+    pretrainer.first_pretrain()
+
+    for ds in datasets:
+        args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
+        args.target_dataset = ds
+        args.lc_dataset = ds
+
+        run_sequence_pete_1(args, writer)
+
+def run_sequence_pete_1(args, writer):
+    if args.base_pretrain:
+            # pretrainer = SelfSupPretrainer(args, writer)
+            # pretrainer.first_pretrain()
+            pass
+
+    if args.target_pretrain:
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
+
+
+
+
+def eurosat(args, writer): # replace this with pete_1
     # Now evaluating eurosat GASP-DA + T
     args.target_pretrain = True
 
-    al_trainer_sample_size = [5000, 3240, 1620] #[800, 400] #[1200, 600]
+    al_trainer_sample_size = [5000, 3240, 1620]
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
@@ -108,7 +144,8 @@ def run_sequence_eurosat(args, writer):
 
 
 
-def ham(args, writer):
+
+def ham(args, writer): # replace this with modern_office
     # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
 
@@ -137,13 +174,44 @@ def run_sequence_ham(args, writer):
 
 
 
+
+def modern_office(args, writer):
+    # Now evaluating ham GASP-DA
+    args.target_pretrain = False
+
+    al_trainer_sample_size = [1300, 800, 400]
+    args.base_dataset = 11
+    args.target_dataset = 11
+    args.lc_dataset = 11
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence_modern_office(args, writer)
+
+def run_sequence_modern_office(args, writer):
+    if args.base_pretrain:
+            logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+
+            pretext = PretextTrainer(args, writer)
+            pretext.do_active_learning()
+
+    if args.target_pretrain:
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
+
+
+
+
 def tacc(args, writer):
     # this is for source-proxy (instead of gan) gradual pretraining
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
 
-    datasets = [2, 4, 5, 6, 7, 11]
+    datasets = [2, 4, 5, 6, 7, 11] #TODO: New -> Consider adding clipart and sketch
 
     al_trainer_sample_size = [1000, 400, 5000, 800, 1800, 1300]
 
@@ -172,8 +240,9 @@ def run_sequence_tacc(args, writer):
 
 
 
+
 def uc(args, writer):
-    # this is for source-proxy hierarchical pretraining
+    # this is for source-proxy hierarchical pretraining (B-P-T-F)
     args.do_gradual_base_pretrain = False
     args.base_pretrain = True
     args.target_pretrain = True
@@ -228,7 +297,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        tacc(args, writer)
+        pete_1(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
