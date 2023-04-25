@@ -294,7 +294,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_1(args, writer)
+        modern_office(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
