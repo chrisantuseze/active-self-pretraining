@@ -113,6 +113,9 @@ def ham(args, writer):
     args.target_pretrain = True
 
     al_trainer_sample_size = [1800, 1200, 600]
+    args.base_dataset = 7
+    args.target_dataset = 7
+    args.lc_dataset = 7
 
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
