@@ -90,9 +90,6 @@ def pete_1(args, writer):
 
     datasets = [2, 5, 6, 7, 8, 11, 9, 4] # copy generated_ucmerced and generated_sketch to pete 1
 
-    pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
-
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
         args.target_dataset = ds
