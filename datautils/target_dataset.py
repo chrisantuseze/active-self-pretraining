@@ -66,13 +66,13 @@ class TargetDataset():
 
         return train_loader, val_loader
 
-    def get_loader(self): #TODO: Remove the added TARGET_PRETRAIN check after running pete_1
+    def get_loader(self): #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
         if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING]:#, TrainingType.BASE_PRETRAIN]:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
                 dataset = self.get_dataset(transforms)
 
-            #TODO: Remove the added TARGET_PRETRAIN check after running pete_1
+            # #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
             # elif self.training_type == TrainingType.TARGET_PRETRAIN:
             #     img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
             #     logging.info(f"Original size of generated images dataset is {len(img_path)}")

@@ -29,12 +29,12 @@ logging.init()
 
 def run_sequence(args, writer):
     if args.base_pretrain:
-            # do_gen_ai(args)
+            do_gen_ai(args)
 
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
-            # pretext = PretextTrainer(args, writer)
-            # pretext.do_active_learning()
+            pretext = PretextTrainer(args, writer)
+            pretext.do_active_learning()
 
     if args.target_pretrain:
         pretrainer = SelfSupPretrainer(args, writer)
@@ -235,8 +235,36 @@ def run_sequence_tacc(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
+def new_tacc2(args, writer):
+    # this is for single iteration pretraining with GAN (B-T-F)
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
 
+    args.training_type = "pete_1"
 
+    datasets = [5, 6, 7, 8, 11, 9, 4] # copy generated_ucmerced and generated_sketch to pete 1
+
+    for ds in datasets:
+        args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
+        args.target_dataset = ds
+        args.lc_dataset = ds
+
+        run_sequence_new_tacc2(args, writer)
+
+def run_sequence_new_tacc2(args, writer):
+    if args.base_pretrain:
+            pass
+
+    if args.target_pretrain:
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
+
+def new_tacc1(args, writer):
+    run_sequence(args, writer)
 
 def uc(args, writer):
     # this is for source-proxy hierarchical pretraining (B-P-T-F)
@@ -292,7 +320,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        uc(args, writer)
+        new_tacc1(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
