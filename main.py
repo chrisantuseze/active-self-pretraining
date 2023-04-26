@@ -277,7 +277,7 @@ def uc(args, writer):
 
     args.training_type = "uc"
 
-    datasets = [2, 4, 6, 7, 11]
+    datasets = [5, 8] #[2, 4, 6, 7, 11]
 
     # pretrainer = SelfSupPretrainer(args, writer)
     # pretrainer.first_pretrain()
@@ -320,7 +320,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_tacc1(args, writer)
+        uc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
