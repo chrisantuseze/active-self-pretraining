@@ -251,8 +251,8 @@ def uc(args, writer):
 
     datasets = [2, 4, 6, 7, 11]
 
-    pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
+    # pretrainer = SelfSupPretrainer(args, writer)
+    # pretrainer.first_pretrain()
 
     for ds in datasets:
         args.base_dataset = ds
@@ -263,9 +263,7 @@ def uc(args, writer):
 
 def run_sequence_uc(args, writer):
     if args.base_pretrain:
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
-            pass
+        pass
 
     if args.target_pretrain:
         pretrainer = SelfSupPretrainer(args, writer)
@@ -294,7 +292,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        modern_office(args, writer)
+        uc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

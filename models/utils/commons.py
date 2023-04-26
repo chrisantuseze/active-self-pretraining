@@ -120,7 +120,7 @@ def get_params(args, training_type):
             temperature=temperature
             ),
         TrainingType.BASE_PRETRAIN: Params(
-            batch_size= 16,
+            batch_size= batch_size, #16,
             image_size=base_image_size, 
             lr=base_lr, 
             epochs=epochs,
@@ -241,16 +241,17 @@ def prepare_model(args, trainingType, model):
             
             model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
-    # elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "uc":
-    #     prefix = get_ssl_method(args.method)
-    #     pretrain_level = "1"
-    #     dataset = "cifar10"
-    #     epoch_num = args.base_epochs
+    elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "uc":
+        prefix = get_ssl_method(args.method)
+        pretrain_level = "1"
+        dataset = "cifar10"
+        epoch_num = args.base_epochs
 
-    #     out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num))
-    #     state = torch.load(out)
+        out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num))
+        logging.info(f"Loading checkpoint from - {out}")
 
-    #     model.load_state_dict(state['model'], strict=False)
+        state = torch.load(out)
+        model.load_state_dict(state['model'], strict=False)
 
     else:
         state = load_saved_state(args, pretrain_level="1")
