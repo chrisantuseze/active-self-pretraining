@@ -246,7 +246,7 @@ def new_tacc2(args, writer):
     datasets = [5, 6, 7, 8, 11] # copy generated_ucmerced and generated_sketch to pete 1 [9, 4]. Chest x-ray (2) was done.
 
     for ds in datasets:
-        args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
+        args.base_dataset = f'generated_{get_dataset_enum(ds)}'
         args.target_dataset = ds
         args.lc_dataset = ds
 
