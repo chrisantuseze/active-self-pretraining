@@ -221,15 +221,15 @@ def get_ds_num_classes(dataset):
 
     elif dataset == DatasetType.AMAZON.value:
         num_classes = 31
-        dir = "/office_31/amazon/images"
+        dir = "/amazon/images"
 
     elif dataset == DatasetType.WEBCAM.value:
         num_classes = 31
-        dir = "/office_31/webcam/images"
+        dir = "/webcam/images"
 
     elif dataset == DatasetType.DSLR.value:
         num_classes = 31
-        dir = "/office_31/dslr/images"
+        dir = "/dslr/images"
 
     else:
         num_classes = 10
