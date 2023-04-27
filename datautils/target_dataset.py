@@ -211,5 +211,17 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the MODERN_OFFICE_31 dataset")
         return TargetDataset(args, "/modern_office_31", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
+    elif args.target_dataset == dataset_enum.DatasetType.AMAZON.value:
+        print("using the Office-31 AMAZON dataset")
+        return TargetDataset(args, "/office_31/amazon/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.WEBCAM.value:
+        print("using the Office-31 WEBCAM dataset")
+        return TargetDataset(args, "/office_31/webcam/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.DSLR.value:
+        print("using the Office-31 DSLR dataset")
+        return TargetDataset(args, "/office_31/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
     else:
         ValueError

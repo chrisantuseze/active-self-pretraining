@@ -219,6 +219,18 @@ def get_ds_num_classes(dataset):
         num_classes = 31
         dir = "/modern_office_31/synthetic"
 
+    elif dataset == DatasetType.AMAZON.value:
+        num_classes = 31
+        dir = "/office_31/amazon/images"
+
+    elif dataset == DatasetType.WEBCAM.value:
+        num_classes = 31
+        dir = "/office_31/webcam/images"
+
+    elif dataset == DatasetType.DSLR.value:
+        num_classes = 31
+        dir = "/office_31/dslr/images"
+
     else:
         num_classes = 10
         dir = "/cifar10"

@@ -5,24 +5,24 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_ucmerced.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_ucmerced") 
 
-with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_sketch") 
+# with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_sketch") 
 
 
-with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_eurosat") 
+# with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_eurosat") 
 
-with zipfile.ZipFile("datasets/generated_ham10000.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_ham10000") 
+# with zipfile.ZipFile("datasets/generated_ham10000.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_ham10000") 
 
-with zipfile.ZipFile("datasets/generated_flowers.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_flowers") 
+# with zipfile.ZipFile("datasets/generated_flowers.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_flowers") 
 
-with zipfile.ZipFile("datasets/generated_modern_office_31.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_modern_office_31") 
+# with zipfile.ZipFile("datasets/generated_modern_office_31.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_modern_office_31") 
 
-with zipfile.ZipFile("datasets/generated_clipart.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_ucmerced") 
+# with zipfile.ZipFile("datasets/generated_clipart.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_ucmerced") 
 
 # with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
 #     zip_ref.extractall("eurosat") 
@@ -33,6 +33,8 @@ with zipfile.ZipFile("datasets/generated_clipart.zip", 'r') as zip_ref:
 # with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
 #     zip_ref.extractall("sketch") 
 
+with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
+    zip_ref.extractall("office-31") 
 
 
 # arr = [3, 4, 1, 0, 6]

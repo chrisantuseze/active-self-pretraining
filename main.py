@@ -285,7 +285,7 @@ def run_sequence_new_tacc2(args, writer):
 def new_tacc1(args, writer): #generate GAN images using uc. tacc couldn't due to space constraint
     run_sequence(args, writer)
 
-def uc(args, writer):
+def uc(args, writer): #done
     # this is for source-proxy hierarchical pretraining (B-P-T-F)
     args.do_gradual_base_pretrain = False
     args.base_pretrain = True
@@ -320,6 +320,29 @@ def run_sequence_uc(args, writer):
     classifier.train_and_eval()
 
 
+def new_uc(args, writer): #currently running
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
+
+    args.target_epochs = 400
+
+    args.training_type = "uc"
+
+    datasets = [12, 13, 14]
+    for ds in datasets:
+        args.base_dataset = ds
+        args.target_dataset = ds
+        args.lc_dataset = ds
+
+        do_gen_ai(args)
+
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        # classifier.train_and_eval()
+
 def main(args):
     writer = None #SummaryWriter()
 
@@ -339,7 +362,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete(args, writer)
+        new_uc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

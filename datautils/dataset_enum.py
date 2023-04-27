@@ -14,6 +14,10 @@ class DatasetType(Enum):
     QUICKDRAW = 10
     MODERN_OFFICE_31 = 11
 
+    AMAZON = 12
+    WEBCAM = 13
+    DSLR = 14
+
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
         return "imagenet"
@@ -50,3 +54,12 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.MODERN_OFFICE_31.value:
         return "modern_office_31"
+
+    if value == DatasetType.AMAZON.value:
+        return "amazon"
+
+    if value == DatasetType.WEBCAM.value:
+        return "webcam"
+
+    if value == DatasetType.DSLR.value:
+        return "dslr"
