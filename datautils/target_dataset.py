@@ -77,7 +77,7 @@ class TargetDataset():
                 img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
                 logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
-                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
+                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=False)
                 random.shuffle(real_target)
                 img_path.extend(real_target)
 
