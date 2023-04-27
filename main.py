@@ -80,7 +80,7 @@ def b_bt_gpt_gp(args, writer):
 
 
 
-def pete_1(args, writer):
+def pete_1(args, writer): #doing this with new_tacc2
     # this is for single iteration pretraining with GAN (B-T-F)
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
@@ -111,7 +111,26 @@ def run_sequence_pete_1(args, writer):
     classifier.train_and_eval()
 
 
+def pete(args, writer): #currently running
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
 
+    args.target_epochs = 400
+
+    args.training_type = "pete"
+
+    datasets = [2, 4, 5, 6, 7, 8, 9, 10, 11]
+    for ds in datasets:
+        args.base_dataset = ds
+        args.target_dataset = ds
+        args.lc_dataset = ds
+
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        classifier.train_and_eval()
 
 def eurosat(args, writer): # replace this with pete_1
     # Now evaluating eurosat GASP-DA + T
@@ -243,7 +262,7 @@ def new_tacc2(args, writer):
 
     args.training_type = "pete_1"
 
-    datasets = [5, 6, 7, 8, 11] # copy generated_ucmerced and generated_sketch to pete 1 [9, 4]. Chest x-ray (2) was done.
+    datasets = [5, 6, 7, 8, 11] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(ds)}'
@@ -320,7 +339,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_tacc2(args, writer)
+        pete(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

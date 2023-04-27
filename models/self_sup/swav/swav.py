@@ -44,7 +44,11 @@ class SwAVTrainer():
         )
 
         # load weights
-        self.model, params_to_update = prepare_model(self.args, training_type, self.model) 
+
+        if self.args.training_type != "pete": #TODO Please remove this later on. Strictly for no pretraining
+            params_to_update = self.model.parameters()
+        else:
+            self.model, params_to_update = prepare_model(self.args, training_type, self.model) 
 
         self.model = self.model.to(self.args.device)
 
