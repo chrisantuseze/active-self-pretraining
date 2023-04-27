@@ -202,7 +202,7 @@ def run_sequence_modern_office(args, writer):
 
 
 
-def tacc(args, writer):
+def tacc(args, writer): # done
     # this is for source-proxy (instead of gan) gradual pretraining
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
@@ -243,7 +243,7 @@ def new_tacc2(args, writer):
 
     args.training_type = "pete_1"
 
-    datasets = [5, 6, 7, 8, 11, 9, 4] # copy generated_ucmerced and generated_sketch to pete 1
+    datasets = [5, 6, 7, 8, 11] # copy generated_ucmerced and generated_sketch to pete 1 [9, 4]. Chest x-ray (2) was done.
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
@@ -263,7 +263,7 @@ def run_sequence_new_tacc2(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def new_tacc1(args, writer):
+def new_tacc1(args, writer): #generate GAN images using uc. tacc couldn't due to space constraint
     run_sequence(args, writer)
 
 def uc(args, writer):
@@ -320,7 +320,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        uc(args, writer)
+        new_tacc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
