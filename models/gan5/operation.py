@@ -76,7 +76,7 @@ class  ImageFolder(Dataset):
         if self.dataset in ['chest_xray', 'imagenet']:
             self.dir = f'{self.dir}/train'
 
-        elif self.dataset in ['ucmerced']:
+        elif self.dataset in ['ucmerced', 'amazon', 'webcam', 'dslr']:
             self.dir = f'{self.dir}/images'
 
         print(self.dir)
