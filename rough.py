@@ -27,14 +27,14 @@ import zipfile
 # with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
 #     zip_ref.extractall("eurosat") 
 
-# with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
-#     zip_ref.extractall("clipart") 
+with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
+    zip_ref.extractall("clipart") 
 
 # with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
 #     zip_ref.extractall("sketch") 
 
-with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
-    zip_ref.extractall("office-31") 
+# with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
+#     zip_ref.extractall("office-31") 
 
 
 # arr = [3, 4, 1, 0, 6]
