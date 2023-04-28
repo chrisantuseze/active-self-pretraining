@@ -254,7 +254,7 @@ def run_sequence_tacc(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def new_tacc2(args, writer):
+def new_tacc2(args, writer): #currently running
     # this is for single iteration pretraining with GAN (B-T-F)
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
@@ -262,7 +262,7 @@ def new_tacc2(args, writer):
 
     args.training_type = "pete_1"
 
-    datasets = [5, 6, 7, 8, 11] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
+    datasets = [8, 11] #[5, 6, 7, 8, 11] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(ds)}'
@@ -362,7 +362,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc(args, writer)
+        new_tacc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
