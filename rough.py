@@ -28,7 +28,13 @@ import zipfile
 #     zip_ref.extractall("eurosat") 
 
 with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
-    zip_ref.extractall("clipart") 
+    zip_ref.extractall("clipart")
+
+with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
+    zip_ref.extractall("sketch")
+
+with zipfile.ZipFile("datasets/painting.zip", 'r') as zip_ref:
+    zip_ref.extractall("painting") 
 
 # with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
 #     zip_ref.extractall("sketch") 

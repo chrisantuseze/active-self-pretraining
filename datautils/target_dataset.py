@@ -223,5 +223,9 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the Office-31 DSLR dataset")
         return TargetDataset(args, "/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
+    elif args.target_dataset == dataset_enum.DatasetType.PAINTING.value:
+            print("using the PAINTING dataset")
+            return TargetDataset(args, "/painting", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
     else:
         ValueError

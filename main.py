@@ -132,6 +132,24 @@ def pete(args, writer): #currently running
         classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
         classifier.train_and_eval()
 
+def pete_2(args, writer):
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
+
+    args.target_epochs = 200
+    args.training_type = "pete2"
+
+    args.base_dataset = 15
+    args.target_dataset = 15
+    args.lc_dataset = 15
+
+    do_gen_ai(args)
+    pretrainer = SelfSupPretrainer(args, writer)
+    pretrainer.second_pretrain()
+
+
+
 def eurosat(args, writer): # replace this with pete_1
     # Now evaluating eurosat GASP-DA + T
     args.target_pretrain = True
@@ -362,7 +380,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc(args, writer)
+        pete_2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

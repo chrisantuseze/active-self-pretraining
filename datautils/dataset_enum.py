@@ -18,6 +18,8 @@ class DatasetType(Enum):
     WEBCAM = 13
     DSLR = 14
 
+    PAINTING = 15
+
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
         return "imagenet"
@@ -63,3 +65,6 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.DSLR.value:
         return "dslr"
+
+    if value == DatasetType.PAINTING.value:
+        return "painting"

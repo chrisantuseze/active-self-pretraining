@@ -231,6 +231,10 @@ def get_ds_num_classes(dataset):
         num_classes = 31
         dir = "/dslr/images"
 
+    elif dataset == DatasetType.PAINTING.value:
+        num_classes = 345
+        dir = "/painting"
+
     else:
         num_classes = 10
         dir = "/cifar10"
