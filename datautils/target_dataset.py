@@ -67,28 +67,28 @@ class TargetDataset():
         return train_loader, val_loader
 
     def get_loader(self): #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING, TrainingType.TARGET_PRETRAIN]:#, TrainingType.BASE_PRETRAIN]:
+        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING]:#, TrainingType.BASE_PRETRAIN]:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
                 dataset = self.get_dataset(transforms)
 
             # #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
-            elif self.training_type == TrainingType.TARGET_PRETRAIN:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
-                logging.info(f"Original size of generated images dataset is {len(img_path)}")
+            # elif self.training_type == TrainingType.TARGET_PRETRAIN:
+            #     img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
+            #     logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
-                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=False)
-                random.shuffle(real_target)
-                img_path.extend(real_target)
+            #     real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=False)
+            #     random.shuffle(real_target)
+            #     img_path.extend(real_target)
 
-                logging.info(f"Total size of dataset is {len(img_path)}")
+            #     logging.info(f"Total size of dataset is {len(img_path)}")
                 
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
+            #     path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
+            #     dataset = PretextMultiCropDataset(
+            #         self.args,
+            #         path_loss_list,
+            #     )
 
             elif self.training_type == TrainingType.BASE_PRETRAIN:
                 img_path = glob.glob(self.dir + '/*')
