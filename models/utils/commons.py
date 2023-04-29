@@ -244,7 +244,7 @@ def get_ds_num_classes(dataset):
 def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
 
-    if args.training_type == "uc2":
+    if args.training_type in ["uc2", "pete_2"]:
             state = get_state_for_da(args)
             model.load_state_dict(state['model'], strict=False)
             
