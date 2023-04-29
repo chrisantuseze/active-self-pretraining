@@ -416,7 +416,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        pete_2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
