@@ -5,8 +5,8 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_ucmerced.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_ucmerced") 
 
-# with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_sketch") 
+with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_sketch") 
 
 
 # with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
@@ -30,8 +30,8 @@ import zipfile
 # with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
 #     zip_ref.extractall("clipart")
 
-with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
-    zip_ref.extractall("sketch")
+# with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
+#     zip_ref.extractall("sketch")
 
 # with zipfile.ZipFile("datasets/painting.zip", 'r') as zip_ref:
 #     zip_ref.extractall("painting") 

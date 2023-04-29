@@ -148,7 +148,20 @@ def pete_2(args, writer): #currently running
     pretrainer = SelfSupPretrainer(args, writer)
     pretrainer.second_pretrain()
 
+def pete_2(args, writer): #not yet running
+    args.do_gradual_base_pretrain = True
+    args.base_pretrain = True
+    args.target_pretrain = False
 
+    args.target_epochs = 400
+
+    args.training_type = "uc2"
+
+    bases = [8, 15, 9] # C-S, P-C, S-P
+    targs = [9, 8, 15]
+
+    for i in range(len(bases)):
+        run_sequence_new_uc2(args, writer, bases[i], targs[i])
 
 def eurosat(args, writer): # replace this with pete_1
     # Now evaluating eurosat GASP-DA + T
@@ -377,8 +390,6 @@ def run_sequence_new_uc2(args, writer, base, target):
     args.base_dataset = base
     args.target_dataset = target
     args.lc_dataset = target
-
-    # logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
