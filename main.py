@@ -280,7 +280,7 @@ def new_tacc2(args, writer): #currently running
 
     args.training_type = "pete_1"
 
-    datasets = [8, 9, 11] #[5, 6, 7, 8, 11] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
+    datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(ds)}'
@@ -405,7 +405,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        new_tacc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
