@@ -132,7 +132,7 @@ def pete(args, writer): #currently running
         classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
         classifier.train_and_eval()
 
-def pete_2(args, writer):
+def pete_2(args, writer): #currently running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
     args.target_pretrain = True

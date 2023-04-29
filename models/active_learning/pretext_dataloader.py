@@ -41,7 +41,7 @@ class PretextDataLoader():
             elif self.args.target_dataset == DatasetType.CIFAR10.value:
                 img_paths = glob.glob(self.args.dataset_dir + '/cifar10v2/train/*/*')
 
-            elif self.args.target_dataset in [DatasetType.UCMERCED.value]:
+            elif self.args.target_dataset in [DatasetType.UCMERCED.value, DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
                 img_paths = glob.glob(self.dir + '/images/*/*')
 
             elif self.args.target_dataset == DatasetType.MODERN_OFFICE_31.value:
