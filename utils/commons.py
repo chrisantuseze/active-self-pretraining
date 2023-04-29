@@ -225,3 +225,18 @@ def get_accuracy_file_ext(args):
         return f'_{args.al_trainer_sample_size}'
 
     return ''
+
+
+def get_state_for_da(args):
+    prefix = "swav"
+
+    pretrain_level = 2
+    epoch_num = args.target_epochs
+    dataset = get_dataset_enum(args.base_dataset)
+
+    filename = "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
+    logging.info(f"Loading [uc2] checkpoint from - {filename}")
+
+    return simple_load_model(args, path=filename)
+    
+

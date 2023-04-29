@@ -13,7 +13,7 @@ from models.self_sup.simclr.simclr import SimCLR
 from models.self_sup.simclr.simclr_v2 import SimCLRV2
 from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
 from models.utils.training_type_enum import Params, TrainingType
-from utils.commons import load_chkpts, load_saved_state
+from utils.commons import get_state_for_da, load_chkpts, load_saved_state
 import utils.logger as logging
 
 
@@ -244,8 +244,11 @@ def get_ds_num_classes(dataset):
 def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
 
-    # if trainingType != TrainingType.BASE_PRETRAIN or args.epoch_num != args.base_epochs:
-    if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
+    if args.training_type == "uc2":
+            state = get_state_for_da(args)
+            model.load_state_dict(state['model'], strict=False)
+            
+    elif (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
         if args.do_gradual_base_pretrain and load_saved_state(args, pretrain_level="1") is not None:
             logging.info("Using base pretrained model")
 

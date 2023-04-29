@@ -338,7 +338,7 @@ def run_sequence_uc(args, writer):
     classifier.train_and_eval()
 
 
-def new_uc(args, writer): #currently running
+def new_uc(args, writer): #done running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
     args.target_pretrain = True
@@ -347,7 +347,7 @@ def new_uc(args, writer): #currently running
 
     args.training_type = "uc"
 
-    datasets = [13, 14]
+    datasets = [12, 13, 14]
     for ds in datasets:
         args.base_dataset = ds
         args.target_dataset = ds
@@ -358,8 +358,33 @@ def new_uc(args, writer): #currently running
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
-        # classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        # classifier.train_and_eval()
+def new_uc2(args, writer): #currently running
+    args.do_gradual_base_pretrain = True
+    args.base_pretrain = True
+    args.target_pretrain = False
+
+    args.target_epochs = 400
+
+    args.training_type = "uc2"
+
+    bases = [12, 12, 14, 14, 13, 12] # A-D, A-W, D-A, D-W, W-A, W-D
+    targs = [14, 13, 12, 13, 12, 14]
+
+    for i in range(len(bases)):
+        run_sequence_new_uc2(args, writer, bases[i], targs[i])
+
+def run_sequence_new_uc2(args, writer, base, target):
+    args.base_dataset = base
+    args.target_dataset = target
+    args.lc_dataset = target
+
+    logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+
+    pretext = PretextTrainer(args, writer)
+    pretext.do_active_learning()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
 
 def main(args):
     writer = None #SummaryWriter()
@@ -380,7 +405,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_2(args, writer)
+        new_uc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
