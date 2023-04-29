@@ -374,7 +374,7 @@ def new_uc2(args, writer): #currently running
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
 
 def run_sequence_new_uc2(args, writer, base, target):
-    args.base_dataset = f'generated_{get_dataset_enum(base)}'
+    args.base_dataset = base
     args.target_dataset = target
     args.lc_dataset = target
 

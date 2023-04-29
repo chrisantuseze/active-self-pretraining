@@ -522,7 +522,8 @@ class PretextTrainer():
     def active_learning_new(self, path_loss, encoder):
         pretraining_sample_pool = []
 
-        gen_images = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')
+        gen_filename = f'generated_{get_dataset_enum(self.args.target_dataset)}'
+        gen_images = glob.glob(f'{self.args.dataset_dir}/{gen_filename}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
         pretraining_sample_pool.extend(pretraining_gen_images) #TODO Uncomment this if new idea does not work
 
