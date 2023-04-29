@@ -133,22 +133,6 @@ def pete(args, writer): #currently running
         classifier.train_and_eval()
 
 def pete_2(args, writer): #currently running
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
-
-    args.target_epochs = 200
-    args.training_type = "pete2"
-
-    args.base_dataset = 15
-    args.target_dataset = 15
-    args.lc_dataset = 15
-
-    do_gen_ai(args)
-    pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.second_pretrain()
-
-def pete_2(args, writer): #not yet running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
