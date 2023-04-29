@@ -278,7 +278,7 @@ def new_tacc2(args, writer): #currently running
     args.base_pretrain = False
     args.target_pretrain = True
 
-    args.training_type = "pete_1"
+    args.training_type = "new_tacc2"
 
     datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
 
@@ -374,11 +374,11 @@ def new_uc2(args, writer): #currently running
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
 
 def run_sequence_new_uc2(args, writer, base, target):
-    args.base_dataset = base
+    args.base_dataset = f'generated_{get_dataset_enum(base)}'
     args.target_dataset = target
     args.lc_dataset = target
 
-    logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+    # logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
@@ -405,7 +405,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_tacc2(args, writer)
+        new_uc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
