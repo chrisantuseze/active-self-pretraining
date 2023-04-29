@@ -153,7 +153,7 @@ def pete_2(args, writer): #not yet running
     args.base_pretrain = True
     args.target_pretrain = False
 
-    args.target_epochs = 400
+    args.target_epochs = 200
 
     args.training_type = "uc2"
 
