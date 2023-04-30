@@ -403,7 +403,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        new_uc(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
