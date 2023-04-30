@@ -224,8 +224,24 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         return TargetDataset(args, "/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.PAINTING.value:
-            print("using the PAINTING dataset")
-            return TargetDataset(args, "/painting", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        print("using the PAINTING dataset")
+        return TargetDataset(args, "/painting", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.ARTISTIC.value:
+        print("using the OfficeHome ARTISTIC dataset")
+        return TargetDataset(args, "/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.CLIP_ART.value:
+        print("using the OfficeHome CLIP_ART dataset")
+        return TargetDataset(args, "/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.PRODUCT.value:
+        print("using the OfficeHome PRODUCT dataset")
+        return TargetDataset(args, "/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.REAL_WORLD.value:
+        print("using the OfficeHome REAL_WORLD dataset")
+        return TargetDataset(args, "/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError

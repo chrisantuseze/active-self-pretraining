@@ -5,8 +5,8 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_ucmerced.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_ucmerced") 
 
-with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_sketch") 
+# with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_sketch") 
 
 
 # with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
@@ -41,6 +41,9 @@ with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
 
 # with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
 #     zip_ref.extractall("office-31") 
+
+with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
+    zip_ref.extractall("officehome") 
 
 
 # arr = [3, 4, 1, 0, 6]

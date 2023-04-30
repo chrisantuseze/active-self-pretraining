@@ -277,7 +277,7 @@ def new_tacc2(args, writer): #currently running
 
     args.training_type = "new_tacc2"
 
-    datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done.
+    datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done. maybe include sketch as well
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(ds)}'
@@ -335,7 +335,7 @@ def run_sequence_uc(args, writer):
     classifier.train_and_eval()
 
 
-def new_uc(args, writer): #done running
+def new_uc(args, writer): #not yet running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
     args.target_pretrain = True
@@ -344,7 +344,7 @@ def new_uc(args, writer): #done running
 
     args.training_type = "uc"
 
-    datasets = [12, 13, 14]
+    datasets = [16, 17, 18, 19] # A, C, P, R
     for ds in datasets:
         args.base_dataset = ds
         args.target_dataset = ds
@@ -355,6 +355,9 @@ def new_uc(args, writer): #done running
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
+    # bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
+    # targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
+
 def new_uc2(args, writer): #currently running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
@@ -364,8 +367,8 @@ def new_uc2(args, writer): #currently running
 
     args.training_type = "uc2"
 
-    bases = [12, 12, 14, 14, 13, 12] # A-D, A-W, D-A, D-W, W-A, W-D
-    targs = [14, 13, 12, 13, 12, 14]
+    bases = [13]#[12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
+    targs = [14]#[14, 13, 12, 13, 12, 14]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -400,7 +403,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_2(args, writer)
+        new_uc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

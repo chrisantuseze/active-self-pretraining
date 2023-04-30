@@ -20,6 +20,11 @@ class DatasetType(Enum):
 
     PAINTING = 15
 
+    ARTISTIC = 16
+    CLIP_ART = 17
+    PRODUCT = 18
+    REAL_WORLD = 19
+
 def get_dataset_enum(value: int):
     if value == DatasetType.IMAGENET.value:
         return "imagenet"
@@ -68,3 +73,15 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.PAINTING.value:
         return "painting"
+
+    if value == DatasetType.ARTISTIC.value:
+        return "artistic"
+
+    if value == DatasetType.CLIP_ART.value:
+        return "clip_art"
+
+    if value == DatasetType.PRODUCT.value:
+        return "product"
+
+    if value == DatasetType.REAL_WORLD.value:
+        return "real_world"

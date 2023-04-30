@@ -235,6 +235,22 @@ def get_ds_num_classes(dataset):
         num_classes = 345
         dir = "/painting"
 
+    elif dataset == DatasetType.ARTISTIC.value:
+        num_classes = 65
+        dir = "/artistic"
+
+    elif dataset == DatasetType.CLIP_ART.value:
+        num_classes = 65
+        dir = "/clip_art"
+
+    elif dataset == DatasetType.PRODUCT.value:
+        num_classes = 65
+        dir = "/product"
+
+    elif dataset == DatasetType.REAL_WORLD.value:
+        num_classes = 65
+        dir = "/real_world"
+
     else:
         num_classes = 10
         dir = "/cifar10"
