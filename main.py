@@ -78,39 +78,6 @@ def b_bt_gpt_gp(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
     classifier.train_and_eval()
 
-
-
-def pete_1(args, writer): #doing this with new_tacc2
-    # this is for single iteration pretraining with GAN (B-T-F)
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
-
-    args.training_type = "pete_1"
-
-    datasets = [2, 5, 6, 7, 8, 11, 9, 4] # copy generated_ucmerced and generated_sketch to pete 1
-
-    for ds in datasets:
-        args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
-        args.target_dataset = ds
-        args.lc_dataset = ds
-
-        run_sequence_pete_1(args, writer)
-
-def run_sequence_pete_1(args, writer):
-    if args.base_pretrain:
-            # pretrainer = SelfSupPretrainer(args, writer)
-            # pretrainer.first_pretrain()
-            pass
-
-    if args.target_pretrain:
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
-
-
 def pete(args, writer): #currently running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
@@ -139,7 +106,7 @@ def pete_2(args, writer): #currently running
 
     args.target_epochs = 200
 
-    args.training_type = "uc2"
+    args.training_type = "pete_2"
 
     bases = [8, 15, 9] # C-S, P-C, S-P
     targs = [9, 8, 15]
@@ -174,8 +141,6 @@ def run_sequence_eurosat(args, writer):
     classifier.train_and_eval()
 
 
-
-
 def ham(args, writer): # replace this with modern_office
     # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
@@ -202,8 +167,6 @@ def run_sequence_ham(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
-
-
 
 
 def modern_office(args, writer):
@@ -277,7 +240,7 @@ def new_tacc2(args, writer): #currently running
 
     args.training_type = "new_tacc2"
 
-    datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done. maybe include sketch as well
+    datasets = [9, 11] #[5, 6, 7, 8] # copy generated_ucmerced to pete 1 [9, 4]. Chest x-ray (2) was done. clipart was not done
 
     for ds in datasets:
         args.base_dataset = f'generated_{get_dataset_enum(ds)}'
@@ -296,9 +259,6 @@ def run_sequence_new_tacc2(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
-
-def new_tacc1(args, writer): #generate GAN images using uc. tacc couldn't due to space constraint
-    run_sequence(args, writer)
 
 def uc(args, writer): #done
     # this is for source-proxy hierarchical pretraining (B-P-T-F)
@@ -335,7 +295,7 @@ def run_sequence_uc(args, writer):
     classifier.train_and_eval()
 
 
-def new_uc(args, writer): #not yet running
+def new_uc(args, writer): #currently running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
     args.target_pretrain = True
@@ -355,10 +315,7 @@ def new_uc(args, writer): #not yet running
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
-    # bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
-    # targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
-
-def new_uc2(args, writer): #currently running
+def new_uc2(args, writer): #not yet running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
@@ -367,8 +324,11 @@ def new_uc2(args, writer): #currently running
 
     args.training_type = "uc2"
 
-    bases = [13]#[12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
-    targs = [14]#[14, 13, 12, 13, 12, 14]
+    # bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
+    # targs = [14, 13, 12, 13, 12, 14]
+
+    bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
+    targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -403,7 +363,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc(args, writer)
+        pete_2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

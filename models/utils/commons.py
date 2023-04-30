@@ -259,21 +259,20 @@ def get_ds_num_classes(dataset):
 
 def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
-
-    if args.training_type in ["uc2", "pete_2"]:
-            state = get_state_for_da(args)
-            model.load_state_dict(state['model'], strict=False)
             
-    elif (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
+    if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
         if args.do_gradual_base_pretrain and load_saved_state(args, pretrain_level="1") is not None:
             logging.info("Using base pretrained model")
 
             state = load_saved_state(args, pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
 
+        elif args.training_type in ["uc2", "pete_2"]:
+            state = get_state_for_da(args)
+            model.load_state_dict(state['model'], strict=False)
+
         else:
             logging.info("Using downloaded swav pretrained model")
-            
             model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
     # elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "uc":

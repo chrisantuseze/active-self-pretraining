@@ -432,7 +432,7 @@ class PretextTrainer():
 
         state = None
         if self.args.al_pretext_from_pretrain:
-            if self.args.training_type == "uc2":
+            if self.args.training_type in ["uc2", "pete_2"]:
                 state = get_state_for_da(self.args)
                 model.load_state_dict(state['model'], strict=False)
 
