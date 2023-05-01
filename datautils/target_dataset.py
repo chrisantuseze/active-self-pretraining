@@ -158,9 +158,9 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
     #     print("using the Generated dataset after AL")
     #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
     
-    # if training_type == TrainingType.BASE_PRETRAIN:
-    #     print("using the proxy dataset")
-    #     return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
+    if args.training_type == "new_tacc3" and training_type == TrainingType.BASE_PRETRAIN:
+        print("using the proxy dataset")
+        return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
         
 
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:

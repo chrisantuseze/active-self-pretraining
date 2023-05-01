@@ -56,28 +56,6 @@ def pretrain_budget(args, writer):
         args.al_trainer_sample_size = ratio
         run_sequence(args, writer)
 
-def b_bt_gpt_gp(args, writer):
-    # run_sequence(args, writer)
-
-    args.base_pretrain = True
-    args.target_pretrain = True
-    run_sequence(args, writer) #Do GP-T-F
-
-
-    args.base_pretrain = False
-    args.do_gradual_base_pretrain = False
-    args.target_pretrain = True
-    pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-T-F
-    classifier.train_and_eval()
-
-    args.target_pretrain = False
-    args.base_pretrain = False
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1") #Do B-F
-    classifier.train_and_eval()
-
 def pete(args, writer): #currently running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
@@ -140,49 +118,22 @@ def run_sequence_eurosat(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-
-def ham(args, writer): # replace this with modern_office
-    # Now evaluating ham GASP-DA + T
-    args.target_pretrain = True
-
-    al_trainer_sample_size = [1800, 1200, 600]
-    args.base_dataset = 7
-    args.target_dataset = 7
-    args.lc_dataset = 7
-
-    for ratio in al_trainer_sample_size:
-        args.al_trainer_sample_size = ratio
-        run_sequence_ham(args, writer)
-
-def run_sequence_ham(args, writer):
-    if args.base_pretrain:
-            logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
-
-            # pretext = PretextTrainer(args, writer)
-            # pretext.do_active_learning()
-
-    if args.target_pretrain:
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
-
-
-def modern_office(args, writer):
+def modern_office1(args, writer): #not yet running
     # Now evaluating ham GASP-DA
     args.target_pretrain = False
 
-    al_trainer_sample_size = [1300, 800, 400]
+    al_trainer_sample_size = [800, 400] #[1300, 800, 400]
     args.base_dataset = 11
     args.target_dataset = 11
     args.lc_dataset = 11
 
+    args.training_type = "modern_office1"
+
     for ratio in al_trainer_sample_size:
         args.al_trainer_sample_size = ratio
-        run_sequence_modern_office(args, writer)
+        run_sequence_modern_office1(args, writer)
 
-def run_sequence_modern_office(args, writer):
+def run_sequence_modern_office1(args, writer):
     if args.base_pretrain:
             logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
 
@@ -196,7 +147,32 @@ def run_sequence_modern_office(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
+def modern_office2(args, writer): #not yet running
+    # Now evaluating ham GASP-DA + T
+    args.target_pretrain = True
 
+    al_trainer_sample_size = [1300, 800, 400]
+    args.base_dataset = 11
+    args.target_dataset = 11
+    args.lc_dataset = 11
+
+    for ratio in al_trainer_sample_size:
+        args.al_trainer_sample_size = ratio
+        run_sequence_modern_office2(args, writer)
+
+def run_sequence_modern_office2(args, writer):
+    if args.base_pretrain:
+            logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
+
+            # pretext = PretextTrainer(args, writer)
+            # pretext.do_active_learning()
+
+    if args.target_pretrain:
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
+
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
 
 
 def tacc(args, writer): # done
@@ -259,6 +235,23 @@ def run_sequence_new_tacc2(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
+
+def new_tacc3(args, writer): #not yet running
+    args.base_dataset = 1
+    args.target_dataset = 9
+    args.lc_dataset = 9
+    args.training_type = "new_tacc3"
+
+    args.base_epochs = 400
+
+    args.base_pretrain = True
+    args.do_gradual_base_pretrain = False
+    args.target_pretrain = True
+
+    # pretrainer = SelfSupPretrainer(args, writer)
+    # pretrainer.first_pretrain()
+
+    run_sequence_uc(args, writer)
 
 def uc(args, writer): #done
     # this is for source-proxy hierarchical pretraining (B-P-T-F)
@@ -363,7 +356,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_2(args, writer)
+        new_tacc3(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
