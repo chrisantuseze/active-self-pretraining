@@ -118,7 +118,7 @@ def run_sequence_eurosat(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def modern_office1(args, writer): #not yet running
+def modern_office1(args, writer): #currently running
     # Now evaluating ham GASP-DA
     args.target_pretrain = False
 
@@ -236,7 +236,7 @@ def run_sequence_new_tacc2(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def new_tacc3(args, writer): #currently running
+def new_tacc3(args, writer): #done running
     # this is for source-proxy hierarchical pretraining (B-P-T-F)
     args.base_dataset = 1
     args.target_dataset = 9
@@ -289,7 +289,7 @@ def run_sequence_uc(args, writer):
     classifier.train_and_eval()
 
 
-def new_uc(args, writer): #currently running
+def new_uc(args, writer): #done running
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
     args.target_pretrain = True
@@ -309,7 +309,7 @@ def new_uc(args, writer): #currently running
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
-def new_uc2(args, writer): #not yet running
+def new_uc2(args, writer): #currently running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
@@ -357,7 +357,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        modern_office1(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
