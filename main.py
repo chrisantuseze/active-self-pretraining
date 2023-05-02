@@ -65,7 +65,7 @@ def pete(args, writer): #currently running
 
     args.training_type = "pete"
 
-    datasets = [2, 4, 5, 6, 7, 8, 9, 10, 11]
+    datasets = [9, 11] #[2, 4, 5, 6, 7, 8, 9, 10, 11]
     for ds in datasets:
         args.base_dataset = ds
         args.target_dataset = ds
@@ -208,7 +208,7 @@ def run_sequence_tacc(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def new_tacc2(args, writer): #currently running
+def new_tacc2(args, writer): #done running
     # this is for single iteration pretraining with GAN (B-T-F)
     args.do_gradual_base_pretrain = False
     args.base_pretrain = False
@@ -236,7 +236,8 @@ def run_sequence_new_tacc2(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def new_tacc3(args, writer): #not yet running
+def new_tacc3(args, writer): #currently running
+    # this is for source-proxy hierarchical pretraining (B-P-T-F)
     args.base_dataset = 1
     args.target_dataset = 9
     args.lc_dataset = 9
@@ -356,7 +357,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_tacc3(args, writer)
+        pete(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
