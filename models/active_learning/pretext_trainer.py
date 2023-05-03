@@ -491,6 +491,7 @@ class PretextTrainer():
         return samplek[: int(len(samplek) * self.args.al_gen_sample_percentage)]
 
     def do_active_learning(self) -> List[PathLoss]:
+        logging.info(f"Base = {get_dataset_enum(self.args.base_dataset)}, Target = {get_dataset_enum(self.args.target_dataset)}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
