@@ -118,7 +118,7 @@ def run_sequence_eurosat(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def modern_office1(args, writer): #currently running
+def modern_office1(args, writer): #done running
     # Now evaluating ham GASP-DA
     args.target_pretrain = False
 
@@ -147,7 +147,7 @@ def run_sequence_modern_office1(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def modern_office2(args, writer): #not yet running
+def modern_office2(args, writer): #currently running
     # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
 
@@ -357,7 +357,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        modern_office1(args, writer)
+        modern_office2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
