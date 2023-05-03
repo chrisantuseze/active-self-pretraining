@@ -151,7 +151,7 @@ def modern_office2(args, writer): #currently running
     # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
 
-    al_trainer_sample_size = [1300, 800, 400]
+    al_trainer_sample_size = [800, 400]
     args.base_dataset = 11
     args.target_dataset = 11
     args.lc_dataset = 11
@@ -360,7 +360,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        modern_office2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
