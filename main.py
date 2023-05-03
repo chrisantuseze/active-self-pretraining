@@ -321,8 +321,11 @@ def new_uc2(args, writer): #currently running
     # bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
     # targs = [14, 13, 12, 13, 12, 14]
 
-    bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
-    targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
+    # bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
+    # targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
+
+    bases = [16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
+    targs = [18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -357,7 +360,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        modern_office2(args, writer)
+        new_uc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

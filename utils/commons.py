@@ -30,7 +30,6 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
     torch.save(state, out)
 
     print("checkpoint saved at {}".format(out))
-    args.resume = out
 
 def load_saved_state(args, recent=True, pretrain_level="1"):
     try:
@@ -45,7 +44,7 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         additional_ext = get_accuracy_file_ext(args)
         logging.info(f"Appending the extension, {additional_ext}")
 
-        out = args.resume if recent and args.resume else os.path.join(
+        out = os.path.join(
                 args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
             )
 
