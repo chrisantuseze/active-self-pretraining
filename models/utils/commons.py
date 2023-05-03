@@ -261,10 +261,10 @@ def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
             
     if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
-        if args.do_gradual_base_pretrain and load_saved_state(args, pretrain_level="1") is not None:
+        state = load_saved_state(args, pretrain_level="1")
+        if args.do_gradual_base_pretrain and state is not None:
             logging.info("Using base pretrained model")
 
-            state = load_saved_state(args, pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
 
         elif args.training_type in ["uc2", "pete_2"]:
