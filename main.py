@@ -86,8 +86,11 @@ def pete_2(args, writer): #currently running
 
     args.training_type = "pete_2"
 
-    bases = [8, 15, 9] # C-S, P-C, S-P
-    targs = [9, 8, 15]
+    # bases = [8, 15, 9] # C-S, P-C, S-P
+    # targs = [9, 8, 15]
+
+    bases = [15, 9] # P-C, S-P
+    targs = [8, 15]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -360,7 +363,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        modern_office1(args, writer)
+        pete_2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
