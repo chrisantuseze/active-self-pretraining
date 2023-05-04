@@ -363,7 +363,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_2(args, writer)
+        modern_office2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
