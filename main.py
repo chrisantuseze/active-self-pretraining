@@ -330,6 +330,7 @@ def new_uc2(args, writer): #currently running
 
     args.target_dataset = 19
     args.lc_dataset = 19
+    args.al_trainer_sample_size = 827
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
