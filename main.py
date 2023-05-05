@@ -328,8 +328,13 @@ def new_uc2(args, writer): #currently running
     # bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
     # targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
 
-    bases = [16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
-    targs = [18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
+    args.target_dataset = 19
+    args.lc_dataset = 19
+    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier.train_and_eval()
+
+    bases = [17, 17, 17, 18, 18, 18, 19, 19, 19] # A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
+    targs = [16, 18, 19, 16, 17, 19, 16, 17, 18]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
