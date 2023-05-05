@@ -545,7 +545,7 @@ class PretextTrainer():
         logging.info(f"Size of the original data is {len(path_loss)}")
 
         if self.args.training_type in ['uc2', 'pete_2']:
-            self.args.al_trainer_sample_size = int((len(path_loss))//self.args.al_batches)
+            self.args.al_trainer_sample_size = int((0.95 * len(path_loss))//self.args.al_batches)
 
         logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
 
