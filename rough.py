@@ -18,8 +18,8 @@ with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
 with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
     zip_ref.extractall("generated_clip_art") 
 
-# with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_product") 
+with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_product") 
 
 # with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_real_world") 
