@@ -12,14 +12,14 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_eurosat") 
 
-with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_artistic") 
+# with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_artistic") 
 
-with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_clip_art") 
+# with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_clip_art") 
 
-with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_product") 
+# with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_product") 
 
 with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
     zip_ref.extractall("generated_real_world") 
@@ -42,8 +42,8 @@ with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
 # with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
 #     zip_ref.extractall("office-31") 
 
-with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
-    zip_ref.extractall("officehome") 
+# with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
+#     zip_ref.extractall("officehome") 
 
 
 # arr = [3, 4, 1, 0, 6]
