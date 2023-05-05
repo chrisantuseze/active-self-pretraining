@@ -318,7 +318,7 @@ def new_uc2(args, writer): #currently running
     args.target_pretrain = False
 
     args.target_epochs = 400
-    args.base_epochs = 150
+    args.base_epochs = 100 #150
 
     args.training_type = "uc2"
 

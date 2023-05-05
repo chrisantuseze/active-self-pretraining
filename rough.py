@@ -12,17 +12,17 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_eurosat") 
 
-# with zipfile.ZipFile("datasets/generated_ham10000.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_ham10000") 
+with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_artistic") 
 
-# with zipfile.ZipFile("datasets/generated_flowers.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_flowers") 
+with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_clip_art") 
 
-# with zipfile.ZipFile("datasets/generated_modern_office_31.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_modern_office_31") 
+# with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_product") 
 
-# with zipfile.ZipFile("datasets/generated_clipart.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_ucmerced") 
+# with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_real_world") 
 
 # with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
 #     zip_ref.extractall("eurosat") 
