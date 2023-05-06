@@ -67,7 +67,7 @@ def pete_2(args, writer): #currently running
 
     args.training_type = "pete_2"
 
-    al = [13373, 9278, ]
+    al = [13373, 9278, 6641]
 
     bases = [8, 15, 9] # C-S, P-C, S-P
     targs = [9, 8, 15]
@@ -79,6 +79,7 @@ def pete_2(args, writer): #currently running
         # run_sequence_new_uc2(args, writer, bases[i], targs[i])
         args.target_dataset = targs[i]
         args.lc_dataset = targs[i]
+        args.al_trainer_sample_size = al[i]
 
         classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
         classifier.train_and_eval()
