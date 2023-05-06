@@ -56,70 +56,32 @@ def pretrain_budget(args, writer):
         args.al_trainer_sample_size = ratio
         run_sequence(args, writer)
 
-def pete(args, writer): #currently running
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
-
-    args.target_epochs = 400
-
-    args.training_type = "pete"
-
-    datasets = [9, 11] #[2, 4, 5, 6, 7, 8, 9, 10, 11]
-    for ds in datasets:
-        args.base_dataset = ds
-        args.target_dataset = ds
-        args.lc_dataset = ds
-
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        classifier.train_and_eval()
-
 def pete_2(args, writer): #currently running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
 
     args.target_epochs = 200
+    args.base_epochs = 75
+    args.lc_epochs = 200
 
     args.training_type = "pete_2"
 
-    # bases = [8, 15, 9] # C-S, P-C, S-P
-    # targs = [9, 8, 15]
+    al = [13373, 9278, ]
 
-    bases = [15, 9] # P-C, S-P
-    targs = [8, 15]
+    bases = [8, 15, 9] # C-S, P-C, S-P
+    targs = [9, 8, 15]
+
+    # bases = [15, 9] # P-C, S-P
+    # targs = [8, 15]
 
     for i in range(len(bases)):
-        run_sequence_new_uc2(args, writer, bases[i], targs[i])
+        # run_sequence_new_uc2(args, writer, bases[i], targs[i])
+        args.target_dataset = targs[i]
+        args.lc_dataset = targs[i]
 
-def eurosat(args, writer): # replace this with pete_1
-    # Now evaluating eurosat GASP-DA + T
-    args.target_pretrain = True
-
-    al_trainer_sample_size = [5000, 3240, 1620]
-
-    for ratio in al_trainer_sample_size:
-        args.al_trainer_sample_size = ratio
-        run_sequence_eurosat(args, writer)
-
-def run_sequence_eurosat(args, writer):
-    if args.base_pretrain:
-            # do_gen_ai(args)
-
-            logging.info(f"Using a pretrain size of {args.al_trainer_sample_size} per AL batch.")
-
-            # pretext = PretextTrainer(args, writer)
-            # pretext.do_active_learning()
-
-    if args.target_pretrain:
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
+        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+        classifier.train_and_eval()
 
 def modern_office1(args, writer): #done running
     # Now evaluating ham GASP-DA
@@ -150,7 +112,7 @@ def run_sequence_modern_office1(args, writer):
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
 
-def modern_office2(args, writer): #currently running
+def modern_office2(args, writer): #done running
     # Now evaluating ham GASP-DA + T
     args.target_pretrain = True
 
@@ -329,11 +291,11 @@ def new_uc2(args, writer): #currently running
     # bases = [16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19, 19] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
     # targs = [17, 18, 19, 16, 18, 19, 16, 17, 19, 16, 17, 18]
 
-    # bases = [16, 16, 16, 17, 17, 17] # A-P, A-R, C-A, C-P, C-R
-    # targs = [17, 18, 19, 16, 18, 19]
+    # bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
+    # targs = [17, 18, 19, 16, 18, 19] #---> UC
 
     bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    targs = [18, 17, 16, 19, 17, 16]
+    targs = [18, 17, 16, 19, 17, 16] #---> TACC
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -368,7 +330,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        pete_2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
