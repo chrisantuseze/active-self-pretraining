@@ -3,7 +3,7 @@ from datautils.path_loss import PathLoss
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 from models.utils.training_type_enum import TrainingType
-from datautils import dataset_enum, cifar10, imagenet
+from datautils import dataset_enum, imagenet
 
 class BasePretrainer():
     def __init__(self, args) -> None:
@@ -16,9 +16,6 @@ class BasePretrainer():
 
         if self.args.base_dataset == dataset_enum.DatasetType.IMAGENET.value:
             train_loader = imagenet.ImageNet(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
-
-        elif self.args.base_dataset == dataset_enum.DatasetType.CIFAR10.value:
-            train_loader = cifar10.CIFAR10(self.args, training_type=TrainingType.BASE_PRETRAIN).get_loader()
 
         else:
             img_path = glob.glob(f'{self.args.dataset_dir}/{self.args.base_dataset}/*')            

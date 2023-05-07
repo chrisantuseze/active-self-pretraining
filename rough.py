@@ -2,48 +2,9 @@
 import sys
 
 import zipfile
-# with zipfile.ZipFile("datasets/generated_ucmerced.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_ucmerced") 
 
-# with zipfile.ZipFile("datasets/generated_sketch.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_sketch") 
-
-
-# with zipfile.ZipFile("datasets/generated_eurosat.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_eurosat") 
-
-# with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_artistic") 
-
-# with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_clip_art") 
-
-# with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
-#     zip_ref.extractall("generated_product") 
-
-with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_real_world") 
-
-# with zipfile.ZipFile("datasets/EuroSAT.zip", 'r') as zip_ref:
-#     zip_ref.extractall("eurosat") 
-
-# with zipfile.ZipFile("datasets/clipart.zip", 'r') as zip_ref:
-#     zip_ref.extractall("clipart")
-
-# with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
-#     zip_ref.extractall("sketch")
-
-# with zipfile.ZipFile("datasets/painting.zip", 'r') as zip_ref:
-#     zip_ref.extractall("painting") 
-
-# with zipfile.ZipFile("datasets/sketch.zip", 'r') as zip_ref:
-#     zip_ref.extractall("sketch") 
-
-# with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
-#     zip_ref.extractall("office-31") 
-
-# with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
-#     zip_ref.extractall("officehome") 
+with zipfile.ZipFile("datasets/office-31.zip", 'r') as zip_ref:
+    zip_ref.extractall("office-31") 
 
 
 # arr = [3, 4, 1, 0, 6]

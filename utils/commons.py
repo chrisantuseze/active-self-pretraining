@@ -238,4 +238,34 @@ def get_state_for_da(args):
 
     return simple_load_model(args, path=filename)
     
+def get_office_31_model(args):
+    prefix = "swav"
+
+    pretrain_level = 1
+
+    bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
+    targs = [14, 13, 12, 13, 12, 14]
+
+    if args.base_dataset == 12 and args.target_dataset == 14:
+        suffix = "amazon_dslr_75_94"
+
+    elif args.base_dataset == 12 and args.target_dataset == 13:
+        suffix = "amazon_webcam_75_151"
+
+    elif args.base_dataset == 14 and args.target_dataset == 12:
+        suffix = "dslr_amazon_75_535"
+
+    elif args.base_dataset == 14 and args.target_dataset == 13:
+        suffix = "dslr_webcam_75_151"
+
+    elif args.base_dataset == 13 and args.target_dataset == 12:
+        suffix = "webcam_amazon_75_535"
+
+    elif args.base_dataset == 13 and args.target_dataset == 14:
+        suffix = "webcam_dslr_75_94"
+
+    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, suffix)
+    logging.info(f"Loading [tacc] checkpoint from - {filename}")
+
+    return simple_load_model(args, path=filename)
 
