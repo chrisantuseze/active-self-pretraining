@@ -187,8 +187,11 @@ def new_uc2(args, writer): #currently running
     # bases = [16, 17, 17, 18, 18, 19] #A-R, C-A, C-R, P-A, P-R, R-A
     # targs = [19, 16, 19, 16, 19, 16]
 
-    bases = [16, 17, 17] #A-R, C-A, C-R
-    targs = [19, 16, 19]
+    # bases = [16, 17, 17] #A-R, C-A, C-R
+    # targs = [19, 16, 19] # --->UC
+
+    bases = [18, 18, 19] #P-A, P-R, R-A
+    targs = [16, 19, 16] #---> TACC
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
