@@ -181,8 +181,14 @@ def new_uc2(args, writer): #currently running
     # bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
     # targs = [17, 18, 19, 16, 18, 19] #---> UC
 
-    bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    targs = [18, 17, 16, 19, 17, 16] #---> TACC
+    # bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
+    # targs = [18, 17, 16, 19, 17, 16] #---> TACC
+
+    # bases = [16, 17, 17, 18, 18, 19] #A-R, C-A, C-R, P-A, P-R, R-A
+    # targs = [19, 16, 19, 16, 19, 16]
+
+    bases = [16, 17, 17] #A-R, C-A, C-R
+    targs = [19, 16, 19]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -217,7 +223,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        tacc(args, writer)
+        new_uc2(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")

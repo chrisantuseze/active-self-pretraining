@@ -526,7 +526,7 @@ class PretextTrainer():
         gen_filename = f'generated_{get_dataset_enum(self.args.target_dataset)}'
         gen_images = glob.glob(f'{self.args.dataset_dir}/{gen_filename}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
-        pretraining_sample_pool.extend(pretraining_gen_images) #TODO Uncomment this if new idea does not work
+        # pretraining_sample_pool.extend(pretraining_gen_images) #TODO Uncomment this if new idea does not work
 
 
         # # adding proxy images
