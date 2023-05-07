@@ -87,9 +87,6 @@ class PretextDataLoader():
                 elif self.args.method == SSL_Method.DCL.value:
                     transforms = TransformsDCL(self.image_size)
 
-                elif self.args.method == SSL_Method.MYOW.value:
-                    transforms = transforms.Compose([transforms.ToTensor()])
-
                 else:
                     ValueError
 

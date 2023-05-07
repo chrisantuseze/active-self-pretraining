@@ -32,9 +32,6 @@ class ImageNet():
             elif self.method == SSL_Method.DCL.value:
                 transforms = TransformsDCL(self.image_size)
 
-            elif self.method == SSL_Method.MYOW.value:
-                transforms = Compose([ToTensor()])
-
             elif self.method == SSL_Method.SUPERVISED.value:
                 transforms = Transforms(self.image_size)
 

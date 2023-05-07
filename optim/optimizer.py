@@ -5,7 +5,6 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.optim import SGD, Adam
 
 from models.utils.training_type_enum import Params
-from .lars import LARS
 import utils.logger as logging
 
 
@@ -70,21 +69,6 @@ def load_optimizer(args, params, state=None, train_params: Params=None, train_lo
                 optimizer, train_params.epochs, eta_min=args.lc_final_lr
             )
 
-    elif train_params.optimizer == "LARS":
-        # optimized using LARS with linear learning rate scaling
-        # (i.e. LearningRate = 0.3 × BatchSize/256) and weight decay of 10−6.
-        lr = train_params.lr * train_params.batch_size/256
-        optimizer = LARS(
-            params,
-            lr=lr,
-            weight_decay=train_params.weight_decay,
-            exclude_from_weight_decay=["batch_normalization", "bias"],
-        )
-
-        # "decay the learning rate with the cosine decay schedule without restarts"
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, train_params.epochs, eta_min=0, last_epoch=-1
-        )
     else:
         raise ValueError
 

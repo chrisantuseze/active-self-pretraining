@@ -3,9 +3,8 @@ from enum import Enum
 class SSL_Method(Enum):
     SIMCLR = 0
     DCL = 1
-    MYOW = 2
-    SWAV = 3
-    SUPERVISED = 4
+    SWAV = 2
+    SUPERVISED = 3
 
 
 def get_ssl_method(value: int):
@@ -14,9 +13,6 @@ def get_ssl_method(value: int):
 
     elif value == SSL_Method.DCL.value:
         prefix = "dcl"
-
-    elif value == SSL_Method.MYOW.value:
-        prefix = "myow"
 
     elif value == SSL_Method.SWAV.value:
         prefix = "swav"

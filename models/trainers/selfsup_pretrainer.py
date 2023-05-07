@@ -57,16 +57,6 @@ class SelfSupPretrainer(BasePretrainer):
                 log_step=log_step
             )
 
-        elif self.args.method == SSL_Method.MYOW.value:
-            # trainer = get_myow_trainer(
-            #     self.args, self.writer, 
-            #     encoder, train_loader, 
-            #     pretrain_level=pretrain_level, 
-            #     trainingType=trainingType, 
-            #     log_step=log_step
-            # )
-            pass
-
         else:
             ValueError
 
