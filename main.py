@@ -126,8 +126,11 @@ def tacc(args, writer):
     # bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
     # targs = [14, 13, 12, 13, 12, 14]
 
-    bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    targs = [18, 17, 16, 19, 17, 16] #---> TACC
+    # bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
+    # targs = [18, 17, 16, 19, 17, 16] #---> TACC
+
+    bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
+    targs = [17, 18, 19, 16, 18, 19] #---> UC
 
 
     for i in range(len(bases)):

@@ -274,8 +274,31 @@ def get_office_home_model(args):
 
     pretrain_level = 1
 
-    bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    targs = [18, 17, 16, 19, 17, 16] #---> TACC2, 13, 12, 14]
+    bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
+    targs = [17, 18, 19, 16, 18, 19] #---> UC
+
+    # bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
+    # targs = [18, 17, 16, 19, 17, 16] #---> TACC2, 13, 12, 14]
+
+    if args.base_dataset == 16 and args.target_dataset == 17:
+        suffix = "artistic_clip_art_75_873"
+
+    elif args.base_dataset == 16 and args.target_dataset == 18:
+        suffix = "artistic_product_75_887"
+
+    elif args.base_dataset == 16 and args.target_dataset == 19:
+        suffix = "artistic_real_world_75_871"
+
+    elif args.base_dataset == 17 and args.target_dataset == 16:
+        suffix = "clip_art_artistic_75_485"
+
+    elif args.base_dataset == 17 and args.target_dataset == 18:
+        suffix = "clip_art_product_75_887"
+
+    elif args.base_dataset == 17 and args.target_dataset == 19:
+        suffix = "clip_art_real_world_75_871"
+
+
 
     if args.base_dataset == 19 and args.target_dataset == 18:
         suffix = "real_world_product_75_887"
