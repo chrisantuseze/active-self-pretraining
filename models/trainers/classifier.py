@@ -13,7 +13,7 @@ from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_ds_num_classes, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from models.utils.early_stopping import EarlyStopping
-from utils.commons import get_accuracy_file_ext, get_office_31_model, load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
+from utils.commons import get_accuracy_file_ext, get_office_31_model, get_office_home_model, load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -28,8 +28,8 @@ class Classifier:
             state = simple_load_model(self.args, path='finetuner.pth')
 
         elif args.training_type == "tacc":
-            logging.info(f"Using pretrained office-31 model weights")
-            state = get_office_31_model(self.args)
+            logging.info(f"Using pretrained officehome model weights")
+            state = get_office_home_model(self.args)
 
         else:
             logging.info(f"Using pretrained {pretrain_level} model weights")

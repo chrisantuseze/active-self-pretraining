@@ -269,3 +269,34 @@ def get_office_31_model(args):
 
     return simple_load_model(args, path=filename)
 
+def get_office_home_model(args):
+    prefix = "swav"
+
+    pretrain_level = 1
+
+    bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
+    targs = [18, 17, 16, 19, 17, 16] #---> TACC2, 13, 12, 14]
+
+    if args.base_dataset == 19 and args.target_dataset == 18:
+        suffix = "real_world_product_75_887"
+
+    elif args.base_dataset == 19 and args.target_dataset == 17:
+        suffix = "real_world_clip_art_75_873"
+
+    elif args.base_dataset == 19 and args.target_dataset == 16:
+        suffix = "real_world_artistic_75_485"
+
+    elif args.base_dataset == 18 and args.target_dataset == 19:
+        suffix = "product_real_world_75_871"
+
+    elif args.base_dataset == 18 and args.target_dataset == 17:
+        suffix = "product_clip_art_75_873"
+
+    elif args.base_dataset == 18 and args.target_dataset == 16:
+        suffix = "product_artistic_75_485"
+
+    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, suffix)
+    logging.info(f"Loading [tacc] checkpoint from - {filename}")
+
+    return simple_load_model(args, path=filename)
+
