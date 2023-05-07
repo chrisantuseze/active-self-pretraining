@@ -27,9 +27,9 @@ class Classifier:
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
 
-        elif args.training_type == "tacc":
-            logging.info(f"Using pretrained officehome model weights")
-            state = get_office_home_model(self.args)
+        # elif args.training_type == "tacc":
+        #     logging.info(f"Using pretrained officehome model weights")
+        #     state = get_office_home_model(self.args)
 
         else:
             logging.info(f"Using pretrained {pretrain_level} model weights")
