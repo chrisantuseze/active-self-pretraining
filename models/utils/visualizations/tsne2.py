@@ -106,4 +106,7 @@ def tsne_similarity(args):
     plt.scatter(dataset2_embedding[:,0], dataset2_embedding[:,1], color='blue', label='Dataset 2')
     plt.scatter(dataset3_embedding[:,0], dataset3_embedding[:,1], color='green', label='Dataset 3')
     plt.legend()
-    plt.show()
+    plt.savefig(f'{args.model_misc_path}/tsne.png')
+    logging.info("Plot saved.")
+
+    
