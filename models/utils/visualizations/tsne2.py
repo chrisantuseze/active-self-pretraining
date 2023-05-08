@@ -44,7 +44,7 @@ def extract_features(model, dataset):
             features.append(model(images.unsqueeze(0)).squeeze()) #output.cpu().numpy())
             labels.append(target.numpy())
     
-    features = np.concatenate(features, axis=0)
+    # features = np.concatenate(features, axis=0)
     labels = np.concatenate(labels, axis=0)
     return features
 
