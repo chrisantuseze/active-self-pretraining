@@ -87,7 +87,7 @@ def tsne_similarity(args):
     dataset3_features = extract_features(model, dataset3)
 
     # Concatenate the features into a single feature matrix
-    features = torch.cat([torch.stack(dataset1_features), torch.stack(dataset2_features), torch.stack(dataset3_features)])
+    features = torch.tensor([torch.stack(dataset1_features), torch.stack(dataset2_features), torch.stack(dataset3_features)])
 
     # Compute the pairwise cosine similarities between the features
     similarities = torch.matmul(features, features.t())
