@@ -55,6 +55,7 @@ def tsne_similarity(args):
 
     # Remove the last fully connected layer
     model = torch.nn.Sequential(*(list(model.children())[:-1]))
+    model = model.to(args.device)
 
     # Define a data transformation pipeline
     transform = transforms.Compose([
