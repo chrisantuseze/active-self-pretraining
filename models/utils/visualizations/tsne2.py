@@ -70,17 +70,16 @@ def tsne_similarity(args):
 
     # Load images from the three datasets and extract their features
     args.target_dataset = 16
+    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
+    dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
     ds = f"generated_{get_dataset_enum(args.target_dataset)}"
     img_path = get_images_pathlist(f'{args.dataset_dir}/{ds}', with_train=True)
     path_loss_list = [PathLoss(path, 0) for path in img_path]
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
 
-    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
-    dataset1 = ds_1.get_dataset(transform, is_tsne=True)
-
     args.target_dataset = 19
-    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
+    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
     dataset3 = ds_3.get_dataset(transform, is_tsne=True)
     
     dataset1_features = extract_features(model, dataset1)
