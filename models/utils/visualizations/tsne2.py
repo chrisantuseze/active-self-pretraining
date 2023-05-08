@@ -11,6 +11,7 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataset
 from models.utils.commons import get_images_pathlist
 from models.utils.training_type_enum import TrainingType
+from models.utils.transformations import Transforms
 
 import utils.logger as logging
 
@@ -58,22 +59,25 @@ def tsne_similarity(args):
     model = model.to(args.device)
 
     # Define a data transformation pipeline
-    transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    # transform = transforms.Compose([
+    #     transforms.Resize(256),
+    #     transforms.CenterCrop(224),
+    #     transforms.ToTensor(),
+    #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    # ])
+
+    transform = Transforms(args.target_image_size)
 
     # Load images from the three datasets and extract their features
-    args.target_dataset = 16
-    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
-    dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
     ds = f"generated_{get_dataset_enum(args.target_dataset)}"
     img_path = get_images_pathlist(f'{args.dataset_dir}/{ds}', with_train=True)
     path_loss_list = [PathLoss(path, 0) for path in img_path]
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
+
+    args.target_dataset = 16
+    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
+    dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
     args.target_dataset = 19
     ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
