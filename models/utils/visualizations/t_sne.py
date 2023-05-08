@@ -34,8 +34,11 @@ class FeatureSim():
         ds_2 = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING)
         dataset2 = ds_2.get_dataset(transform, is_tsne=True)
 
+        ds_3 = get_target_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING)
+        dataset3 = ds_3.get_dataset(transform, is_tsne=True)
+
         # Combine the datasets into a single tensor
-        combined_data = torch.utils.data.ConcatDataset([dataset1, dataset2])
+        combined_data = torch.utils.data.ConcatDataset([dataset1, dataset2, dataset3])
 
         # Create a dataloader to load the data in batches
         dataloader = torch.utils.data.DataLoader(combined_data, batch_size=1000, shuffle=True)

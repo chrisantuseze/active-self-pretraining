@@ -23,6 +23,7 @@ from models.trainers.classifier import Classifier
 import utils.logger as logging
 
 from models.gan.train import do_gen_ai
+from models.utils.visualizations.tsne2 import tsne_similarity
 
 logging.init()
 
@@ -110,36 +111,6 @@ def run_sequence_new_tacc2(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
-
-def tacc(args, writer):
-    args.do_gradual_base_pretrain = True
-    args.base_pretrain = True
-    args.target_pretrain = False
-
-    args.target_epochs = 400
-    args.base_epochs = 75
-    args.lc_epochs = 200
-    args.lc_batch_size = 64
-
-    args.training_type = "tacc"
-
-    # bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
-    # targs = [14, 13, 12, 13, 12, 14]
-
-    # bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    # targs = [18, 17, 16, 19, 17, 16] #---> TACC
-
-    bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
-    targs = [17, 18, 19, 16, 18, 19] #---> UC
-
-
-    for i in range(len(bases)):
-        args.base_dataset = bases[i]
-        args.target_dataset = targs[i]
-        args.lc_dataset = targs[i]
-
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        classifier.train_and_eval()
 
 def new_uc(args, writer): #done running
     args.do_gradual_base_pretrain = False
@@ -251,8 +222,9 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    main(args)
+    # main(args)
     # FeatureSim(args).compute_similarity()
+    tsne_similarity(args)
 
     logging.info("CASL ended.")
 
