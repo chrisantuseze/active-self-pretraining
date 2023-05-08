@@ -1,6 +1,8 @@
 from enum import Enum
 import torch
 import torchvision.transforms as transforms
+import torch.nn.functional as F
+
 from typing import List
 from PIL import Image
 import random
@@ -225,6 +227,8 @@ class MakeBatchDataset(torch.utils.data.Dataset):
             label = path.split('/')[-2]
 
         if self.is_tnse:
+            max_shape = max(img.shape)
+            img = F.pad(img, (0, max_shape - img.shape[1], 0, max_shape - img.shape[0]))
             return img, label
         
         save_class_names(self.args, label)

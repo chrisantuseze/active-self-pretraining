@@ -35,6 +35,8 @@ def extract_features(model, dataset):
     labels = []
     with torch.no_grad():
         for images, target in dataloader:
+            
+        
             # Move the data to the GPU if available
             if torch.cuda.is_available():
                 images = images.cuda()
@@ -70,7 +72,7 @@ def tsne_similarity(args):
 
     # Load images from the three datasets and extract their features
     args.target_dataset = 16
-    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
+    ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
     ds = f"generated_{get_dataset_enum(args.target_dataset)}"
@@ -79,7 +81,7 @@ def tsne_similarity(args):
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
 
     args.target_dataset = 19
-    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN)
+    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset3 = ds_3.get_dataset(transform, is_tsne=True)
     
     dataset1_features = extract_features(model, dataset1)
