@@ -41,7 +41,7 @@ def extract_features(model, dataset):
             
             # Extract the features using the pre-trained model
             output = model(images)
-            features.append(model(images.unsqueeze(0)).squeeze()) #output.cpu().numpy())
+            features.append(output.cpu())
             labels.append(target.numpy())
     
     # features = np.concatenate(features, axis=0)
