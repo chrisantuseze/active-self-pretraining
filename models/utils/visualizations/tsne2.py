@@ -12,6 +12,8 @@ from models.active_learning.pretext_dataloader import PretextDataset
 from models.utils.commons import get_images_pathlist
 from models.utils.training_type_enum import TrainingType
 
+import utils.logger as logging
+
 # # Define a function to extract features from an image using the ResNet-18 model
 # def extract_features(image):
 #     with torch.no_grad():
@@ -26,6 +28,7 @@ def extract_features(model, dataset):
         shuffle=True, num_workers=4,
         pin_memory=True,)
 
+    logging.info("Extracting features...")
 
     features = []
     labels = []
@@ -89,6 +92,8 @@ def tsne_similarity(args):
 
     # Apply t-SNE to the similarities to obtain a 2D embedding
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
+
+    logging.info("Generating TSNE embeddings...")
     embedding = tsne.fit_transform(similarities.cpu().numpy())
 
     # Split the embedding back into the three datasets
