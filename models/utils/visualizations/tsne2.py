@@ -25,7 +25,7 @@ import utils.logger as logging
 def extract_features(model, dataset):
     # Create a dataloader to load the data in batches
     dataloader = torch.utils.data.DataLoader(
-        dataset, batch_size=1000, 
+        dataset, batch_size=512, 
         shuffle=True, num_workers=4,
         pin_memory=True,)
 
