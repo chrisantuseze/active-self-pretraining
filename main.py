@@ -156,13 +156,13 @@ def new_uc2(args, writer): #currently running
     # targs = [18, 17, 16, 19, 17, 16] #---> TACC
 
     # bases = [16, 17, 17, 18, 18, 19] #A-R, C-A, C-R, P-A, P-R, R-A
-    # targs = [19, 16, 19, 16, 19, 16]
+    # targs = [19, 16, 19, 16, 19, 16] 
 
-    # bases = [16, 17, 17] #A-R, C-A, C-R
-    # targs = [19, 16, 19] # --->UC
+    bases = [16, 17, 17] #A-R, C-A, C-R
+    targs = [19, 16, 19] # --->UC
 
-    bases = [18, 18, 19] #P-A, P-R, R-A
-    targs = [16, 19, 16] #---> TACC
+    # bases = [18, 18, 19] #P-A, P-R, R-A
+    # targs = [16, 19, 16] #---> TACC
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -222,9 +222,9 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
 
-    # main(args)
+    main(args)
     # FeatureSim(args).compute_similarity()
-    tsne_similarity(args)
+    # tsne_similarity(args)
 
     logging.info("CASL ended.")
 
