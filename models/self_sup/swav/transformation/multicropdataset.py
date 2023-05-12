@@ -43,9 +43,6 @@ class MultiCropDataset(datasets.ImageFolder):
         mean = [0.485, 0.456, 0.406]
         std = [0.228, 0.224, 0.225]
 
-        # mean = [0.4914, 0.4822, 0.4465]
-        # std = [0.2023, 0.1994, 0.2010]
-
         trans = []
         for i in range(len(size_crops)):
             randomresizedcrop = transforms.RandomResizedCrop(

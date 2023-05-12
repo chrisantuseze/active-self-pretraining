@@ -66,7 +66,6 @@ def train(args):
     saved_model_folder, saved_image_folder = get_dir(args)
     policy = 'color,translation'
 
-    # args.ckpt = f'{saved_model_folder}/gan5_imagenet_model_50000.pth' #gan5_{args.path}_model_50000.pth'
     checkpoint = args.ckpt
 
     percept = lpips.PerceptualLoss(model='net-lin', net='vgg', model_path=args.ckpt, use_gpu=use_cuda)

@@ -94,21 +94,6 @@ class TargetDataset():
                 img_path = glob.glob(self.dir + '/*')
                 logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
-                # real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
-                # random.shuffle(real_target)
-
-                # augment_size = len(real_target) #1000
-                # logging.info(f"Augmenting {augment_size} real target images to the generated dataset")
-                # img_path.extend(real_target[0:augment_size])
-
-                # #TODO: This is only for gan1
-                # source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
-                # random.shuffle(source_proxy)
-
-                # augment_size = 500
-                # logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
-                # img_path.extend(source_proxy[0:augment_size])
-
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
                 dataset = PretextMultiCropDataset(
@@ -140,8 +125,26 @@ class TargetDataset():
             )
         
         else:
-            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
-            loader, dataset = swav.train_loader, swav.train_dataset
+            if self.args.target_dataset in [dataset_enum.DatasetType.MNIST_M, dataset_enum.DatasetType.SVHN]:
+                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
+                path_loss_list = [PathLoss(path, 0) for path in img_path]
+                
+                dataset = PretextMultiCropDataset(
+                    self.args,
+                    path_loss_list,
+                )
+
+                loader = torch.utils.data.DataLoader(
+                    dataset,
+                    batch_size=self.batch_size,
+                    pin_memory=True,
+                    shuffle=self.is_train, 
+                    num_workers=self.args.workers
+                )
+            
+            else:
+                swav = TransformsSwAV(self.args, self.batch_size, self.dir)
+                loader, dataset = swav.train_loader, swav.train_dataset
         
         logging.info(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
 
@@ -158,7 +161,6 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
     if args.training_type == "new_tacc3" and training_type == TrainingType.BASE_PRETRAIN:
         print("using the proxy dataset")
         return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
-        
 
     if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
         print("using the CHEST XRAY dataset")
@@ -238,7 +240,7 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
 
     elif args.target_dataset == dataset_enum.DatasetType.USPS.value:
         print("using the USPS dataset")
-        return TargetDataset(args, "/usps", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/usps", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.SYN_DIGITS.value:
         print("using the SYN_DIGITS dataset")

@@ -73,23 +73,20 @@ class  ImageFolder(Dataset):
         return img_path
 
     def _parse_frame(self):
-        if self.dataset in ['chest_xray', 'imagenet']:
+        if self.dataset in ['chest_xray', 'mnist', 'usps']:
             self.dir = f'{self.dir}/train'
 
-        elif self.dataset in ['ucmerced', 'amazon', 'webcam', 'dslr']:
+        elif self.dataset in ['amazon', 'webcam', 'dslr']:
             self.dir = f'{self.dir}/images'
 
         print(self.dir)
 
         if self.dataset == "modern_office_31":
             img_path = glob.glob(self.dir + '/*/*/*')
+        elif self.dataset in ["mnist_m", "svhn"]:
+            img_path = glob.glob(self.dir + '/*')
         else:
             img_path = glob.glob(self.dir + '/*/*')
-
-        # mixing the dataset with some source proxy
-        # source_proxy = glob.glob(f'datasets/cifar10/train/*/*')
-        # random.shuffle(source_proxy)
-        # img_path.extend(source_proxy[0:500])
 
         random.shuffle(img_path)
 

@@ -315,11 +315,14 @@ def get_images_pathlist(dir, with_train):
     if dir == "./datasets/modern_office_31":
         return glob.glob(dir + '/*/*/*')
 
+    elif dir in ["./datasets/mnist_m", "./datasets/svhn"]:
+        return glob.glob(dir + '/*')
+
     if "./datasets/generated" in dir.split('_'):
         img_path = glob.glob(dir + '/*')
 
     elif with_train:
-        if dir in ["./datasets/imagenet", "./datasets/chest_xray"]:
+        if dir in ["./datasets/mnist", "./datasets/usps", "./datasets/chest_xray"]:
             img_path = glob.glob(dir + '/train/*/*')
         else:
             img_path = glob.glob(dir + '/train/*/*')
