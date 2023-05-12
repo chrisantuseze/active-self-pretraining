@@ -58,7 +58,6 @@ def get_dir(args):
 
 
 class  ImageFolder(Dataset):
-    """docstring for ArtDataset"""
     def __init__(self, dataset, transform=None, distillation=False):
         super(ImageFolder, self).__init__()
         self.dataset = dataset
