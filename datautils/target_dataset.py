@@ -125,8 +125,7 @@ class TargetDataset():
             )
         
         else:
-            logging.info(f"{self.args.target_dataset}")
-            if self.args.target_dataset in [dataset_enum.DatasetType.MNIST_M, dataset_enum.DatasetType.SVHN]:
+            if self.args.target_dataset in [18, 19]:
                 img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=True)
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
