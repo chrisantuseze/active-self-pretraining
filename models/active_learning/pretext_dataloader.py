@@ -37,13 +37,10 @@ class PretextDataLoader():
         if is_val:
             val_path_loss_list = []
 
-            if self.args.target_dataset in [DatasetType.IMAGENET.value, DatasetType.CHEST_XRAY.value]:
+            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value]:
                 img_paths = glob.glob(self.dir + '/train/*/*')# img_paths = glob.glob(self.dir + '/train/*/*/*')
             
-            elif self.args.target_dataset == DatasetType.CIFAR10.value:
-                img_paths = glob.glob(self.args.dataset_dir + '/cifar10v2/train/*/*')
-
-            elif self.args.target_dataset in [DatasetType.UCMERCED.value, DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
+            elif self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
                 img_paths = glob.glob(self.dir + '/images/*/*')
 
             elif self.args.target_dataset == DatasetType.MODERN_OFFICE_31.value:
@@ -132,15 +129,12 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
+        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value]:
             img = pil_loader(path)
         else:
             img = Image.open(path)
 
-        if self.args.target_dataset == DatasetType.IMAGENET.value:
-            label = path.split('/')[-2]
-        else:
-            label = path.split('/')[-2]
+        label = path.split('/')[-2]
 
         return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
@@ -185,7 +179,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.IMAGENET.value, DatasetType.MODERN_OFFICE_31.value]:
+        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value]:
             image = pil_loader(path)
         else:
             image = Image.open(path)
