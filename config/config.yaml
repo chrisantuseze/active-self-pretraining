@@ -12,6 +12,7 @@ temperature: 0.1                              # see appendix B.7.: Optimal tempe
 # reload options
 model_checkpoint_path: "save/checkpoints"     # directory where all checkpoints would be saved
 model_misc_path: "save/misc"                  # directory where all misc files would be saved
+gen_images_path: "generated"
 epoch_num: 50                                 # use to determine the base checkpoint to be used for the AL cycle
 reload: False                                 # indicates whether to start the training from the checkpoint or not
 
