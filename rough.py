@@ -3,20 +3,17 @@ import sys
 
 import zipfile
 
-with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_artistic") 
+with zipfile.ZipFile("datasets/mnist.zip", 'r') as zip_ref:
+    zip_ref.extractall("mnist") 
 
-with zipfile.ZipFile("datasets/generated_clip_art.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_clip_art") 
+with zipfile.ZipFile("datasets/mnist_m.zip", 'r') as zip_ref:
+    zip_ref.extractall("mnist_m") 
 
-with zipfile.ZipFile("datasets/generated_product.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_product") 
+with zipfile.ZipFile("datasets/svhn.zip", 'r') as zip_ref:
+    zip_ref.extractall("svhn") 
 
-with zipfile.ZipFile("datasets/generated_real_world.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_real_world") 
-
-with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
-    zip_ref.extractall("officehome") 
+with zipfile.ZipFile("datasets/usps.zip", 'r') as zip_ref:
+    zip_ref.extractall("usps") 
 
 
 # arr = [3, 4, 1, 0, 6]

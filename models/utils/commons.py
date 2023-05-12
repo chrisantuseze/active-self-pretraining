@@ -175,21 +175,9 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 
 
 def get_ds_num_classes(dataset):
-    if dataset == DatasetType.REAL.value:
-        num_classes = 345
-        dir = "/real"
-
-    elif dataset == DatasetType.IMAGENET.value:
-        num_classes = 10#200
-        dir = "/imagenet"
-
-    elif dataset == DatasetType.CHEST_XRAY.value:
+    if dataset == DatasetType.CHEST_XRAY.value:
         num_classes = 100
         dir = "/chest_xray"
-
-    elif dataset == DatasetType.UCMERCED.value:
-        num_classes = 21
-        dir = "/ucmerced/images"
 
     elif dataset == DatasetType.EUROSAT.value:
         num_classes = 10
@@ -251,9 +239,26 @@ def get_ds_num_classes(dataset):
         num_classes = 65
         dir = "/real_world"
 
-    else:
+    elif dataset == DatasetType.MNIST.value:
         num_classes = 10
-        dir = "/cifar10"
+        dir = "/mnist"
+
+    elif dataset == DatasetType.MNIST_M.value:
+        num_classes = 10
+        dir = "/mnist_m"
+
+    elif dataset == DatasetType.SVHN.value:
+        num_classes = 10
+        dir = "/svhn"
+
+    elif dataset == DatasetType.USPS.value:
+        num_classes = 10
+        dir = "/usps"
+
+    elif dataset == DatasetType.SYN_DIGITS.value:
+        num_classes = 10
+        dir = "/syn_digits"
+
     
     return num_classes, dir
 

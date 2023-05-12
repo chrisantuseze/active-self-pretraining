@@ -164,22 +164,6 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the CHEST XRAY dataset")
         return TargetDataset(args, "/chest_xray", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.REAL.value:
-        print("using the REAL dataset")
-        return TargetDataset(args, "/real", training_type, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.UCMERCED.value:
-        print("using the UCMERCED dataset")
-        return TargetDataset(args, "/ucmerced/images", training_type, is_train=is_train, batch_size=batch_size)
-    
-    elif args.target_dataset == dataset_enum.DatasetType.IMAGENET.value:
-        print("using the IMAGENET dataset")
-        return TargetDataset(args, "/imagenet", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.CIFAR10.value:
-        print("using the CIFAR10 dataset")
-        return TargetDataset(args, "/cifar10v2", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
     elif args.target_dataset == dataset_enum.DatasetType.FLOWERS.value:
         print("using the FLOWERS dataset")
         return TargetDataset(args, "/flowers", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
@@ -239,6 +223,26 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
     elif args.target_dataset == dataset_enum.DatasetType.REAL_WORLD.value:
         print("using the OfficeHome REAL_WORLD dataset")
         return TargetDataset(args, "/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+    
+    elif args.target_dataset == dataset_enum.DatasetType.MNIST.value:
+        print("using the MNIST dataset")
+        return TargetDataset(args, "/mnist", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.MNIST_M.value:
+        print("using the MNIST_M dataset")
+        return TargetDataset(args, "/mnist_m", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.SVHN.value:
+        print("using the SVHN dataset")
+        return TargetDataset(args, "/svhn", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.USPS.value:
+        print("using the USPS dataset")
+        return TargetDataset(args, "/usps", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+
+    elif args.target_dataset == dataset_enum.DatasetType.SYN_DIGITS.value:
+        print("using the SYN_DIGITS dataset")
+        return TargetDataset(args, "/syn_digits", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError

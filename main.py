@@ -56,33 +56,24 @@ def pretrain_budget(args, writer):
         args.al_trainer_sample_size = ratio
         run_sequence(args, writer)
 
-def pete_2(args, writer): #currently running
-    args.do_gradual_base_pretrain = True
-    args.base_pretrain = True
-    args.target_pretrain = False
+def pete_1(args, writer): #currently running
+    args.do_gradual_base_pretrain = False
+    args.base_pretrain = False
+    args.target_pretrain = True
 
-    args.target_epochs = 200
-    args.base_epochs = 75
-    args.lc_epochs = 200
+    args.target_epochs = 400
 
-    args.training_type = "pete_2"
+    args.training_type = "pete_1"
 
-    al = [13373, 9278, 6641]
+    ds = [16, 17, 18, 19]
 
-    bases = [8, 15, 9] # C-S, P-C, S-P
-    targs = [9, 8, 15]
+    for i in range(len(ds)):
+        args.target_dataset = ds[i]
 
-    # bases = [15, 9] # P-C, S-P
-    # targs = [8, 15]
+        do_gen_ai(args)
 
-    for i in range(len(bases)):
-        # run_sequence_new_uc2(args, writer, bases[i], targs[i])
-        args.target_dataset = targs[i]
-        args.lc_dataset = targs[i]
-        args.al_trainer_sample_size = al[i]
-
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        classifier.train_and_eval()
+        pretrainer = SelfSupPretrainer(args, writer)
+        pretrainer.second_pretrain()
 
 def new_tacc2(args, writer): #done running
     # this is for single iteration pretraining with GAN (B-T-F)
@@ -132,7 +123,7 @@ def new_uc(args, writer): #done running
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
 
-def new_uc2(args, writer): #currently running
+def new_uc2(args, writer): #done running
     args.do_gradual_base_pretrain = True
     args.base_pretrain = True
     args.target_pretrain = False
@@ -197,7 +188,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        new_uc2(args, writer)
+        pete_1(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
@@ -220,7 +211,7 @@ if __name__ == "__main__":
     assert args.target_dataset == args.lc_dataset
     assert args.base_dataset == args.target_dataset
 
-    args.base_dataset = f'generated_{get_dataset_enum(args.base_dataset)}'
+    args.base_dataset = f'generated_{get_dataset_enum(args.target_dataset)}'
 
     main(args)
     # FeatureSim(args).compute_similarity()

@@ -1,45 +1,36 @@
 from enum import Enum
 
 class DatasetType(Enum):
-    IMAGENET = 0
-    CIFAR10 = 1
-    CHEST_XRAY = 2
-    REAL = 3
-    UCMERCED = 4
-    EUROSAT = 5
-    FLOWERS = 6
-    HAM10000 = 7
-    CLIPART = 8
-    SKETCH = 9
-    QUICKDRAW = 10
-    MODERN_OFFICE_31 = 11
+    CHEST_XRAY = 0
+    EUROSAT = 1
+    FLOWERS = 2
+    HAM10000 = 3
+    
+    CLIPART = 4
+    SKETCH = 5
+    QUICKDRAW = 6
+    PAINTING = 7
 
-    AMAZON = 12
-    WEBCAM = 13
-    DSLR = 14
+    MODERN_OFFICE_31 = 8
 
-    PAINTING = 15
+    AMAZON = 9
+    WEBCAM = 10
+    DSLR = 11
 
-    ARTISTIC = 16
-    CLIP_ART = 17
-    PRODUCT = 18
-    REAL_WORLD = 19
+    ARTISTIC = 12
+    CLIP_ART = 13
+    PRODUCT = 14
+    REAL_WORLD = 15
+
+    MNIST = 16
+    MNIST_M = 17
+    SVHN = 18
+    USPS = 19
+    SYN_DIGITS = 20
 
 def get_dataset_enum(value: int):
-    if value == DatasetType.IMAGENET.value:
-        return "imagenet"
-
-    if value == DatasetType.CIFAR10.value:
-        return "cifar10"
-
     if value == DatasetType.CHEST_XRAY.value:
         return "chest_xray"
-
-    if value == DatasetType.REAL.value:
-        return "real"
-
-    if value == DatasetType.UCMERCED.value:
-        return "ucmerced"
     
     if value == DatasetType.EUROSAT.value:
         return "eurosat"
@@ -85,3 +76,18 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.REAL_WORLD.value:
         return "real_world"
+
+    if value == DatasetType.MNIST.value:
+        return "mnist"
+
+    if value == DatasetType.MNIST_M.value:
+        return "mnist_m"
+
+    if value == DatasetType.SVHN.value:
+        return "svhn"
+
+    if value == DatasetType.USPS.value:
+        return "usps"
+
+    if value == DatasetType.SYN_DIGITS.value:
+        return "syn_digits"
