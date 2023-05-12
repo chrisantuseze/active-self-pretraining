@@ -71,7 +71,7 @@ def pete_1(args, writer): #currently running
     for i in range(len(ds)):
         args.target_dataset = ds[i]
 
-        do_gen_ai(args)
+        # do_gen_ai(args)
 
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
