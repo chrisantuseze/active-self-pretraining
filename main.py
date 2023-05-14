@@ -67,7 +67,7 @@ def pete_1(args, writer): #currently running
 
     # ds = [16, 17] #pete 1
     # ds = [18, 19] #pete 2
-    ds = [17] #pete 3
+    ds = [17, 19] #pete 3
 
     for i in range(len(ds)):
         args.target_dataset = ds[i]
