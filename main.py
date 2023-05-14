@@ -65,8 +65,8 @@ def pete_1(args, writer): #currently running
 
     args.training_type = "pete_1"
 
-    ds = [19]#[16] #pete 1
-    # ds = [18] #pete 2
+    # ds = [16] #pete 1
+    ds = [19] #[18] #pete 2
     # ds = [17] #pete 3
 
     for i in range(len(ds)):
