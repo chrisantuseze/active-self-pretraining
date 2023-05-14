@@ -3,14 +3,14 @@ import sys
 
 import zipfile
 
-with zipfile.ZipFile("datasets/mnist.zip", 'r') as zip_ref:
-    zip_ref.extractall("mnist") 
+# with zipfile.ZipFile("datasets/mnist.zip", 'r') as zip_ref:
+#     zip_ref.extractall("mnist") 
 
 with zipfile.ZipFile("datasets/mnist_m.zip", 'r') as zip_ref:
     zip_ref.extractall("mnist_m") 
 
-with zipfile.ZipFile("datasets/svhn.zip", 'r') as zip_ref:
-    zip_ref.extractall("svhn") 
+# with zipfile.ZipFile("datasets/svhn.zip", 'r') as zip_ref:
+#     zip_ref.extractall("svhn") 
 
 with zipfile.ZipFile("datasets/usps.zip", 'r') as zip_ref:
     zip_ref.extractall("usps") 
