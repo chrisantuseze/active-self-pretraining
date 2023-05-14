@@ -65,9 +65,9 @@ def pete_1(args, writer): #currently running
 
     args.training_type = "pete_1"
 
-    # ds = [16, 17] #pete 1
-    # ds = [18, 19] #pete 2
-    ds = [17, 19] #pete 3
+    ds = [19]#[16] #pete 1
+    # ds = [18] #pete 2
+    # ds = [17] #pete 3
 
     for i in range(len(ds)):
         args.target_dataset = ds[i]
@@ -76,6 +76,23 @@ def pete_1(args, writer): #currently running
 
         pretrainer = SelfSupPretrainer(args, writer)
         pretrainer.second_pretrain()
+
+def pete(args, writer):
+    args.do_gradual_base_pretrain = True
+    args.base_pretrain = True
+    args.target_pretrain = False
+
+    args.target_epochs = 400
+    args.base_epochs = 75
+    args.lc_epochs = 200
+
+    args.training_type = "uc2"
+
+    bases = [16] #pete 1
+    targs = []
+
+    for i in range(len(bases)):
+        run_sequence_new_uc2(args, writer, bases[i], targs[i])
 
 def new_tacc2(args, writer): #done running
     # this is for single iteration pretraining with GAN (B-T-F)
@@ -104,26 +121,6 @@ def run_sequence_new_tacc2(args, writer):
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
-
-def new_uc(args, writer): #done running
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
-
-    args.target_epochs = 400
-
-    args.training_type = "uc"
-
-    datasets = [16, 17, 18, 19] # A, C, P, R
-    for ds in datasets:
-        args.base_dataset = ds
-        args.target_dataset = ds
-        args.lc_dataset = ds
-
-        do_gen_ai(args)
-
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
 
 def new_uc2(args, writer): #done running
     args.do_gradual_base_pretrain = True
