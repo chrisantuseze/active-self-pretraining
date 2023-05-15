@@ -33,10 +33,14 @@ def tsne_similarity(args):
     ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
-    ds = f"generated_{get_dataset_enum(args.target_dataset)}"
-    img_path = get_images_pathlist(f'{args.dataset_dir}/{ds}', with_train=True)
-    path_loss_list = [PathLoss(path, 0) for path in img_path]
-    dataset2 = PretextDataset(args, path_loss_list, transform, False)
+    # ds = f"generated_{get_dataset_enum(args.target_dataset)}"
+    # img_path = get_images_pathlist(f'{args.dataset_dir}/{ds}', with_train=True)
+    # path_loss_list = [PathLoss(path, 0) for path in img_path]
+    # dataset2 = PretextDataset(args, path_loss_list, transform, False)
+
+    args.target_dataset = 13
+    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
+    dataset2 = ds_3.get_dataset(transform, is_tsne=True)
 
     # Create data loaders for each dataset
     data_loader1 = torch.utils.data.DataLoader(dataset1, batch_size=512, shuffle=False)
@@ -77,8 +81,8 @@ def tsne_similarity(args):
     embedded_data2 = embeddings[len(dataset1):]
 
     # Create a scatter plot
-    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
-    plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
+    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Artistic') #Artistic
+    plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Clip Art') #Intermediate
 
     # Plot the t-SNE embeddings
     # plt.scatter(embeddings[:, 0], embeddings[:, 1])
