@@ -44,10 +44,10 @@ def extract_features(model, dataset):
             # Extract the features using the pre-trained model
             output = model(images)
             features.append(output.cpu())
-            labels.append(target.numpy())
+            # labels.append(target.numpy())
     
     # features = np.concatenate(features, axis=0)
-    labels = np.concatenate(labels, axis=0)
+    # labels = np.concatenate(labels, axis=0)
     return features
 
 def tsne_similarity(args):
