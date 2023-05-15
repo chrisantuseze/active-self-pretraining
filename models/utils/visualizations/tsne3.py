@@ -92,8 +92,7 @@ def tsne_similarity(args):
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
 
     distances = distances.cpu()
-    logging.info(distances.shape)
-    nsamples, nx, ny = distances.shape
+    nsamples, nx, ny, nz = distances.shape
     distances = distances.reshape((nsamples, nx*ny))
 
     embeddings = tsne.fit_transform(distances)
