@@ -566,7 +566,6 @@ class PretextTrainer():
             # pretraining_sample_pool = []
             # ################################
 
-            batch += 1 
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
@@ -575,7 +574,6 @@ class PretextTrainer():
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                logging.info(sample6400)
                 samplek = self.batch_sampler(batch_sampler_encoder, sample6400)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
