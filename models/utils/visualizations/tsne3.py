@@ -89,8 +89,13 @@ def tsne_similarity(args):
     logging.info("Generating TSNE embeddings...")
 
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2)
-    embeddings = tsne.fit_transform(distances.cpu())
+    tsne = TSNE(n_components=2, perplexity=30, random_state=0)
+
+    distances = distances.cpu()
+    nsamples, nx, ny = distances.shape
+    distances = distances.reshape((nsamples, nx*ny))
+
+    embeddings = tsne.fit_transform(distances)
 
     # Plot the t-SNE embeddings
     num_samples_dataset1 = len(dataset1)
@@ -103,4 +108,5 @@ def tsne_similarity(args):
     plt.scatter(embeddings[num_samples_dataset1+num_samples_dataset2:, 0], 
                 embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='green', label='Dataset 3')
     plt.legend()
-    plt.show()
+    plt.savefig(f'{args.model_misc_path}/tsne.png')
+    logging.info("Plot saved.")
