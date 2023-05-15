@@ -103,7 +103,7 @@ def tsne_similarity(args):
     num_samples_dataset2 = len(dataset2)
     # num_samples_dataset3 = len(dataset3)
 
-    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Chest-Xray')
+    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
     # plt.scatter(embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 0], 
     #             embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 1], c='#5f81c2', label='Intermediate')
     # plt.scatter(embeddings[num_samples_dataset1+num_samples_dataset2:, 0], 
