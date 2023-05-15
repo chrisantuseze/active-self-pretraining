@@ -102,11 +102,11 @@ def tsne_similarity(args):
     num_samples_dataset2 = len(dataset2)
     num_samples_dataset3 = len(dataset3)
 
-    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='red', label='Dataset 1')
+    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
     plt.scatter(embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 0], 
-                embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 1], c='blue', label='Dataset 2')
+                embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 1], c='#5f81c2', label='Intermediate')
     plt.scatter(embeddings[num_samples_dataset1+num_samples_dataset2:, 0], 
-                embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='green', label='Dataset 3')
+                embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='#c26b67', label='Clip Art')
     plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
