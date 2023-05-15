@@ -56,6 +56,7 @@ def tsne_similarity(args):
     distances = torch.cdist(features1, features2)
 
     distances = distances.cpu()
+    logging.info(distances.shape)
     nsamples, nx, ny, nz = distances.shape
     distances = distances.reshape((nsamples, nx*ny))
 
