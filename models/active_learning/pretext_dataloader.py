@@ -136,7 +136,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         label = path.split('/')[-2]
 
-        return self.transform.__call__(img, not self.is_val), self.label_dic[label])
+        return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
     def __init__(
