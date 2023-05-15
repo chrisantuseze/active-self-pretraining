@@ -47,8 +47,8 @@ def tsne_similarity(args):
     model = model.eval()
 
     # Extract features from each dataset
-    features1 = extract_features(data_loader1)
-    features2 = extract_features(data_loader2)
+    features1 = extract_features(args, model, data_loader1)
+    features2 = extract_features(args, model, data_loader2)
 
     logging.info("Generating TSNE embeddings...")
 
