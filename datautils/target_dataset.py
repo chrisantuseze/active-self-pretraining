@@ -125,8 +125,8 @@ class TargetDataset():
             )
         
         else:
-            if self.args.target_dataset in [17, 18]:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=self.args.target_dataset in [18])
+            if self.args.target_dataset in [dataset_enum.DatasetType.MNIST_M.value, dataset_enum.DatasetType.SVHN.value]:
+                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=self.args.target_dataset == dataset_enum.DatasetType.SVHN.value)
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
                 dataset = PretextMultiCropDataset(
@@ -241,10 +241,6 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
     elif args.target_dataset == dataset_enum.DatasetType.USPS.value:
         print("using the USPS dataset")
         return TargetDataset(args, "/usps", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.SYN_DIGITS.value:
-        print("using the SYN_DIGITS dataset")
-        return TargetDataset(args, "/syn_digits", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     else:
         ValueError

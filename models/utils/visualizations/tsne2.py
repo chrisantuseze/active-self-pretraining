@@ -60,18 +60,10 @@ def tsne_similarity(args):
     model = torch.nn.Sequential(*(list(model.children())[:-1]))
     model = model.to(args.device)
 
-    # Define a data transformation pipeline
-    # transform = transforms.Compose([
-    #     transforms.Resize(256),
-    #     transforms.CenterCrop(224),
-    #     transforms.ToTensor(),
-    #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    # ])
-
     transform = Transforms(args.target_image_size)
 
     # Load images from the three datasets and extract their features
-    args.target_dataset = 16
+    args.target_dataset = 12
     ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
@@ -80,7 +72,7 @@ def tsne_similarity(args):
     path_loss_list = [PathLoss(path, 0) for path in img_path]
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
 
-    args.target_dataset = 19
+    args.target_dataset = 13
     ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset3 = ds_3.get_dataset(transform, is_tsne=True)
     

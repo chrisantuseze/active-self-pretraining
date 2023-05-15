@@ -26,7 +26,6 @@ class DatasetType(Enum):
     MNIST_M = 17
     SVHN = 18
     USPS = 19
-    SYN_DIGITS = 20
 
 def get_dataset_enum(value: int):
     if value == DatasetType.CHEST_XRAY.value:
@@ -88,6 +87,3 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.USPS.value:
         return "usps"
-
-    if value == DatasetType.SYN_DIGITS.value:
-        return "syn_digits"

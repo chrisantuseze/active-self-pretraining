@@ -254,11 +254,6 @@ def get_ds_num_classes(dataset):
     elif dataset == DatasetType.USPS.value:
         num_classes = 10
         dir = "/usps"
-
-    elif dataset == DatasetType.SYN_DIGITS.value:
-        num_classes = 10
-        dir = "/syn_digits"
-
     
     return num_classes, dir
 
