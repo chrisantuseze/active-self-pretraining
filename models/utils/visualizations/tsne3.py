@@ -76,7 +76,7 @@ def tsne_similarity(args):
     features = []
     with torch.no_grad():
         for images, _ in data_loader:
-            outputs = outputs.to(args.device)
+            images = images.to(args.device)
             outputs = model(images)
             features.extend(outputs)
 
