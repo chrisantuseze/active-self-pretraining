@@ -136,7 +136,11 @@ class PretextDataset(torch.utils.data.Dataset):
 
         label = path.split('/')[-2]
 
-        return self.transform.__call__(img, not self.is_val), torch.tensor(1) #torch.tensor(self.label_dic[label])
+        image = self.transform.__call__(img, not self.is_val)
+
+        logging.info(type(image))
+
+        return image, torch.tensor(1) #torch.tensor(self.label_dic[label])
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
     def __init__(
@@ -217,8 +221,6 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         label = path.split('/')[-2]
 
         if self.is_tnse:
-            # max_shape = max(img.shape)
-            # img = F.pad(img, (0, max_shape - img.shape[1], 0, max_shape - img.shape[0]))
             return self.transform.__call__(img), label
         
         save_class_names(self.args, label)
