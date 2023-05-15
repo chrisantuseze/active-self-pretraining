@@ -60,9 +60,9 @@ def tsne_similarity(args):
     path_loss_list = [PathLoss(path, 0) for path in img_path]
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
 
-    # args.target_dataset = 13
-    # ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
-    # dataset3 = ds_3.get_dataset(transform, is_tsne=True)
+    args.target_dataset = 13
+    ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
+    dataset2 = ds_3.get_dataset(transform, is_tsne=True)
 
     # Concatenate the datasets
     # concat_dataset = torch.utils.data.ConcatDataset([dataset1, dataset2, dataset3])
@@ -110,7 +110,7 @@ def tsne_similarity(args):
     #             embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='#698e77', label='Clip Art')
 
     plt.scatter(embeddings[num_samples_dataset1:, 0], 
-                embeddings[num_samples_dataset1:, 1], c='#698e77', label='Intermediate')
+                embeddings[num_samples_dataset1:, 1], c='#698e77', label='Clip Art')
     plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
