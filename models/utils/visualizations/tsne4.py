@@ -57,8 +57,8 @@ def tsne_similarity(args):
 
     distances = distances.cpu()
     logging.info(distances.shape)
-    nsamples, nx, ny, nz = distances.shape
-    distances = distances.reshape((nsamples, nx*ny))
+    # nsamples, nx, ny, nz = distances.shape
+    # distances = distances.reshape((nsamples, nx*ny))
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
