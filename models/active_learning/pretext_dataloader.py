@@ -37,8 +37,8 @@ class PretextDataLoader():
         if is_val:
             val_path_loss_list = []
 
-            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value]:
-                img_paths = glob.glob(self.dir + '/train/*/*')# img_paths = glob.glob(self.dir + '/train/*/*/*')
+            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.USPS.value, DatasetType.MNIST.value]:
+                img_paths = glob.glob(self.dir + '/train/*/*')
             
             elif self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
                 img_paths = glob.glob(self.dir + '/images/*/*')
