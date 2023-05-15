@@ -47,7 +47,7 @@ def tsne_similarity(args):
     data_loader2 = torch.utils.data.DataLoader(dataset2, batch_size=512, shuffle=False)
 
     # Load a pre-trained CNN model
-    model = torchvision.models.resnet50(pretrained=True).to(args.device)
+    model = torchvision.models.resnet18(pretrained=True).to(args.device)
     model = model.eval()
 
     # Extract features from each dataset
@@ -72,7 +72,7 @@ def tsne_similarity(args):
     # distances = distances.cpu()
 
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2, perplexity=30, random_state=42)
+    tsne = TSNE(n_components=2, perplexity=30, random_state=0)
     # embeddings = tsne.fit_transform(distances)
     embeddings = tsne.fit_transform(similarities.cpu().numpy())
 
