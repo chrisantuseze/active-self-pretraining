@@ -64,8 +64,16 @@ def tsne_similarity(args):
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
     embeddings = tsne.fit_transform(distances)
 
+    num_samples_dataset1 = len(dataset1)
+    num_samples_dataset2 = len(dataset2)
+
+    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
+    
+    plt.scatter(embeddings[num_samples_dataset1:, 0], 
+                embeddings[num_samples_dataset1:, 1], c='#698e77', label='Intermediate')
+
     # Plot the t-SNE embeddings
-    plt.scatter(embeddings[:, 0], embeddings[:, 1])
+    # plt.scatter(embeddings[:, 0], embeddings[:, 1])
     plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
