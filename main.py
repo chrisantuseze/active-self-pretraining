@@ -88,8 +88,8 @@ def pete(args, writer):
 
     args.training_type = "uc2"
 
-    bases = [16] #pete 1
-    targs = []
+    bases = [18, 16, 19, 16] #pete 1 
+    targs = [16, 19, 16, 17]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -187,7 +187,7 @@ def main(args):
             classifier.train_and_eval() 
 
     else:
-        pete_1(args, writer)
+        pete(args, writer)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="CASL")
