@@ -58,7 +58,7 @@ def tsne_similarity(args):
     distances = distances.cpu()
 
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2, perplexity=30, random_state=0)
+    tsne = TSNE(n_components=2, perplexity=30, random_state=42)
     embeddings = tsne.fit_transform(distances)
 
     # Separate the embedded data into the original datasets
