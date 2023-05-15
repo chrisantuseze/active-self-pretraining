@@ -575,6 +575,7 @@ class PretextTrainer():
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
+                logging.info(sample6400)
                 samplek = self.batch_sampler(batch_sampler_encoder, sample6400)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
