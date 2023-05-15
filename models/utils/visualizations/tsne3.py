@@ -106,7 +106,7 @@ def tsne_similarity(args):
     plt.scatter(embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 0], 
                 embeddings[num_samples_dataset1:num_samples_dataset1+num_samples_dataset2, 1], c='#5f81c2', label='Intermediate')
     plt.scatter(embeddings[num_samples_dataset1+num_samples_dataset2:, 0], 
-                embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='#c26b67', label='Clip Art')
+                embeddings[num_samples_dataset1+num_samples_dataset2:, 1], c='#698e77', label='Clip Art')
     plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
