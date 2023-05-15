@@ -70,10 +70,13 @@ def tsne_similarity(args):
     # Create a data loader
     data_loader = torch.utils.data.DataLoader(concat_dataset, batch_size=512, shuffle=False)
 
+
+    logging.info("Extracting features...")
     # Extract features from the datasets
     features = []
     with torch.no_grad():
         for images, _ in data_loader:
+            outputs = outputs.to(args.device)
             outputs = model(images)
             features.extend(outputs)
 
@@ -82,6 +85,8 @@ def tsne_similarity(args):
 
     # Compute pairwise feature distances
     distances = torch.cdist(features_tensor, features_tensor)
+
+    logging.info("Generating TSNE embeddings...")
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2)
