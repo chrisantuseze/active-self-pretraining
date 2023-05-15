@@ -56,21 +56,24 @@ def tsne_similarity(args):
     distances = torch.cdist(features1, features2)
 
     distances = distances.cpu()
-    logging.info(distances.shape)
-    # nsamples, nx, ny, nz = distances.shape
-    # distances = distances.reshape((nsamples, nx*ny))
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
     embeddings = tsne.fit_transform(distances)
 
-    num_samples_dataset1 = len(dataset1)
-    num_samples_dataset2 = len(dataset2)
+    # Separate the embedded data into the original datasets
+    embedded_data1 = embeddings[:len(dataset1)]
+    embedded_data2 = embeddings[len(dataset1):]
 
-    plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
+    # Create a scatter plot
+    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
+    plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
+
+
+    # plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
     
-    plt.scatter(embeddings[num_samples_dataset1:, 0], 
-                embeddings[num_samples_dataset1:, 1], c='#698e77', label='Intermediate')
+    # plt.scatter(embeddings[num_samples_dataset1:, 0], 
+    #             embeddings[num_samples_dataset1:, 1], c='#698e77', label='Intermediate')
 
     # Plot the t-SNE embeddings
     # plt.scatter(embeddings[:, 0], embeddings[:, 1])
