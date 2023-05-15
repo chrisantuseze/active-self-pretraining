@@ -108,14 +108,14 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        labels = set(load_class_names(self.args))
-        index = 0
-        self.label_dic = {}
-        for label in labels:
-            label = label.replace("\n", "")
-            if label not in self.label_dic:
-                self.label_dic[label] = index
-                index += 1
+        # labels = set(load_class_names(self.args))
+        # index = 0
+        # self.label_dic = {}
+        # for label in labels:
+        #     label = label.replace("\n", "")
+        #     if label not in self.label_dic:
+        #         self.label_dic[label] = index
+        #         index += 1
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -135,7 +135,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         label = path.split('/')[-2]
 
-        return self.transform.__call__(img, not self.is_val), torch.tensor(self.label_dic[label])
+        return self.transform.__call__(img, not self.is_val), torch.tensor("0")#self.label_dic[label])
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
     def __init__(
