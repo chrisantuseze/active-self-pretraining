@@ -23,20 +23,17 @@ import utils.logger as logging
 
 # Define a function to extract features from the data using a pre-trained model
 def extract_features(model, dataset):
-    # Create a dataloader to load the data in batches
     dataloader = torch.utils.data.DataLoader(
-        dataset, batch_size=512, 
+        dataset, batch_size=256, 
         shuffle=True, num_workers=4,
         pin_memory=True,)
 
     logging.info("Extracting features...")
 
     features = []
-    labels = []
     with torch.no_grad():
         for images, target in dataloader:
             
-        
             # Move the data to the GPU if available
             if torch.cuda.is_available():
                 images = images.cuda()
@@ -44,10 +41,7 @@ def extract_features(model, dataset):
             # Extract the features using the pre-trained model
             output = model(images)
             features.append(output.cpu())
-            # labels.append(target.numpy())
     
-    # features = np.concatenate(features, axis=0)
-    # labels = np.concatenate(labels, axis=0)
     return features
 
 def tsne_similarity(args):
