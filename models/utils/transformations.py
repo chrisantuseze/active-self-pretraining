@@ -4,7 +4,8 @@ class Transforms():
     def __init__(self, size):
 
         self.train_transform = transforms.Compose([
-            transforms.RandomResizedCrop(size, scale=(0.2, 1.0)),
+            # transforms.RandomResizedCrop(size, scale=(0.2, 1.0)),
+            transforms.Resize((size, size)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
