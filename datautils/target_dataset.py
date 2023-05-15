@@ -125,8 +125,8 @@ class TargetDataset():
             )
         
         else:
-            if self.args.target_dataset in [17, 18, 19]:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=self.args.target_dataset in [18, 19])
+            if self.args.target_dataset in [17, 18]:
+                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=self.args.target_dataset in [18])
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
                 dataset = PretextMultiCropDataset(
