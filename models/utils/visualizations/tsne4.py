@@ -66,17 +66,11 @@ def tsne_similarity(args):
     embedded_data2 = embeddings[len(dataset1):]
 
     # Create a scatter plot
-    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
-    plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
-
-
-    # plt.scatter(embeddings[:num_samples_dataset1, 0], embeddings[:num_samples_dataset1, 1], c='#ed9a68', label='Artistic')
-    
-    # plt.scatter(embeddings[num_samples_dataset1:, 0], 
-    #             embeddings[num_samples_dataset1:, 1], c='#698e77', label='Intermediate')
+    # plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
+    # plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
 
     # Plot the t-SNE embeddings
-    # plt.scatter(embeddings[:, 0], embeddings[:, 1])
-    plt.legend()
+    plt.scatter(embeddings[:, 0], embeddings[:, 1])
+    # plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
