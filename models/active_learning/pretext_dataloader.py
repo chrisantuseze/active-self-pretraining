@@ -138,7 +138,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         image = self.transform.__call__(img, not self.is_val)
 
-        logging.info(type(image))
+        # logging.info(type(image))
 
         return image, torch.tensor(1) #torch.tensor(self.label_dic[label])
 
@@ -221,7 +221,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         label = path.split('/')[-2]
 
         if self.is_tnse:
-            return self.transform.__call__(img), label
+            return self.transform.__call__(img), torch.tensor(label)
         
         save_class_names(self.args, label)
         
