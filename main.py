@@ -88,8 +88,14 @@ def pete(args, writer):
 
     args.training_type = "uc2"
 
-    bases = [18, 16, 19, 16] #pete 1 
-    targs = [16, 19, 16, 17]
+    # bases = [18, 16, 19, 16] #pete 1 SVHN-MNIST, MNIST-USPS, USPS-MNIST, MNIST-MNIST-M
+    # targs = [16, 19, 16, 17]
+
+    # bases = [18] #SVHN-MNIST
+    # targs = [16]
+
+    bases = [16] #MNIST-USPS
+    targs = [19]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
