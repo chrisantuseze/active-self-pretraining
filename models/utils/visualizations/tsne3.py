@@ -90,7 +90,7 @@ def tsne_similarity(args):
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2)
-    embeddings = tsne.fit_transform(distances)
+    embeddings = tsne.fit_transform(distances.cpu())
 
     # Plot the t-SNE embeddings
     num_samples_dataset1 = len(dataset1)
