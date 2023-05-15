@@ -72,7 +72,6 @@ class PretextDataLoader():
                 batch_size=self.batch_size,
                 num_workers=self.args.workers,
                 pin_memory=True,
-                # drop_last=True
             )
 
         else:
@@ -129,7 +128,7 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value]:
+        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value, DatasetType.MNIST.value, DatasetType.USPS.value]:
             img = pil_loader(path)
         else:
             img = Image.open(path)
@@ -179,13 +178,13 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value, DatasetType.USPS.value]:
+        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value, DatasetType.MNIST.value, DatasetType.USPS.value]:
             image = pil_loader(path)
         else:
             image = Image.open(path)
 
         multi_crops = list(map(lambda trans: trans(image), self.trans))
-        return multi_crops #TODO: Check the len of this multi_crops. Also check if you can use a mined view and an aug view here instead of just aug views.
+        return multi_crops
 
 
 class MakeBatchDataset(torch.utils.data.Dataset):
@@ -196,7 +195,6 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         self.batch_size = params.batch_size
 
         self.dir = dir
-        # self.dir = args.dataset_dir + dir
 
         self.is_train = is_train
         self.is_tnse = is_tsne
@@ -209,16 +207,13 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir in ["./datasets/chest_xray", "./datasets/imagenet", "./datasets/food", "./datasets/modern_office_31"]:
+        if self.dir in ["./datasets/chest_xray", "./datasets/mnist", "./datasets/usps", "./datasets/modern_office_31"]:
             img = pil_loader(self.img_path[idx])
         else:
             img = Image.open(self.img_path[idx])
 
         path = self.img_path[idx] 
-        if self.dir == "./datasets/imagenet":
-            label = path.split('/')[-2]# label = path.split('/')[-3]
-        else:
-            label = path.split('/')[-2]
+        label = path.split('/')[-2]
 
         if self.is_tnse:
             max_shape = max(img.shape)
@@ -246,5 +241,4 @@ class MakeBatchDataset(torch.utils.data.Dataset):
             rotations = [0, 1, 2, 3]
             random.shuffle(rotations)
 
-            # print(imgs[rotations[0]].shape, imgs[rotations[1]].shape, imgs[rotations[2]].shape, imgs[rotations[3]].shape)
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path
