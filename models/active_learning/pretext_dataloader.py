@@ -178,6 +178,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
+        logging.info(path)
         if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value, DatasetType.MNIST.value, DatasetType.USPS.value]:
             image = pil_loader(path)
         else:
