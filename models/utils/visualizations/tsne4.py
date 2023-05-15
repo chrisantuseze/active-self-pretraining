@@ -56,8 +56,8 @@ def tsne_similarity(args):
     # distances = torch.cdist(features1, features2)
     
     features = torch.cat([
-        torch.stack(features1),
-        torch.stack(features2),
+        features1,
+        features2,
     ])
 
     # Compute the pairwise cosine similarities between the features
