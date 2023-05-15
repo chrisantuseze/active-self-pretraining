@@ -85,7 +85,7 @@ def tsne_similarity(args):
     features = torch.cat([
         torch.stack(dataset1_features),
         torch.stack(dataset2_features),
-        torch.stack(dataset3_features).unsqueeze(0).expand_as(dataset1_features)
+        # torch.stack(dataset3_features).unsqueeze(0).expand_as(dataset1_features)
     ])
 
     # Compute the pairwise cosine similarities between the features
@@ -102,12 +102,12 @@ def tsne_similarity(args):
     # Split the embedding back into the three datasets
     dataset1_embedding = embedding[:len(dataset1_features)]
     dataset2_embedding = embedding[len(dataset1_features):len(dataset1_features)+len(dataset2_features)]
-    dataset3_embedding = embedding[len(dataset1_features)+len(dataset2_features):]
+    # dataset3_embedding = embedding[len(dataset1_features)+len(dataset2_features):]
 
     # Visualize the t-SNE embedding using a scatter plot
     plt.scatter(dataset1_embedding[:,0], dataset1_embedding[:,1], color='red', label='Dataset 1')
     plt.scatter(dataset2_embedding[:,0], dataset2_embedding[:,1], color='blue', label='Dataset 2')
-    plt.scatter(dataset3_embedding[:,0], dataset3_embedding[:,1], color='green', label='Dataset 3')
+    # plt.scatter(dataset3_embedding[:,0], dataset3_embedding[:,1], color='green', label='Dataset 3')
     plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
