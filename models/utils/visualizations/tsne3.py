@@ -51,7 +51,7 @@ def tsne_similarity(args):
     transform = Transforms(args.target_image_size)
 
     # Load images from the three datasets and extract their features
-    args.target_dataset = 0 #12
+    args.target_dataset = 12
     ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
