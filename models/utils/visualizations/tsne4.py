@@ -65,7 +65,7 @@ def tsne_similarity(args):
     norms = similarities.norm(dim=1, keepdim=True)
     similarities = similarities / norms / norms.t()
 
-    distances = distances.cpu()
+    # distances = distances.cpu()
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
