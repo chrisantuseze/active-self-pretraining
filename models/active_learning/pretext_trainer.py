@@ -565,7 +565,8 @@ class PretextTrainer():
             # pretraining_sample_pool = []
             # ################################
 
-            if batch >= 0:
+            batch += 1 
+            if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
 
                 state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
