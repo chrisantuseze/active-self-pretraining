@@ -221,7 +221,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         label = path.split('/')[-2]
 
         if self.is_tnse:
-            return self.transform.__call__(img), torch.tensor(label)
+            return self.transform.__call__(img), torch.tensor(0)
         
         save_class_names(self.args, label)
         
