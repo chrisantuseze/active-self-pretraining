@@ -15,12 +15,6 @@ from models.utils.transformations import Transforms
 
 import utils.logger as logging
 
-# # Define a function to extract features from an image using the ResNet-18 model
-# def extract_features(image):
-#     with torch.no_grad():
-#         features = model(image.unsqueeze(0)).squeeze()
-#     return features
-
 # Define a function to extract features from the data using a pre-trained model
 def extract_features(model, dataset):
     dataloader = torch.utils.data.DataLoader(

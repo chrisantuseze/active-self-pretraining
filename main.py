@@ -23,7 +23,7 @@ from models.trainers.classifier import Classifier
 import utils.logger as logging
 
 from models.gan.train import do_gen_ai
-from models.utils.visualizations.tsne2 import tsne_similarity
+from models.utils.visualizations.tsne3 import tsne_similarity
 
 logging.init()
 
