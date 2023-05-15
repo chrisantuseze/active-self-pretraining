@@ -108,6 +108,7 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
+        #TODO Put back after tsne eval
         # labels = set(load_class_names(self.args))
         # index = 0
         # self.label_dic = {}
