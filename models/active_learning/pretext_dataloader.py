@@ -219,7 +219,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         if self.is_tnse:
             # max_shape = max(img.shape)
             # img = F.pad(img, (0, max_shape - img.shape[1], 0, max_shape - img.shape[0]))
-            return img, label
+            return self.transform.__call__(img), label
         
         save_class_names(self.args, label)
         
