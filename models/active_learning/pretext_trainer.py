@@ -161,6 +161,7 @@ class PretextTrainer():
         logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
         _preds = []
 
+        model = model.to(self.args.device)
         model.eval()
         with torch.no_grad():
             for step, (inputs, _) in enumerate(loader):
