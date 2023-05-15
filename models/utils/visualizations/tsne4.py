@@ -53,24 +53,35 @@ def tsne_similarity(args):
     logging.info("Generating TSNE embeddings...")
 
     # Compute pairwise feature distances
-    distances = torch.cdist(features1, features2)
+    # distances = torch.cdist(features1, features2)
+    
+    features = torch.cat([
+        torch.stack(features1),
+        torch.stack(features2),
+    ])
+
+    # Compute the pairwise cosine similarities between the features
+    similarities = torch.matmul(features, features.t())
+    norms = similarities.norm(dim=1, keepdim=True)
+    similarities = similarities / norms / norms.t()
 
     distances = distances.cpu()
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
-    embeddings = tsne.fit_transform(distances)
+    # embeddings = tsne.fit_transform(distances)
+    embeddings = tsne.fit_transform(similarities.cpu().numpy())
 
     # Separate the embedded data into the original datasets
     embedded_data1 = embeddings[:len(dataset1)]
     embedded_data2 = embeddings[len(dataset1):]
 
     # Create a scatter plot
-    # plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
-    # plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
+    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='Data 1')
+    plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Data 2')
 
     # Plot the t-SNE embeddings
-    plt.scatter(embeddings[:, 0], embeddings[:, 1])
-    # plt.legend()
+    # plt.scatter(embeddings[:, 0], embeddings[:, 1])
+    plt.legend()
     plt.savefig(f'{args.model_misc_path}/tsne.png')
     logging.info("Plot saved.")
