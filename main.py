@@ -177,7 +177,7 @@ def run_sequence_new_uc2(args, writer, base, target):
     # pretext = PretextTrainer(args, writer)
     # pretext.do_active_learning()
 
-    args.al_trainer_sample_size = 3999
+    args.al_trainer_sample_size = 8400
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
