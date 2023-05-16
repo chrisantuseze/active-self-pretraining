@@ -94,11 +94,11 @@ def pete(args, writer):
     # bases = [18] #SVHN-MNIST
     # targs = [16]
 
-    # bases = [16] #MNIST-USPS
-    # targs = [19]
+    bases = [16] #MNIST-USPS
+    targs = [19]
 
-    bases = [19] #USPS-MNIST
-    targs = [16]
+    # bases = [19] #USPS-MNIST
+    # targs = [16]
 
     # bases = [16] #MNIST-MNIST-M
     # targs = [17]
@@ -174,8 +174,8 @@ def run_sequence_new_uc2(args, writer, base, target):
     args.target_dataset = target
     args.lc_dataset = target
 
-    pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext = PretextTrainer(args, writer)
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
     classifier.train_and_eval()
