@@ -317,10 +317,7 @@ def get_images_pathlist(dir, with_train):
         img_path = glob.glob(dir + '/*')
 
     elif with_train:
-        if dir in ["./datasets/mnist", "./datasets/usps", "./datasets/chest_xray"]:
-            img_path = glob.glob(dir + '/train/*/*')
-        else:
-            img_path = glob.glob(dir + '/train/*/*')
+        img_path = glob.glob(dir + '/train/*/*')
     else:
         img_path = glob.glob(dir + '/*/*')
 
