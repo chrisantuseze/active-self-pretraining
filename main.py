@@ -82,7 +82,7 @@ def pete(args, writer):
     args.base_pretrain = True
     args.target_pretrain = False
 
-    args.target_epochs = 400
+    args.target_epochs = 200
     args.base_epochs = 75
     args.lc_epochs = 200
 
@@ -97,8 +97,11 @@ def pete(args, writer):
     # bases = [16] #MNIST-USPS
     # targs = [19]
 
-    bases = [16] #MNIST-MNIST-M
-    targs = [17]
+    bases = [19] #USPS-MNIST
+    targs = [16]
+
+    # bases = [16] #MNIST-MNIST-M
+    # targs = [17]
 
     for i in range(len(bases)):
         run_sequence_new_uc2(args, writer, bases[i], targs[i])
@@ -221,9 +224,9 @@ if __name__ == "__main__":
 
     args.base_dataset = f'generated_{get_dataset_enum(args.target_dataset)}'
 
-    # main(args)
+    main(args)
     # FeatureSim(args).compute_similarity()
-    tsne_similarity(args)
+    # tsne_similarity(args)
 
     logging.info("CASL ended.")
 
