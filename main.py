@@ -91,11 +91,11 @@ def pete(args, writer):
     # bases = [18, 16, 19, 16] #pete 1 SVHN-MNIST, MNIST-USPS, USPS-MNIST, MNIST-MNIST-M
     # targs = [16, 19, 16, 17]
 
-    # bases = [18] #SVHN-MNIST
-    # targs = [16]
+    bases = [18] #SVHN-MNIST
+    targs = [16]
 
-    bases = [16] #MNIST-USPS
-    targs = [19]
+    # bases = [16] #MNIST-USPS
+    # targs = [19]
 
     # bases = [19] #USPS-MNIST
     # targs = [16]
