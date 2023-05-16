@@ -6,8 +6,8 @@ import zipfile
 # with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
 #     zip_ref.extractall("generated_artistic") 
 
-with zipfile.ZipFile("datasets/generated_mnist.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_mnist") 
+# with zipfile.ZipFile("datasets/generated_mnist.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_mnist") 
 
 with zipfile.ZipFile("datasets/mnist.zip", 'r') as zip_ref:
     zip_ref.extractall("mnist") 
