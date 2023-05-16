@@ -138,8 +138,6 @@ class PretextDataset(torch.utils.data.Dataset):
 
         image = self.transform.__call__(img, not self.is_val)
 
-        # logging.info(type(image))
-
         return image, torch.tensor(1) #torch.tensor(self.label_dic[label])
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
