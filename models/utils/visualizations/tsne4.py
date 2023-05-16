@@ -58,14 +58,14 @@ def tsne_similarity(args):
     # Extract features from each dataset
     features1 = extract_features(args, model, data_loader1)
     features2 = extract_features(args, model, data_loader2)
-    features3 = extract_features(args, model, data_loader3)
+    # features3 = extract_features(args, model, data_loader3)
 
     logging.info("Generating TSNE embeddings...")
 
     features = torch.cat([
         features1,
         features2,
-        features3,
+        # features3,
     ])
 
     # Compute the pairwise cosine similarities between the features
@@ -79,15 +79,15 @@ def tsne_similarity(args):
 
     # Separate the embedded data into the original datasets
     embedded_data1 = embeddings[:len(dataset1)]
-    # embedded_data2 = embeddings[len(dataset1):]
+    embedded_data2 = embeddings[len(dataset1):]
 
-    embedded_data2 = embeddings[len(dataset1): len(dataset1) + len(dataset2)]
-    embedded_data3 = embeddings[len(dataset1) + len(dataset2):]
+    # embedded_data2 = embeddings[len(dataset1): len(dataset1) + len(dataset2)]
+    # embedded_data3 = embeddings[len(dataset1) + len(dataset2):]
 
     # Create a scatter plot
-    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='MNIST-M') #Artistic
+    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='MNIST') #Artistic
     plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Intermediate') #Intermediate
-    plt.scatter(embedded_data3[:, 0], embedded_data3[:, 1], c='blue', label='USPS') #USPS
+    # plt.scatter(embedded_data3[:, 0], embedded_data3[:, 1], c='blue', label='USPS') #USPS
 
     # Plot the t-SNE embeddings
     plt.legend()
