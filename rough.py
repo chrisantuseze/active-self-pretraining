@@ -3,17 +3,17 @@ import sys
 
 import zipfile
 
-with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_artistic") 
+# with zipfile.ZipFile("datasets/generated_artistic.zip", 'r') as zip_ref:
+#     zip_ref.extractall("generated_artistic") 
 
-with zipfile.ZipFile("datasets/generated_chest_xray.zip", 'r') as zip_ref:
-    zip_ref.extractall("generated_chest_xray") 
+with zipfile.ZipFile("datasets/generated_mnist.zip", 'r') as zip_ref:
+    zip_ref.extractall("generated_mnist") 
 
-with zipfile.ZipFile("datasets/officehome.zip", 'r') as zip_ref:
-    zip_ref.extractall("officehome") 
+with zipfile.ZipFile("datasets/mnist.zip", 'r') as zip_ref:
+    zip_ref.extractall("mnist") 
 
-with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
-    zip_ref.extractall("chest_xray") 
+# with zipfile.ZipFile("datasets/chest_xray.zip", 'r') as zip_ref:
+#     zip_ref.extractall("chest_xray") 
 
 
 # arr = [3, 4, 1, 0, 6]
