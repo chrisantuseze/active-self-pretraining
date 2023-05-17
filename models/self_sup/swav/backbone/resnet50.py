@@ -207,11 +207,11 @@ class ResNet(nn.Module):
                 nn.BatchNorm1d(hidden_mlp),
                 nn.ReLU(inplace=True),
 
-                # nn.Linear(hidden_mlp, hidden_mlp), #TODO: This is from Chris
-                # nn.ReLU(inplace=True), #TODO: This is from Chris
-                nn.Linear(hidden_mlp, 512, bias=False), #TODO: This is from Chris
-                nn.BatchNorm1d(512), #TODO: This is from Chris
-                nn.ReLU(inplace=True), #TODO: This is from Chris
+                ##### added update ##############
+                nn.Linear(hidden_mlp, 512, bias=False),
+                nn.BatchNorm1d(512),
+                nn.ReLU(inplace=True),
+                #################################
 
                 nn.Linear(512, output_dim),
             )

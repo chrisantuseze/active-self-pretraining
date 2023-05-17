@@ -18,7 +18,7 @@ reload: False                                 # indicates whether to start the t
 
 # pretrain options
 
-method: 2                                     # 0 for SimCLR, 1 for DCL, 2 for SwAV, 3 for SUPERVISED, 
+method: 2                                     # 0 for SimCLR, 1 for DCL, 2 for SwAV
 
 ################################ SIMCLR #######################################
 simclr_batch_size: 512
@@ -33,7 +33,6 @@ dcl_base_epochs: 200                      # for all datasets
 dcl_temperature: 0.1                      # 0.1 (ImageNet-1k), 0.07 (Cifar10, Cifar100, STL)
 dcl_optimizer: "DCL"                 # SGD with Cosine annealing scheduler
 dcl_base_lr: 0.03                         # 0.03 * batch_size/256
-# backbone: "resnet50"                  # resnet18 (Cifar10, Cifar100, STL), resnet50 (ImageNet-1k, ImageNet-100)
 
 ################################ SWAV #######################################
 
@@ -120,10 +119,10 @@ use_bn: False
 #########################
 #### optim parameters ###
 #########################
-lc_optimizer: "Classifier" #"Adam-DCL"                # 
+lc_optimizer: "Classifier"
 lc_epochs: 100
 lc_batch_size: 32
-lc_lr: 0.3 #1.0e-2 
+lc_lr: 0.3
 nesterov: False
 scheduler_type: "cosine"
 
@@ -155,4 +154,4 @@ al_train_maintask: False                      # this enables the training of the
 ml_project: False                             # switches to ML Final Project mode 
 do_al_for_ml_project: False                   # switches between AL and regular classification
 
-training_type: "uc"
+training_type: ""
