@@ -1,9 +1,5 @@
 from random import shuffle
 import torch
-import torchvision
-from torchvision.transforms import ToTensor, Compose
-import torchvision.datasets as datasets
-from torch.utils.data import random_split
 from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
 
 from models.utils.commons import get_params, split_dataset
@@ -11,7 +7,6 @@ from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
-from models.utils.transformations import Transforms
 
 
 class ImageNet():
@@ -31,9 +26,6 @@ class ImageNet():
 
             elif self.method == SSL_Method.DCL.value:
                 transforms = TransformsDCL(self.image_size)
-
-            elif self.method == SSL_Method.SUPERVISED.value:
-                transforms = Transforms(self.image_size)
 
             else:
                 NotImplementedError

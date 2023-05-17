@@ -5,7 +5,6 @@ from models.self_sup.simclr.loss.dcl_loss import DCL
 from optim.optimizer import load_optimizer
 from models.utils.commons import get_model_criterion, get_params, AverageMeter, get_params_to_update, prepare_model
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_chkpts, load_saved_state
 
 class SimCLRTrainerV2():
     def __init__(self, 
@@ -39,8 +38,6 @@ class SimCLRTrainerV2():
         data_time = AverageMeter()
         losses = AverageMeter()
 
-        # total_loss, total_num = 0.0, 0
-
         self.model.train()
         end = time.time()
 
@@ -67,9 +64,6 @@ class SimCLRTrainerV2():
             batch_time.update(time.time() - end)
             end = time.time()
 
-            # total_num += self.train_params.batch_size
-            # total_loss += loss.item() * self.train_params.batch_size
-
             if step % self.log_step == 0:
                 logging.info(
                     "Epoch: [{0}][{1}]\t"
@@ -86,7 +80,6 @@ class SimCLRTrainerV2():
                     )
                 )
 
-            # self.writer.add_scalar("Loss/train_epoch", total_loss, self.args.global_step)
             self.args.global_step += 1
 
         return losses.avg

@@ -4,8 +4,6 @@ class SSL_Method(Enum):
     SIMCLR = 0
     DCL = 1
     SWAV = 2
-    SUPERVISED = 3
-
 
 def get_ssl_method(value: int):
     if value == SSL_Method.SIMCLR.value:
@@ -16,8 +14,5 @@ def get_ssl_method(value: int):
 
     elif value == SSL_Method.SWAV.value:
         prefix = "swav"
-
-    elif value == SSL_Method.SUPERVISED.value:
-        prefix = "sup"
 
     return prefix

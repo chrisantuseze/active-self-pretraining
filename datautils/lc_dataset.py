@@ -1,10 +1,7 @@
 import os
 import torch
-import torchvision
 from torch.utils.data import random_split
-import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-from datautils.dataset_enum import DatasetType
 from models.active_learning.pretext_dataloader import PretextDataLoader
 
 from models.utils.commons import get_params, split_dataset

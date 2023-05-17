@@ -13,7 +13,7 @@ import os
 import numpy as np
 import torch
 
-from models.utils.logger import PD_Stats, create_logger
+from models.utils.logger import PD_Stats
 
 FALSY_STRINGS = {"off", "false", "0"}
 TRUTHY_STRINGS = {"on", "true", "1"}

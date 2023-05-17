@@ -66,14 +66,13 @@ class TargetDataset():
 
         return train_loader, val_loader
 
-    def get_loader(self): #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING] or (self.args.training_type == "new_tacc2" and TrainingType.TARGET_PRETRAIN):#, TrainingType.BASE_PRETRAIN]:
+    def get_loader(self):
+        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING] or (self.args.training_type == "single_iter" and TrainingType.TARGET_PRETRAIN) or (self.args.training_type == "proxy_source" and TrainingType.BASE_PRETRAIN):
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
                 dataset = self.get_dataset(transforms)
 
-            # #TODO: Remove the added TARGET_PRETRAIN check after running pete_1 or new_tacc2
-            elif self.args.training_type == "new_tacc2" and self.training_type == TrainingType.TARGET_PRETRAIN:
+            elif self.args.training_type == "single_iter" and self.training_type == TrainingType.TARGET_PRETRAIN:
                 img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
                 logging.info(f"Original size of generated images dataset is {len(img_path)}")
 
@@ -90,9 +89,8 @@ class TargetDataset():
                     path_loss_list,
                 )
 
-            elif self.training_type == TrainingType.BASE_PRETRAIN:
-                img_path = glob.glob(self.dir + '/*')
-                logging.info(f"Original size of generated images dataset is {len(img_path)}")
+            elif self.args.training_type == "proxy_source" and self.training_type == TrainingType.BASE_PRETRAIN:
+                img_path = glob.glob(self.dir + '/train/*/*')
 
                 path_loss_list = [PathLoss(path, 0) for path in img_path]
                 
@@ -108,9 +106,6 @@ class TargetDataset():
                 if self.method == SSL_Method.DCL.value:
                     transforms = TransformsDCL(self.image_size)
 
-                elif self.method == SSL_Method.SUPERVISED.value:
-                    transforms = Transforms(self.image_size)
-
                 else:
                     ValueError
 
@@ -125,26 +120,8 @@ class TargetDataset():
             )
         
         else:
-            if self.args.target_dataset in [dataset_enum.DatasetType.MNIST_M.value, dataset_enum.DatasetType.SVHN.value]:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=self.args.target_dataset == dataset_enum.DatasetType.SVHN.value)
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
-                
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
-
-                loader = torch.utils.data.DataLoader(
-                    dataset,
-                    batch_size=self.batch_size,
-                    pin_memory=True,
-                    shuffle=self.is_train, 
-                    num_workers=self.args.workers
-                )
-            
-            else:
-                swav = TransformsSwAV(self.args, self.batch_size, self.dir)
-                loader, dataset = swav.train_loader, swav.train_dataset
+            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
+            loader, dataset = swav.train_loader, swav.train_dataset
         
         logging.info(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
 
@@ -152,13 +129,8 @@ class TargetDataset():
     
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
-    # comment out the two if's for gradually pretraining
 
-    # if training_type == TrainingType.BASE_AL:
-    #     print("using the Generated dataset after AL")
-    #     return TargetDataset(args, f"/{args.base_dataset}", TrainingType.ACTIVE_LEARNING, is_train=is_train, batch_size=batch_size)
-    
-    if args.training_type == "new_tacc3" and training_type == TrainingType.BASE_PRETRAIN:
+    if args.training_type == "proxy_source" and training_type == TrainingType.BASE_PRETRAIN:
         print("using the proxy dataset")
         return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
 
@@ -226,21 +198,5 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the OfficeHome REAL_WORLD dataset")
         return TargetDataset(args, "/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif args.target_dataset == dataset_enum.DatasetType.MNIST.value:
-        print("using the MNIST dataset")
-        return TargetDataset(args, "/mnist", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.MNIST_M.value:
-        print("using the MNIST_M dataset")
-        return TargetDataset(args, "/mnist_m", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.SVHN.value:
-        print("using the SVHN dataset")
-        return TargetDataset(args, "/svhn", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.USPS.value:
-        print("using the USPS dataset")
-        return TargetDataset(args, "/usps", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
     else:
         ValueError

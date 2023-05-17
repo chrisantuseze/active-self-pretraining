@@ -37,7 +37,7 @@ class PretextDataLoader():
         if is_val:
             val_path_loss_list = []
 
-            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.USPS.value, DatasetType.MNIST.value]:
+            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value]:
                 img_paths = glob.glob(self.dir + '/train/*/*')
             
             elif self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
@@ -108,15 +108,14 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = transform
         self.is_val = is_val
 
-        #TODO Put back after tsne eval
-        # labels = set(load_class_names(self.args))
-        # index = 0
-        # self.label_dic = {}
-        # for label in labels:
-        #     label = label.replace("\n", "")
-        #     if label not in self.label_dic:
-        #         self.label_dic[label] = index
-        #         index += 1
+        labels = set(load_class_names(self.args))
+        index = 0
+        self.label_dic = {}
+        for label in labels:
+            label = label.replace("\n", "")
+            if label not in self.label_dic:
+                self.label_dic[label] = index
+                index += 1
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -129,7 +128,7 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value, DatasetType.MNIST.value, DatasetType.USPS.value]:
+        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value]:
             img = pil_loader(path)
         else:
             img = Image.open(path)
@@ -138,7 +137,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         image = self.transform.__call__(img, not self.is_val)
 
-        return image, torch.tensor(1) #torch.tensor(self.label_dic[label])
+        return image, torch.tensor(self.label_dic[label])
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
     def __init__(
@@ -181,7 +180,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value, DatasetType.MNIST.value, DatasetType.USPS.value]:
+        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value]:
             image = pil_loader(path)
         else:
             image = Image.open(path)
@@ -210,7 +209,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir in ["./datasets/chest_xray", "./datasets/mnist", "./datasets/usps", "./datasets/modern_office_31"]:
+        if self.dir in ["./datasets/chest_xray", "./datasets/modern_office_31"]:
             img = pil_loader(self.img_path[idx])
         else:
             img = Image.open(self.img_path[idx])

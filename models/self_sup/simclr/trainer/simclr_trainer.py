@@ -1,11 +1,8 @@
 import time
 import utils.logger as logging
-from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from optim.optimizer import load_optimizer
-from models.utils.commons import get_model_criterion, get_params, AverageMeter, get_params_to_update, prepare_model
+from models.utils.commons import get_model_criterion, get_params, AverageMeter, prepare_model
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_chkpts, load_saved_state
-from models.heads.nt_xent import NT_Xent
 
 class SimCLRTrainer():
     def __init__(self, 
@@ -56,9 +53,6 @@ class SimCLRTrainer():
             batch_time.update(time.time() - end)
             end = time.time()
 
-            # total_num += self.train_params.batch_size
-            # total_loss += loss.item() * self.train_params.batch_size
-
             if step % self.log_step == 0:
                 logging.info(
                     "Epoch: [{0}][{1}]\t"
@@ -75,7 +69,6 @@ class SimCLRTrainer():
                     )
                 )
 
-            # self.writer.add_scalar("Loss/train_epoch", loss, self.args.global_step)
             self.args.global_step += 1
 
         return losses.avg

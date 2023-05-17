@@ -22,11 +22,6 @@ class DatasetType(Enum):
     PRODUCT = 14
     REAL_WORLD = 15
 
-    MNIST = 16
-    MNIST_M = 17
-    SVHN = 18
-    USPS = 19
-
 def get_dataset_enum(value: int):
     if value == DatasetType.CHEST_XRAY.value:
         return "chest_xray"
@@ -75,15 +70,3 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.REAL_WORLD.value:
         return "real_world"
-
-    if value == DatasetType.MNIST.value:
-        return "mnist"
-
-    if value == DatasetType.MNIST_M.value:
-        return "mnist_m"
-
-    if value == DatasetType.SVHN.value:
-        return "svhn"
-
-    if value == DatasetType.USPS.value:
-        return "usps"

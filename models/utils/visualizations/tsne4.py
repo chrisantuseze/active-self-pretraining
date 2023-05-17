@@ -29,7 +29,7 @@ def extract_features(args, model, data_loader):
 def tsne_similarity(args):
     transform = Transforms(args.target_image_size)
     # Load images from the three datasets and extract their features
-    args.target_dataset = 16
+    args.target_dataset = 12
     ds_1 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset1 = ds_1.get_dataset(transform, is_tsne=True)
 
@@ -38,7 +38,7 @@ def tsne_similarity(args):
     path_loss_list = [PathLoss(path, 0) for path in img_path]
     dataset2 = PretextDataset(args, path_loss_list, transform, False)
 
-    args.target_dataset = 18
+    args.target_dataset = 13
     ds_3 = get_target_pretrain_ds(args, training_type=TrainingType.ACTIVE_LEARNING)
     dataset3 = ds_3.get_dataset(transform, is_tsne=True)
 
@@ -51,21 +51,20 @@ def tsne_similarity(args):
     model = torchvision.models.resnet18(pretrained=True).to(args.device)
     model = model.eval()
 
-    # Remove the last fully connected layer
-    model = torch.nn.Sequential(*(list(model.children())[:-1]))
-    model = model.to(args.device)
-
     # Extract features from each dataset
     features1 = extract_features(args, model, data_loader1)
     features2 = extract_features(args, model, data_loader2)
-    # features3 = extract_features(args, model, data_loader3)
+    features3 = extract_features(args, model, data_loader3)
 
     logging.info("Generating TSNE embeddings...")
 
+    # Compute pairwise feature distances
+    # distances = torch.cdist(features1, features2)
+    
     features = torch.cat([
         features1,
         features2,
-        # features3,
+        features3,
     ])
 
     # Compute the pairwise cosine similarities between the features
@@ -73,21 +72,23 @@ def tsne_similarity(args):
     norms = similarities.norm(dim=1, keepdim=True)
     similarities = similarities / norms / norms.t()
 
+    # distances = distances.cpu()
+
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, perplexity=30, random_state=0)
     embeddings = tsne.fit_transform(similarities.cpu().numpy())
 
     # Separate the embedded data into the original datasets
     embedded_data1 = embeddings[:len(dataset1)]
-    embedded_data2 = embeddings[len(dataset1):]
+    # embedded_data2 = embeddings[len(dataset1):]
 
-    # embedded_data2 = embeddings[len(dataset1): len(dataset1) + len(dataset2)]
-    # embedded_data3 = embeddings[len(dataset1) + len(dataset2):]
+    embedded_data2 = embeddings[len(dataset1): len(dataset1) + len(dataset2)]
+    embedded_data3 = embeddings[len(dataset1) + len(dataset2):]
 
     # Create a scatter plot
-    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='MNIST') #Artistic
+    plt.scatter(embedded_data1[:, 0], embedded_data1[:, 1], c='#ed9a68', label='MNIST-M') #Artistic
     plt.scatter(embedded_data2[:, 0], embedded_data2[:, 1], c='#698e77', label='Intermediate') #Intermediate
-    # plt.scatter(embedded_data3[:, 0], embedded_data3[:, 1], c='blue', label='USPS') #USPS
+    plt.scatter(embedded_data3[:, 0], embedded_data3[:, 1], c='blue', label='USPS') #USPS
 
     # Plot the t-SNE embeddings
     plt.legend()

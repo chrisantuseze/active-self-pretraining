@@ -6,7 +6,7 @@ import pickle
 from PIL import Image
 from models.active_learning.al_method_enum import get_al_method_enum
 
-from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
+from models.utils.ssl_method_enum import get_ssl_method
 from datautils.dataset_enum import get_dataset_enum
 import utils.logger as logging
 
@@ -80,10 +80,8 @@ def load_chkpts(args, filename, model):
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
         for k, v in model.state_dict().items():
             if k not in list(state_dict):
-                # logging.info('key "{}" could not be found in provided state dict'.format(k))
                 pass
             elif state_dict[k].shape != v.shape:
-                # logging.info('key "{}" is of different shape in model and provided state dict'.format(k))
                 state_dict[k] = v
         msg = model.load_state_dict(state_dict, strict=False)
 
@@ -107,7 +105,6 @@ def simple_load_model(args, path):
         return torch.load(out)
 
     except IOError as er:
-        # logging.error(er)
         return None
 
 def accuracy(pred, target, topk=1):
@@ -141,7 +138,6 @@ def save_path_loss(args, filename, image_loss_list):
         logging.info(f"path loss saved at {out}")
 
     except IOError as er:
-        # logging.error(er)
         None
 
 
@@ -154,12 +150,9 @@ def load_path_loss(args, filename):
             return pickle.load(file)
 
     except IOError as er:
-        # logging.error(er)
         return None
 
 def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
-    # dataset = f"{get_dataset_enum(args.dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
-    # filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -173,7 +166,6 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
             logging.info(f"accuracies saved saved at {out}")
 
     except IOError as er:
-        # logging.error(er)
         None
 
 def load_accuracy_file(args):
@@ -186,7 +178,6 @@ def load_accuracy_file(args):
             return file.readlines()
 
     except IOError as er:
-        # logging.error(er)
         return None
 
 def save_class_names(args, label):
@@ -237,89 +228,3 @@ def get_state_for_da(args):
     logging.info(f"Loading [uc2] checkpoint from - {filename}")
 
     return simple_load_model(args, path=filename)
-    
-def get_office_31_model(args):
-    prefix = "swav"
-
-    pretrain_level = 1
-
-    bases = [12, 12, 14, 14, 13, 13] # A-D, A-W, D-A, D-W, W-A, W-D
-    targs = [14, 13, 12, 13, 12, 14]
-
-    if args.base_dataset == 12 and args.target_dataset == 14:
-        suffix = "amazon_dslr_75_94"
-
-    elif args.base_dataset == 12 and args.target_dataset == 13:
-        suffix = "amazon_webcam_75_151"
-
-    elif args.base_dataset == 14 and args.target_dataset == 12:
-        suffix = "dslr_amazon_75_535"
-
-    elif args.base_dataset == 14 and args.target_dataset == 13:
-        suffix = "dslr_webcam_75_151"
-
-    elif args.base_dataset == 13 and args.target_dataset == 12:
-        suffix = "webcam_amazon_75_535"
-
-    elif args.base_dataset == 13 and args.target_dataset == 14:
-        suffix = "webcam_dslr_75_94"
-
-    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, suffix)
-    logging.info(f"Loading [tacc] checkpoint from - {filename}")
-
-    return simple_load_model(args, path=filename)
-
-def get_office_home_model(args):
-    prefix = "swav"
-
-    pretrain_level = 1
-
-    bases = [16, 16, 16, 17, 17, 17] # A-C, A-P, A-R, C-A, C-P, C-R
-    targs = [17, 18, 19, 16, 18, 19] #---> UC
-
-    # bases = [19, 19, 19, 18, 18, 18] # R-P, R-C, R-A, P-R, P-C, P-A
-    # targs = [18, 17, 16, 19, 17, 16] #---> TACC2, 13, 12, 14]
-
-    if args.base_dataset == 16 and args.target_dataset == 17:
-        suffix = "artistic_clip_art_75_873"
-
-    elif args.base_dataset == 16 and args.target_dataset == 18:
-        suffix = "artistic_product_75_887"
-
-    elif args.base_dataset == 16 and args.target_dataset == 19:
-        suffix = "artistic_real_world_75_871"
-
-    elif args.base_dataset == 17 and args.target_dataset == 16:
-        suffix = "clip_art_artistic_75_485"
-
-    elif args.base_dataset == 17 and args.target_dataset == 18:
-        suffix = "clip_art_product_75_887"
-
-    elif args.base_dataset == 17 and args.target_dataset == 19:
-        suffix = "clip_art_real_world_75_871"
-
-
-
-    if args.base_dataset == 19 and args.target_dataset == 18:
-        suffix = "real_world_product_75_887"
-
-    elif args.base_dataset == 19 and args.target_dataset == 17:
-        suffix = "real_world_clip_art_75_873"
-
-    elif args.base_dataset == 19 and args.target_dataset == 16:
-        suffix = "real_world_artistic_75_485"
-
-    elif args.base_dataset == 18 and args.target_dataset == 19:
-        suffix = "product_real_world_75_871"
-
-    elif args.base_dataset == 18 and args.target_dataset == 17:
-        suffix = "product_clip_art_75_873"
-
-    elif args.base_dataset == 18 and args.target_dataset == 16:
-        suffix = "product_artistic_75_485"
-
-    filename = "{}_{}_checkpoint_{}.tar".format(prefix, pretrain_level, suffix)
-    logging.info(f"Loading [tacc] checkpoint from - {filename}")
-
-    return simple_load_model(args, path=filename)
-

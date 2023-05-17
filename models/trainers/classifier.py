@@ -1,19 +1,15 @@
 import torch
-import torch.nn as nn
-from torch.optim.lr_scheduler import StepLR
 import time
 import copy
 import utils.logger as logging
-from datautils.dataset_enum import DatasetType, get_dataset_enum
+from datautils.dataset_enum import get_dataset_enum
 
 from datautils.lc_dataset import LCDataset
 from models.backbones.resnet import resnet_backbone
-from models.heads.logloss_head import LogLossHead
 from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_ds_num_classes, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
-from models.utils.early_stopping import EarlyStopping
-from utils.commons import get_accuracy_file_ext, get_office_31_model, get_office_home_model, load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
+from utils.commons import get_accuracy_file_ext, load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -26,10 +22,6 @@ class Classifier:
         if pretrain_level == "AL":
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
-
-        # elif args.training_type == "tacc":
-        #     logging.info(f"Using pretrained officehome model weights")
-        #     state = get_office_home_model(self.args)
 
         else:
             logging.info(f"Using pretrained {pretrain_level} model weights")
@@ -65,8 +57,6 @@ class Classifier:
 
         val_acc_history = []
 
-        early_stopping = EarlyStopping(tolerance=10, min_delta=20)
-
         logging.info(f"Performing linear eval on {get_dataset_enum(self.args.lc_dataset)}")
 
         for epoch in range(self.args.lc_epochs):
@@ -89,11 +79,6 @@ class Classifier:
             if self.scheduler:
                 self.scheduler.step()
 
-            # early stopping
-            early_stopping(train_loss, val_loss)
-            # if early_stopping.early_stop:
-            #     print("We are at epoch:", epoch)
-            #     break
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

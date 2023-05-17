@@ -1,9 +1,3 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
-#
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,10 +10,9 @@ import time
 
 import numpy as np
 from models.self_sup.swav.utils import initialize_exp
-from models.utils.commons import get_params, AverageMeter, get_params_to_update, prepare_model
+from models.utils.commons import get_params, AverageMeter, prepare_model
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
-from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
@@ -34,7 +27,7 @@ class SwAVTrainer():
         self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
-        zero_init_residual = True #TODO: They said that this improves the network by 0.2-0.3%
+        zero_init_residual = True #This improves the network by 0.2-0.3%
         self.model = resnet_models.__dict__[args.backbone](
             zero_init_residual=zero_init_residual,
             normalize=True,
@@ -45,7 +38,7 @@ class SwAVTrainer():
 
         # load weights
 
-        if self.args.training_type == "pete": #TODO Please remove this later on. Strictly for no pretraining
+        if self.args.training_type == "no_prt": #For no pretraining
             params_to_update = self.model.parameters()
         else:
             self.model, params_to_update = prepare_model(self.args, training_type, self.model) 

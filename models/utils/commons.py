@@ -45,12 +45,6 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
             model = SimCLRV2(n_features)
             print("using SIMCLRv2")
 
-        elif args.method == SSL_Method.SUPERVISED.value:
-            criterion = nn.CrossEntropyLoss()
-            model = encoder
-            print("using Supervised model")
-    
-
     return model, criterion
 
 def get_feature_dimensions_backbone(args):
@@ -238,22 +232,6 @@ def get_ds_num_classes(dataset):
     elif dataset == DatasetType.REAL_WORLD.value:
         num_classes = 65
         dir = "/real_world"
-
-    elif dataset == DatasetType.MNIST.value:
-        num_classes = 10
-        dir = "/mnist"
-
-    elif dataset == DatasetType.MNIST_M.value:
-        num_classes = 10
-        dir = "/mnist_m"
-
-    elif dataset == DatasetType.SVHN.value:
-        num_classes = 10
-        dir = "/svhn"
-
-    elif dataset == DatasetType.USPS.value:
-        num_classes = 10
-        dir = "/usps"
     
     return num_classes, dir
 
@@ -276,7 +254,7 @@ def prepare_model(args, trainingType, model):
             model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
     # this is for proxy source with hierarchical (B-P-T-F)
-    elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "new_tacc3":
+    elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "proxy_source":
         prefix = get_ssl_method(args.method)
         pretrain_level = "1"
         dataset = "cifar10"
@@ -309,9 +287,6 @@ def prepare_model(args, trainingType, model):
 def get_images_pathlist(dir, with_train):
     if dir == "./datasets/modern_office_31":
         return glob.glob(dir + '/*/*/*')
-
-    elif dir in ["./datasets/mnist_m", "./datasets/svhn"]:
-        return glob.glob(dir + '/*')
 
     if "./datasets/generated" in dir.split('_'):
         img_path = glob.glob(dir + '/*')

@@ -1,3 +1,8 @@
+'''
+Code adapted from: https://github.com/odegeasslbc/FastGAN-pytorch
+
+'''
+
 import os
 import torch
 from torch import nn

@@ -8,7 +8,6 @@ from models.self_sup.swav.swav import SwAVTrainer
 from models.trainers.base_pretrainer import BasePretrainer
 from models.utils.commons import get_params
 import utils.logger as logging
-# from models.self_sup.myow.trainer.myow_trainer import get_myow_trainer
 from models.self_sup.simclr.trainer.simclr_trainer import SimCLRTrainer
 from models.self_sup.simclr.trainer.simclr_trainer_v2 import SimCLRTrainerV2
 from models.utils.training_type_enum import TrainingType
@@ -70,7 +69,6 @@ class SelfSupPretrainer(BasePretrainer):
 
             epoch_loss = trainer.train_epoch(epoch)
 
-            lr = 0
             # Decay Learning Rate
             if self.args.method is not SSL_Method.SWAV.value and trainer.scheduler:
                 trainer.scheduler.step()
@@ -104,15 +102,6 @@ class SelfSupPretrainer(BasePretrainer):
 
     def get_loader(self, do_al, distilled_ds=None, training_type=None):
         if do_al:
-            if distilled_ds is None:
-                # pretext = PretextTrainer(self.args, self.writer)
-
-                # if training_type == TrainingType.BASE_PRETRAIN:
-                #     distilled_ds = pretext.distill_gen_dataset()
-                # else:
-                #     distilled_ds = pretext.do_active_learning()
-                pass
-
             loader = PretextDataLoader(self.args, distilled_ds, training_type=training_type).get_loader()
         else:
             loader = get_target_pretrain_ds(self.args, training_type=training_type).get_loader()  
