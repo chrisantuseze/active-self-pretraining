@@ -104,7 +104,7 @@ def train(args):
 
     if use_source:
         source_classifier = resnet_backbone(args.backbone, pretrained=False)
-        state = simple_load_model(args, path=f'source_{args.target_dataset}.pth')
+        state = simple_load_model(args, path=f'source_{args.source_dataset}.pth')
         source_classifier.load_state_dict(state['model'], strict=False)
 
         source_criterion = nn.MSELoss()
