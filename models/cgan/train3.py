@@ -21,7 +21,7 @@ def train(args):
     use_source = False
 
     # data_type = args.target_dataset #"mnist"
-    data_type = "mnist"
+    data_type = 999
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
