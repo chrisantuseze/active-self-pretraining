@@ -127,7 +127,7 @@ def train(args):
 
                     pred_real_label = source_classifier(x)
                     print(pred_real_label.shape)
-                    pred_real_label = pred_real_label[:, 0:1, :, :].long()
+                    pred_real_label = pred_real_label.long()
             else:
                 pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
