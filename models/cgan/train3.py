@@ -18,7 +18,10 @@ def train(args):
     # Model
     z_size = 100
 
-    data_type = args.target_dataset #"mnist"
+    use_source = False
+
+    # data_type = args.target_dataset #"mnist"
+    data_type = "mnist"
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
@@ -96,8 +99,6 @@ def train(args):
 
     g_early_stopper = EarlyStopper(patience=3, min_delta=10)
     d_early_stopper = EarlyStopper(patience=3, min_delta=10)
-
-    use_source = False
 
     if use_source:
         source_classifier = resnet_backbone(args.backbone, pretrained=False)
