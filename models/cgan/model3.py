@@ -136,7 +136,7 @@ class Discriminator(nn.Module):
         # print("y.shape", y.shape)
 
         inp = torch.cat((x, y), dim=1)
-        # print("inp.shape", inp.shape)
+        print("inp.shape", inp.shape)
 
         out = self.main(inp)
         # print("disc out.shape", out.shape)
