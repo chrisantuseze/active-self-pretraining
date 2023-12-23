@@ -9,7 +9,7 @@ class Transforms():
             transforms.RandomHorizontalFlip(),
 
             transforms.RandomRotation(degrees=30),
-            transforms.ColorJitter(ghtness=0.5, contrast=0.5),
+            transforms.ColorJitter(brightness=0.5, contrast=0.5),
 
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),

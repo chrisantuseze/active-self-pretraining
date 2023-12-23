@@ -1,5 +1,5 @@
-from cgan.dataset import FashionMNIST
-from cgan.model3 import Discriminator, Generator
+from models.cgan.dataset import FashionMNIST
+from models.cgan.model3 import Discriminator, Generator
 from datautils.target_dataset import get_pretrain_ds
 from models.trainers.resnet import resnet_backbone
 from models.utils.commons import get_ds_num_classes
@@ -7,15 +7,10 @@ from models.utils.training_type_enum import TrainingType
 from models.utils.transformations import Transforms
 import torch
 import torch.nn as nn
-import numpy as np
-from torchvision import transforms
-from torch.autograd import Variable
-from torchvision.utils import make_grid, save_image
+from torchvision.utils import save_image
 import torchvision.datasets as datasets
 
-import matplotlib.pyplot as plt
 import os
-from PIL import Image
 
 from utils.commons import simple_load_model
 
