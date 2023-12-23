@@ -124,7 +124,8 @@ class Discriminator(nn.Module):
         )
 
     def forward(self, x, y):
-        # print("x.shape", x.shape)
+        print("x.shape", x.shape)
+        print("y.shape", y.shape)
 
         y = self.label_emb(y)
         y = self.fc(y)
