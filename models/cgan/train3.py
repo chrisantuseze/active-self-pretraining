@@ -20,7 +20,7 @@ def train(args):
     # Model
     z_size = 100
 
-    use_source = True
+    use_source = False
 
     # data_type = args.target_dataset #"mnist"
     data_type = 999
