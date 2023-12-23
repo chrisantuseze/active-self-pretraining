@@ -2,6 +2,7 @@ from cgan.dataset import FashionMNIST
 from cgan.model3 import Discriminator, Generator
 from datautils.target_dataset import get_pretrain_ds
 from models.trainers.resnet import resnet_backbone
+from models.utils.commons import get_ds_num_classes
 from models.utils.training_type_enum import TrainingType
 from models.utils.transformations import Transforms
 import torch
@@ -22,16 +23,16 @@ def train(args):
     # Model
     z_size = 100
 
-    data_type = "cifar10"
+    data_type = args.target_dataset #"mnist"
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
-    output_folder = 'save/output_images'
+    output_folder = args.gen_images_path
     os.makedirs(output_folder, exist_ok=True)
 
     n_channel = 1
     
-    if data_type == "fashion_mnist":
+    if data_type == 9999:
         train_data_path = 'save/fashion-mnist_train.csv' # Path of data
 
         img_size = 64 #28
@@ -45,7 +46,7 @@ def train(args):
         ])
         dataset = FashionMNIST(train_data_path, img_size=28, transform=transform)
 
-    elif data_type == "mnist":
+    elif data_type == 999:
         img_size = 64
         class_num = 10
 
@@ -56,7 +57,7 @@ def train(args):
                                     transforms.Normalize((0.5,), (0.5,)),
                                 ]))
         
-    elif data_type == 'cifar10':
+    elif data_type == 99:
         img_size = 64 #32
         class_num = 10
 
@@ -71,9 +72,9 @@ def train(args):
 
     else:
         img_size = args.gan_image_size
-        class_num = None
-        n_channel = None
-        
+        class_num, dir = get_ds_num_classes(args.target_dataset)
+        n_channel = 3
+
         transforms = Transforms(img_size, is_train=False)
         dataset = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN, is_train=False, batch_size=1).get_dataset(transforms)
         

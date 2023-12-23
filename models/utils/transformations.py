@@ -7,6 +7,10 @@ class Transforms():
         self.train_transform = transforms.Compose([
             transforms.RandomResizedCrop(size, scale=(0.2, 1.0)),
             transforms.RandomHorizontalFlip(),
+
+            transforms.RandomRotation(degrees=30),
+            transforms.ColorJitter(ghtness=0.5, contrast=0.5),
+
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])

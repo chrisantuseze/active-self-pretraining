@@ -1,5 +1,6 @@
 from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
+from models.cgan.train3 import train
 from models.trainers.trainer import Trainer
 from models.utils.commons import get_params
 import torch
@@ -30,7 +31,7 @@ class DomainAdapter:
         trainer.train()
 
     def generate_data(self):
-        pass
+        train(self.args)
 
     def train_target(self):
         pretext = PretextTrainer(self.args, self.writer)

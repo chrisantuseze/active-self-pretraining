@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from models.trainers.domain_adapter import DomainAdapter
 import torch
 from torch.utils.tensorboard import SummaryWriter
@@ -73,6 +74,7 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_args()
+    os.makedirs(args.model_checkpoint_path, exist_ok=True)
     
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"You are using {args.device}")
