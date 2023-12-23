@@ -4,14 +4,8 @@ import torch.nn as nn
 import torch
 import torchvision
 from torch.utils.data import random_split
-import gc
 from datautils.dataset_enum import DatasetType
 
-from models.self_sup.simclr.loss.dcl_loss import DCL
-from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
-from models.self_sup.simclr.simclr import SimCLR
-from models.self_sup.simclr.simclr_v2 import SimCLRV2
-from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
 from models.utils.training_type_enum import Params, TrainingType
 from utils.commons import get_state_for_da, load_chkpts, load_saved_state
 import utils.logger as logging
@@ -33,17 +27,6 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
         print("using Regular model for LC")
-
-    else:
-        if args.method == SSL_Method.SIMCLR.value:
-            criterion = NTXentLoss(args)
-            model = SimCLR(encoder, args.projection_dim, n_features)
-            print("using SIMCLR")
-
-        elif args.method == SSL_Method.DCL.value:
-            criterion = DCL(args)
-            model = SimCLRV2(n_features)
-            print("using SIMCLRv2")
 
     return model, criterion
 
@@ -75,70 +58,31 @@ def get_params_to_update(model, feature_extract):
     return params_to_update
 
 def get_params(args, training_type):
-    base_image_size = args.base_image_size
-    target_image_size = args.target_image_size
-
-    if args.method == SSL_Method.DCL.value:
-        batch_size = args.dcl_batch_size
-        epochs = args.base_epochs
-        temperature = args.dcl_temperature
-        optimizer = args.dcl_optimizer
-        base_lr = args.dcl_base_lr
-        target_lr = args.dcl_base_lr
-
-    elif args.method == SSL_Method.SIMCLR.value:
-        batch_size = args.simclr_batch_size
-        epochs = args.base_epochs
-        temperature = args.simclr_temperature
-        optimizer = args.simclr_optimizer
-        base_lr = args.simclr_base_lr
-        target_lr = args.simclr_base_lr
-
-    elif args.method == SSL_Method.SWAV.value:
-        batch_size = args.swav_batch_size
-        epochs = args.base_epochs
-        temperature = args.swav_temperature
-        optimizer = args.swav_optimizer
-        base_lr = 0.01
-        target_lr = args.swav_base_lr
-
 
     params = {
         TrainingType.ACTIVE_LEARNING: Params(
-            batch_size=args.al_finetune_batch_size, 
-            image_size=target_image_size, 
+            batch_size=args.al_batch_size, #doesn't need one though
+            image_size=args.al_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
-            optimizer=args.al_optimizer,
             weight_decay=args.al_weight_decay,
-            temperature=temperature
+            name="active_learning",
             ),
-        TrainingType.BASE_PRETRAIN: Params(
-            batch_size= batch_size, #16,
-            image_size=base_image_size, 
-            lr=base_lr, 
-            epochs=epochs,
-            optimizer=optimizer,
-            weight_decay=args.weight_decay,
-            temperature=temperature
+        TrainingType.SOURCE_PRETRAIN: Params(
+            batch_size=args.source_batch_size,
+            image_size=args.source_image_size, 
+            lr=args.source_lr, 
+            epochs=args.source_epochs,
+            weight_decay=args.source_weight_decay,
+            name="source",
             ),
         TrainingType.TARGET_PRETRAIN: Params(
-            batch_size=batch_size, 
-            image_size=target_image_size, 
-            lr=target_lr, 
+            batch_size=args.target_batch_size, 
+            image_size=args.target_image_size, 
+            lr=args.target_lr, 
             epochs=args.target_epochs,
-            optimizer=optimizer,
-            weight_decay=args.weight_decay,
-            temperature=temperature
-            ),
-        TrainingType.LINEAR_CLASSIFIER: Params(
-            batch_size=args.lc_batch_size, 
-            image_size=args.lc_image_size, 
-            lr=args.lc_lr, 
-            epochs=args.lc_epochs,
-            optimizer=args.lc_optimizer,
-            weight_decay=args.weight_decay,
-            temperature=temperature
+            weight_decay=args.target_weight_decay,
+            name="target",
             ),
     }
     return params[training_type]
@@ -169,23 +113,7 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 
 
 def get_ds_num_classes(dataset):
-    if dataset == DatasetType.CHEST_XRAY.value:
-        num_classes = 100
-        dir = "/chest_xray"
-
-    elif dataset == DatasetType.EUROSAT.value:
-        num_classes = 10
-        dir = "/eurosat"
-
-    elif dataset == DatasetType.FLOWERS.value:
-        num_classes = 5
-        dir = "/flowers"
-
-    elif dataset == DatasetType.HAM10000.value:
-        num_classes = 2
-        dir = "/ham10000"
-
-    elif dataset == DatasetType.CLIPART.value:
+    if dataset == DatasetType.CLIPART.value:
         num_classes = 345
         dir = "/clipart"
 
@@ -196,10 +124,6 @@ def get_ds_num_classes(dataset):
     elif dataset == DatasetType.QUICKDRAW.value:
         num_classes = 345
         dir = "/quickdraw"
-
-    elif dataset == DatasetType.MODERN_OFFICE_31.value:
-        num_classes = 31
-        dir = "/modern_office_31/synthetic"
 
     elif dataset == DatasetType.AMAZON.value:
         num_classes = 31
@@ -238,7 +162,7 @@ def get_ds_num_classes(dataset):
 def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
             
-    if (trainingType == TrainingType.BASE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
+    if (trainingType == TrainingType.SOURCE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
         state = load_saved_state(args, pretrain_level="1")
         if args.do_gradual_base_pretrain and state is not None:
             logging.info("Using base pretrained model")
@@ -252,19 +176,6 @@ def prepare_model(args, trainingType, model):
         else:
             logging.info("Using downloaded swav pretrained model")
             model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
-
-    # this is for proxy source with hierarchical (B-P-T-F)
-    elif trainingType == TrainingType.TARGET_PRETRAIN and args.training_type == "proxy_source":
-        prefix = get_ssl_method(args.method)
-        pretrain_level = "1"
-        dataset = "cifar10"
-        epoch_num = args.base_epochs
-
-        out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num))
-        logging.info(f"Loading checkpoint from - {out}")
-
-        state = torch.load(out)
-        model.load_state_dict(state['model'], strict=False)
 
     else:
         state = load_saved_state(args, pretrain_level="1")
@@ -315,9 +226,3 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-        
-def free_mem(X, y):
-    del X
-    del y
-    gc.collect()
-    torch.cuda.empty_cache()

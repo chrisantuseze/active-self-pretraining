@@ -8,13 +8,12 @@ class Params:
     image_size: int
     lr: float
     epochs: int
-    optimizer: str
     weight_decay: float
-    temperature: float
+    name: str
 
 class TrainingType(Enum):
     BASE_PRETRAIN = "Base"
-    BASE_AL = "Base AL"
+    SOURCE_PRETRAIN = "Source"
     TARGET_PRETRAIN = "Target"
     ACTIVE_LEARNING = "Active Learning"
     LINEAR_CLASSIFIER = "Linear Classifier"

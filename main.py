@@ -1,161 +1,77 @@
 #!/usr/bin/env python3
 
-import os
-import numpy as np
+from models.trainers.domain_adapter import DomainAdapter
 import torch
-import torch.nn as nn
+from torch.utils.tensorboard import SummaryWriter
 import argparse
 
-from datautils.dataset_enum import get_dataset_enum
-from models.active_learning.pretext_trainer import PretextTrainer
 from utils.random_seeders import set_random_seeds
 
-from utils.yaml_config_hook import yaml_config_hook
-from models.trainers.selfsup_pretrainer import SelfSupPretrainer
-from models.trainers.classifier import Classifier
 import utils.logger as logging
-
-from models.gan.train import do_gen_ai
-from models.utils.visualizations.tsne4 import tsne_similarity
-
 logging.init()
 
-def no_pretraining(args, writer):
-    args.training_type = "no_prt"
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
+def parse_args():
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    args.target_epochs = 600
+    parser.add_argument('--source_batch_size', default=64, type=int, help='')
+    parser.add_argument('--source_image_size', default=40, type=int, help='')
+    parser.add_argument('--source_lr', default=0.001, type=float, help='')
+    parser.add_argument('--source_epochs', default=100, type=int, help='')
+    parser.add_argument('--source_weight_decay', default=1.0e-6, type=float, help='')
+    parser.add_argument('--source_dataset', default=4, type=int, help='')
 
-    datasets = [0, 1, 2, 3, 4, 5, 6, 8] 
+    parser.add_argument('--target_batch_size', default=64, type=int, help='')
+    parser.add_argument('--target_image_size', default=80, type=int, help='')
+    parser.add_argument('--target_lr', default=1.0e-3, type=float, help='')
+    parser.add_argument('--target_epochs', default=100, type=int, help='')
+    parser.add_argument('--target_weight_decay', default=1.0e-6, type=float, help='')
+    parser.add_argument('--target_dataset', default=0, type=int, help='')
 
-    for ds in datasets:
-        args.target_dataset = ds
-        args.lc_dataset = ds
+    parser.add_argument('--al_batch_size', default=256, type=int, help='')
+    parser.add_argument('--al_image_size', default=80, type=int, help='')
+    parser.add_argument('--al_lr', default=0.01, type=float, help='')
+    parser.add_argument('--al_epochs', default=20, type=int, help='')
+    parser.add_argument('--al_weight_decay', default=5.0e-4, type=float, help='')
+    parser.add_argument('--al_trainer_sample_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
+    parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
+    parser.add_argument('--al_batches', default=5, type=int, help='')
 
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
+    # args for trainer
+    parser.add_argument('--dataset_dir', default="./datasets", type=str, help='')
+    parser.add_argument('--backbone', default="resnet50", type=str, help='')
+    parser.add_argument('--model_checkpoint_path', default="save/checkpoints", type=str, help='')
+    parser.add_argument('--model_misc_path', default="save/misc", type=str, help='')
+    parser.add_argument('--gen_images_path', default="generated", type=str, help='')
+    parser.add_argument('--object_set', default='seen', type=str, help='')
 
-        classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-        classifier.train_and_eval()
+    parser.add_argument('--split_ratio', default=0.9, type=float, help='')
+    parser.add_argument('--momentum', type=float, default=0.9, help='Momentum for SGD')
+    parser.add_argument('--weight_decay', type=float, default=1e-3, help='Weight decay for optimizer')
+    parser.add_argument('--workers', type=int, default=4, help='')
+    
+    parser.add_argument('--log_step', default=200, type=int, help='')
+    parser.add_argument('--seed', default=6, type=int, help='')
 
-def proxy_source(args, writer):
-    # this is for proxy source(B-P-T-F)
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = True
-    args.target_pretrain = True
+    return parser.parse_args()
 
-    args.training_type = "proxy_source"
-
-    datasets = [0, 1, 2, 3, 4, 5, 8] 
-
-    for ds in datasets:
-        args.base_dataset = f'generated_{get_dataset_enum(ds)}'
-        args.target_dataset = ds
-        args.lc_dataset = ds
-
-        run_proxy_source_sequence(args, writer)
-
-def run_proxy_source_sequence(args, writer):
-    if args.target_pretrain:
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
-
-def single_iter(args, writer):
-    # this is for single iteration pretraining with GAN (B-T-F)
-    args.do_gradual_base_pretrain = False
-    args.base_pretrain = False
-    args.target_pretrain = True
-
-    args.training_type = "single_iter"
-
-    datasets = [0, 1, 2, 3, 4, 5, 8] 
-
-    for ds in datasets:
-        args.base_dataset = f'generated_{get_dataset_enum(ds)}'
-        args.target_dataset = ds
-        args.lc_dataset = ds
-
-        run_single_iter_sequence(args, writer)
-
-def run_single_iter_sequence(args, writer):
-    if args.base_pretrain:
-            pass
-
-    if args.target_pretrain:
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
-
-def office_dataset(args, writer):
-    args.do_gradual_base_pretrain = True
-    args.base_pretrain = True
-    args.target_pretrain = False
-
-    args.training_type = "office"
-
-    # bases = [9, 9, 11, 11, 10, 10] # A-D, A-W, D-A, D-W, W-A, W-D
-    # targs = [11, 10, 9, 10, 9, 11]
-
-    bases = [12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15] # A-C, A-P, A-R, C-A, C-P, C-R, P-A, P-C, P-R, R-A, R-C, R-P
-    targs = [13, 14, 15, 12, 14, 15, 12, 13, 15, 12, 13, 14]
-
-    datasets = [9, 10, 11, 12, 13, 14, 15]
-
-    for ds in datasets:
-        args.base_dataset = ds
-        args.target_dataset = ds
-
-        do_gen_ai(args)
-
-        pretrainer = SelfSupPretrainer(args, writer)
-        pretrainer.second_pretrain()
-
-    for i in range(len(bases)):
-        run_office_sequence(args, writer, bases[i], targs[i])
-
-def run_office_sequence(args, writer, base, target):
-    args.base_dataset = base
-    args.target_dataset = target
-    args.lc_dataset = target
-
-    pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
-
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
-    classifier.train_and_eval()
 
 def main(args):
-    writer = None
+    writer = SummaryWriter()
 
-    office_dataset(args, writer)
+    adapter = DomainAdapter(args, writer)
+    adapter.train_source()
+
+    adapter.generate_data()
+
+    # adapter.train_target()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GASP")
-    config = yaml_config_hook("./config/config.yaml")
-    for k, v in config.items():
-        parser.add_argument(f"--{k}", default=v, type=type(v))
-
-    args = parser.parse_args()
-
+    args = parse_args()
+    
     args.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(f"You are using {args.device}")
-    args.num_gpus = torch.cuda.device_count()
-    args.world_size = args.gpus * args.nodes
-
-    args.epoch_num = args.base_epochs
-    args.target_epoch_num = args.target_epochs
 
     set_random_seeds(random_seed=args.seed)
-
-    assert args.target_dataset == args.lc_dataset
-    assert args.base_dataset == args.target_dataset
 
     main(args)
     # tsne_similarity(args)

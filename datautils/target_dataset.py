@@ -1,18 +1,11 @@
-import glob
+import os
 import torch
 import torchvision
-from torchvision.transforms import ToTensor, Compose
-import random
+from PIL import Image
 
-from datautils.path_loss import PathLoss
-
-from models.active_learning.pretext_dataloader import MakeBatchDataset, PretextMultiCropDataset
-from models.self_sup.simclr.transformation import TransformsSimCLR
-from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
-from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
-from models.utils.commons import get_images_pathlist, get_params, split_dataset2
+from models.active_learning.pretext_dataloader import MakeBatchDataset
+from models.utils.commons import get_params, split_dataset2
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import SSL_Method
 
 from datautils import dataset_enum
 from models.utils.transformations import Transforms
@@ -20,10 +13,9 @@ from models.utils.transformations import Transforms
 import utils.logger as logging
 
 class TargetDataset():
-    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.SOURCE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
-        self.method = args.method
         self.training_type = training_type
         self.with_train = with_train
         self.is_train = is_train
@@ -32,171 +24,115 @@ class TargetDataset():
         self.image_size = params.image_size
         self.batch_size = params.batch_size if not batch_size else batch_size
 
-    
-    def get_dataset(self, transforms, is_tsne=False):
-        return MakeBatchDataset(
-            self.args, self.dir, self.with_train, 
-            self.is_train, is_tsne, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
-                                                                                                self.dir, transform=transforms)
+    def get_loaders(self):
+        transforms = Transforms(self.image_size, is_train=True)
+        print("dataset path:", self.dir)
+        dataset = torchvision.datasets.ImageFolder(self.dir, transform=transforms)
 
-    def get_finetuner_loaders(self, train_batch_size, val_batch_size, path_list=None):
-        transforms = Transforms(self.image_size)
-        dataset = MakeBatchDataset(
-            self.args, self.dir, self.with_train, self.is_train, 
-            is_tsne=False, transform=transforms, path_list=path_list)
+        # Define the size of the validation set
+        val_size = int(0.2 * len(dataset))
+        train_size = len(dataset) - val_size
 
-        train_ds, val_ds = split_dataset2(dataset=dataset, ratio=0.7, is_classifier=True)
-
+        # Split the dataset into train and validation sets
+        train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
         train_loader = torch.utils.data.DataLoader(
-                    train_ds, 
-                    batch_size=train_batch_size,
-                    num_workers=self.args.workers,
-                    shuffle=True,
-                    pin_memory=True
-                )
+            train_dataset,
+            batch_size=self.batch_size,
+            pin_memory=True,
+            shuffle=True, 
+            num_workers=self.args.workers
+        )
+
         val_loader = torch.utils.data.DataLoader(
-                        val_ds, 
-                        batch_size=val_batch_size, 
-                        num_workers=self.args.workers,
-                        shuffle=False,
-                        pin_memory=True
-                    )
+            val_dataset,
+            batch_size=self.batch_size,
+            pin_memory=True,
+            num_workers=self.args.workers
+        )
 
-        print(f"The size of the dataset is ({len(train_ds)}, {len(val_ds)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
-
+        logging.info(f"The size of the train dataset is {len(train_dataset)}, size of val is {len(val_dataset)}, and the number of batches is {train_loader.__len__()} for a batch size of {self.batch_size}")
         return train_loader, val_loader
 
-    def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING] or (self.args.training_type == "single_iter" and TrainingType.TARGET_PRETRAIN) or (self.args.training_type == "proxy_source" and TrainingType.BASE_PRETRAIN):
-            if self.training_type == TrainingType.ACTIVE_LEARNING:
-                transforms = Transforms(self.image_size)
-                dataset = self.get_dataset(transforms)
+# Not used, but will be kept just in case
+class CustomDataset(torch.utils.data.Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.classes = sorted(os.listdir(root_dir))
+        self.class_to_idx = {cls: i for i, cls in enumerate(self.classes)}
+        self.images = self.load_dataset()
+        print("images length:", len(self.images))
 
-            elif self.args.training_type == "single_iter" and self.training_type == TrainingType.TARGET_PRETRAIN:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
-                logging.info(f"Original size of generated images dataset is {len(img_path)}")
+    def load_dataset(self):
+        dataset = []
+        for cls in self.classes:
+            class_path = os.path.join(self.root_dir, cls)
+            for img_name in os.listdir(class_path):
+                img_path = os.path.join(class_path, img_name)
+                dataset.append((img_path, self.class_to_idx[cls]))
+        return dataset
 
-                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=False)
-                random.shuffle(real_target)
-                img_path.extend(real_target)
+    def __len__(self):
+        return len(self.images)
 
-                logging.info(f"Total size of dataset is {len(img_path)}")
-                
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
-                
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
+    def __getitem__(self, idx):
+        img_path, label = self.images[idx]
+        img = Image.open(img_path).convert('RGB')
 
-            elif self.args.training_type == "proxy_source" and self.training_type == TrainingType.BASE_PRETRAIN:
-                img_path = glob.glob(self.dir + '/train/*/*')
+        if self.transform:
+            img = self.transform(img)
 
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
-                
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
+        return img, label
 
-            else:
-                if self.method == SSL_Method.SIMCLR.value:
-                    transforms = TransformsSimCLR(self.image_size)
+def get_pretrain_ds(args, training_type=TrainingType.SOURCE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
+    if training_type == TrainingType.SOURCE_PRETRAIN:
+        dataset_type = args.source_dataset
+    else:
+        dataset_type = args.target_dataset
 
-                if self.method == SSL_Method.DCL.value:
-                    transforms = TransformsDCL(self.image_size)
-
-                else:
-                    ValueError
-
-                dataset = self.get_dataset(transforms)
-
-            loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=self.batch_size,
-                pin_memory=True,
-                shuffle=self.is_train, 
-                num_workers=self.args.workers
-            )
-        
-        else:
-            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
-            loader, dataset = swav.train_loader, swav.train_dataset
-        
-        logging.info(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
-
-        return loader
-    
-
-def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
-
-    if args.training_type == "proxy_source" and training_type == TrainingType.BASE_PRETRAIN:
-        print("using the proxy dataset")
-        return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
-
-    if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
-        print("using the CHEST XRAY dataset")
-        return TargetDataset(args, "/chest_xray", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.FLOWERS.value:
-        print("using the FLOWERS dataset")
-        return TargetDataset(args, "/flowers", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.EUROSAT.value:
-        print("using the EUROSAT dataset")
-        return TargetDataset(args, "/eurosat", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.HAM10000.value:
-        print("using the HAM10000 dataset")
-        return TargetDataset(args, "/ham10000", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
+    if dataset_type == dataset_enum.DatasetType.CLIPART.value:
         print("using the CLIPART dataset")
         return TargetDataset(args, "/clipart", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.SKETCH.value:
+    elif dataset_type == dataset_enum.DatasetType.SKETCH.value:
         print("using the SKETCH dataset")
         return TargetDataset(args, "/sketch", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif args.target_dataset == dataset_enum.DatasetType.QUICKDRAW.value:
+    elif dataset_type == dataset_enum.DatasetType.QUICKDRAW.value:
         print("using the QUICKDRAW dataset")
         return TargetDataset(args, "/quickdraw", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif args.target_dataset == dataset_enum.DatasetType.MODERN_OFFICE_31.value:
-        print("using the MODERN_OFFICE_31 dataset")
-        return TargetDataset(args, "/modern_office_31", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.AMAZON.value:
+    elif dataset_type == dataset_enum.DatasetType.AMAZON.value:
         print("using the Office-31 AMAZON dataset")
-        return TargetDataset(args, "/amazon/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/office-31/amazon/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.WEBCAM.value:
+    elif dataset_type == dataset_enum.DatasetType.WEBCAM.value:
         print("using the Office-31 WEBCAM dataset")
-        return TargetDataset(args, "/webcam/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/office-31/webcam/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.DSLR.value:
+    elif dataset_type == dataset_enum.DatasetType.DSLR.value:
         print("using the Office-31 DSLR dataset")
-        return TargetDataset(args, "/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/office-31/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.PAINTING.value:
+    elif dataset_type == dataset_enum.DatasetType.PAINTING.value:
         print("using the PAINTING dataset")
         return TargetDataset(args, "/painting", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.ARTISTIC.value:
+    elif dataset_type == dataset_enum.DatasetType.ARTISTIC.value:
         print("using the OfficeHome ARTISTIC dataset")
-        return TargetDataset(args, "/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.CLIP_ART.value:
+    elif dataset_type == dataset_enum.DatasetType.CLIP_ART.value:
         print("using the OfficeHome CLIP_ART dataset")
-        return TargetDataset(args, "/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.PRODUCT.value:
+    elif dataset_type == dataset_enum.DatasetType.PRODUCT.value:
         print("using the OfficeHome PRODUCT dataset")
-        return TargetDataset(args, "/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
-    elif args.target_dataset == dataset_enum.DatasetType.REAL_WORLD.value:
+    elif dataset_type == dataset_enum.DatasetType.REAL_WORLD.value:
         print("using the OfficeHome REAL_WORLD dataset")
-        return TargetDataset(args, "/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     else:
         ValueError

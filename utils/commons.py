@@ -1,12 +1,10 @@
 import os
-from sys import prefix
 import torch
 
 import pickle
 from PIL import Image
 from models.active_learning.al_method_enum import get_al_method_enum
 
-from models.utils.ssl_method_enum import get_ssl_method
 from datautils.dataset_enum import get_dataset_enum
 import utils.logger as logging
 
@@ -15,7 +13,7 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
     if not os.path.isdir(args.model_checkpoint_path):
         os.makedirs(args.model_checkpoint_path)
 
-    prefix = get_ssl_method(args.method)
+    prefix = None#get_ssl_method(args.method)
     dataset = get_dataset_enum(args.target_dataset)
 
     additional_ext = get_accuracy_file_ext(args)
@@ -33,12 +31,12 @@ def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-
 
 def load_saved_state(args, recent=True, pretrain_level="1"):
     try:
-        prefix = get_ssl_method(args.method)
+        prefix = None #get_ssl_method(args.method)
         if pretrain_level == "2":
             epoch_num = args.target_epochs
 
         else:
-            epoch_num = args.base_epochs
+            epoch_num = args.source_epochs
 
         dataset = get_dataset_enum(args.target_dataset)
         additional_ext = get_accuracy_file_ext(args)
@@ -56,12 +54,12 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         return None
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
-    prefix = get_ssl_method(args.method)
+    prefix = None #get_ssl_method(args.method)
     if pretrain_level == "2":
         epoch_num = args.target_epochs
 
     else:
-        epoch_num = args.base_epochs
+        epoch_num = args.source_epochs
 
     dataset = get_dataset_enum(args.target_dataset)
     filename = "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
@@ -169,8 +167,8 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
         None
 
 def load_accuracy_file(args):
-    dataset = f"{get_dataset_enum(args.base_dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
-    filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
+    dataset = f"{get_dataset_enum(args.source_dataset)}-{get_dataset_enum(args.target_dataset)}"
+    filename = "{}_{}_batch.txt".format(dataset, get_al_method_enum(args.al_method))
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -211,18 +209,18 @@ def pil_loader(path):
             return img.convert('RGB')
 
 def get_accuracy_file_ext(args):
-    if args.do_gradual_base_pretrain and args.base_pretrain:
-        return f'_{args.al_trainer_sample_size}'
+    # if args.do_gradual_base_pretrain and args.base_pretrain:
+    #     return f'_{args.al_trainer_sample_size}'
 
     return ''
 
 
 def get_state_for_da(args):
-    prefix = "swav"
+    prefix = None #"swav"
 
     pretrain_level = 2
     epoch_num = args.target_epochs
-    dataset = get_dataset_enum(args.base_dataset)
+    dataset = get_dataset_enum(args.source_dataset)
 
     filename = "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
     logging.info(f"Loading [uc2] checkpoint from - {filename}")
