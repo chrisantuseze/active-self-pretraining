@@ -121,10 +121,11 @@ def train(args):
 
             if use_source: 
                 with torch.no_grad():
-                    if input_sequence.shape[1] == 1:
-                        input_sequence = torch.cat((input_sequence, input_sequence, input_sequence), dim=1).to(args.device)
+                    x = input_sequence
+                    if x.shape[1] == 1:
+                        x = torch.cat((x, x, x), dim=1).to(args.device)
 
-                    pred_real_label = source_classifier(input_sequence)  
+                    pred_real_label = source_classifier(x)  
             else:
                 pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
