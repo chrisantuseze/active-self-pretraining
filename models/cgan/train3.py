@@ -1,3 +1,9 @@
+import torch
+import torch.nn as nn
+from torchvision.utils import save_image
+import torchvision.datasets as datasets
+from torchvision import transforms
+
 from models.cgan.dataset import FashionMNIST
 from models.cgan.model3 import Discriminator, Generator
 from datautils.target_dataset import get_pretrain_ds
@@ -5,10 +11,6 @@ from models.trainers.resnet import resnet_backbone
 from models.utils.commons import get_ds_num_classes
 from models.utils.training_type_enum import TrainingType
 from models.utils.transformations import Transforms
-import torch
-import torch.nn as nn
-from torchvision.utils import save_image
-import torchvision.datasets as datasets
 
 import os
 
@@ -73,8 +75,8 @@ def train(args):
         class_num, dir = get_ds_num_classes(args.target_dataset)
         n_channel = 3
 
-        transforms = Transforms(img_size, is_train=False)
-        dataset = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN, is_train=False, batch_size=1).get_dataset(transforms)
+        transform = Transforms(img_size, is_train=False)
+        dataset = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN, is_train=False, batch_size=1).get_dataset(transform)
         
 
     print('Train data path:', train_data_path)
