@@ -108,6 +108,7 @@ def train(args):
         if state:
             source_classifier.load_state_dict(state['model'], strict=False)
 
+        source_classifier = source_classifier.to(args.device)
         source_criterion = nn.MSELoss()
         lambda_pred = 0.1 
 
