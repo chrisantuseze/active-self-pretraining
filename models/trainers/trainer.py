@@ -16,6 +16,7 @@ class Trainer:
         self.val_loader = val_loader
         self.train_params = train_params
 
+        self.model = self.model.to(self.args.device)
         self.optimizer = torch.optim.Adam(model.parameters(), lr=train_params.lr, weight_decay=train_params.weight_decay)
         self.criterion = nn.CrossEntropyLoss()
 
