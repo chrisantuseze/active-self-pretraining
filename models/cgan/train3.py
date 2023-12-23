@@ -1,6 +1,9 @@
 from cgan.dataset import FashionMNIST
 from cgan.model3 import Discriminator, Generator
+from datautils.target_dataset import get_pretrain_ds
 from models.trainers.resnet import resnet_backbone
+from models.utils.training_type_enum import TrainingType
+from models.utils.transformations import Transforms
 import torch
 import torch.nn as nn
 import numpy as np
@@ -15,22 +18,9 @@ from PIL import Image
 
 from utils.commons import simple_load_model
 
-def train():
-    # Data
-    batch_size = 32  # Batch size
-
+def train(args):
     # Model
     z_size = 100
-
-    # Training
-    # epochs = 500  # Train epochs
-    learning_rate = 2e-4
-
-    # batchsize = 200
-    epochs = 500
-    class_num = 10
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 
     data_type = "cifar10"
     train_data_path = 'save/' # Path of data
@@ -45,6 +35,8 @@ def train():
         train_data_path = 'save/fashion-mnist_train.csv' # Path of data
 
         img_size = 64 #28
+        class_num = 10
+
         class_list = ['T-Shirt', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
         transform = transforms.Compose([
                 transforms.Resize(img_size),
@@ -55,6 +47,8 @@ def train():
 
     elif data_type == "mnist":
         img_size = 64
+        class_num = 10
+
         dataset = datasets.MNIST(root=train_data_path, download=True,
                                 transform=transforms.Compose([
                                     transforms.Resize(img_size),
@@ -64,6 +58,8 @@ def train():
         
     elif data_type == 'cifar10':
         img_size = 64 #32
+        class_num = 10
+
         class_list = ["airplanes", "cars", "birds", "cats", "deer", "dogs", "frogs", "horses", "ships", "trucks"]
         dataset = datasets.CIFAR10(root=train_data_path, download=True,
                             transform=transforms.Compose([
@@ -73,25 +69,34 @@ def train():
                             ]))
         n_channel = 3
 
+    else:
+        img_size = args.gan_image_size
+        class_num = None
+        n_channel = None
+        
+        transforms = Transforms(img_size, is_train=False)
+        dataset = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN, is_train=False, batch_size=1).get_dataset(transforms)
+        
+
     print('Train data path:', train_data_path)
 
     # train_data = Data(file_name="cifar-10-batches-py/")
-    data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=args.gan_batch_size, shuffle=True, drop_last=True)
 
-    netG = Generator(n_channel, z_size, img_size, class_num, batch_size).to(device)
-    netD = Discriminator(n_channel, img_size, class_num, batch_size).to(device)
+    netG = Generator(n_channel, z_size, img_size, class_num, args.gan_batch_size).to(args.device)
+    netD = Discriminator(n_channel, img_size, class_num, args.gan_batch_size).to(args.device)
 
 
-    optimizerD = torch.optim.Adam(netD.parameters(), lr=learning_rate,betas=(0.5, 0.999))
-    optimizerG = torch.optim.Adam(netG.parameters(), lr=learning_rate,betas=(0.5, 0.999))
+    optimizerD = torch.optim.Adam(netD.parameters(), lr=args.gan_lr, betas=(0.5, 0.999))
+    optimizerG = torch.optim.Adam(netG.parameters(), lr=args.gan_lr, betas=(0.5, 0.999))
 
     netD.train()
     netG.train()
 
     criterion = nn.BCELoss()
 
-    real_label = torch.ones([batch_size, n_channel], dtype=torch.float).to(device)
-    fake_label = torch.zeros([batch_size, n_channel], dtype=torch.float).to(device)
+    real_label = torch.ones([args.gan_batch_size, n_channel], dtype=torch.float).to(args.device)
+    fake_label = torch.zeros([args.gan_batch_size, n_channel], dtype=torch.float).to(args.device)
 
     g_early_stopper = EarlyStopper(patience=3, min_delta=10)
     d_early_stopper = EarlyStopper(patience=3, min_delta=10)
@@ -100,40 +105,40 @@ def train():
 
     if use_source:
         source_classifier = resnet_backbone(args.backbone, pretrained=False)
-        state = simple_load_model(args, path='source_classifier.pth')
+        state = simple_load_model(args, path=f'source_{args.target_dataset}.pth')
         source_classifier.load_state_dict(state['model'], strict=False)
 
         source_criterion = nn.MSELoss()
         lambda_pred = 0.1 
 
-    for epoch in range(epochs):
+    for epoch in range(args.gan_epochs):
         g_loss = 0.0
         d_loss = 0.0
 
         for i, (input_sequence, label) in enumerate(data_loader):
-            input_sequence = input_sequence.to(device)
+            input_sequence = input_sequence.to(args.device)
 
             if use_source: 
                 with torch.no_grad():
                     pred_real_label = source_classifier(input_sequence)  
             else:
-                pred_real_label = label.to(device)
+                pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
 
-            fixed_noise = torch.randn(batch_size, z_size, 1, 1, device=device)
+            fixed_noise = torch.randn(args.gan_batch_size, z_size, 1, 1, device=args.device)
             
             '''
                 Update D network: maximize log(D(x)) + log(1 - D(G(z)))
             '''
 
             d_output_real = netD(input_sequence, pred_real_label)
-            d_output_real = d_output_real.view(batch_size, -1)
+            d_output_real = d_output_real.view(args.gan_batch_size, -1)
             d_real_loss = criterion(d_output_real, real_label)
 
             g_output = netG(fixed_noise, pred_real_label)
 
             d_output_fake = netD(g_output, pred_real_label)
-            d_output_fake = d_output_fake.view(batch_size, -1)
+            d_output_fake = d_output_fake.view(args.gan_batch_size, -1)
             d_fake_loss = criterion(d_output_fake, fake_label)
 
             # Back propagation
@@ -146,14 +151,14 @@ def train():
             '''
                 Update G network: maximize log(D(G(z)))
             '''
-            new_label = torch.LongTensor(batch_size, class_num).random_(0, class_num).to(device)
+            new_label = torch.LongTensor(args.gan_batch_size, class_num).random_(0, class_num).to(args.device)
             new_embed = new_label[:,0].view(-1)
             # print("new_embed.shape", new_embed.shape)
 
             g_output = netG(fixed_noise, new_embed)
 
             d_output_fake = netD(g_output, new_embed)
-            d_output_fake = d_output_fake.view(batch_size, -1)
+            d_output_fake = d_output_fake.view(args.gan_batch_size, -1)
             g_train_loss = criterion(d_output_fake, real_label)
 
             if use_source:  
@@ -180,14 +185,14 @@ def train():
 
         g_loss = g_loss/i
         d_loss = d_loss/i
-        print(f"Epoch: {epoch}/{epochs}", "\t\tG_Loss: %f\tD_Loss: %f\n" % (g_loss, d_loss))
+        print(f"Epoch: {epoch}/{args.gan_epochs}", "\t\tG_Loss: %f\tD_Loss: %f\n" % (g_loss, d_loss))
 
         # Set generator eval
         netG.eval()
-        z = torch.randn(batch_size, z_size, 1, 1, device=device)
+        z = torch.randn(args.gan_batch_size, z_size, 1, 1, device=args.device)
 
         # Labels 0 ~ 9
-        labels = torch.LongTensor(batch_size, class_num).random_(0, class_num).to(device)
+        labels = torch.LongTensor(args.gan_batch_size, class_num).random_(0, class_num).to(args.device)
         labels = labels[:,0].view(-1)
         # print("labels.shape", labels.shape, "labels", labels)
 
@@ -200,16 +205,14 @@ def train():
         if g_early_stopper.early_stop(g_loss) or d_early_stopper.early_stop(d_loss):      
             break
 
-def generate_dataset(generator, data_dir, n_classes, z_size):
+def generate_dataset(args, generator, data_dir, n_classes, z_size):
     # Create a folder to save the images if it doesn't exist
     os.makedirs(data_dir, exist_ok=True)
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
     generator.eval()
     for i in range(200):
-        z = torch.randn(n_classes, z_size, 1, 1, device=device)
-        labels = torch.LongTensor(n_classes, 1).random_(0, n_classes).view(-1).to(device)
+        z = torch.randn(n_classes, z_size, 1, 1, device=args.device)
+        labels = torch.LongTensor(n_classes, 1).random_(0, n_classes).view(-1).to(args.device)
 
         sample_images = generator(z, labels).unsqueeze(1).data.cpu()
         for j, image in enumerate(sample_images.squeeze(1)):

@@ -24,6 +24,27 @@ class TargetDataset():
         self.image_size = params.image_size
         self.batch_size = params.batch_size if not batch_size else batch_size
 
+    def get_dataset(self, transforms, is_tsne=False):
+        return MakeBatchDataset(
+            self.args, self.dir, self.with_train, 
+            self.is_train, is_tsne, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
+                                                                                                self.dir, transform=transforms)
+
+    def get_loader(self):
+        transforms = Transforms(self.image_size, is_train=self.is_train)
+        dataset = self.get_dataset(transforms)
+
+        loader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=self.batch_size,
+            pin_memory=True,
+            shuffle=self.is_train, 
+            num_workers=self.args.workers
+        )
+
+        logging.info(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
+        return loader
+
     def get_loaders(self):
         transforms = Transforms(self.image_size, is_train=True)
         print("dataset path:", self.dir)
