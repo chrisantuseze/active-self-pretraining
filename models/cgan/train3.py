@@ -105,7 +105,8 @@ def train(args):
     if use_source:
         source_classifier = resnet_backbone(args.backbone, pretrained=False)
         state = simple_load_model(args, path=f'source_{args.source_dataset}.pth')
-        source_classifier.load_state_dict(state['model'], strict=False)
+        if state:
+            source_classifier.load_state_dict(state['model'], strict=False)
 
         source_criterion = nn.MSELoss()
         lambda_pred = 0.1 
@@ -119,6 +120,11 @@ def train(args):
 
             if use_source: 
                 with torch.no_grad():
+                    print(input_sequence.shape)
+                    if input_sequence.shape[1] == 1:
+                        print(input_sequence.shape)
+                        input_sequence = torch.cat((input_sequence, input_sequence, input_sequence), dim=1)
+
                     pred_real_label = source_classifier(input_sequence)  
             else:
                 pred_real_label = label.to(args.device)
