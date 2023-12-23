@@ -126,6 +126,7 @@ def train(args):
                         x = torch.cat((x, x, x), dim=1).to(args.device)
 
                     pred_real_label = source_classifier(x)
+                    print(pred_real_label.shape)
                     pred_real_label = pred_real_label[:, 0:1, :, :].long()
             else:
                 pred_real_label = label.to(args.device)
