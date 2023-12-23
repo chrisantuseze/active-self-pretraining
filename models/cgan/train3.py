@@ -120,10 +120,8 @@ def train(args):
 
             if use_source: 
                 with torch.no_grad():
-                    print(input_sequence.shape)
                     if input_sequence.shape[1] == 1:
-                        print(input_sequence.shape)
-                        input_sequence = torch.cat((input_sequence, input_sequence, input_sequence), dim=1)
+                        input_sequence = torch.cat((input_sequence, input_sequence, input_sequence), dim=1).to(args.device)
 
                     pred_real_label = source_classifier(input_sequence)  
             else:
