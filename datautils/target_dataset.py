@@ -30,8 +30,8 @@ class TargetDataset():
         dataset = torchvision.datasets.ImageFolder(self.dir, transform=transforms)
 
         # Define the size of the validation set
-        val_size = int(0.2 * len(dataset))
-        train_size = len(dataset) - val_size
+        train_size = int(self.args.split_ratio * len(dataset))
+        val_size = len(dataset) - train_size
 
         # Split the dataset into train and validation sets
         train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])

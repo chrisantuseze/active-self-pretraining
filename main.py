@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('--source_batch_size', default=128, type=int, help='')
     parser.add_argument('--source_image_size', default=64, type=int, help='')
     parser.add_argument('--source_lr', default=1e-4, type=float, help='')
-    parser.add_argument('--source_epochs', default=300, type=int, help='')
+    parser.add_argument('--source_epochs', default=500, type=int, help='')
     parser.add_argument('--source_weight_decay', default=1.0e-6, type=float, help='')
     parser.add_argument('--source_dataset', default=4, type=int, help='')
 
@@ -38,7 +38,7 @@ def parse_args():
 
     # args for trainer
     parser.add_argument('--dataset_dir', default="./datasets", type=str, help='')
-    parser.add_argument('--backbone', default="resnet50", type=str, help='')
+    parser.add_argument('--backbone', default="resnet18", type=str, help='')
     parser.add_argument('--model_checkpoint_path', default="save/checkpoints", type=str, help='')
     parser.add_argument('--model_misc_path', default="save/misc", type=str, help='')
     parser.add_argument('--gen_images_path', default="generated", type=str, help='')
@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument('--split_ratio', default=0.9, type=float, help='')
     parser.add_argument('--momentum', type=float, default=0.9, help='Momentum for SGD')
     parser.add_argument('--weight_decay', type=float, default=1e-3, help='Weight decay for optimizer')
-    parser.add_argument('--workers', type=int, default=4, help='')
+    parser.add_argument('--workers', type=int, default=8, help='')
     
     parser.add_argument('--log_step', default=200, type=int, help='')
     parser.add_argument('--seed', default=6, type=int, help='')
