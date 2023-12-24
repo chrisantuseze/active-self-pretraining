@@ -148,7 +148,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir in ["./datasets/chest_xray", "./datasets/modern_office_31"]:
+        if self.dir in ["./datasets/modern_office_31"]:
             img = pil_loader(self.img_path[idx])
         else:
             img = Image.open(self.img_path[idx])
@@ -160,24 +160,26 @@ class MakeBatchDataset(torch.utils.data.Dataset):
             return self.transform.__call__(img), torch.tensor(0)
         
         save_class_names(self.args, label)
+
+        return img, label, path
         
-        if self.is_train:
-            img = self.transform.__call__(img)
-            img1 = torch.rot90(img, 1, [1,2])
-            img2 = torch.rot90(img, 2, [1,2])
-            img3 = torch.rot90(img, 3, [1,2])
-            imgs = [img, img1, img2, img3]
-            rotations = [0, 1, 2, 3]
-            random.shuffle(rotations)
+        # if self.is_train:
+        #     img = self.transform.__call__(img)
+        #     img1 = torch.rot90(img, 1, [1,2])
+        #     img2 = torch.rot90(img, 2, [1,2])
+        #     img3 = torch.rot90(img, 3, [1,2])
+        #     imgs = [img, img1, img2, img3]
+        #     rotations = [0, 1, 2, 3]
+        #     random.shuffle(rotations)
 
-            return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
-        else:
-            img = self.transform.__call__(img, False)
-            img1 = torch.rot90(img, 1, [1,2])
-            img2 = torch.rot90(img, 2, [1,2])
-            img3 = torch.rot90(img, 3, [1,2])
-            imgs = [img, img1, img2, img3]
-            rotations = [0, 1, 2, 3]
-            random.shuffle(rotations)
+        #     return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
+        # else:
+        #     img = self.transform.__call__(img)
+        #     img1 = torch.rot90(img, 1, [1,2])
+        #     img2 = torch.rot90(img, 2, [1,2])
+        #     img3 = torch.rot90(img, 3, [1,2])
+        #     imgs = [img, img1, img2, img3]
+        #     rotations = [0, 1, 2, 3]
+        #     random.shuffle(rotations)
 
-            return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path
+        #     return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path

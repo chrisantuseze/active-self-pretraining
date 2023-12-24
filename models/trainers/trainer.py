@@ -69,6 +69,11 @@ class Trainer:
             targets = targets.to(self.args.device)
 
             outputs = self.model(images)
+
+            # preds = torch.nn.functional.softmax(outputs, dim=1).detach()
+            # pred_labels = torch.argmax(preds, dim=1)
+            # print("targets", targets, "pred_labels", pred_labels) 
+            
             loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
@@ -100,6 +105,11 @@ class Trainer:
 
                 # compute output
                 outputs = self.model(images)
+
+                # preds = torch.nn.functional.softmax(outputs, dim=1).detach()
+                # pred_labels = torch.argmax(preds, dim=1)
+                # print("targets", targets, "pred_labels", pred_labels) 
+
                 loss = self.criterion(outputs, targets)
 
                 _, preds = torch.max(outputs, 1)
