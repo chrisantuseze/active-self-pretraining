@@ -68,7 +68,10 @@ class PretextTrainer():
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}'
 
-        print(model)
+        for name, param in model.named_parameters():
+            inits = name.split(".")
+            if "layer3" not in inits and "layer4" not in inits:
+                param.requires_grad = False
 
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
         trainer.train()
