@@ -130,9 +130,7 @@ class PretextTrainer():
                 inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
 
-                pred = F.softmax(outputs, dim=1).detach().cpu()
-                # label = torch.argmax(pred, dim=1)
-                
+                pred = F.softmax(outputs, dim=1).detach().cpu()                
                 _preds.append(pred)
 
                 if step % self.args.log_step == 0:
@@ -141,9 +139,9 @@ class PretextTrainer():
         preds = torch.cat(_preds)#.numpy()
        
         # return self.get_new_samples(preds, samples)
-        return self.get_new_data(preds, 0.5, samples)
+        return self.get_new_data(preds, samples)
     
-    def get_new_data(self, preds, threshold, samples):
+    def get_new_data(self, preds, samples, threshold=0.5):
         # Select high confidence samples
         conf = preds.max(dim=1)[0]
         masks = conf > threshold
@@ -159,12 +157,6 @@ class PretextTrainer():
         # Update the 'label' attribute of each object in the list
         for i, path_loss_obj in enumerate(new_data):
             path_loss_obj.label = new_labels[i].item()
-
-        print("new_data", new_data)
-
-        # Combine labeled data  
-        # combined_data = torch.concat([gen_target_data, new_data], dim=0)
-        # combined_labels = torch.concat([gen_labels, new_labels], dim=0)
 
         return new_data
 
@@ -185,9 +177,7 @@ class PretextTrainer():
         logging.info(f"Size of the original data is {len(path_loss)}")
 
         pretraining_sample_pool = []
-
-        logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
-        logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
+        # logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
 
         sample_per_batch = len(path_loss)//self.args.al_batches
         model = encoder
@@ -203,7 +193,7 @@ class PretextTrainer():
             model.load_state_dict(state['model'], strict=False)
 
             # sampling
-            samplek = self.label_target(model, samples)[:self.args.al_trainer_sample_size]
+            samplek = self.label_target(model, samples)#[:self.args.al_trainer_sample_size]
             model = encoder
 
             pretraining_sample_pool.extend(samplek)
