@@ -161,7 +161,7 @@ class PretextTrainer():
         # Filter objects based on the boolean mask
         new_data = [obj for obj, mask in zip(samples, masks) if mask]
 
-        print("new_data", samples)
+        print("new_data", new_data)
         new_labels = pseudo_labels
 
         # Update the 'label' attribute of each object in the list
