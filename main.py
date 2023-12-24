@@ -68,9 +68,9 @@ def main(args):
     adapter = DomainAdapter(args, writer)
     # adapter.train_source()
 
-    adapter.generate_data()
+    # adapter.generate_data()
 
-    # adapter.train_target()
+    adapter.train_target()
 
 if __name__ == "__main__":
     args = parse_args()

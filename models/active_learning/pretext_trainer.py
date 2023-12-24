@@ -51,8 +51,11 @@ class PretextTrainer():
         
         state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         if not state:
+            state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
+            if state:
+                encoder.load_state_dict(state['model'], strict=False)
+            
             self.train_target(encoder, path_loss_list=[])
-
         return self.self_learning(encoder)
     
     def train_target(self, model, path_loss_list):
