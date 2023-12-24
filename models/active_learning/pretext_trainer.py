@@ -144,29 +144,23 @@ class PretextTrainer():
         return self.get_new_data(preds, 0.5, samples)
     
     def get_new_data(self, preds, threshold, samples):
-        print("preds", preds)
-
         # Select high confidence samples
         conf = preds.max(dim=1)[0]
-        print("conf", conf)
-
         masks = conf > threshold
-        print("masks", masks)
         
         # Get pseudo_labels for high conf samples
         pseudo_labels = preds[masks]
         pseudo_labels = torch.argmax(pseudo_labels, dim=1)
-        logging.info("pseudo_labels:", pseudo_labels)
         
         # Filter objects based on the boolean mask
         new_data = [obj for obj, mask in zip(samples, masks) if mask]
-
-        print("new_data", new_data)
         new_labels = pseudo_labels
 
         # Update the 'label' attribute of each object in the list
         for i, path_loss_obj in enumerate(new_data):
             path_loss_obj.label = new_labels[i]
+
+        print("new_data", new_data)
 
         # Combine labeled data  
         # combined_data = torch.concat([gen_target_data, new_data], dim=0)
