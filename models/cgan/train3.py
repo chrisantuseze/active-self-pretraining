@@ -236,17 +236,20 @@ def generate_dataset(args):
         generator = Generator(n_channel, z_size, args.gan_image_size, n_classes, args.gan_batch_size).to(args.device)
         generator.load_state_dict(stateG['model'], strict=False)
 
+    data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), str(i))
+    for i in range(n_classes):
+        folder = os.path.join(data_dir, str(i))
+        os.makedirs(folder, exist_ok=True)
+
     generator.eval()
+    print("Generating dataset...")
     for i in range(200):
         z = torch.randn(n_classes, z_size, 1, 1, device=args.device)
         labels = torch.LongTensor(n_classes, 1).random_(0, n_classes).view(-1).to(args.device)
 
-        data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), str(i))
-        os.makedirs(data_dir, exist_ok=True)
-
         sample_images = generator(z, labels).unsqueeze(1).data.cpu()
         for j, image in enumerate(sample_images.squeeze(1)):
-            image_path = os.path.join(data_dir, f'image_{labels[j]}_{i}.png')
+            image_path = os.path.join(data_dir, labels[j], f'image_{i}.png')
             save_image(image, image_path)
 
 
