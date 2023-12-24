@@ -249,8 +249,10 @@ def generate_dataset(args):
 
         sample_images = generator(z, labels).unsqueeze(1).data.cpu()
         for j, image in enumerate(sample_images.squeeze(1)):
-            image_path = os.path.join(data_dir, labels[j], f'image_{i}.png')
+            image_path = os.path.join(data_dir, str(labels[j].long()), f'image_{i}.png')
             save_image(image, image_path)
+
+    print("...done")
 
 
 class EarlyStopper:
