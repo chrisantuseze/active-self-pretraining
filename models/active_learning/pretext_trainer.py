@@ -122,7 +122,9 @@ class PretextTrainer():
                 inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
 
-                pred = F.softmax(outputs, dim=1).detach().cpu()
+                pred = F.softmax(outputs, dim=1).detach()
+                # label = torch.argmax(pred, dim=1)
+                
                 _preds.append(pred)
 
                 if step % self.args.log_step == 0:
@@ -134,8 +136,12 @@ class PretextTrainer():
         return self.get_new_data(preds, 0.7, samples)
     
     def get_new_data(self, preds, threshold, samples):
+        print("preds", preds)
+        
         # Select high confidence samples
         conf = preds.max(dim=1)[0]
+        print("conf", conf)
+
         mask = conf > threshold
         
         # Get pseudo_labels for high conf samples

@@ -3,6 +3,7 @@ import torch.nn as nn
 from torchvision.utils import save_image
 import torchvision.datasets as datasets
 from torchvision import transforms
+import torch.nn.functional as F
 
 from models.cgan.dataset import FashionMNIST
 from models.cgan.model3 import Discriminator, Generator
@@ -22,8 +23,8 @@ def train(args):
 
     use_source = True
 
-    # data_type = args.target_dataset #"mnist"
-    data_type = 999
+    data_type = args.target_dataset
+    # data_type = 999
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
@@ -125,9 +126,9 @@ def train(args):
                     if x.shape[1] == 1:
                         x = torch.cat((x, x, x), dim=1).to(args.device)
 
-                    pred_real_label = source_classifier(x)
-                    print(pred_real_label.shape)
-                    pred_real_label = pred_real_label[:, 0:1].long()
+                    real_outputs = source_classifier(x)
+                    preds = F.softmax(real_outputs, dim=1).detach()
+                    pred_real_label = torch.argmax(preds, dim=1)
             else:
                 pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
@@ -170,9 +171,9 @@ def train(args):
 
             if use_source:  
                 with torch.no_grad():
-                    pred_fake_label = source_classifier(g_output) 
+                    fake_outputs = source_classifier(g_output) 
             
-                loss_pred = source_criterion(pred_fake_label, pred_real_label) 
+                loss_pred = source_criterion(fake_outputs, real_outputs) 
                 g_train_loss += lambda_pred * loss_pred
 
             # Back propagation

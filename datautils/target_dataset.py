@@ -46,7 +46,11 @@ class TargetDataset():
         return loader
 
     def get_loaders(self):
-        transforms = Transforms(self.image_size, is_train=True)
+        if self.training_type == TrainingType.SOURCE_PRETRAIN:
+            no_aug = False
+        else:
+            no_aug = True
+        transforms = Transforms(self.image_size, is_train=True, no_aug=no_aug)
         print("dataset path:", self.dir)
         dataset = torchvision.datasets.ImageFolder(self.dir, transform=transforms)
 

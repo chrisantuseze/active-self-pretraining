@@ -100,7 +100,7 @@ def simple_save_model(args, model, path):
 def simple_load_model(args, path):
     try:
         out = os.path.join(args.model_checkpoint_path, path)
-        return torch.load(out)
+        return torch.load(out, map_location=args.device.type)
 
     except IOError as er:
         return None
