@@ -1,3 +1,4 @@
+import os
 import torch
 
 from typing import List
@@ -144,8 +145,21 @@ class MakeBatchDataset(torch.utils.data.Dataset):
 
         self.transform = transform
 
+        subfolders = self.get_subfolders()
+        index = 0
+        self.label_dic = {}
+        for label in subfolders:
+            label = label.replace("\n", "")
+            if label not in self.label_dic:
+                self.label_dic[label] = index
+                index += 1
+
     def __len__(self):
         return len(self.img_path)
+    
+    def get_subfolders(self):
+        subfolders = [f.name for f in os.scandir(self.dir) if f.is_dir()]
+        return subfolders
 
     def __getitem__(self, idx):
         if self.dir in ["./datasets/modern_office_31"]:
@@ -161,8 +175,9 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         if self.is_tnse:
             return img, torch.tensor(0)
         
-        save_class_names(self.args, label)
+        # save_class_names(self.args, label)
 
+        label = self.label_dic[label]
         return img, label, path
         
         # if self.is_train:

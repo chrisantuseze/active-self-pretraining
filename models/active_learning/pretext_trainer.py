@@ -52,9 +52,9 @@ class PretextTrainer():
         
         state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         if not state:
-            # state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
-            # encoder.load_state_dict(state['model'], strict=False)
-            
+            state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
+            encoder.load_state_dict(state['model'], strict=False)
+
             self.train_target(encoder, path_loss_list=[])
         return self.self_learning(encoder)
     
@@ -67,10 +67,10 @@ class PretextTrainer():
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}'
 
-        # for name, param in model.named_parameters():
-        #     inits = name.split(".")
-        #     if "layer3" not in inits and "layer4" not in inits:
-        #         param.requires_grad = False
+        for name, param in model.named_parameters():
+            inits = name.split(".")
+            if "layer3" not in inits and "layer4" not in inits:
+                param.requires_grad = False
 
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
         trainer.train()
