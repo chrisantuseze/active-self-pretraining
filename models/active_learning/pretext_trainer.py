@@ -155,6 +155,7 @@ class PretextTrainer():
         
         # Get pseudo_labels for high conf samples
         pseudo_labels = preds[mask]
+        pseudo_labels = torch.argmax(pseudo_labels, dim=1)
         logging.info("pseudo_labels:", pseudo_labels)
         
         # Use pseudo_labels as labels for new unlab data
