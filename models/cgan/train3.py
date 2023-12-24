@@ -131,7 +131,6 @@ def train(args):
                     real_outputs = source_classifier(x)
                     preds = F.softmax(real_outputs, dim=1).detach()
                     pred_real_label = torch.argmax(preds, dim=1)
-                    print(pred_real_label)
             else:
                 pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
