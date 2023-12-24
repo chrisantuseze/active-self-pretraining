@@ -41,7 +41,7 @@ class Trainer:
         lr = self.train_params.lr
 
         for epoch in range(self.train_params.epochs):
-            logging.info('\nEpoch {}/{} lr: '.format(epoch, self.train_params.epochs, lr))
+            logging.info('\nEpoch {}/{} lr: {}'.format(epoch, self.train_params.epochs, lr))
             logging.info('-' * 20)
 
             train_loss, train_acc = self.train_single_epoch()
