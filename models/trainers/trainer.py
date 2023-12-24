@@ -26,12 +26,10 @@ class Trainer:
                 momentum=args.momentum,
                 weight_decay=train_params.weight_decay,
             )
-            self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                    self.optimizer, train_params.epochs, eta_min=1e-5
-            )
         else:
             self.optimizer = torch.optim.Adam(model.parameters(), lr=train_params.lr, weight_decay=train_params.weight_decay)
         
+        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, train_params.epochs, eta_min=1e-5)
         self.criterion = nn.CrossEntropyLoss()
 
         self.best_model = copy.deepcopy(self.model)
