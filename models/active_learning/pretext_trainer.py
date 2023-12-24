@@ -150,16 +150,17 @@ class PretextTrainer():
         conf = preds.max(dim=1)[0]
         print("conf", conf)
 
-        mask = conf > threshold
-        print("mask", mask)
+        masks = conf > threshold
+        print("masks", masks)
         
         # Get pseudo_labels for high conf samples
-        pseudo_labels = preds[mask]
+        pseudo_labels = preds[masks]
         pseudo_labels = torch.argmax(pseudo_labels, dim=1)
         logging.info("pseudo_labels:", pseudo_labels)
         
-        # Use pseudo_labels as labels for new unlab data
-        new_data = samples[mask]
+        # Filter objects based on the boolean mask
+        new_data = [obj for obj, mask in zip(samples, masks) if mask]
+
         print("new_data", samples)
         new_labels = pseudo_labels
 
