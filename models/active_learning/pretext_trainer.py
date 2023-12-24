@@ -130,7 +130,7 @@ class PretextTrainer():
                 inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
 
-                pred = F.softmax(outputs, dim=1).detach()
+                pred = F.softmax(outputs, dim=1).detach().cpu()
                 # label = torch.argmax(pred, dim=1)
                 
                 _preds.append(pred)
@@ -160,6 +160,7 @@ class PretextTrainer():
         
         # Use pseudo_labels as labels for new unlab data
         new_data = samples[mask]
+        print("new_data", samples)
         new_labels = pseudo_labels
 
         # Update the 'label' attribute of each object in the list
