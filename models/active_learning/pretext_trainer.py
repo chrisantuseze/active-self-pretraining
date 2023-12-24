@@ -44,7 +44,7 @@ class PretextTrainer():
         self.pretraining_gen_images = []
         for path in gen_images:
             label = path.split('/')[-2]
-            logging.info("label:", label)
+            # logging.info("label:", label)
             self.pretraining_gen_images.append(PathLoss(path=path, loss=0, label=label))
 
     def do_self_learning(self):

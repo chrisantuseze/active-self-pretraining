@@ -72,7 +72,8 @@ class Trainer:
 
         total_loss, corrects = 0.0, 0
         for step, (images, targets) in enumerate(self.train_loader):
-            images, targets = images.to(self.args.device), targets.to(self.args.device)
+            images = images.to(self.args.device)
+            targets = targets.to(self.args.device)
 
             outputs = self.model(images)
             loss = self.criterion(outputs, targets)
@@ -101,7 +102,8 @@ class Trainer:
         total_loss, corrects = 0.0, 0
         with torch.no_grad():
             for step, (images, targets) in enumerate(self.val_loader):
-                images, targets = images.to(self.args.device), targets.to(self.args.device)
+                images = images.to(self.args.device)
+                targets = targets.to(self.args.device)
 
                 # compute output
                 outputs = self.model(images)
