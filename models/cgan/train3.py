@@ -241,7 +241,7 @@ def generate_dataset(args):
         z = torch.randn(n_classes, z_size, 1, 1, device=args.device)
         labels = torch.LongTensor(n_classes, 1).random_(0, n_classes).view(-1).to(args.device)
 
-        data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), i)
+        data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), str(i))
         os.makedirs(data_dir, exist_ok=True)
 
         sample_images = generator(z, labels).unsqueeze(1).data.cpu()
