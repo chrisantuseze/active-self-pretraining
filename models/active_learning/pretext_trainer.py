@@ -147,7 +147,7 @@ class PretextTrainer():
         print("preds", preds)
 
         # Select high confidence samples
-        conf = preds.max(dim=1)[0]
+        conf = preds.max(dim=1)
         print("conf", conf)
 
         mask = conf > threshold
