@@ -113,7 +113,7 @@ class PretextTrainer():
                 pathloss.append(PathLoss(path=path, loss=loss))
         
         sorted_samples = sorted(pathloss, key=lambda x: x.loss) # sort the losses from low to high
-        save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
+        # save_path_loss(self.args, self.args.al_path_loss_file, sorted_samples)
 
         return sorted_samples
     

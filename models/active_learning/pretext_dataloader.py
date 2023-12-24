@@ -140,10 +140,9 @@ class MakeBatchDataset(torch.utils.data.Dataset):
 
         self.is_train = is_train
         self.is_tnse = is_tsne
-
-        self.img_path = path_list if path_list is not None else get_images_pathlist(self.dir, with_train)
-
         self.transform = transform
+
+        self.img_path = path_list if path_list else get_images_pathlist(self.dir, with_train)
 
         subfolders = self.get_subfolders()
         index = 0
