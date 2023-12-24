@@ -52,8 +52,8 @@ class PretextTrainer():
         
         state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         if not state:
-            # state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
-            # encoder.load_state_dict(state['model'], strict=False)
+            state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
+            encoder.load_state_dict(state['model'], strict=False)
 
             self.train_target(encoder, path_loss_list=[])
         return self.self_learning(encoder)
@@ -69,10 +69,10 @@ class PretextTrainer():
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}'
 
-        # for name, param in model.named_parameters():
-        #     inits = name.split(".")
-        #     if "layer3" not in inits and "layer4" not in inits:
-        #         param.requires_grad = False
+        for name, param in model.named_parameters():
+            inits = name.split(".")
+            if "layer3" not in inits and "layer4" not in inits:
+                param.requires_grad = False
 
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
         trainer.train()
@@ -80,7 +80,6 @@ class PretextTrainer():
     def make_batches(self, model):
         loader = get_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
-        # model, criterion = get_model_criterion(self.args, model, num_classes=4)
         criterion = torch.nn.CrossEntropyLoss()
         state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
