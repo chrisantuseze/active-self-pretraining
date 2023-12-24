@@ -114,11 +114,10 @@ class PretextDataset(torch.utils.data.Dataset):
         img = Image.open(path)
 
         if path_loss.label:
-            label = path_loss.label
+            label = int(path_loss.label) # NOTE: We're assuming that the labels are string numerals
         elif self.label_dic:
             label = path.split('/')[-2]
             label = torch.tensor(self.label_dic[label])
-            print("here")
         else:
             label = 0
 
