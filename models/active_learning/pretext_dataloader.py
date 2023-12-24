@@ -125,7 +125,7 @@ class PretextDataset(torch.utils.data.Dataset):
         image = self.transform.__call__(img)
 
         if not isinstance(label, int):
-            print(label)
+            print("pds", label)
 
         return image, label
 
