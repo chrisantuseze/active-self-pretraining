@@ -137,7 +137,7 @@ class PretextTrainer():
     
     def get_new_data(self, preds, threshold, samples):
         print("preds", preds)
-        
+
         # Select high confidence samples
         conf = preds.max(dim=1)[0]
         print("conf", conf)

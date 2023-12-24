@@ -1,3 +1,4 @@
+from datautils.dataset_enum import get_dataset_enum
 import torch
 import torch.nn as nn
 from torchvision.utils import save_image
@@ -15,7 +16,7 @@ from models.utils.transformations import Transforms
 
 import os
 
-from utils.commons import simple_load_model
+from utils.commons import simple_load_model, simple_save_model
 
 def train(args):
     # Model
@@ -23,12 +24,12 @@ def train(args):
 
     use_source = True
 
-    # data_type = args.target_dataset
-    data_type = 999
+    data_type = args.target_dataset
+    # data_type = 999
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
-    output_folder = args.gen_images_path
+    output_folder = os.path.join(args.gen_images_path, "misc_" + get_dataset_enum(args.target_dataset))
     os.makedirs(output_folder, exist_ok=True)
 
     n_channel = 1
@@ -105,7 +106,7 @@ def train(args):
 
     if use_source:
         source_classifier = resnet_backbone(args.backbone, pretrained=False)
-        state = simple_load_model(args, path=f'source_{args.source_dataset}.pth')
+        state = simple_load_model(args, path=f'source_{get_dataset_enum(args.source_dataset)}.pth')
         if state:
             source_classifier.load_state_dict(state['model'], strict=False)
 
@@ -215,9 +216,26 @@ def train(args):
         if g_early_stopper.early_stop(g_loss) or d_early_stopper.early_stop(d_loss):      
             break
 
-def generate_dataset(args, generator, data_dir, n_classes, z_size):
+    simple_save_model(args, netG, f'netG_{get_dataset_enum(args.target_dataset)}.pth')
+    simple_save_model(args, netD, f'netD_{get_dataset_enum(args.target_dataset)}.pth')
+
+    return netG
+
+def generate_dataset(args):
+    n_classes, dir = get_ds_num_classes(args.target_dataset)
+    n_channel = 3
+    z_size = 100
+
     # Create a folder to save the images if it doesn't exist
+    data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
     os.makedirs(data_dir, exist_ok=True)
+    
+    stateG = simple_load_model(args, path=f'netG_{get_dataset_enum(args.target_dataset)}.pth')
+    if not stateG:
+        generator = train(args)
+    else:
+        generator = Generator(n_channel, z_size, args.gan_image_size, n_classes, args.gan_batch_size).to(args.device)
+        generator.load_state_dict(stateG['model'], strict=False)
 
     generator.eval()
     for i in range(200):
@@ -228,6 +246,7 @@ def generate_dataset(args, generator, data_dir, n_classes, z_size):
         for j, image in enumerate(sample_images.squeeze(1)):
             image_path = os.path.join(data_dir, f'{i}/image_{labels[j]}_{i}.png')
             save_image(image, image_path)
+
 
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):

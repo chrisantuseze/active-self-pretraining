@@ -37,7 +37,7 @@ def parse_args():
     parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
     parser.add_argument('--al_batches', default=5, type=int, help='')
 
-    parser.add_argument('--gan_batch_size', default=64, type=int, help='')
+    parser.add_argument('--gan_batch_size', default=32, type=int, help='')
     parser.add_argument('--gan_image_size', default=64, type=int, help='')
     parser.add_argument('--gan_lr', default=1.0e-4, type=float, help='')
     parser.add_argument('--gan_epochs', default=100, type=int, help='')
@@ -66,7 +66,7 @@ def main(args):
     writer = SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
-    # adapter.train_source()
+    adapter.train_source()
 
     adapter.generate_data()
 

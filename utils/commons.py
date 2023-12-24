@@ -98,6 +98,7 @@ def simple_save_model(args, model, path):
     torch.save(state, out)
 
 def simple_load_model(args, path):
+    logging.info("Loading model from", path)
     try:
         out = os.path.join(args.model_checkpoint_path, path)
         return torch.load(out, map_location=args.device.type)
