@@ -61,8 +61,10 @@ class PretextTrainer():
     def train_target(self, model, path_loss_list):
         path_loss_list = self.pretraining_gen_images + path_loss_list
         
-        train_loader, val_loader = PretextDataLoader(
-            self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
+        # train_loader, val_loader = PretextDataLoader(
+        #     self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
+
+        train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
 
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}'
