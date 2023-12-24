@@ -17,22 +17,40 @@ class Trainer:
         self.train_params = train_params
 
         self.model = self.model.to(self.args.device)
-        self.optimizer = torch.optim.Adam(model.parameters(), lr=train_params.lr, weight_decay=train_params.weight_decay)
+        # self.optimizer = torch.optim.Adam(model.parameters(), lr=train_params.lr, weight_decay=train_params.weight_decay)
+
+        self.optimizer = torch.optim.SGD(
+            model.parameters(),
+            lr=train_params.lr,
+            nesterov=False,
+            momentum=args.momentum,
+            weight_decay=train_params.weight_decay,
+        )
+        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                self.optimizer, train_params.epochs, eta_min=1e-5
+        )
+        
         self.criterion = nn.CrossEntropyLoss()
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
+        lr = train_params.lr
 
     def train(self) -> None:
 
         val_acc_history = []
         for epoch in range(self.train_params.epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, self.train_params.epochs))
+            logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.lc_epochs, lr))
             logging.info('-' * 20)
 
             train_loss, train_acc = self.train_single_epoch()
             val_loss, val_acc = self.validate()
             val_acc_history.append(str(val_acc))
+
+            # Decay Learning Rate
+            if self.scheduler:
+                self.scheduler.step()
+                lr = self.scheduler.get_last_lr()
 
             self.writer.add_scalar(f"{self.train_params.name}/train_loss", train_loss, epoch)
             self.writer.add_scalar(f"{self.train_params.name}/val_loss", val_loss, epoch)
