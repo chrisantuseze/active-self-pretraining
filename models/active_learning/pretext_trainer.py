@@ -1,4 +1,5 @@
 import glob
+import os
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -35,9 +36,9 @@ class PretextTrainer():
         self.dataset = get_dataset_enum(self.args.target_dataset)
 
         self.train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-
-        gen_folder = f'generated_{get_dataset_enum(self.args.target_dataset)}'
-        gen_images = glob.glob(f'{self.args.dataset_dir}/{gen_folder}/*/*')
+        
+        data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
+        gen_images = glob.glob(f'{data_dir}/*/*')
         # self.pretraining_gen_images = [PathLoss(path=path, loss=0) for path in gen_images]
 
         self.pretraining_gen_images = []

@@ -191,7 +191,7 @@ def save_class_names(args, label):
         logging.error(er)
         None
 
-def load_class_names(args):
+def load_class_names(args) -> list:
     filename = f"{get_dataset_enum(args.target_dataset)}.txt"
     out = os.path.join(args.model_misc_path, filename)
 
@@ -201,7 +201,7 @@ def load_class_names(args):
 
     except IOError as er:
         logging.error(er)
-        return None
+        return []
 
 def pil_loader(path):
         # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)

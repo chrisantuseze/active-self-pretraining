@@ -114,9 +114,11 @@ class PretextDataset(torch.utils.data.Dataset):
 
         if path_loss.label:
             label = path_loss.label
-        else:
+        elif self.label_dic:
             label = path.split('/')[-2]
             label = torch.tensor(self.label_dic[label])
+        else:
+            label = 0
 
         image = self.transform.__call__(img)
 
