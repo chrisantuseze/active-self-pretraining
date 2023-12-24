@@ -78,16 +78,13 @@ class PretextTrainer():
     def make_batches(self, model):
         loader = get_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
-        model, criterion = get_model_criterion(self.args, model, num_classes=4)
-
+        # model, criterion = get_model_criterion(self.args, model, num_classes=4)
+        criterion = torch.nn.CrossEntropyLoss()
         state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
-        correct = 0
-        total = 0
         pathloss = []
-
         logging.info("About to begin eval to make batches")
 
         model.eval()
@@ -97,11 +94,6 @@ class PretextTrainer():
 
                 outputs = model(inputs)
                 loss = criterion(outputs, targets)
-
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-
                 loss = loss.item()
 
                 if step % self.args.log_step == 0:

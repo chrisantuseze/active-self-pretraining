@@ -92,7 +92,8 @@ class PretextDataset(torch.utils.data.Dataset):
         self.transform = Transforms(image_size, is_val)
         self.is_val = is_val
 
-        labels = set(load_class_names(self.args))
+        # labels = set(load_class_names(self.args))
+        labels = []
         index = 0
         self.label_dic = {}
         for label in labels:
