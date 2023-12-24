@@ -21,7 +21,7 @@ def train(args):
     # Model
     z_size = 100
 
-    use_source = False
+    use_source = True
 
     # data_type = args.target_dataset
     data_type = 999
@@ -113,6 +113,7 @@ def train(args):
         source_criterion = nn.MSELoss()
         lambda_pred = 0.1 
 
+    print("Training CGAN model....")
     for epoch in range(args.gan_epochs):
         g_loss = 0.0
         d_loss = 0.0
@@ -129,6 +130,7 @@ def train(args):
                     real_outputs = source_classifier(x)
                     preds = F.softmax(real_outputs, dim=1).detach()
                     pred_real_label = torch.argmax(preds, dim=1)
+                    print(pred_real_label)
             else:
                 pred_real_label = label.to(args.device)
                 # print("pred_real_label.shape", pred_real_label.shape, "pred_real_label", pred_real_label)
