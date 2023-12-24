@@ -226,8 +226,8 @@ def generate_dataset(args):
     z_size = 100
 
     # Create a folder to save the images if it doesn't exist
-    data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
-    os.makedirs(data_dir, exist_ok=True)
+    # data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
+    # os.makedirs(data_dir, exist_ok=True)
     
     stateG = simple_load_model(args, path=f'netG_{get_dataset_enum(args.target_dataset)}.pth')
     if not stateG:
@@ -241,9 +241,12 @@ def generate_dataset(args):
         z = torch.randn(n_classes, z_size, 1, 1, device=args.device)
         labels = torch.LongTensor(n_classes, 1).random_(0, n_classes).view(-1).to(args.device)
 
+        data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), i)
+        os.makedirs(data_dir, exist_ok=True)
+
         sample_images = generator(z, labels).unsqueeze(1).data.cpu()
         for j, image in enumerate(sample_images.squeeze(1)):
-            image_path = os.path.join(data_dir, f'{i}/image_{labels[j]}_{i}.png')
+            image_path = os.path.join(data_dir, f'image_{labels[j]}_{i}.png')
             save_image(image, image_path)
 
 
