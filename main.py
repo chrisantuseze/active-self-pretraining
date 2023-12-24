@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument('--target_lr', default=1.0e-3, type=float, help='')
     parser.add_argument('--target_epochs', default=25, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-6, type=float, help='')
-    parser.add_argument('--target_dataset', default=4, type=int, help='')
+    parser.add_argument('--target_dataset', default=6, type=int, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
