@@ -141,16 +141,17 @@ class PretextTrainer():
         preds = torch.cat(_preds)#.numpy()
        
         # return self.get_new_samples(preds, samples)
-        return self.get_new_data(preds, 0.7, samples)
+        return self.get_new_data(preds, 0.5, samples)
     
     def get_new_data(self, preds, threshold, samples):
         print("preds", preds)
 
         # Select high confidence samples
-        conf = preds.max(dim=1)
+        conf = preds.max(dim=1)[0]
         print("conf", conf)
 
         mask = conf > threshold
+        print("mask", mask)
         
         # Get pseudo_labels for high conf samples
         pseudo_labels = preds[mask]
