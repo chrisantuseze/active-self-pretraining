@@ -57,9 +57,10 @@ class PretextDataLoader():
         return loader
     
     def get_loaders(self):
-        total_size = len(self.path_loss_list)
-        train = self.path_loss_list[: int(total_size * 0.9)]
-        val = self.path_loss_list[int(total_size * 0.1):]
+        split_index = int(len(self.path_loss_list)* 0.9)
+
+        train = self.path_loss_list[:split_index]
+        val = self.path_loss_list[split_index:]
 
         train_dataset = PretextDataset(self.args, train, self.image_size, is_val=False)
         val_dataset = PretextDataset(self.args, val, self.image_size, is_val=True)
@@ -114,6 +115,7 @@ class PretextDataset(torch.utils.data.Dataset):
 
         if path_loss.label:
             label = path_loss.label
+            print(label)
         elif self.label_dic:
             label = path.split('/')[-2]
             label = torch.tensor(self.label_dic[label])
