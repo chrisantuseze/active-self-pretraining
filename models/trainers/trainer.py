@@ -34,11 +34,12 @@ class Trainer:
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
-        lr = train_params.lr
 
     def train(self) -> None:
 
         val_acc_history = []
+        lr = self.train_params.lr
+
         for epoch in range(self.train_params.epochs):
             logging.info('\nEpoch {}/{} lr: '.format(epoch, self.train_params.epochs, lr))
             logging.info('-' * 20)
