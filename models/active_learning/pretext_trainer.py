@@ -158,7 +158,7 @@ class PretextTrainer():
 
         # Update the 'label' attribute of each object in the list
         for i, path_loss_obj in enumerate(new_data):
-            path_loss_obj.label = new_labels[i]
+            path_loss_obj.label = new_labels[i].item()
 
         print("new_data", new_data)
 
