@@ -23,8 +23,8 @@ def train(args):
 
     use_source = True
 
-    data_type = args.target_dataset
-    # data_type = 999
+    # data_type = args.target_dataset
+    data_type = 999
     train_data_path = 'save/' # Path of data
 
     # Create a folder to save the images if it doesn't exist
