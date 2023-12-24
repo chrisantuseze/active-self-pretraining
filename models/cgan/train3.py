@@ -236,7 +236,7 @@ def generate_dataset(args):
         generator = Generator(n_channel, z_size, args.gan_image_size, n_classes, args.gan_batch_size).to(args.device)
         generator.load_state_dict(stateG['model'], strict=False)
 
-    data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset), str(i))
+    data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
     for i in range(n_classes):
         folder = os.path.join(data_dir, str(i))
         os.makedirs(folder, exist_ok=True)
