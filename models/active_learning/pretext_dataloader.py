@@ -153,11 +153,13 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         else:
             img = Image.open(self.img_path[idx])
 
+        img = self.transform.__call__(img)
+
         path = self.img_path[idx] 
         label = path.split('/')[-2]
 
         if self.is_tnse:
-            return self.transform.__call__(img), torch.tensor(0)
+            return img, torch.tensor(0)
         
         save_class_names(self.args, label)
 
