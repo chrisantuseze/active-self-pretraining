@@ -16,7 +16,7 @@ def parse_args():
 
     parser.add_argument('--source_batch_size', default=8, type=int, help='')
     parser.add_argument('--source_image_size', default=128, type=int, help='')
-    parser.add_argument('--source_lr', default=5e-4, type=float, help='')
+    parser.add_argument('--source_lr', default=1e-3, type=float, help='')
     parser.add_argument('--source_epochs', default=600, type=int, help='')
     parser.add_argument('--source_weight_decay', default=1.0e-3, type=float, help='')
     parser.add_argument('--source_dataset', default=4, type=int, help='')

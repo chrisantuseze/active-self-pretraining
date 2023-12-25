@@ -2,7 +2,7 @@ from datautils.dataset_enum import get_dataset_enum
 from models.active_learning.pretext_trainer import PretextTrainer
 from models.cgan.train3 import generate_dataset
 from models.trainers.trainer import Trainer
-from models.utils.commons import get_params
+from models.utils.commons import get_ds_num_classes, get_params
 import torch
 import torch.nn as nn
 
@@ -20,8 +20,10 @@ class DomainAdapter:
     def train_source(self):
         train_params = get_params(self.args, TrainingType.SOURCE_PRETRAIN)
 
-        model = resnet_backbone(self.args.backbone, pretrained=True)
+        num_classes, dir = get_ds_num_classes(self.args.source_dataset)
+        model = resnet_backbone(self.args.backbone, num_classes, pretrained=True)
         print("=> creating model '{}'".format(self.args.backbone))
+        print(model)
 
         train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.SOURCE_PRETRAIN).get_loaders() 
 

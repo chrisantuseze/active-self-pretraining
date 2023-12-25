@@ -113,11 +113,14 @@ def resnet50():
     return ResNet(Bottleneck, [3, 4, 6, 3])
 
 
-def resnet_backbone(name, pretrained=False):
+def resnet_backbone(name, num_classes, pretrained=False):
     resnets = {
         "resnet18": torchvision.models.resnet18(pretrained=pretrained),
         "resnet50": torchvision.models.resnet50(pretrained=pretrained),
     }
     if name not in resnets.keys():
         raise KeyError(f"{name} is not a valid ResNet version")
-    return resnets[name]
+    resnet_model = resnets[name]
+    resnet_model.fc = nn.Linear(resnet_model.fc.in_features, num_classes)
+    return resnet_model
+

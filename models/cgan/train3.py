@@ -105,7 +105,8 @@ def train(args):
     d_early_stopper = EarlyStopper(patience=3, min_delta=10)
 
     if use_source:
-        source_classifier = resnet_backbone(args.backbone, pretrained=False)
+        num_classes, dir = get_ds_num_classes(args.source_dataset)
+        source_classifier = resnet_backbone(args.backbone, num_classes, pretrained=False)
         state = simple_load_model(args, path=f'source_{get_dataset_enum(args.source_dataset)}.pth')
         if state:
             source_classifier.load_state_dict(state['model'], strict=False)
