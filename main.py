@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument('--target_lr', default=1.0e-3, type=float, help='')
     parser.add_argument('--target_epochs', default=25, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-6, type=float, help='')
-    parser.add_argument('--target_dataset', default=6, type=int, help='')
+    parser.add_argument('--target_dataset', default=5, type=int, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
@@ -45,7 +45,7 @@ def parse_args():
 
     # args for trainer
     parser.add_argument('--dataset_dir', default="./datasets", type=str, help='')
-    parser.add_argument('--backbone', default="resnet18", type=str, help='')
+    parser.add_argument('--backbone', default="resnet50", type=str, help='')
     parser.add_argument('--model_checkpoint_path', default="save/checkpoints", type=str, help='')
     parser.add_argument('--model_misc_path', default="save/misc", type=str, help='')
     parser.add_argument('--gen_images_path', default="generated", type=str, help='')
@@ -66,7 +66,7 @@ def main(args):
     writer = SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
-    # adapter.train_source()
+    adapter.train_source()
 
     adapter.generate_data()
 

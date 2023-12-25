@@ -20,7 +20,7 @@ class DomainAdapter:
     def train_source(self):
         train_params = get_params(self.args, TrainingType.SOURCE_PRETRAIN)
 
-        model = resnet_backbone(self.args.backbone, pretrained=False)
+        model = resnet_backbone(self.args.backbone, pretrained=True)
         print("=> creating model '{}'".format(self.args.backbone))
 
         train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.SOURCE_PRETRAIN).get_loaders() 
