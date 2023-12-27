@@ -9,6 +9,7 @@ import argparse
 from utils.random_seeders import set_random_seeds
 
 import utils.logger as logging
+from utils.viz import viz
 logging.init()
 
 def parse_args():
@@ -26,7 +27,7 @@ def parse_args():
     parser.add_argument('--target_lr', default=1.0e-3, type=float, help='')
     parser.add_argument('--target_epochs', default=25, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-6, type=float, help='')
-    parser.add_argument('--target_dataset', default=5, type=int, help='')
+    parser.add_argument('--target_dataset', default=6, type=int, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
@@ -82,7 +83,8 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     main(args)
-    # tsne_similarity(args)
+
+    # viz(args)
 
     logging.info("GASP ended.")
 
