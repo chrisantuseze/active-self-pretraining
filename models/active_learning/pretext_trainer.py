@@ -61,10 +61,10 @@ class PretextTrainer():
     def train_target(self, model, path_loss_list, suffix=""):
         path_loss_list = self.pretraining_gen_images + path_loss_list
         
-        # train_loader, val_loader = PretextDataLoader(
-        #     self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
+        train_loader, val_loader = PretextDataLoader(
+            self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
 
-        train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
+        # train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
 
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}{suffix}'
@@ -130,9 +130,8 @@ class PretextTrainer():
                 if step % self.args.log_step == 0:
                     logging.info(f"Eval Step [{step}/{len(loader)}]")
 
-        preds = torch.cat(_preds)#.numpy()
+        preds = torch.cat(_preds)
        
-        # return self.get_new_samples(preds, samples)
         return self.get_new_data(preds, samples)
     
     def get_new_data(self, preds, samples, threshold=0.5):
@@ -154,17 +153,6 @@ class PretextTrainer():
 
         return new_data
 
-
-    def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        entropy = (np.log(preds) * preds).sum(axis=1) * -1.
-        indices = entropy.argsort(axis=0)[::-1]
-
-        new_samples = []
-        for item in indices:
-            new_samples.append(samples[item]) # Map back to original indices
-
-        return new_samples
-    
     def self_learning(self, encoder):
         path_loss = self.make_batches(encoder, "-1")
         path_loss = path_loss[::-1][:10000] # this does a reverse active learning to pick only the most certain data
