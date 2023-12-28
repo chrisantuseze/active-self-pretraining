@@ -19,7 +19,6 @@ from utils.commons import save_path_loss, simple_load_model
 
 
 from models.trainers.trainer import Trainer
-from utils.viz import visualize_features
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
