@@ -74,6 +74,7 @@ class PretextTrainer():
             if "layer3" not in inits and "layer4" not in inits:
                 param.requires_grad = False
 
+        print("train_params.name", train_params.name)
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
         trainer.train()
 
