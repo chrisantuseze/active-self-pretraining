@@ -78,11 +78,11 @@ class PretextTrainer():
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
         trainer.train()
 
-    def make_batches(self, model):
+    def make_batches(self, model, suffix=""):
         loader = get_pretrain_ds(self.args, training_type=TrainingType.ACTIVE_LEARNING, is_train=False, batch_size=1).get_loader()
 
         criterion = torch.nn.CrossEntropyLoss()
-        state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'target_{self.dataset}{suffix}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -166,7 +166,7 @@ class PretextTrainer():
         return new_samples
     
     def self_learning(self, encoder):
-        path_loss = self.make_batches(encoder)
+        path_loss = self.make_batches(encoder, "-1")
         path_loss = path_loss[::-1][:10000] # this does a reverse active learning to pick only the most certain data
         logging.info(f"Size of the original data is {len(path_loss)}")
 
