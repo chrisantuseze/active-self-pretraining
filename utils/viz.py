@@ -88,7 +88,7 @@ def visualize_source_model_features(args, source_model, source_data, target_data
     plt.title('Before Adaptation')
     plt.show()
 
-def visualize_adapted_model_features(args, adapted_model, source_data, target_data):
+def visualize_adapted_model_features(args, adapted_model, source_data, target_data, batch):
     for _, (images, _) in enumerate(source_data):
         with torch.no_grad():
             images = images.to(args.device)
@@ -117,7 +117,7 @@ def visualize_adapted_model_features(args, adapted_model, source_data, target_da
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
-    plt.title('After Adaptation')
+    plt.title(f'After Adaptation {batch}')
     plt.show()
 
 def visualize_features_both(args, source_model, adapted_model, source_data, target_data):
@@ -176,33 +176,9 @@ def visualize_features_both(args, source_model, adapted_model, source_data, targ
     plt.title('After Adaptation')
     plt.show()
 
-def visualize_classification_accuracy(source_model, adapted_model, source_data, target_data):
-    domain_classifier = DomainClassifier() 
-
-    # Before adaptation
-    source_features = source_model.features(source_data)
-    source_target_features = source_model.features(target_data)
-
-    src_acc = domain_classifier.accuracy(source_features) 
-    tgt_acc = domain_classifier.accuracy(source_target_features)
-
-    print('Before Adaptation:') 
-    print(f'Source accuracy: {src_acc:.2f}')
-    print(f'Target accuracy: {tgt_acc:.2f}')
-
-    # After adaptation
-    source_features = adapted_model.features(source_data)
-    target_features = adapted_model.features(target_data) 
-
-    src_acc = domain_classifier.accuracy(source_features)
-    tgt_acc = domain_classifier.accuracy(target_features) 
-
-    print('After Adaptation:')
-    print(f'Source accuracy: {src_acc:.2f}') 
-    print(f'Target accuracy: {tgt_acc:.2f}')
-
-
 def viz(args):
+    args.source_batch_size = 128
+    args.target_batch_size = 128
     num_classes, dir = get_ds_num_classes(args.source_dataset)
     encoder = resnet_backbone(args.backbone, num_classes, pretrained=False)
     
@@ -224,4 +200,4 @@ def viz(args):
         target_model = target_model.to(args.device)
         target_model.eval()
 
-        visualize_adapted_model_features(args, target_model, source_train_loader, target_train_loader)
+        visualize_adapted_model_features(args, target_model, source_train_loader, target_train_loader, batch)
