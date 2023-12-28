@@ -82,9 +82,9 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
-    # main(args)
+    main(args)
 
-    viz(args)
+    # viz(args)
 
     logging.info("GASP ended.")
 
