@@ -19,6 +19,7 @@ from utils.commons import save_path_loss, simple_load_model
 
 
 from models.trainers.trainer import Trainer
+from utils.viz import visualize_features
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
@@ -55,10 +56,10 @@ class PretextTrainer():
             state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
             encoder.load_state_dict(state['model'], strict=False)
 
-            self.train_target(encoder, path_loss_list=[])
+            self.train_target(encoder, path_loss_list=[], suffix="-1")
         return self.self_learning(encoder)
     
-    def train_target(self, model, path_loss_list):
+    def train_target(self, model, path_loss_list, suffix=""):
         path_loss_list = self.pretraining_gen_images + path_loss_list
         
         # train_loader, val_loader = PretextDataLoader(
@@ -67,7 +68,7 @@ class PretextTrainer():
         train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
 
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
-        train_params.name = f'target_{self.dataset}'
+        train_params.name = f'target_{self.dataset}{suffix}'
 
         for name, param in model.named_parameters():
             inits = name.split(".")
@@ -180,22 +181,18 @@ class PretextTrainer():
 
         for batch in range(self.args.al_batches):
             logging.info(f'Batch {batch}')
-            samples = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
-            state = simple_load_model(self.args, path=f'{train_params.name}.pth')
+            state = simple_load_model(self.args, path=f'{train_params.name}{str(batch-1)}.pth')
             model.load_state_dict(state['model'], strict=False)
+
+            samples = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
             # sampling
             samplek = self.label_target(model, samples)#[:self.args.al_trainer_sample_size]
-            model = encoder
-
             pretraining_sample_pool.extend(samplek)
 
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
             # retrain target using labeled target data
-            state = simple_load_model(self.args, path=f'{train_params.name}.pth')
-            model.load_state_dict(state['model'], strict=False)
-
-            self.train_target(model, pretraining_sample_pool)
+            self.train_target(model, pretraining_sample_pool, suffix=str(batch))
             model = encoder
