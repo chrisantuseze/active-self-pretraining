@@ -50,29 +50,25 @@ class PretextTrainer():
     def do_self_learning(self):
         encoder = resnet_backbone(self.args.backbone, self.num_classes, pretrained=True)
         
-        state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
-        if not state:
-            state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
-            encoder.load_state_dict(state['model'], strict=False)
+        # state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
+        # if not state:
+        state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')
+        encoder.load_state_dict(state['model'], strict=False)
 
-            self.train_target(encoder, path_loss_list=[], suffix="-1")
+        self.train_target(encoder, path_loss_list=[], suffix="-1")
         return self.self_learning(encoder)
+        
     
     def train_target(self, model, path_loss_list, suffix=""):
         path_loss_list = self.pretraining_gen_images + path_loss_list
         
-        train_loader, val_loader = PretextDataLoader(
-            self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
+        # train_loader, val_loader = PretextDataLoader(
+        #     self.args, path_loss_list, training_type=TrainingType.TARGET_PRETRAIN, is_val=False).get_loaders()
 
-        # train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
+        train_loader, val_loader = get_pretrain_ds(self.args, training_type=TrainingType.TARGET_PRETRAIN).get_loaders() 
 
         train_params = get_params(self.args, TrainingType.TARGET_PRETRAIN)
         train_params.name = f'target_{self.dataset}{suffix}'
-
-        for name, param in model.named_parameters():
-            inits = name.split(".")
-            if "layer3" not in inits and "layer4" not in inits:
-                param.requires_grad = False
 
         print("train_params.name", train_params.name)
         trainer = Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)

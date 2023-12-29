@@ -40,23 +40,6 @@ def get_feature_dimensions_backbone(args):
     else:
         raise NotImplementedError
 
-def set_parameter_requires_grad(model, feature_extract):
-    if feature_extract:
-        for param in model.parameters():
-            param.requires_grad = False
-
-def get_params_to_update(model, feature_extract):
-    params_to_update = model.parameters()
-
-    if feature_extract:
-        params_to_update = []
-
-        for name, param in model.named_parameters():
-            if param.requires_grad == True:
-                params_to_update.append(param)
-
-    return params_to_update
-
 def get_params(args, training_type):
 
     params = {
@@ -159,33 +142,28 @@ def get_ds_num_classes(dataset):
     
     return num_classes, dir
 
-def prepare_model(args, trainingType, model):
+def set_parameter_requires_grad(model, feature_extract):
+    if feature_extract:
+        for param in model.parameters():
+            param.requires_grad = False
+
+def get_params_to_update(model, feature_extract):
     params_to_update = model.parameters()
-            
-    if (trainingType == TrainingType.SOURCE_PRETRAIN and args.base_pretrain) or (trainingType == TrainingType.TARGET_PRETRAIN and not args.base_pretrain):
-        state = load_saved_state(args, pretrain_level="1")
-        if args.do_gradual_base_pretrain and state is not None:
-            logging.info("Using base pretrained model")
 
-            model.load_state_dict(state['model'], strict=False)
+    if feature_extract:
+        params_to_update = []
 
-        elif args.training_type in ["uc2", "pete_2"]:
-            state = get_state_for_da(args)
-            model.load_state_dict(state['model'], strict=False)
+        for name, param in model.named_parameters():
+            if param.requires_grad == True:
+                params_to_update.append(param)
 
-        else:
-            logging.info("Using downloaded swav pretrained model")
-            model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
+    return params_to_update
 
-    else:
-        state = load_saved_state(args, pretrain_level="1")
-        model.load_state_dict(state['model'], strict=False)
+def prepare_model(model):
+    params_to_update = model.parameters()
 
     # freeze some layers
     for name, param in model.named_parameters():
-        if 'projection_head' in name or 'prototypes' in name:
-            continue
-
         if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name):
             continue
 
@@ -193,7 +171,7 @@ def prepare_model(args, trainingType, model):
 
     params_to_update = get_params_to_update(model, feature_extract=True)
 
-    return model, params_to_update
+    return params_to_update
 
 def get_images_pathlist(dir, with_train):
     if dir == "./datasets/modern_office_31":

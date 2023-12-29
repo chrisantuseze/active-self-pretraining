@@ -1,11 +1,12 @@
 import copy
+from datautils.dataset_enum import get_dataset_enum
 
 import torch
 import torch.nn as nn
 from utils.commons import simple_save_model
 
 import utils.logger as logging
-from models.utils.commons import accuracy
+from models.utils.commons import accuracy, prepare_model
 
 class Trainer:
     def __init__(self, args, writer, model, train_loader, val_loader, train_params) -> None:
@@ -16,9 +17,11 @@ class Trainer:
         self.val_loader = val_loader
         self.train_params = train_params
 
+        params_to_update = prepare_model(self.model) 
+
         self.model = self.model.to(self.args.device)
         self.optimizer = torch.optim.SGD(
-            model.parameters(),
+            params_to_update,
             lr=train_params.lr,
             nesterov=False,
             momentum=args.momentum,
@@ -69,11 +72,6 @@ class Trainer:
             targets = targets.to(self.args.device)
 
             outputs = self.model(images)
-
-            # preds = torch.nn.functional.softmax(outputs, dim=1).detach()
-            # pred_labels = torch.argmax(preds, dim=1)
-            # print("targets", targets, "pred_labels", pred_labels) 
-            
             loss = self.criterion(outputs, targets)
             _, preds = torch.max(outputs, 1)
 
@@ -105,11 +103,6 @@ class Trainer:
 
                 # compute output
                 outputs = self.model(images)
-
-                # preds = torch.nn.functional.softmax(outputs, dim=1).detach()
-                # pred_labels = torch.argmax(preds, dim=1)
-                # print("targets", targets, "pred_labels", pred_labels) 
-
                 loss = self.criterion(outputs, targets)
 
                 _, preds = torch.max(outputs, 1)

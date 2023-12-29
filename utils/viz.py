@@ -118,6 +118,10 @@ def visualize_adapted_model_features(args, adapted_model, source_data, target_da
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
     plt.title(f'After Adaptation {batch}')
+
+    # Save figure to image file
+    # plt.savefig('embeddings_plot.png')
+
     plt.show()
 
 def visualize_features_both(args, source_model, adapted_model, source_data, target_data):
@@ -193,11 +197,11 @@ def viz(args):
 
     visualize_source_model_features(args, source_model, source_train_loader, target_train_loader)
 
-    for batch in range(args.al_batches):
+    for batch in range(args.al_batches + 1):
         target_model = encoder
         state = simple_load_model(args, path=f'target_{get_dataset_enum(args.target_dataset)}{str(batch-1)}.pth')
         target_model.load_state_dict(state['model'], strict=False)
         target_model = target_model.to(args.device)
         target_model.eval()
 
-        visualize_adapted_model_features(args, target_model, source_train_loader, target_train_loader, batch)
+        visualize_adapted_model_features(args, target_model, source_train_loader, target_train_loader, batch-1)
