@@ -117,7 +117,7 @@ def visualize_adapted_model_features(args, adapted_model, source_data, target_da
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
-    plt.title(f'After Adaptation {batch}')
+    plt.title(f'After Adaptation -> batch {batch}')
 
     # Save figure to image file
     # plt.savefig('embeddings_plot.png')
