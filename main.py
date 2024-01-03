@@ -3,7 +3,7 @@
 import os
 from models.trainers.domain_adapter import DomainAdapter
 import torch
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 import argparse
 
 from utils.random_seeders import set_random_seeds
@@ -63,7 +63,7 @@ def parse_args():
 
 
 def main(args):
-    writer = SummaryWriter()
+    writer = None #SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
     adapter.train_source()

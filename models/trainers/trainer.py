@@ -51,12 +51,13 @@ class Trainer:
                 self.scheduler.step()
                 lr = self.scheduler.get_last_lr()
 
-            self.writer.add_scalar(f"{self.train_params.name}/train_loss", train_loss, epoch)
-            self.writer.add_scalar(f"{self.train_params.name}/val_loss", val_loss, epoch)
+            # self.writer.add_scalar(f"{self.train_params.name}/train_loss", train_loss, epoch)
+            # self.writer.add_scalar(f"{self.train_params.name}/val_loss", val_loss, epoch)
 
         logging.info('Best val accuracy: {:3f}'.format(self.best_acc))
 
         simple_save_model(self.args, self.best_model, f'{self.train_params.name}.pth')
+        # self.writer.close()
 
         # additional_ext = get_accuracy_file_ext(self.args)
         # save_accuracy_to_file(
