@@ -39,7 +39,6 @@ class PretextTrainer():
         
         data_dir = os.path.join(args.gen_images_path, get_dataset_enum(args.target_dataset))
         gen_images = glob.glob(f'{data_dir}/*/*')
-        # self.pretraining_gen_images = [PathLoss(path=path, loss=0) for path in gen_images]
 
         self.pretraining_gen_images = []
         for path in gen_images:
@@ -137,6 +136,7 @@ class PretextTrainer():
         
         # Get pseudo_labels for high conf samples
         pseudo_labels = preds[masks]
+        logging.info("len(pseudo_labels)", len(pseudo_labels))
         pseudo_labels = torch.argmax(pseudo_labels, dim=1)
         
         # Filter objects based on the boolean mask
