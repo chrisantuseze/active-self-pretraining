@@ -137,6 +137,9 @@ class PretextTrainer():
         # Get pseudo_labels for high conf samples
         pseudo_labels = preds[masks]
         logging.info("len(pseudo_labels)", len(pseudo_labels))
+        if len(pseudo_labels) == 0:
+            return []
+
         pseudo_labels = torch.argmax(pseudo_labels, dim=1)
         
         # Filter objects based on the boolean mask
