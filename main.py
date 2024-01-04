@@ -66,7 +66,7 @@ def main(args):
     writer = None #SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
-    adapter.train_source()
+    # adapter.train_source()
 
     adapter.generate_data()
 
