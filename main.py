@@ -61,7 +61,7 @@ def parse_args():
 
     # swav
     parser.add_argument('--crops_for_assign', default=[0, 1], type=int, help='')
-    parser.add_argument('--swav_temperature', default=0.1, type=float, help='')
+    parser.add_argument('--temperature', default=0.1, type=float, help='')
     parser.add_argument('--epsilon', default=0.05, type=float, help='')
     parser.add_argument('--sinkhorn_iterations', default=3, type=int, help='')
     parser.add_argument('--feat_dim', default=128, type=int, help='')
