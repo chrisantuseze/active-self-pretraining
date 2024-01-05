@@ -16,16 +16,16 @@ def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--source_batch_size', default=8, type=int, help='')
-    parser.add_argument('--source_image_size', default=128, type=int, help='')
+    parser.add_argument('--source_image_size', default=64, type=int, help='')
     parser.add_argument('--source_lr', default=1e-3, type=float, help='')
     parser.add_argument('--source_epochs', default=600, type=int, help='')
     parser.add_argument('--source_weight_decay', default=1.0e-4, type=float, help='')
     parser.add_argument('--source_dataset', default=7, type=int, help='')
 
     parser.add_argument('--target_batch_size', default=4, type=int, help='')
-    parser.add_argument('--target_image_size', default=128, type=int, help='')
+    parser.add_argument('--target_image_size', default=64, type=int, help='')
     parser.add_argument('--target_lr', default=1.0e-4, type=float, help='')
-    parser.add_argument('--target_epochs', default=25, type=int, help='')
+    parser.add_argument('--target_epochs', default=50, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-4, type=float, help='')
     parser.add_argument('--target_dataset', default=8, type=int, help='')
 
@@ -66,7 +66,7 @@ def main(args):
     writer = None #SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
-    # adapter.train_source()
+    adapter.train_source()
 
     adapter.generate_data()
 
