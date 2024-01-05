@@ -153,6 +153,8 @@ class ResNet(nn.Module):
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
+        self.nmb_prototypes = nmb_prototypes
+
         self.eval_mode = eval_mode
         self.padding = nn.ConstantPad2d(1, 0.0)
 
@@ -307,6 +309,9 @@ class ResNet(nn.Module):
 
         if self.l2norm:
             x = nn.functional.normalize(x, dim=1, p=2)
+
+        if self.nmb_prototypes < 3000:
+            return x
 
         if self.prototypes is not None:
             return x, self.prototypes(x)
