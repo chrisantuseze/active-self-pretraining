@@ -71,7 +71,7 @@ def load_chkpts(args, filename, model):
             args.model_checkpoint_path, filename
         )
     
-        state_dict = torch.load(out, map_location="cuda:0")
+        state_dict = torch.load(out, map_location=args.device.type)#map_location="cuda:0")
         if "state_dict" in state_dict:
             state_dict = state_dict["state_dict"]
         # remove prefixe "module."

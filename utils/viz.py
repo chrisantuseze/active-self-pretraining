@@ -184,7 +184,7 @@ def viz(args):
     args.source_batch_size = 128
     args.target_batch_size = 128
     num_classes, dir = get_ds_num_classes(args.source_dataset)
-    encoder = resnet_backbone(args.backbone, num_classes, pretrained=False)
+    encoder = resnet_backbone(args, num_classes, pretrained=False)
     
     source_model = encoder
     state = simple_load_model(args, path=f'source_{get_dataset_enum(args.source_dataset)}.pth')

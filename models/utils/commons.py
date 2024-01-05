@@ -164,6 +164,9 @@ def prepare_model(model):
 
     # freeze some layers
     for name, param in model.named_parameters():
+        if 'projection_head' in name or 'prototypes' in name:
+            continue
+
         if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name):
             continue
 

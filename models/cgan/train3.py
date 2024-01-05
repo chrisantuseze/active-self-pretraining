@@ -106,7 +106,7 @@ def train(args):
 
     if use_source:
         num_classes, dir = get_ds_num_classes(args.source_dataset)
-        source_classifier = resnet_backbone(args.backbone, num_classes, pretrained=False)
+        source_classifier = resnet_backbone(args, num_classes, pretrained=False)
         state = simple_load_model(args, path=f'source_{get_dataset_enum(args.source_dataset)}.pth')
         if state:
             source_classifier.load_state_dict(state['model'], strict=False)

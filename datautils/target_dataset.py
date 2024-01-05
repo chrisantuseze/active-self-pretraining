@@ -1,4 +1,5 @@
 import os
+from models.self_sup.swav_transform import TransformsSwAV
 import torch
 import torchvision
 from PIL import Image
@@ -46,10 +47,12 @@ class TargetDataset():
         return loader
 
     def get_loaders(self):
-        if self.training_type == TrainingType.SOURCE_PRETRAIN:
-            no_aug = False
-        else:
-            no_aug = True
+        if self.training_type == TrainingType.SOURCE_PRETRAIN: # Here we assume that swav is always used for source pretraining. Delete this if swav is longer needed
+            swav = TransformsSwAV(self.args, self.batch_size, self.dir)
+            loader, dataset = swav.train_loader, swav.train_dataset
+            return loader, None
+
+        no_aug = not self.training_type == TrainingType.SOURCE_PRETRAIN
         transforms = Transforms(self.image_size, is_train=True, no_aug=no_aug)
         print("dataset path:", self.dir)
         dataset = torchvision.datasets.ImageFolder(self.dir, transform=transforms)

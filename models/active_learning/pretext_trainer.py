@@ -47,7 +47,7 @@ class PretextTrainer():
             self.pretraining_gen_images.append(PathLoss(path=path, loss=0, label=label))
 
     def do_self_learning(self):
-        encoder = resnet_backbone(self.args.backbone, self.num_classes, pretrained=False)
+        encoder = resnet_backbone(self.args, self.num_classes, pretrained=False)
         
         # state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         # if not state:
