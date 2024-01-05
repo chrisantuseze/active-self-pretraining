@@ -17,7 +17,7 @@ class Trainer:
         self.val_loader = val_loader
         self.train_params = train_params
 
-        params_to_update = prepare_model(args, self.model) 
+        params_to_update = prepare_model(self.model) 
 
         self.model = self.model.to(self.args.device)
         self.optimizer = torch.optim.SGD(
