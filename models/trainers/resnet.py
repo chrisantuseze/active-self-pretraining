@@ -127,13 +127,18 @@ def resnet50():
 
 # Delete this if swav is longer needed
 def resnet_backbone(args, num_classes, is_source=False, pretrained=False):
+    if is_source:
+        nmb_prototypes = args.nmb_prototypes
+    else:
+        nmb_prototypes = num_classes
+
     resnet_model = resnet_models.__dict__[args.backbone](
         zero_init_residual=True,
         normalize=True,
         hidden_mlp=args.hidden_mlp,
         output_dim=args.feat_dim,
-        nmb_prototypes=args.nmb_prototypes,
+        nmb_prototypes=nmb_prototypes,
     )
-    if not is_source:
-        resnet_model.prototypes = nn.Linear(resnet_model.prototypes.in_features, num_classes)
+    # if not is_source:
+    #     resnet_model.prototypes = nn.Linear(resnet_model.prototypes.in_features, num_classes)
     return resnet_model
