@@ -167,7 +167,7 @@ def prepare_model(model):
         if 'projection_head' in name or 'prototypes' in name:
             continue
 
-        if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name):
+        if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name) or ('layer3' in name and 'bn' in name and 'weight' in name):
             continue
 
         param.requires_grad = False

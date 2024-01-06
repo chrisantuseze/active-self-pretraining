@@ -90,7 +90,7 @@ def main(args):
     adapter = DomainAdapter(args, writer)
     adapter.train_source()
 
-    adapter.generate_data()
+    # adapter.generate_data()
 
     adapter.train_target()
 
