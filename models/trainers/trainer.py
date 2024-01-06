@@ -20,14 +20,16 @@ class Trainer:
         params_to_update = prepare_model(self.model) 
 
         self.model = self.model.to(self.args.device)
-        self.optimizer = torch.optim.SGD(
-            params_to_update,
-            lr=train_params.lr,
-            nesterov=False,
-            momentum=args.momentum,
-            weight_decay=train_params.weight_decay,
-        )
-        self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, train_params.epochs, eta_min=1e-5)
+        # self.optimizer = torch.optim.SGD(
+        #     params_to_update,
+        #     lr=train_params.lr,
+        #     nesterov=False,
+        #     momentum=args.momentum,
+        #     weight_decay=train_params.weight_decay,
+        # )
+        self.scheduler = None #torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, train_params.epochs, eta_min=1e-5)
+
+        self.optimizer = torch.optim.Adam(params_to_update, lr=train_params.lr, betas=(0.9, 0.99))
         self.criterion = nn.CrossEntropyLoss()
 
         self.best_model = copy.deepcopy(self.model)

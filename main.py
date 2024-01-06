@@ -17,8 +17,8 @@ def parse_args():
 
     parser.add_argument('--source_batch_size', default=16, type=int, help='')
     parser.add_argument('--source_image_size', default=64, type=int, help='')
-    parser.add_argument('--source_lr', default=1e-2, type=float, help='')
-    parser.add_argument('--source_epochs', default=700, type=int, help='') #600
+    parser.add_argument('--source_lr', default=1e-3, type=float, help='')
+    parser.add_argument('--source_epochs', default=400, type=int, help='') #600
     parser.add_argument('--source_weight_decay', default=1.0e-4, type=float, help='')
     parser.add_argument('--source_dataset', default=7, type=int, help='')
 
@@ -57,7 +57,7 @@ def parse_args():
     parser.add_argument('--workers', type=int, default=8, help='')
     
     parser.add_argument('--log_step', default=200, type=int, help='')
-    parser.add_argument('--seed', default=6, type=int, help='')
+    parser.add_argument('--seed', default=1, type=int, help='')
 
     # swav
     parser.add_argument('--crops_for_assign', default=[0, 1], type=int, help='')
