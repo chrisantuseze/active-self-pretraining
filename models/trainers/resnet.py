@@ -113,32 +113,32 @@ def resnet50():
     return ResNet(Bottleneck, [3, 4, 6, 3])
 
 
-# def resnet_backbone(args, num_classes, pretrained=False):
-#     name = args.backbone
-#     resnets = {
-#         "resnet18": torchvision.models.resnet18(pretrained=pretrained),
-#         "resnet50": torchvision.models.resnet50(pretrained=pretrained),
-#     }
-#     if name not in resnets.keys():
-#         raise KeyError(f"{name} is not a valid ResNet version")
-#     resnet_model = resnets[name]
-#     resnet_model.fc = nn.Linear(resnet_model.fc.in_features, num_classes)
-#     return resnet_model
+def resnet_backbone(args, num_classes, is_source=False, pretrained=False):
+    name = args.backbone
+    resnets = {
+        "resnet18": torchvision.models.resnet18(pretrained=pretrained),
+        "resnet50": torchvision.models.resnet50(pretrained=pretrained),
+    }
+    if name not in resnets.keys():
+        raise KeyError(f"{name} is not a valid ResNet version")
+    resnet_model = resnets[name]
+    resnet_model.fc = nn.Linear(resnet_model.fc.in_features, num_classes)
+    return resnet_model
 
 # Delete this if swav is longer needed
-def resnet_backbone(args, num_classes, is_source=False, pretrained=False):
-    if is_source:
-        nmb_prototypes = args.nmb_prototypes
-    else:
-        nmb_prototypes = num_classes
+# def resnet_backbone(args, num_classes, is_source=False, pretrained=False):
+#     if is_source:
+#         nmb_prototypes = args.nmb_prototypes
+#     else:
+#         nmb_prototypes = num_classes
 
-    resnet_model = resnet_models.__dict__[args.backbone](
-        zero_init_residual=True,
-        normalize=True,
-        hidden_mlp=args.hidden_mlp,
-        output_dim=args.feat_dim,
-        nmb_prototypes=nmb_prototypes,
-    )
-    # if not is_source:
-    #     resnet_model.prototypes = nn.Linear(resnet_model.prototypes.in_features, num_classes)
-    return resnet_model
+#     resnet_model = resnet_models.__dict__[args.backbone](
+#         zero_init_residual=True,
+#         normalize=True,
+#         hidden_mlp=args.hidden_mlp,
+#         output_dim=args.feat_dim,
+#         nmb_prototypes=nmb_prototypes,
+#     )
+#     # if not is_source:
+#     #     resnet_model.prototypes = nn.Linear(resnet_model.prototypes.in_features, num_classes)
+#     return resnet_model

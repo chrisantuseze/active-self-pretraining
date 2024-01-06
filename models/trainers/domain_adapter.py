@@ -29,8 +29,8 @@ class DomainAdapter:
 
         train_params.name = f'source_{get_dataset_enum(self.args.source_dataset)}'
 
-        # trainer =  Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
-        trainer = SwAVTrainer(self.args, model, train_loader, train_params, TrainingType.SOURCE_PRETRAIN) # Delete this if swav is longer needed
+        trainer =  Trainer(self.args, self.writer, model, train_loader, val_loader, train_params)
+        # trainer = SwAVTrainer(self.args, model, train_loader, train_params, TrainingType.SOURCE_PRETRAIN) # Delete this if swav is longer needed
         trainer.train()
 
     def generate_data(self):

@@ -52,9 +52,7 @@ class PretextTrainer():
         # state = simple_load_model(self.args, path=f'target_{self.dataset}.pth')
         # if not state:
         state = simple_load_model(self.args, path=f'source_{get_dataset_enum(self.args.source_dataset)}.pth')['model']
-        state['prototypes.weight'] = state['prototypes.weight'][:self.num_classes]
-
-        # state.update(new_dict)
+        # state['prototypes.weight'] = state['prototypes.weight'][:self.num_classes]
         encoder.load_state_dict(state, strict=False)
 
         self.train_target(encoder, path_loss_list=[], suffix="-1")
