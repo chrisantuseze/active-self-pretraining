@@ -67,37 +67,10 @@ class TargetDataset():
         return train_loader, val_loader
 
     def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING] or (self.args.training_type == "single_iter" and TrainingType.TARGET_PRETRAIN) or (self.args.training_type == "proxy_source" and TrainingType.BASE_PRETRAIN):
+        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING]:
             if self.training_type == TrainingType.ACTIVE_LEARNING:
                 transforms = Transforms(self.image_size)
                 dataset = self.get_dataset(transforms)
-
-            elif self.args.training_type == "single_iter" and self.training_type == TrainingType.TARGET_PRETRAIN:
-                img_path = get_images_pathlist(f'{self.args.dataset_dir}/{self.args.base_dataset}', with_train=True)
-                logging.info(f"Original size of generated images dataset is {len(img_path)}")
-
-                real_target = get_images_pathlist(f'{self.args.dataset_dir}/{dataset_enum.get_dataset_enum(self.args.target_dataset)}', with_train=False)
-                random.shuffle(real_target)
-                img_path.extend(real_target)
-
-                logging.info(f"Total size of dataset is {len(img_path)}")
-                
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
-                
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
-
-            elif self.args.training_type == "proxy_source" and self.training_type == TrainingType.BASE_PRETRAIN:
-                img_path = glob.glob(self.dir + '/train/*/*')
-
-                path_loss_list = [PathLoss(path, 0) for path in img_path]
-                
-                dataset = PretextMultiCropDataset(
-                    self.args,
-                    path_loss_list,
-                )
 
             else:
                 if self.method == SSL_Method.SIMCLR.value:
@@ -130,27 +103,7 @@ class TargetDataset():
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
 
-    if args.training_type == "proxy_source" and training_type == TrainingType.BASE_PRETRAIN:
-        print("using the proxy dataset")
-        return TargetDataset(args, "/cifar10", TrainingType.BASE_PRETRAIN, is_train=is_train, batch_size=batch_size)
-
-    if args.target_dataset == dataset_enum.DatasetType.CHEST_XRAY.value:
-        print("using the CHEST XRAY dataset")
-        return TargetDataset(args, "/chest_xray", training_type, with_train=True, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.FLOWERS.value:
-        print("using the FLOWERS dataset")
-        return TargetDataset(args, "/flowers", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.EUROSAT.value:
-        print("using the EUROSAT dataset")
-        return TargetDataset(args, "/eurosat", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.HAM10000.value:
-        print("using the HAM10000 dataset")
-        return TargetDataset(args, "/ham10000", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
-    elif args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
+    if args.target_dataset == dataset_enum.DatasetType.CLIPART.value:
         print("using the CLIPART dataset")
         return TargetDataset(args, "/clipart", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
@@ -162,10 +115,6 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
         print("using the QUICKDRAW dataset")
         return TargetDataset(args, "/quickdraw", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif args.target_dataset == dataset_enum.DatasetType.MODERN_OFFICE_31.value:
-        print("using the MODERN_OFFICE_31 dataset")
-        return TargetDataset(args, "/modern_office_31", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
-
     elif args.target_dataset == dataset_enum.DatasetType.AMAZON.value:
         print("using the Office-31 AMAZON dataset")
         return TargetDataset(args, "/amazon/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
@@ -184,19 +133,19 @@ def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_tr
 
     elif args.target_dataset == dataset_enum.DatasetType.ARTISTIC.value:
         print("using the OfficeHome ARTISTIC dataset")
-        return TargetDataset(args, "/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.CLIP_ART.value:
         print("using the OfficeHome CLIP_ART dataset")
-        return TargetDataset(args, "/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.PRODUCT.value:
         print("using the OfficeHome PRODUCT dataset")
-        return TargetDataset(args, "/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif args.target_dataset == dataset_enum.DatasetType.REAL_WORLD.value:
         print("using the OfficeHome REAL_WORLD dataset")
-        return TargetDataset(args, "/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+        return TargetDataset(args, "/officehome/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     else:
         ValueError

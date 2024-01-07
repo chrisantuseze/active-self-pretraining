@@ -169,23 +169,7 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 
 
 def get_ds_num_classes(dataset):
-    if dataset == DatasetType.CHEST_XRAY.value:
-        num_classes = 100
-        dir = "/chest_xray"
-
-    elif dataset == DatasetType.EUROSAT.value:
-        num_classes = 10
-        dir = "/eurosat"
-
-    elif dataset == DatasetType.FLOWERS.value:
-        num_classes = 5
-        dir = "/flowers"
-
-    elif dataset == DatasetType.HAM10000.value:
-        num_classes = 2
-        dir = "/ham10000"
-
-    elif dataset == DatasetType.CLIPART.value:
+    if dataset == DatasetType.CLIPART.value:
         num_classes = 345
         dir = "/clipart"
 
@@ -197,21 +181,17 @@ def get_ds_num_classes(dataset):
         num_classes = 345
         dir = "/quickdraw"
 
-    elif dataset == DatasetType.MODERN_OFFICE_31.value:
-        num_classes = 31
-        dir = "/modern_office_31/synthetic"
-
     elif dataset == DatasetType.AMAZON.value:
         num_classes = 31
-        dir = "/amazon/images"
+        dir = "/office-31/amazon/images"
 
     elif dataset == DatasetType.WEBCAM.value:
         num_classes = 31
-        dir = "/webcam/images"
+        dir = "/office-31/webcam/images"
 
     elif dataset == DatasetType.DSLR.value:
         num_classes = 31
-        dir = "/dslr/images"
+        dir = "/office-31/dslr/images"
 
     elif dataset == DatasetType.PAINTING.value:
         num_classes = 345
@@ -219,19 +199,19 @@ def get_ds_num_classes(dataset):
 
     elif dataset == DatasetType.ARTISTIC.value:
         num_classes = 65
-        dir = "/artistic"
+        dir = "/officehome/artistic"
 
     elif dataset == DatasetType.CLIP_ART.value:
         num_classes = 65
-        dir = "/clip_art"
+        dir = "/officehome/clip_art"
 
     elif dataset == DatasetType.PRODUCT.value:
         num_classes = 65
-        dir = "/product"
+        dir = "/officehome/product"
 
     elif dataset == DatasetType.REAL_WORLD.value:
         num_classes = 65
-        dir = "/real_world"
+        dir = "/officehome/real_world"
     
     return num_classes, dir
 

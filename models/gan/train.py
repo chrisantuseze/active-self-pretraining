@@ -4,6 +4,7 @@ Code adapted from: https://github.com/odegeasslbc/FastGAN-pytorch
 '''
 
 import os
+from models.utils.commons import get_ds_num_classes
 import torch
 from torch import nn
 import torch.optim as optim
@@ -256,7 +257,7 @@ def do_gen_ai(args):
 
     gen_args = parser.parse_args()
 
-    gen_args.path = get_dataset_enum(args.target_dataset)
+    _, gen_args.path = get_ds_num_classes(args.target_dataset)
 
     train(gen_args)
 

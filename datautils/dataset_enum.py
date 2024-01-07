@@ -1,40 +1,21 @@
 from enum import Enum
 
 class DatasetType(Enum):
-    CHEST_XRAY = 0
-    EUROSAT = 1
-    FLOWERS = 2
-    HAM10000 = 3
-    
-    CLIPART = 4
-    SKETCH = 5
-    QUICKDRAW = 6
-    PAINTING = 7
+    CLIPART = 0
+    SKETCH = 1
+    QUICKDRAW = 2
+    PAINTING = 3
 
-    MODERN_OFFICE_31 = 8
+    AMAZON = 4
+    WEBCAM = 5
+    DSLR = 6
 
-    AMAZON = 9
-    WEBCAM = 10
-    DSLR = 11
-
-    ARTISTIC = 12
-    CLIP_ART = 13
-    PRODUCT = 14
-    REAL_WORLD = 15
+    ARTISTIC = 7
+    CLIP_ART = 8
+    PRODUCT = 9
+    REAL_WORLD = 10
 
 def get_dataset_enum(value: int):
-    if value == DatasetType.CHEST_XRAY.value:
-        return "chest_xray"
-    
-    if value == DatasetType.EUROSAT.value:
-        return "eurosat"
-
-    if value == DatasetType.FLOWERS.value:
-        return "flowers"
-
-    if value == DatasetType.HAM10000.value:
-        return "ham10000"
-
     if value == DatasetType.CLIPART.value:
         return "clipart"
 
@@ -43,9 +24,6 @@ def get_dataset_enum(value: int):
 
     if value == DatasetType.QUICKDRAW.value:
         return "quickdraw"
-
-    if value == DatasetType.MODERN_OFFICE_31.value:
-        return "modern_office_31"
 
     if value == DatasetType.AMAZON.value:
         return "amazon"

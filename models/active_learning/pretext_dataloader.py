@@ -11,7 +11,7 @@ from datautils.path_loss import PathLoss
 from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
 from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
-from models.utils.commons import get_images_pathlist, get_params
+from models.utils.commons import get_ds_num_classes, get_images_pathlist, get_params
 from models.utils.transformations import Transforms
 from utils.commons import load_class_names, pil_loader, save_class_names
 from models.utils.training_type_enum import TrainingType
@@ -31,21 +31,15 @@ class PretextDataLoader():
         self.training_type = training_type
         self.is_val = is_val
 
-        self.dir = self.args.dataset_dir + "/" + get_dataset_enum(self.args.target_dataset)
+        self.dir = self.args.dataset_dir + "/" + get_ds_num_classes(self.args.target_dataset)[1]
 
         # This is done to ensure that the dataset used for validation is only a subset of the entire datasets used for training
         if is_val:
             val_path_loss_list = []
 
-            if self.args.target_dataset in [DatasetType.CHEST_XRAY.value]:
-                img_paths = glob.glob(self.dir + '/train/*/*')
-            
-            elif self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
+            if self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
                 img_paths = glob.glob(self.dir + '/images/*/*')
 
-            elif self.args.target_dataset == DatasetType.MODERN_OFFICE_31.value:
-                img_paths = glob.glob(self.dir + '/*/*/*')
-            
             else:
                 img_paths = glob.glob(self.dir + '/*/*')
 
@@ -128,10 +122,7 @@ class PretextDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.CHEST_XRAY.value, DatasetType.MODERN_OFFICE_31.value]:
-            img = pil_loader(path)
-        else:
-            img = Image.open(path)
+        img = Image.open(path)
 
         label = path.split('/')[-2]
 
@@ -180,10 +171,7 @@ class PretextMultiCropDataset(torch.utils.data.Dataset):
         else:
             path = path_loss.path
 
-        if self.args.target_dataset in [DatasetType.MODERN_OFFICE_31.value]:
-            image = pil_loader(path)
-        else:
-            image = Image.open(path)
+        image = Image.open(path)
 
         multi_crops = list(map(lambda trans: trans(image), self.trans))
         return multi_crops
@@ -209,10 +197,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         return len(self.img_path)
 
     def __getitem__(self, idx):
-        if self.dir in ["./datasets/chest_xray", "./datasets/modern_office_31"]:
-            img = pil_loader(self.img_path[idx])
-        else:
-            img = Image.open(self.img_path[idx])
+        img = Image.open(self.img_path[idx])
 
         path = self.img_path[idx] 
         label = path.split('/')[-2]
