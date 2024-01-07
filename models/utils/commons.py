@@ -162,15 +162,15 @@ def get_params_to_update(model, feature_extract):
 def prepare_model(model):
     params_to_update = model.parameters()
 
-    # # freeze some layers
-    # for name, param in model.named_parameters():
-    #     if 'projection_head' in name or 'prototypes' in name:
-    #         continue
+    # freeze some layers
+    for name, param in model.named_parameters():
+        # if 'projection_head' in name or 'prototypes' in name:
+        #     continue
 
-    #     if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name) or ('layer3' in name and 'bn' in name and 'weight' in name):
-    #         continue
+        # if 'bn' in name and 'bias' in name or ('layer4' in name and 'bn' in name and 'weight' in name) or ('layer3' in name and 'bn' in name and 'weight' in name):
+        #     continue
 
-    #     param.requires_grad = False
+        param.requires_grad = False
 
     params_to_update = get_params_to_update(model, feature_extract=True)
 
