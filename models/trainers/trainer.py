@@ -45,8 +45,10 @@ class Trainer:
             logging.info('-' * 20)
 
             train_loss, train_acc = self.train_single_epoch()
-            val_loss, val_acc = self.validate()
-            val_acc_history.append(str(val_acc))
+
+            if self.val_loader:
+                val_loss, val_acc = self.validate()
+                val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
             if self.scheduler:
