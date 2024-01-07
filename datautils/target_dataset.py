@@ -103,7 +103,7 @@ class TargetDataset():
 
 def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
     if training_type == TrainingType.BASE_PRETRAIN:
-        dataset_type = args.source_dataset
+        dataset_type = args.base_dataset
     else:
         dataset_type = args.target_dataset
 

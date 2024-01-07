@@ -18,7 +18,7 @@ import utils.logger as logging
 from models.gan.train import do_gen_ai
 from models.utils.visualizations.tsne4 import tsne_similarity
 
-logging.init()
+# logging.init()
 
 def office_dataset(args, writer):
     args.do_gradual_base_pretrain = True
