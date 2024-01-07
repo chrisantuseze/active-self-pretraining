@@ -61,7 +61,7 @@ class  ImageFolder(Dataset):
     def __init__(self, dataset, transform=None, distillation=False):
         super(ImageFolder, self).__init__()
         self.dataset = dataset
-        self.dir = f'datasets/{dataset}'
+        self.dir = f'datasets{dataset}'
 
         self.frame = self._parse_frame2() if distillation else self._parse_frame()
         self.transform = transform

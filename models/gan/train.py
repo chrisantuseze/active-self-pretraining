@@ -205,7 +205,7 @@ def train(args):
                         'd':netD.state_dict(),
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
-                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/gan5_{args.path}_model_{iteration}.pth')
+                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/{get_dataset_enum(args.target_dataset)}_model.pth')
 
 def generate_images(args, images_path, iter):
     ndf = 64
@@ -222,11 +222,11 @@ def generate_images(args, images_path, iter):
     netG.to(device)
     netD.to(device)
 
-    model_path, saved_image_folder = get_dir(args)
+    model_path, _ = get_dir(args)
 
     logging.info("Loading checkpoint")
 
-    args.ckpt = f'{model_path}/gan5_{args.path}_model_{args.iter}.pth'
+    args.ckpt = f'{model_path}/{get_dataset_enum(args.target_dataset)}_model.pth'
     ckpt = torch.load(args.ckpt)
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
@@ -238,7 +238,7 @@ def generate_images(args, images_path, iter):
     for i, val in enumerate(netG(fixed_noise)[0].add(1).mul(0.5)):
             torchvision.utils.save_image(
                 val,
-                f'{images_path}/{args.path}_{iter}_{i}.jpg',
+                f'{images_path}/{get_dataset_enum(args.target_dataset)}_{i}.jpg',
                 nrow=1,
                 normalize=True,
             )
