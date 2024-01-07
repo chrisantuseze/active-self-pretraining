@@ -25,9 +25,9 @@ def office_dataset(args, writer):
     args.base_pretrain = True
     args.target_pretrain = True
 
-    args.base_dataset = 7
-    args.target_dataset = 8
-    args.lc_dataset = 8
+    args.base_dataset = 5 #7
+    args.target_dataset = 6 #8
+    args.lc_dataset = 6 #8
 
     pretrainer = SelfSupPretrainer(args, writer)
     pretrainer.first_pretrain()
