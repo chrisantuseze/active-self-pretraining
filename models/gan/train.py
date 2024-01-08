@@ -205,7 +205,7 @@ def train(args):
                         'd':netD.state_dict(),
                         'g_ema': avg_param_G,
                         'opt_g': optimizerG.state_dict(),
-                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/{get_dataset_enum(args.target_dataset)}_model.pth')
+                        'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/{args.model_name}')
 
 def generate_images(args, images_path, iter):
     ndf = 64
@@ -248,7 +248,7 @@ def do_gen_ai(args):
 
     parser.add_argument('--path', type=str, default='imagenet_gan', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
-    parser.add_argument('--name', type=str, default='test1', help='experiment name')
+    parser.add_argument('--model_name', type=str, default='test1', help='experiment name')
     parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
@@ -258,6 +258,7 @@ def do_gen_ai(args):
     gen_args = parser.parse_args()
 
     _, gen_args.path = get_ds_num_classes(args.target_dataset)
+    gen_args.model_name = f"{get_dataset_enum(args.target_dataset)}_model.pth"
 
     train(gen_args)
 
