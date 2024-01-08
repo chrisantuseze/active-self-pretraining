@@ -226,7 +226,7 @@ def generate_images(args, images_path, iter):
 
     logging.info("Loading checkpoint")
 
-    args.ckpt = f'{model_path}/{get_dataset_enum(args.target_dataset)}_model.pth'
+    args.ckpt = f'{model_path}/{args.model_name}'
     ckpt = torch.load(args.ckpt)
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
