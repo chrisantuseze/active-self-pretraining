@@ -95,7 +95,7 @@ def train(args):
         dataset = ImageFolder(args.path, transform=trans)
 
    
-    print(args.path, "length is", len(dataset))
+    print(args.path, "length is", len(dataset), "model name is", args.model_name) 
     dataloader = iter(DataLoader(dataset, batch_size=batch_size, shuffle=False,
                       sampler=InfiniteSamplerWrapper(dataset), num_workers=dataloader_workers, pin_memory=True))
     
