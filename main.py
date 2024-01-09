@@ -32,7 +32,7 @@ def office_dataset(args, writer):
     pretrainer = SelfSupPretrainer(args, writer)
     # pretrainer.first_pretrain()
 
-    do_gen_ai(args)
+    # do_gen_ai(args)
     # pretrainer.second_pretrain()
 
     pretext = PretextTrainer(args, writer)
