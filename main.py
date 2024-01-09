@@ -31,9 +31,9 @@ def office_dataset(args, writer):
     # pretrainer.second_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
-    classifier = Classifier(args, pretrain_level="2" if args.target_pretrain else "1")
+    classifier = Classifier(args, pretrain_level="2")
     classifier.train_and_eval()
 
 def main(args):

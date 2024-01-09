@@ -17,21 +17,17 @@ class Classifier:
         self.args = args
         self.model = resnet_backbone(self.args.backbone, pretrained=False)
 
-        if pretrain_level == "AL":
+        if pretrain_level == "1":
+            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+
+        elif pretrain_level == "2":
+            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level="2")
+
+        else:
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
 
-        else:
-            logging.info(f"Using pretrained {pretrain_level} model weights")
-            state = load_saved_state(self.args, pretrain_level=pretrain_level)
-            
-        if self.args.target_pretrain or self.args.base_pretrain:
-            logging.info("<Target Pretrain>")
-            self.model.load_state_dict(state['model'], strict=False)
-        else:
-            logging.info("<SwAV Weights>")
-            self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
-
+        self.model.load_state_dict(state['model'], strict=False)
         num_classes, self.dataset, self.dir = get_dataset_info(self.args.lc_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
