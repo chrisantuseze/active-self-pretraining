@@ -508,17 +508,16 @@ class PretextTrainer():
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
         logging.info(f"Size of the original data is {len(path_loss)}")
 
-        if self.args.training_type in ['uc2', 'pete_2']:
-            self.args.al_trainer_sample_size = int((len(path_loss))//self.args.al_batches)
-
+        self.args.al_trainer_sample_size = int(0.75 * (len(path_loss))//self.args.al_batches)
         logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
 
         sample_per_batch = len(path_loss)//self.args.al_batches
 
         batch_sampler_encoder = encoder
 
-        for batch in range(self.args.al_batches):
-            sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
+        for batch in range(1, self.args.al_batches):
+            sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
+            logging.info(f"Size of sampled data {len(sampled_data)}")
 
             if batch > 0:
                 logging.info(f'>> Getting best checkpoint for batch {batch}')
@@ -528,11 +527,11 @@ class PretextTrainer():
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.batch_sampler(batch_sampler_encoder, sample6400)[:self.args.al_trainer_sample_size]
+                samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
                 # first iteration: sample k at even intervals
-                samplek = sample6400[:self.args.al_trainer_sample_size]
+                samplek = sampled_data[:self.args.al_trainer_sample_size]
 
             pretraining_sample_pool.extend(samplek)
 
