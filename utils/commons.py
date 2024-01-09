@@ -15,11 +15,11 @@ def save_state(args, model, dataset, pretrain_level="1"):
     if not os.path.isdir(args.model_checkpoint_path):
         os.makedirs(args.model_checkpoint_path)
 
-    out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
+    out = "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
     simple_save_model(args, model, out)
 
 def load_saved_state(args, dataset, pretrain_level="1"):
-    out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
+    out = "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
     return simple_load_model(args, out)
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
@@ -176,12 +176,3 @@ def get_accuracy_file_ext(args):
         return f'_{args.al_trainer_sample_size}'
 
     return ''
-
-
-def get_state_for_da(args,  pretrain_level=2):
-    dataset = get_dataset_enum(args.base_dataset)
-
-    filename = "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
-    logging.info(f"Loading [uc2] checkpoint from - {filename}")
-
-    return simple_load_model(args, path=filename)

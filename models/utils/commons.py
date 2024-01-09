@@ -13,7 +13,7 @@ from models.self_sup.simclr.simclr import SimCLR
 from models.self_sup.simclr.simclr_v2 import SimCLRV2
 from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
 from models.utils.training_type_enum import Params, TrainingType
-from utils.commons import get_state_for_da, load_chkpts, load_saved_state
+from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
 
 
