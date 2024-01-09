@@ -2,12 +2,12 @@ import torch
 import time
 import copy
 import utils.logger as logging
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 
 from datautils.lc_dataset import LCDataset
 from models.backbones.resnet import resnet_backbone
 from optim.optimizer import load_optimizer
-from models.utils.commons import accuracy, get_ds_num_classes, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
+from models.utils.commons import accuracy, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
 from utils.commons import get_accuracy_file_ext, load_chkpts, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
@@ -32,7 +32,7 @@ class Classifier:
             logging.info("<SwAV Weights>")
             self.model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", self.model)
 
-        num_classes, self.dir = get_ds_num_classes(self.args.lc_dataset)
+        num_classes, self.dataset, self.dir = get_dataset_info(self.args.lc_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.LINEAR_CLASSIFIER, num_classes=num_classes)
@@ -53,7 +53,7 @@ class Classifier:
 
         since = time.time()
         val_acc_history = []
-        logging.info(f"Performing linear eval on {get_dataset_enum(self.args.lc_dataset)}")
+        logging.info(f"Performing linear eval on {self.dataset}")
 
         for epoch in range(self.args.lc_epochs):
             lr = 0
@@ -80,7 +80,7 @@ class Classifier:
         additional_ext = get_accuracy_file_ext(self.args)
         save_accuracy_to_file(
             self.args, accuracies=val_acc_history, best_accuracy=self.best_acc, 
-            filename=f"classifier_{get_dataset_enum(self.args.lc_dataset)}_batch_{self.args.lc_epochs}{additional_ext}.txt")
+            filename=f"classifier_{self.dataset}_batch_{self.args.lc_epochs}{additional_ext}.txt")
 
         return self.model, val_acc_history
 

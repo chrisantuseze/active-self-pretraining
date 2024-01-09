@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import time
 import numpy as np
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import load_optimizer
@@ -18,7 +18,7 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
-from models.utils.commons import AverageMeter, get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
+from models.utils.commons import AverageMeter, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_chkpts, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
@@ -34,9 +34,8 @@ class PretextTrainer():
         self.val_acc_history = []
         self.best_model = None
 
-        self.num_classes, self.dir = get_ds_num_classes(self.args.target_dataset)
         self.n_features = get_feature_dimensions_backbone(self.args)
-        self.dataset = get_dataset_enum(self.args.target_dataset)
+        self.num_classes, self.dataset, self.dir = get_dataset_info(self.args.target_dataset)
 
     def eval_main_task(self, model, epoch, criterion, batch, test_loader):
         batch_time = AverageMeter()
@@ -431,7 +430,7 @@ class PretextTrainer():
 
         state = None
         if self.args.al_pretext_from_pretrain:
-            state = load_saved_state(self.args, dataset=get_dataset_enum(self.args.base_dataset), pretrain_level=1)
+            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level=1)
             model.load_state_dict(state['model'], strict=False)
 
             # if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
@@ -472,7 +471,7 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
-        logging.info(f"Base = {get_dataset_enum(self.args.base_dataset)}, Target = {get_dataset_enum(self.args.target_dataset)}")
+        logging.info(f"Base = {get_dataset_info(self.args.base_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
@@ -488,7 +487,7 @@ class PretextTrainer():
     def active_learning_new(self, path_loss, encoder):
         pretraining_sample_pool = []
 
-        gen_filename = f'generated_{get_dataset_enum(self.args.target_dataset)}'
+        gen_filename = f'generated_{get_dataset_info(self.args.target_dataset)[1]}'
         gen_images = glob.glob(f'{self.args.dataset_dir}/{gen_filename}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
         pretraining_sample_pool.extend(pretraining_gen_images)
@@ -541,7 +540,7 @@ class PretextTrainer():
 
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
-            pretrainer.base_pretrain(loader, self.args.base_epochs, trainingType=TrainingType.TARGET_AL)
+            pretrainer.base_pretrain(loader, self.args.target_epochs, trainingType=TrainingType.TARGET_AL)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)

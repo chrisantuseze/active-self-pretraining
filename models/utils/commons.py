@@ -150,54 +150,6 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 
     return train_ds, val_ds
 
-
-def get_ds_num_classes(dataset):
-    if dataset == DatasetType.CLIPART.value:
-        num_classes = 345
-        dir = "/clipart"
-
-    elif dataset == DatasetType.SKETCH.value:
-        num_classes = 345
-        dir = "/sketch"
-
-    elif dataset == DatasetType.QUICKDRAW.value:
-        num_classes = 345
-        dir = "/quickdraw"
-
-    elif dataset == DatasetType.AMAZON.value:
-        num_classes = 31
-        dir = "/office-31/amazon/images"
-
-    elif dataset == DatasetType.WEBCAM.value:
-        num_classes = 31
-        dir = "/office-31/webcam/images"
-
-    elif dataset == DatasetType.DSLR.value:
-        num_classes = 31
-        dir = "/office-31/dslr/images"
-
-    elif dataset == DatasetType.PAINTING.value:
-        num_classes = 345
-        dir = "/painting"
-
-    elif dataset == DatasetType.ARTISTIC.value:
-        num_classes = 65
-        dir = "/officehome/artistic"
-
-    elif dataset == DatasetType.CLIP_ART.value:
-        num_classes = 65
-        dir = "/officehome/clip_art"
-
-    elif dataset == DatasetType.PRODUCT.value:
-        num_classes = 65
-        dir = "/officehome/product"
-
-    elif dataset == DatasetType.REAL_WORLD.value:
-        num_classes = 65
-        dir = "/officehome/real_world"
-    
-    return num_classes, dir
-
 def prepare_model(args, trainingType, model):
     params_to_update = model.parameters()
             

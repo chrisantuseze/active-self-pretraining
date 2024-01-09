@@ -4,7 +4,6 @@ Code adapted from: https://github.com/odegeasslbc/FastGAN-pytorch
 '''
 
 import os
-from models.utils.commons import get_ds_num_classes
 import torch
 from torch import nn
 import torch.optim as optim
@@ -12,12 +11,11 @@ import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
 import torchvision
 from torchvision import transforms
-from torchvision import utils as vutils
 
 import argparse
 import random
 from tqdm import tqdm
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 
 from models.gan.models import weights_init, Discriminator, Generator
 from models.gan.operation import copy_G_params, load_params, get_dir, ImageFolder, InfiniteSamplerWrapper
@@ -122,36 +120,6 @@ def train(args):
         avg_param_G = ckpt['g_ema']
         optimizerG.load_state_dict(ckpt['opt_g'])
         optimizerD.load_state_dict(ckpt['opt_d'])
-        # current_iteration = int(checkpoint.split('_')[-1].split('.')[0])
-
-
-        # freeze some layers
-        for name, param in netD.named_parameters():
-            name_ = name.split(".")
-            if ('decoder_big' in name_ and 'bias' in name_) or ('decoder_big' in name_ and 'weight' in name_):
-                continue
-
-            if ('decoder_part' in name_ and 'bias' in name_) or ('decoder_part' in name_ and 'weight' in name_):
-                continue
-
-            if ('decoder_small' in name_ and 'bias' in name_) or ('decoder_small' in name_ and 'weight' in name_):
-                continue
-
-            param.requires_grad = False
-
-        for name, param in netG.named_parameters():
-            name_ = name.split(".")
-            if ('feat_1024' in name_ and 'bias' in name_) or ('feat_1024' in name_ and 'weight' in name_):
-                continue
-
-            if ('feat_512' in name_ and 'bias' in name_) or ('feat_512' in name_ and 'weight' in name_):
-                continue
-
-            if ('feat_256' in name_ and 'bias' in name_) or ('feat_256' in name_ and 'weight' in name_):
-                continue        
-
-            param.requires_grad = False
-
         del ckpt
         
     if multi_gpu:
@@ -207,7 +175,7 @@ def train(args):
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/{args.model_name}')
 
-def generate_images(args, images_path, iter):
+def generate_images(args, images_path):
     ndf = 64
     ngf = 64
     nz = 256
@@ -231,17 +199,13 @@ def generate_images(args, images_path, iter):
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
     netD.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['d'].items()})
 
-    fixed_noise = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
-
+    # z = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
     logging.info("Generating images...")
 
-    for i, val in enumerate(netG(fixed_noise)[0].add(1).mul(0.5)):
-            torchvision.utils.save_image(
-                val,
-                f'{images_path}/{args.model_name}_{i}.jpg',
-                nrow=1,
-                normalize=True,
-            )
+    for i in range(128):
+        z = torch.randn(25, nz).to(device)
+        for j, val in enumerate(netG(z)[0].add(1).mul(0.5)):
+            torchvision.utils.save_image(val, f'{images_path}/image_{iter}_{i}_{j}.jpg')
 
 def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
@@ -256,19 +220,18 @@ def do_gen_ai(args):
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint weight path if have one')
 
     gen_args = parser.parse_args()
+    n_classes, ds_name, gen_args.path = get_dataset_info(args.target_dataset)
 
-    _, gen_args.path = get_ds_num_classes(args.target_dataset)
-    gen_args.model_name = f"{get_dataset_enum(args.target_dataset)}_model.pth"
+    gen_args.model_name = f"{ds_name}_model.pth"
 
     train(gen_args)
 
-    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{get_dataset_enum(args.target_dataset)}')
+    gen_images_path = os.path.join(args.dataset_dir, f'{args.gen_images_path}_{ds_name}')
     if not os.path.exists(gen_images_path):
         os.makedirs(gen_images_path)
 
     logging.info(f"Generated images path {gen_images_path}")
-    for i in range(128):
-        generate_images(gen_args, gen_images_path, i)
+    generate_images(gen_args, gen_images_path)
 
 if __name__ == "__main__":
     do_gen_ai()

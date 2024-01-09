@@ -1,24 +1,18 @@
-from enum import Enum
 import torch
 import torchvision.transforms as transforms
-import torch.nn.functional as F
 
 from typing import List
 from PIL import Image
 import random
 import glob
 from datautils.path_loss import PathLoss
-from models.self_sup.simclr.transformation.simclr_transformations import TransformsSimCLR
-from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
 from models.self_sup.swav.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
-from models.utils.commons import get_ds_num_classes, get_images_pathlist, get_params
+from models.utils.commons import get_images_pathlist, get_params
 from models.utils.transformations import Transforms
-from utils.commons import load_class_names, pil_loader, save_class_names
+from utils.commons import load_class_names, save_class_names
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import SSL_Method
-from datautils.dataset_enum import DatasetType, get_dataset_enum
+from datautils.dataset_enum import DatasetType, get_dataset_info
 # import cv2
-import utils.logger as logging
 
 labels = {}
 index = 0
@@ -31,7 +25,7 @@ class PretextDataLoader():
         self.training_type = training_type
         self.is_val = is_val
 
-        self.dir = self.args.dataset_dir + "/" + get_ds_num_classes(self.args.target_dataset)[1]
+        self.dir = self.args.dataset_dir + "/" + get_dataset_info(self.args.target_dataset)[2]
 
         # This is done to ensure that the dataset used for validation is only a subset of the entire datasets used for training
         if is_val:

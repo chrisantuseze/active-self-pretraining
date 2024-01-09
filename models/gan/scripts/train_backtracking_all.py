@@ -1,5 +1,4 @@
 import torch
-from torch import nn, real, select
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
@@ -9,10 +8,9 @@ from torchvision import utils as vutils
 import argparse
 from tqdm import tqdm
 
-from models.gan.models import weights_init, Discriminator, Generator, SimpleDecoder
-from models.gan.operation import copy_G_params, load_params, get_dir
+from models.gan.models import Generator
+from models.gan.operation import load_params, get_dir
 from models.gan.operation import ImageFolder, InfiniteSamplerWrapper
-from models.gan.diffaug import DiffAugment
 policy = 'color,translation'
 import models.gan.lpips as lpips
 percept = lpips.PerceptualLoss(model='net-lin', net='vgg', use_gpu=True)

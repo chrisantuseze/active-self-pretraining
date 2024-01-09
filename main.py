@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import argparse
 
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.random_seeders import set_random_seeds
 
@@ -32,7 +32,7 @@ def office_dataset(args, writer):
     pretrainer = SelfSupPretrainer(args, writer)
     # pretrainer.first_pretrain()
 
-    # do_gen_ai(args)
+    do_gen_ai(args)
     # pretrainer.second_pretrain()
 
     pretext = PretextTrainer(args, writer)

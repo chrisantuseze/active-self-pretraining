@@ -1,19 +1,14 @@
 from eval import load_params
 import torch
-from torch import nn
-from torch import optim
 import torch.nn.functional as F
 from torchvision.datasets import ImageFolder
-from torch.utils.data import DataLoader
 from torchvision import utils as vutils
 from torchvision import transforms
 import os
-import random
-import argparse
 from tqdm import tqdm
 
 from models.gan.models import Generator
-from models.gan.operation import load_params, InfiniteSamplerWrapper
+from models.gan.operation import load_params
 
 noise_dim = 256
 device = torch.device('cuda:%d'%(0))

@@ -1,5 +1,5 @@
 import glob
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
@@ -23,10 +23,10 @@ class SelfSupPretrainer:
     def base_pretrain(self, train_loader, epochs, trainingType) -> None:        
         if trainingType == TrainingType.BASE_PRETRAIN:
             pretrain_level = "1" 
-            dataset_type = get_dataset_enum(self.args.base_dataset)
+            dataset_type = get_dataset_info(self.args.base_dataset)[1]
         else:
             pretrain_level = "2" 
-            dataset_type = get_dataset_enum(self.args.target_dataset)
+            dataset_type = get_dataset_info(self.args.target_dataset)[1]
 
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 

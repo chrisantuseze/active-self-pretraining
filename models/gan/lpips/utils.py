@@ -6,7 +6,6 @@ from __future__ import print_function
 import numpy as np
 # import skimage
 import torch
-from torch.autograd import Variable
 
 from models.gan.lpips import dist_model
 

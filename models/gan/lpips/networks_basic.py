@@ -1,12 +1,9 @@
 
 from __future__ import absolute_import
 
-import sys
 import torch
 import torch.nn as nn
-import torch.nn.init as init
 from torch.autograd import Variable
-import numpy as np
 from models.gan.lpips import pretrained_networks as pn
 
 from models.gan.lpips import utils as util

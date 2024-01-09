@@ -7,7 +7,7 @@ from PIL import Image
 from models.active_learning.al_method_enum import get_al_method_enum
 
 from models.utils.ssl_method_enum import get_ssl_method
-from datautils.dataset_enum import get_dataset_enum
+from datautils.dataset_enum import get_dataset_info
 import utils.logger as logging
 
 
@@ -23,7 +23,7 @@ def load_saved_state(args, dataset, pretrain_level="1"):
     return simple_load_model(args, out)
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
-    dataset = get_dataset_enum(args.target_dataset)
+    dataset = get_dataset_info(args.target_dataset)[1]
     filename = "sawv_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
     return load_chkpts(args, filename, model)
 
@@ -89,7 +89,7 @@ def accuracy(pred, target, topk=1):
 
 
 def save_path_loss(args, filename, image_loss_list):
-    filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
+    filename = "{}_{}".format(get_dataset_info(args.target_dataset)[1], filename)
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -103,7 +103,7 @@ def save_path_loss(args, filename, image_loss_list):
 
 
 def load_path_loss(args, filename):
-    filename = "{}_{}".format(get_dataset_enum(args.target_dataset), filename)
+    filename = "{}_{}".format(get_dataset_info(args.target_dataset)[1], filename)
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -130,7 +130,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
         None
 
 def load_accuracy_file(args):
-    dataset = f"{get_dataset_enum(args.base_dataset)}-{get_dataset_enum(args.target_dataset)}-{get_dataset_enum(args.finetune_dataset)}"
+    dataset = f"{get_dataset_info(args.base_dataset)[1]}-{get_dataset_info(args.target_dataset)[1]}-{get_dataset_info(args.finetune_dataset)[1]}"
     filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
     out = os.path.join(args.model_misc_path, filename)
 
@@ -142,7 +142,7 @@ def load_accuracy_file(args):
         return None
 
 def save_class_names(args, label):
-    filename = f"{get_dataset_enum(args.target_dataset)}.txt"
+    filename = f"{get_dataset_info(args.target_dataset)[1]}.txt"
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -154,7 +154,7 @@ def save_class_names(args, label):
         None
 
 def load_class_names(args):
-    filename = f"{get_dataset_enum(args.target_dataset)}.txt"
+    filename = f"{get_dataset_info(args.target_dataset)[1]}.txt"
     out = os.path.join(args.model_misc_path, filename)
 
     try:
