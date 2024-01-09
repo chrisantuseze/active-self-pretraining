@@ -249,7 +249,7 @@ def do_gen_ai(args):
     parser.add_argument('--path', type=str, default='imagenet_gan', help='path of resource dataset, should be a folder that has one or many sub image folders inside')
     parser.add_argument('--cuda', type=int, default=0, help='index of gpu to use')
     parser.add_argument('--model_name', type=str, default='test1', help='experiment name')
-    parser.add_argument('--iter', type=int, default=100, help='number of iterations') #50000
+    parser.add_argument('--iter', type=int, default=50000, help='number of iterations')
     parser.add_argument('--start_iter', type=int, default=0, help='the iteration to start training')
     parser.add_argument('--batch_size', type=int, default=8, help='mini batch number of images')
     parser.add_argument('--im_size', type=int, default=1024, help='image resolution')

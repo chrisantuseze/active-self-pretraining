@@ -22,6 +22,7 @@ class SelfSupPretrainer(BasePretrainer):
 
         self.args = args
         self.writer = writer
+        self.encoder = resnet_backbone(self.args.backbone, pretrained=False)
 
     def base_pretrain(self, encoder, train_loader, epochs, trainingType) -> None:
         train_params = get_params(self.args, trainingType)
@@ -83,22 +84,13 @@ class SelfSupPretrainer(BasePretrainer):
 
 
     def first_pretrain(self) -> None:
-        do_al = False
-        training_type = TrainingType.BASE_AL if do_al else TrainingType.BASE_PRETRAIN
-
-        loader = self.get_loader(do_al=do_al, training_type=training_type)
-        encoder = resnet_backbone(self.args.backbone, pretrained=False)
-
-        self.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
-
+        loader = self.get_loader(do_al=False, training_type=TrainingType.BASE_PRETRAIN)
+        self.base_pretrain(self.encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
 
     def second_pretrain(self) -> None:
         distilled_ds = load_path_loss(self.args, self.args.pretrain_path_loss_file)
-
         loader = self.get_loader(self.args.do_al, distilled_ds=distilled_ds, training_type=TrainingType.TARGET_PRETRAIN)
-        encoder = resnet_backbone(self.args.backbone, pretrained=False)
-
-        self.base_pretrain(encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
+        self.base_pretrain(self.encoder, loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
 
     def get_loader(self, do_al, distilled_ds=None, training_type=None):
         if do_al:
