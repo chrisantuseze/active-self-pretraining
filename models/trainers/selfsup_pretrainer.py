@@ -55,7 +55,7 @@ class SelfSupPretrainer:
 
             self.args.current_epoch += 1
 
-        save_state(self.args, model, pretrain_level)
+        save_state(self.args, model, dataset_type, pretrain_level)
 
 
     def first_pretrain(self) -> None:

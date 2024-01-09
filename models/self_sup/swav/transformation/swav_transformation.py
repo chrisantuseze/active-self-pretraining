@@ -25,5 +25,3 @@ class TransformsSwAV():
             pin_memory=True,
             drop_last=True
         )
-
-        print(f"The size of the dataset is {len(self.train_dataset)} and the number of batches is {self.train_loader.__len__()} for a batch size of {batch_size}")
