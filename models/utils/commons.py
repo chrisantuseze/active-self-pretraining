@@ -213,7 +213,7 @@ def prepare_model(args, trainingType, model):
         state = load_saved_state(args, dataset=get_dataset_enum(args.target_dataset), pretrain_level="2")
 
         # This is the first AL cycle
-        if not state:
+        if state is None:
             state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
