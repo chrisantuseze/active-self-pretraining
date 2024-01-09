@@ -522,7 +522,7 @@ class PretextTrainer():
             sample6400 = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
 
             if batch > 0:
-                logging.info(f'>> Getting best checkpoint for batch {batch + 1}')
+                logging.info(f'>> Getting best checkpoint for batch {batch}')
 
                 state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
 
