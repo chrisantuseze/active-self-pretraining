@@ -301,7 +301,7 @@ class PretextTrainer():
                 batch_time.update(time.perf_counter() - end)
                 end = time.perf_counter()
 
-                total_steps = step
+                total_steps = step if step > 0 else 1
 
         # Save checkpoint.
         epoch_acc = 100. * correct / total
