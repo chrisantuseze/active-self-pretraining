@@ -175,7 +175,7 @@ def train(args):
                         'opt_g': optimizerG.state_dict(),
                         'opt_d': optimizerD.state_dict()}, f'{saved_model_folder}/{args.model_name}')
 
-def generate_images(args, images_path):
+def generate_images(args, images_path, i):
     ndf = 64
     ngf = 64
     nz = 256
@@ -202,10 +202,9 @@ def generate_images(args, images_path):
     # z = torch.FloatTensor(25, nz).normal_(0, 1).to(device)#8 size of dataset to be generated
     logging.info("Generating images...")
 
-    for i in range(128):
-        z = torch.randn(25, nz).to(device)
-        for j, val in enumerate(netG(z)[0].add(1).mul(0.5)):
-            torchvision.utils.save_image(val, f'{images_path}/image_{iter}_{i}_{j}.jpg')
+    z = torch.randn(25, nz).to(device)
+    for j, val in enumerate(netG(z)[0].add(1).mul(0.5)):
+        torchvision.utils.save_image(val, f'{images_path}/image_{iter}_{i}_{j}.jpg')
 
 def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
@@ -231,7 +230,8 @@ def do_gen_ai(args):
         os.makedirs(gen_images_path)
 
     logging.info(f"Generated images path {gen_images_path}")
-    generate_images(gen_args, gen_images_path)
+    for i in range(128):
+        generate_images(gen_args, gen_images_path, i)
 
 if __name__ == "__main__":
     do_gen_ai()
