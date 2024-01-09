@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
-import os
-import numpy as np
 import torch
-import torch.nn as nn
 import argparse
 
-from datautils.dataset_enum import get_dataset_info
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.random_seeders import set_random_seeds
 
@@ -16,7 +12,6 @@ from models.trainers.classifier import Classifier
 import utils.logger as logging
 
 from models.gan.train import do_gen_ai
-from models.utils.visualizations.tsne4 import tsne_similarity
 
 # logging.init()
 
