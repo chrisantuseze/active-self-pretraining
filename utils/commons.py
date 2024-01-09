@@ -16,11 +16,11 @@ def save_state(args, model, dataset, pretrain_level="1"):
         os.makedirs(args.model_checkpoint_path)
 
     out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
-    simple_save_model(model, out)
+    simple_save_model(args, model, out)
 
 def load_saved_state(args, dataset, pretrain_level="1"):
     out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
-    return simple_load_model(out)
+    return simple_load_model(args, out)
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
     dataset = get_dataset_enum(args.target_dataset)
@@ -63,7 +63,7 @@ def simple_load_model(args, path):
     try:
         out = os.path.join(args.model_checkpoint_path, path)
         logging.info(f"Loading checkpoint from - {out}")
-        
+
         return torch.load(out)
     except IOError as er:
         return None
