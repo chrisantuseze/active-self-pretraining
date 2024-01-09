@@ -205,9 +205,16 @@ def prepare_model(args, trainingType, model):
         logging.info("Using downloaded swav pretrained model")
         model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
-    else:
-        state = load_saved_state(args, dataset=get_dataset_enum(args.target_dataset), 
-                                 pretrain_level="1" if trainingType == TrainingType.TARGET_PRETRAIN else "2")
+    elif trainingType == TrainingType.TARGET_PRETRAIN:
+        state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
+        model.load_state_dict(state['model'], strict=False)
+
+    elif trainingType == TrainingType.TARGET_AL:
+        state = load_saved_state(args, dataset=get_dataset_enum(args.target_dataset), pretrain_level="2")
+
+        # This is the first AL cycle
+        if not state:
+            state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
     # freeze some layers
