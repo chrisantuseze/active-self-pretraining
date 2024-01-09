@@ -28,19 +28,14 @@ class PretextDataLoader():
         self.dir = self.args.dataset_dir + "/" + get_dataset_info(self.args.target_dataset)[2]
 
         # This is done to ensure that the dataset used for validation is only a subset of the entire datasets used for training
-        if is_val:
-            val_path_loss_list = []
+        # if is_val:
+        #     val_path_loss_list = []
 
-            if self.args.target_dataset in [DatasetType.AMAZON.value, DatasetType.DSLR.value, DatasetType.WEBCAM.value]:
-                img_paths = glob.glob(self.dir + '/images/*/*')
+        #     img_paths = glob.glob(self.dir + '/*/*')
+        #     for path in img_paths[0:len(path_loss_list)]:
+        #         val_path_loss_list.append(PathLoss(path, 0))     
 
-            else:
-                img_paths = glob.glob(self.dir + '/*/*')
-
-            for path in img_paths[0:len(path_loss_list)]:
-                val_path_loss_list.append(PathLoss(path, 0))     
-
-            self.path_loss_list = val_path_loss_list 
+        #     self.path_loss_list = val_path_loss_list 
 
         params = get_params(args, training_type)
         self.image_size = params.image_size
