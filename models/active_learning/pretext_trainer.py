@@ -370,7 +370,7 @@ class PretextTrainer():
                     )
                 )
 
-            total_steps = step
+            total_steps = step if step > 0 else 1
         avg_loss = losses.sum/total_steps
             
         logging.info("Train Loss: {:.4f}".format(avg_loss))
