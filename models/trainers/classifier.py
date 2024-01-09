@@ -14,9 +14,7 @@ from utils.commons import get_accuracy_file_ext, load_chkpts, load_saved_state, 
 
 class Classifier:
     def __init__(self, args, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
-
         self.args = args
-        
         self.model = resnet_backbone(self.args.backbone, pretrained=False)
 
         if pretrain_level == "AL":
@@ -54,13 +52,10 @@ class Classifier:
             training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=pretrain_data)
 
         since = time.time()
-
         val_acc_history = []
-
         logging.info(f"Performing linear eval on {get_dataset_enum(self.args.lc_dataset)}")
 
         for epoch in range(self.args.lc_epochs):
-
             lr = 0
             if self.scheduler:
                 lr = self.scheduler.get_last_lr()
@@ -68,17 +63,13 @@ class Classifier:
             logging.info('\nEpoch {}/{} lr: '.format(epoch, self.args.lc_epochs, lr))
             logging.info('-' * 10)
 
-            # train for one epoch
-            train_loss, train_acc = self.train_single_epoch(train_loader)
-
-            # evaluate on validation set
-            val_loss, val_acc = self.validate(val_loader)
+            _, _ = self.train_single_epoch(train_loader)
+            _, val_acc = self.validate(val_loader)
             val_acc_history.append(str(val_acc))
 
             # Decay Learning Rate
             if self.scheduler:
                 self.scheduler.step()
-
 
         time_elapsed = time.time() - since
         logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

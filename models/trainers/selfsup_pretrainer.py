@@ -5,7 +5,6 @@ from datautils.target_dataset import get_target_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 # from models.active_learning.pretext_trainer import PretextTrainer
 from models.self_sup.swav.swav import SwAVTrainer
-from models.trainers.base_pretrainer import BasePretrainer
 from models.utils.commons import get_params
 import utils.logger as logging
 from models.utils.training_type_enum import TrainingType
@@ -13,7 +12,7 @@ from utils.commons import load_path_loss, save_state
 from models.utils.ssl_method_enum import SSL_Method
 
 
-class SelfSupPretrainer(BasePretrainer):
+class SelfSupPretrainer:
     def __init__(self, 
         args, 
         writer) -> None:
@@ -21,9 +20,7 @@ class SelfSupPretrainer(BasePretrainer):
         self.args = args
         self.writer = writer
 
-    def base_pretrain(self, train_loader, epochs, trainingType) -> None:
-        train_params = get_params(self.args, trainingType)
-        
+    def base_pretrain(self, train_loader, epochs, trainingType) -> None:        
         if trainingType == TrainingType.BASE_PRETRAIN:
             pretrain_level = "1" 
             dataset_type = get_dataset_enum(self.args.base_dataset)
@@ -36,14 +33,11 @@ class SelfSupPretrainer(BasePretrainer):
         log_step = self.args.log_step
         trainer = SwAVTrainer(
             self.args, train_loader, 
-            pretrain_level=pretrain_level, 
             training_type=trainingType, 
             log_step=log_step
         )
 
         model = trainer.model
-        optimizer = trainer.optimizer
-
         self.args.current_epoch = 0
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))

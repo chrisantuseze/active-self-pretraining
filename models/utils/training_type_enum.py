@@ -14,7 +14,7 @@ class Params:
 
 class TrainingType(Enum):
     BASE_PRETRAIN = "Base"
-    BASE_AL = "Base AL"
+    TARGET_AL = "Target AL"
     TARGET_PRETRAIN = "Target"
     ACTIVE_LEARNING = "Active Learning"
     LINEAR_CLASSIFIER = "Linear Classifier"

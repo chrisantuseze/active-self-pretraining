@@ -53,40 +53,21 @@ class PretextDataLoader():
         self.batch_size = params.batch_size if not batch_size else batch_size
 
     def get_loader(self):
-
-        # this handles the 2nd pretraining (after AL)
-        if self.args.method == SSL_Method.SWAV.value and (self.training_type is not TrainingType.ACTIVE_LEARNING or self.training_type is not TrainingType.BASE_PRETRAIN):
-            dataset = PretextMultiCropDataset(
-                self.args,
-                self.path_loss_list,
-            )
-
-            loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=self.batch_size,
-                num_workers=self.args.workers,
-                pin_memory=True,
-            )
-
-        else:
-            if self.training_type == TrainingType.ACTIVE_LEARNING:
-                transforms = Transforms(self.image_size)
-
-            else:
-                if self.args.method == SSL_Method.SIMCLR.value:
-                    transforms = TransformsSimCLR(self.image_size)
-
-                elif self.args.method == SSL_Method.DCL.value:
-                    transforms = TransformsDCL(self.image_size)
-
-                else:
-                    ValueError
-
+        if self.training_type == TrainingType.ACTIVE_LEARNING:
+            transforms = Transforms(self.image_size)
             dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
             loader = torch.utils.data.DataLoader(
                 dataset,
                 batch_size=self.batch_size,
                 shuffle=not self.is_val,
+                num_workers=self.args.workers,
+                pin_memory=True,
+            )
+        else:
+            dataset = PretextMultiCropDataset(self.args, self.path_loss_list)
+            loader = torch.utils.data.DataLoader(
+                dataset,
+                batch_size=self.batch_size,
                 num_workers=self.args.workers,
                 pin_memory=True,
             )

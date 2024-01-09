@@ -21,7 +21,7 @@ from models.backbones.resnet import resnet_backbone
 from models.utils.commons import AverageMeter, get_ds_num_classes, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
 from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
-from utils.commons import get_state_for_da, load_chkpts, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
+from utils.commons import load_chkpts, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
@@ -431,7 +431,7 @@ class PretextTrainer():
 
         state = None
         if self.args.al_pretext_from_pretrain:
-            state = get_state_for_da(self.args, pretrain_level=1)
+            state = load_saved_state(self.args, dataset=get_dataset_enum(self.args.base_dataset), pretrain_level=1)
             model.load_state_dict(state['model'], strict=False)
 
             # if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
@@ -539,9 +539,9 @@ class PretextTrainer():
 
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
-            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN).get_loader()
+            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
-            pretrainer.base_pretrain(encoder, loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+            pretrainer.base_pretrain(loader, self.args.base_epochs, trainingType=TrainingType.TARGET_AL)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
