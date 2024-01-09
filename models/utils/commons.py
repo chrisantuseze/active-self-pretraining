@@ -1,17 +1,16 @@
 import glob
-import os
+from datautils.dataset_enum import get_dataset_info
 import torch.nn as nn
 import torch
 import torchvision
 from torch.utils.data import random_split
 import gc
-from datautils.dataset_enum import DatasetType, get_dataset_enum
 
 from models.self_sup.simclr.loss.dcl_loss import DCL
 from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
 from models.self_sup.simclr.simclr import SimCLR
 from models.self_sup.simclr.simclr_v2 import SimCLRV2
-from models.utils.ssl_method_enum import SSL_Method, get_ssl_method
+from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
@@ -158,15 +157,15 @@ def prepare_model(args, trainingType, model):
         model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
     elif trainingType == TrainingType.TARGET_PRETRAIN:
-        state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
+        state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
         model.load_state_dict(state['model'], strict=False)
 
     elif trainingType == TrainingType.TARGET_AL:
-        state = load_saved_state(args, dataset=get_dataset_enum(args.target_dataset), pretrain_level="2")
+        state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level="2")
 
         # This is the first AL cycle
         if state is None:
-            state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
+            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
 
         model.load_state_dict(state['model'], strict=False)
 
