@@ -211,10 +211,13 @@ def prepare_model(args, trainingType, model):
 
     elif trainingType == TrainingType.TARGET_AL:
         state = load_saved_state(args, dataset=get_dataset_enum(args.target_dataset), pretrain_level="2")
+        print(state)
 
         # This is the first AL cycle
         if state is None:
             state = load_saved_state(args, dataset=get_dataset_enum(args.base_dataset), pretrain_level="1")
+
+        print(state)
         model.load_state_dict(state['model'], strict=False)
 
     # freeze some layers
