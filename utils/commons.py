@@ -11,42 +11,20 @@ from datautils.dataset_enum import get_dataset_enum
 import utils.logger as logging
 
 
-def save_state(args, model, optimizer, pretrain_level="1", optimizer_type="Adam-Cosine"):
+def save_state(args, model, dataset, pretrain_level="1"):
     if not os.path.isdir(args.model_checkpoint_path):
         os.makedirs(args.model_checkpoint_path)
 
-    prefix = get_ssl_method(args.method)
-    dataset = get_dataset_enum(args.target_dataset)
+    out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
 
-    additional_ext = get_accuracy_file_ext(args)
-    logging.info(f"Appending the extension, {additional_ext}")
-
-    out = os.path.join(args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}{}.tar".format(prefix, pretrain_level, dataset, args.current_epoch, additional_ext))
-
-    state = {
-        'model': model.state_dict(),
-        optimizer_type + '-optimizer': optimizer.state_dict()
-    }
+    state = {'model': model.state_dict()}
     torch.save(state, out)
-
     print("checkpoint saved at {}".format(out))
 
-def load_saved_state(args, recent=True, pretrain_level="1"):
+def load_saved_state(args, pretrain_level="1"):
     try:
-        prefix = get_ssl_method(args.method)
-        if pretrain_level == "2":
-            epoch_num = args.target_epochs
-
-        else:
-            epoch_num = args.base_epochs
-
         dataset = get_dataset_enum(args.target_dataset)
-        additional_ext = get_accuracy_file_ext(args)
-        logging.info(f"Appending the extension, {additional_ext}")
-
-        out = os.path.join(
-                args.model_checkpoint_path, "{}_{}_checkpoint_{}_{}{}.tar".format(prefix, pretrain_level, dataset, epoch_num, additional_ext)
-            )
+        out = os.path.join(args.model_checkpoint_path, "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset))
 
         logging.info(f"Loading checkpoint from - {out}")
         return torch.load(out, map_location=args.device.type)
@@ -56,15 +34,8 @@ def load_saved_state(args, recent=True, pretrain_level="1"):
         return None
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
-    prefix = get_ssl_method(args.method)
-    if pretrain_level == "2":
-        epoch_num = args.target_epochs
-
-    else:
-        epoch_num = args.base_epochs
-
     dataset = get_dataset_enum(args.target_dataset)
-    filename = "{}_{}_checkpoint_{}_{}.tar".format(prefix, pretrain_level, dataset, epoch_num)
+    filename = "sawv_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
     return load_chkpts(args, filename, model)
 
 def load_chkpts(args, filename, model):
