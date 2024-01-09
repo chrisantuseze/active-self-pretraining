@@ -29,7 +29,7 @@ def debug(message: str):
 
 def info(message: str):
     print(message)
-    logging.info(message)
+    # logging.info(message)
 
 def warn(message: str):
     print(message)

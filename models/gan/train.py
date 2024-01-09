@@ -192,8 +192,6 @@ def generate_images(args, images_path, i):
 
     model_path, _ = get_dir(args)
 
-    logging.info("Loading checkpoint")
-
     args.ckpt = f'{model_path}/{args.model_name}'
     ckpt = torch.load(args.ckpt)
     netG.load_state_dict({k.replace('module.', ''): v for k, v in ckpt['g'].items()})
@@ -203,7 +201,7 @@ def generate_images(args, images_path, i):
 
     z = torch.randn(25, nz).to(device)
     for j, val in enumerate(netG(z)[0].add(1).mul(0.5)):
-        torchvision.utils.save_image(val, f'{images_path}/image_{iter}_{i}_{j}.jpg')
+        torchvision.utils.save_image(val, f'{images_path}/image_{i}_{j}.jpg')
 
 def do_gen_ai(args):
     parser = argparse.ArgumentParser(description='region gan')
