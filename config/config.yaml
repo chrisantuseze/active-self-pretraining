@@ -120,7 +120,7 @@ use_bn: False
 #### optim parameters ###
 #########################
 lc_optimizer: "Classifier"
-lc_epochs: 150
+lc_epochs: 100
 lc_batch_size: 32
 lc_lr: 0.3
 nesterov: False

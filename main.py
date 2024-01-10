@@ -26,15 +26,15 @@ def office_dataset(args, writer):
     args.lc_dataset = 6 #8
 
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     # do_gen_ai(args)
     # pretrainer.second_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
-    classifier = Classifier(args, pretrain_level="2_3")#f"2_{args.al_batches-1}")
+    classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
 
 def main(args):
