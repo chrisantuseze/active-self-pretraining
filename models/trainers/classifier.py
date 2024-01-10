@@ -20,12 +20,11 @@ class Classifier:
         if pretrain_level == "1":
             state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level=pretrain_level)
 
-        elif pretrain_level == "2":
-            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
-
-        else:
+        elif pretrain_level == "AL":
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='finetuner.pth')
+        else:
+            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
 
         self.model.load_state_dict(state['model'], strict=False)
         num_classes, self.dataset, self.dir = get_dataset_info(self.args.lc_dataset)
