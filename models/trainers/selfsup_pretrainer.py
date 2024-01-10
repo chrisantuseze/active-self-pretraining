@@ -22,10 +22,12 @@ class SelfSupPretrainer:
 
     def base_pretrain(self, train_loader, epochs, batch, trainingType) -> None:        
         if trainingType == TrainingType.BASE_PRETRAIN:
-            pretrain_level = "1" 
+            pretrain_level, plevel = "1", "1"
             dataset_type = get_dataset_info(self.args.base_dataset)[1]
         else:
-            pretrain_level = "2" if trainingType == TrainingType.TARGET_PRETRAIN else f"2_{batch-1}"
+            pretrain_level, plevel = "2", "2"
+            if trainingType == TrainingType.TARGET_AL:
+                pretrain_level, plevel = f"2_{batch-1}", f"2_{batch}"
             dataset_type = get_dataset_info(self.args.target_dataset)[1]
 
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
@@ -56,7 +58,7 @@ class SelfSupPretrainer:
 
             self.args.current_epoch += 1
 
-        save_state(self.args, model, dataset_type, pretrain_level)
+        save_state(self.args, model, dataset_type, pretrain_level=plevel)
 
 
     def first_pretrain(self) -> None:

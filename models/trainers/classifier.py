@@ -18,10 +18,10 @@ class Classifier:
         self.model = resnet_backbone(self.args.backbone, pretrained=False)
 
         if pretrain_level == "1":
-            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level=pretrain_level)
 
         elif pretrain_level == "2":
-            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level="2")
+            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
 
         else:
             logging.info("Using pretext task weights")
@@ -35,17 +35,14 @@ class Classifier:
         self.model = self.model.to(self.args.device)
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
-
         train_params = get_params(self.args, TrainingType.LINEAR_CLASSIFIER)
         self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
 
-    def train_and_eval(self, pretrain_data=None) -> None:
-        train_loader, val_loader = LCDataset(
-            self.args, dir=self.dir, 
-            training_type=TrainingType.LINEAR_CLASSIFIER).get_loader(pretrain_data=pretrain_data)
+    def train_and_eval(self) -> None:
+        train_loader, val_loader = LCDataset(self.args, dir=self.dir, training_type=TrainingType.LINEAR_CLASSIFIER).get_loader()
 
         since = time.time()
         val_acc_history = []

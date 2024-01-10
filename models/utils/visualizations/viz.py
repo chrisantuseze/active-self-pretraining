@@ -8,7 +8,7 @@ from models.backbones.resnet import resnet_backbone
 from datautils.dataset_enum import get_dataset_info
 from datautils.target_dataset import get_pretrain_ds
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_saved_state
+from utils.commons import load_chkpts, load_saved_state
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 
@@ -187,7 +187,6 @@ def viz(args):
     os.makedirs('models/utils/visualizations/plots/', exist_ok=True)
     args.source_batch_size = 256
     args.target_batch_size = 256
-    num_classes, source_ds_name, dir = get_dataset_info(args.base_dataset)
     encoder = resnet_backbone(args.backbone, pretrained=False)
 
     # encoder = resnet_models.__dict__[args.backbone](
@@ -201,20 +200,24 @@ def viz(args):
     source_loader = get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN).get_loader() 
     target_loader = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN).get_loader() 
 
-    source_model = encoder
-    state = load_saved_state(args, dataset=source_ds_name, pretrain_level="1")
-    source_model.load_state_dict(state['model'], strict=False)
-    source_model = source_model.to(args.device)
-    source_model.eval()
+    # num_classes, source_ds_name, dir = get_dataset_info(args.base_dataset)
+    # source_model = encoder
+    # state = load_saved_state(args, dataset=source_ds_name, pretrain_level="1")
+    # source_model.load_state_dict(state['model'], strict=False)
+    # source_model = source_model.to(args.device)
+    # source_model.eval()
 
-    visualize_source_model_features(args, source_model, source_loader, target_loader)
+    # visualize_source_model_features(args, source_model, source_loader, target_loader)
 
     num_classes, target_ds_name, dir = get_dataset_info(args.target_dataset)
-    for batch in range(4, args.al_batches + 1):
-        target_model = encoder
-        state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
-        target_model.load_state_dict(state['model'], strict=False)
-        target_model = target_model.to(args.device)
-        target_model.eval()
+    # for batch in range(4, args.al_batches + 1):
+    batch = 4
+    target_model = encoder
+    target_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", target_model)
 
-        visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
+    # state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
+    # target_model.load_state_dict(state['model'], strict=False)
+    target_model = target_model.to(args.device)
+    target_model.eval()
+
+    visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)

@@ -492,38 +492,21 @@ class PretextTrainer():
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
         pretraining_sample_pool.extend(pretraining_gen_images)
 
-
-        # # adding proxy images
-        # source_proxy = glob.glob(f'{self.args.dataset_dir}/cifar10/train/*/*')
-        # random.shuffle(source_proxy)
-        # pretraining_source_proxy = [PathLoss(path, 0) for path in source_proxy]
-
-        # augment_size = 3200
-        # logging.info(f"Augmenting {augment_size} proxy source images to the generated dataset")
-        # pretraining_sample_pool.extend(pretraining_source_proxy[0:augment_size])
-        # # ###################
-
-        logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
-
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
-        logging.info(f"Size of the original data is {len(path_loss)}")
+        logging.info(f"The size of gen images is {len(pretraining_sample_pool)} while the size of the original data is {len(path_loss)}")
 
         self.args.al_trainer_sample_size = int(0.75 * (len(path_loss))//self.args.al_batches)
         logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
 
         sample_per_batch = len(path_loss)//self.args.al_batches
-
         batch_sampler_encoder = encoder
 
         for batch in range(self.args.al_batches):
+            logging.info(f'>> Batch {batch}')
+
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
-            logging.info(f"Size of sampled data {len(sampled_data)}")
-
             if batch > 0:
-                logging.info(f'>> Getting best checkpoint for batch {batch}')
-
                 state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
-
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
@@ -534,7 +517,6 @@ class PretextTrainer():
                 samplek = sampled_data[:self.args.al_trainer_sample_size]
 
             pretraining_sample_pool.extend(samplek)
-
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()

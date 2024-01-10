@@ -169,7 +169,13 @@ def prepare_model(args, trainingType, pretrain_level, model):
 
         model.load_state_dict(state['model'], strict=False)
 
-    # freeze some layers
+    # freeze some layers NOTE: We follow https://arxiv.org/pdf/1502.02791.pdf to "to adapt multiple layers instead of only one layer"
+    '''
+    deep features in standard CNNs eventually transition from general to
+    specific along the network, and the transferability of features
+    and classifiers decreases when the cross-domain discrepancy
+    increases (Yosinski et al., 2014)
+    '''
     for name, param in model.named_parameters():
         if 'projection_head' in name or 'prototypes' in name:
             continue
