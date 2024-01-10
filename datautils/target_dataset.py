@@ -101,7 +101,7 @@ class TargetDataset():
         return loader
     
 
-def get_target_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
+def get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
     if training_type == TrainingType.BASE_PRETRAIN:
         dataset_type = args.base_dataset
     else:

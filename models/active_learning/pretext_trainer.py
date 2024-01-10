@@ -14,7 +14,7 @@ import copy
 import random
 
 from datautils.path_loss import PathLoss
-from datautils.target_dataset import get_target_pretrain_ds
+from datautils.target_dataset import get_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.backbones.resnet import resnet_backbone
 
@@ -210,7 +210,7 @@ class PretextTrainer():
         return new_samples
 
     def make_batches(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
-        loader = get_target_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
+        loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
         state = simple_load_model(self.args, path=f'{prefix}_finetuner_{self.dataset}.pth')
@@ -379,12 +379,12 @@ class PretextTrainer():
         if path_list is not None:
             path_list = [path.path for path in path_list]
 
-            train_loader, test_loader = get_target_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
                 train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100, path_list=path_list
             )
 
         else:
-            train_loader, test_loader = get_target_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
                 train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100
             )
 
@@ -420,7 +420,7 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
 
     def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
-        train_loader, test_loader = get_target_pretrain_ds(
+        train_loader, test_loader = get_pretrain_ds(
             self.args, training_type=training_type).get_finetuner_loaders(
                 train_batch_size=self.args.al_finetune_batch_size,
                 val_batch_size=100
@@ -430,7 +430,7 @@ class PretextTrainer():
 
         state = None
         if self.args.al_pretext_from_pretrain:
-            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level=1)
+            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
 
             # if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
@@ -515,7 +515,7 @@ class PretextTrainer():
 
         batch_sampler_encoder = encoder
 
-        for batch in range(1, self.args.al_batches):
+        for batch in range(self.args.al_batches):
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             logging.info(f"Size of sampled data {len(sampled_data)}")
 
@@ -539,7 +539,7 @@ class PretextTrainer():
 
             loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
-            pretrainer.base_pretrain(loader, self.args.target_epochs, trainingType=TrainingType.TARGET_AL)
+            pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)

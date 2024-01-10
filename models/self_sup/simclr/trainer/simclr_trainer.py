@@ -18,7 +18,7 @@ class SimCLRTrainer():
 
         self.model, self.criterion = get_model_criterion(self.args, encoder, training_type)
         
-        self.model, params_to_update = prepare_model(self.args, training_type, self.model)
+        self.model, params_to_update = prepare_model(self.args, training_type, "1", self.model)
 
         self.model = self.model.to(self.args.device)
 

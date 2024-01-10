@@ -1,7 +1,7 @@
 import glob
 from datautils.dataset_enum import get_dataset_info
 from datautils.path_loss import PathLoss
-from datautils.target_dataset import get_target_pretrain_ds
+from datautils.target_dataset import get_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
 # from models.active_learning.pretext_trainer import PretextTrainer
 from models.self_sup.swav.swav import SwAVTrainer
@@ -20,12 +20,12 @@ class SelfSupPretrainer:
         self.args = args
         self.writer = writer
 
-    def base_pretrain(self, train_loader, epochs, trainingType) -> None:        
+    def base_pretrain(self, train_loader, epochs, batch, trainingType) -> None:        
         if trainingType == TrainingType.BASE_PRETRAIN:
             pretrain_level = "1" 
             dataset_type = get_dataset_info(self.args.base_dataset)[1]
         else:
-            pretrain_level = "2" 
+            pretrain_level = "2" if trainingType == TrainingType.TARGET_PRETRAIN else f"2_{batch-1}"
             dataset_type = get_dataset_info(self.args.target_dataset)[1]
 
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
@@ -33,6 +33,7 @@ class SelfSupPretrainer:
         log_step = self.args.log_step
         trainer = SwAVTrainer(
             self.args, train_loader, 
+            pretrain_level=pretrain_level,
             training_type=trainingType, 
             log_step=log_step
         )
@@ -71,6 +72,6 @@ class SelfSupPretrainer:
         if do_al:
             loader = PretextDataLoader(self.args, distilled_ds, training_type=training_type).get_loader()
         else:
-            loader = get_target_pretrain_ds(self.args, training_type=training_type).get_loader()  
+            loader = get_pretrain_ds(self.args, training_type=training_type).get_loader()  
 
         return loader

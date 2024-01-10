@@ -17,7 +17,7 @@ import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 class SwAVTrainer():
-    def __init__(self, args, dataloader, training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
+    def __init__(self, args, dataloader, pretrain_level, training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
         
         self.args = args
         self.train_loader = dataloader
@@ -37,7 +37,7 @@ class SwAVTrainer():
 
         # load weights
 
-        self.model, params_to_update = prepare_model(self.args, training_type, self.model) 
+        self.model, params_to_update = prepare_model(self.args, training_type, pretrain_level, self.model) 
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)

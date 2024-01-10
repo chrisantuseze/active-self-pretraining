@@ -149,7 +149,7 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 
     return train_ds, val_ds
 
-def prepare_model(args, trainingType, model):
+def prepare_model(args, trainingType, pretrain_level, model):
     params_to_update = model.parameters()
             
     if trainingType == TrainingType.BASE_PRETRAIN:
@@ -157,11 +157,11 @@ def prepare_model(args, trainingType, model):
         model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
     elif trainingType == TrainingType.TARGET_PRETRAIN:
-        state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+        state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level=pretrain_level)
         model.load_state_dict(state['model'], strict=False)
 
     elif trainingType == TrainingType.TARGET_AL:
-        state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level="2")
+        state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
 
         # This is the first AL cycle
         if state is None:

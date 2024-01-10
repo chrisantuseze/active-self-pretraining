@@ -64,7 +64,7 @@ def simple_load_model(args, path):
         out = os.path.join(args.model_checkpoint_path, path)
         logging.info(f"Loading checkpoint from - {out}")
 
-        return torch.load(out)
+        return torch.load(out, map_location=args.device)
     except IOError as er:
         return None
 

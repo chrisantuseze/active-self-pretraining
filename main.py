@@ -3,6 +3,7 @@
 import torch
 import argparse
 
+from models.utils.visualizations.viz import viz
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.random_seeders import set_random_seeds
 
@@ -25,13 +26,13 @@ def office_dataset(args, writer):
     args.lc_dataset = 6 #8
 
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     # do_gen_ai(args)
     # pretrainer.second_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level="2")
     classifier.train_and_eval()
@@ -59,10 +60,9 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     assert args.target_dataset == args.lc_dataset
-    assert args.base_dataset == args.target_dataset
 
     main(args)
-    # tsne_similarity(args)
+    # viz(args)
 
     logging.info("GASP ended.")
 
