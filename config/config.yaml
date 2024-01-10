@@ -108,7 +108,7 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 ################################## LINEAR CLASSIFIER ###########################################
 lc_dataset: 6                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-lc_image_size: 90                             # this depends on the dataset used
+lc_image_size: 64                             # this depends on the dataset used
 
 #########################
 #### model parameters ###
@@ -120,7 +120,7 @@ use_bn: False
 #### optim parameters ###
 #########################
 lc_optimizer: "Classifier"
-lc_epochs: 100
+lc_epochs: 150
 lc_batch_size: 32
 lc_lr: 0.3
 nesterov: False

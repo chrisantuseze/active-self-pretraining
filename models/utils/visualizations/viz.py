@@ -8,7 +8,7 @@ from models.backbones.resnet import resnet_backbone
 from datautils.dataset_enum import get_dataset_info
 from datautils.target_dataset import get_pretrain_ds
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_chkpts, load_saved_state
+from utils.commons import load_chkpts, load_saved_state, simple_load_model
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 
@@ -83,6 +83,9 @@ def visualize_source_model_features(args, source_model, source_data, target_data
     source_emb = tsne.fit_transform(source_features) 
     target_emb = tsne.fit_transform(target_features)
 
+    # Create a new figure for each iteration
+    plt.figure()
+
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
@@ -116,6 +119,9 @@ def visualize_adapted_model_features(args, adapted_model, source_data, target_da
     # Extract features after adaptation
     source_emb = tsne.fit_transform(adapted_source_features)
     target_emb = tsne.fit_transform(adapted_target_features) 
+
+    # Create a new figure for each iteration
+    plt.figure()
 
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
@@ -210,14 +216,16 @@ def viz(args):
     # visualize_source_model_features(args, source_model, source_loader, target_loader)
 
     num_classes, target_ds_name, dir = get_dataset_info(args.target_dataset)
-    # for batch in range(4, args.al_batches + 1):
-    batch = 4
-    target_model = encoder
-    target_model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", target_model)
+    for batch in range(args.al_batches):
+        target_model = encoder
+        # state = simple_load_model(args, "1_finetuner_dslr.pth")
 
-    # state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
-    # target_model.load_state_dict(state['model'], strict=False)
-    target_model = target_model.to(args.device)
-    target_model.eval()
+        state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
+        target_model.load_state_dict(state['model'], strict=False)
+        target_model = target_model.to(args.device)
+        target_model.eval()
 
-    visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
+        visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
+
+    # Ensure that figures are closed at the end of the loop
+    plt.close('all')
