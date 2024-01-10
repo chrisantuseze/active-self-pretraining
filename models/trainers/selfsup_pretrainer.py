@@ -61,12 +61,12 @@ class SelfSupPretrainer:
 
     def first_pretrain(self) -> None:
         loader = self.get_loader(do_al=False, training_type=TrainingType.BASE_PRETRAIN)
-        self.base_pretrain(loader, self.args.base_epochs, trainingType=TrainingType.BASE_PRETRAIN)
+        self.base_pretrain(loader, self.args.base_epochs, batch=0, trainingType=TrainingType.BASE_PRETRAIN)
 
     def second_pretrain(self) -> None:
         distilled_ds = load_path_loss(self.args, self.args.pretrain_path_loss_file)
         loader = self.get_loader(self.args.do_al, distilled_ds=distilled_ds, training_type=TrainingType.TARGET_PRETRAIN)
-        self.base_pretrain(loader, self.args.target_epochs, trainingType=TrainingType.TARGET_PRETRAIN)
+        self.base_pretrain(loader, self.args.target_epochs, batch=0, trainingType=TrainingType.TARGET_PRETRAIN)
 
     def get_loader(self, do_al, distilled_ds=None, training_type=None):
         if do_al:
