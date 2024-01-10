@@ -15,7 +15,7 @@ from models.utils.training_type_enum import TrainingType
 from models.utils.ssl_method_enum import SSL_Method
 
 from datautils import dataset_enum
-from models.utils.transformations import Transforms
+from models.utils.transformations import Transforms, get_train_val_transforms
 
 import utils.logger as logging
 
@@ -39,31 +39,27 @@ class TargetDataset():
             self.is_train, is_tsne, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir, transform=transforms)
 
-    def get_finetuner_loaders(self, train_batch_size, val_batch_size, path_list=None):
-        transforms = Transforms(self.image_size)
-        dataset = MakeBatchDataset(
+    def get_finetuner_loaders(self, path_list=None):
+        train_transform, val_transform = get_train_val_transforms()
+        
+        train_dataset = MakeBatchDataset(
             self.args, self.dir, self.with_train, self.is_train, 
-            is_tsne=False, transform=transforms, path_list=path_list)
-
-        train_ds, val_ds = split_dataset2(dataset=dataset, ratio=0.7, is_classifier=True)
-
+            is_tsne=False, transform=train_transform, path_list=path_list)
         train_loader = torch.utils.data.DataLoader(
-                    train_ds, 
-                    batch_size=train_batch_size,
-                    num_workers=self.args.workers,
-                    shuffle=True,
-                    pin_memory=True
-                )
+            train_dataset, batch_size=self.batch_size,
+            num_workers=self.args.workers,
+            shuffle=True, pin_memory=True, drop_last=True
+        )
+        
+        val_dataset = MakeBatchDataset(
+            self.args, self.dir, self.with_train, self.is_train, 
+            is_tsne=False, transform=val_transform, path_list=path_list)
         val_loader = torch.utils.data.DataLoader(
-                        val_ds, 
-                        batch_size=val_batch_size, 
-                        num_workers=self.args.workers,
-                        shuffle=False,
-                        pin_memory=True
-                    )
+            val_dataset, batch_size=self.batch_size, 
+            num_workers=self.args.workers, shuffle=False
+        )
 
-        print(f"The size of the dataset is ({len(train_ds)}, {len(val_ds)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
-
+        print(f"The size of the dataset is ({len(train_dataset)}, {len(val_dataset)}) and the number of batches is ({train_loader.__len__()}, {val_loader.__len__()}) for a batch size of {self.batch_size}")
         return train_loader, val_loader
 
     def get_loader(self):

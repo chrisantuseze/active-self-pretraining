@@ -1,3 +1,4 @@
+from models.utils.transformations import get_train_val_transforms
 import torch
 import torchvision.transforms as transforms
 import torchvision
@@ -26,14 +27,8 @@ class LCDataset():
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.228, 0.224, 0.225])
         # train_dataset, val_dataset = self.split_dataset(normalize)
 
-        train_transform = transforms.Compose([
-                transforms.Resize((256, 256)),
-                transforms.RandomResizedCrop(224),
-                transforms.RandomHorizontalFlip(),
-                transforms.RandomAutocontrast(0.5),
-                transforms.ToTensor(),
-                normalize
-        ])  
+        train_transform, val_transform = get_train_val_transforms()
+
         train_dataset = torchvision.datasets.ImageFolder(self.dir, transform=train_transform)
         train_loader = torch.utils.data.DataLoader(
                 train_dataset, batch_size=self.batch_size,
@@ -41,12 +36,6 @@ class LCDataset():
                 shuffle=True, pin_memory=True, drop_last=True
         )
         
-        val_transform = transforms.Compose([
-                transforms.Resize((256, 256)),
-                transforms.CenterCrop(224),
-                transforms.ToTensor(),
-                normalize
-        ])
         val_dataset = torchvision.datasets.ImageFolder(self.dir, transform=val_transform)        
         val_loader = torch.utils.data.DataLoader(
             val_dataset, batch_size=self.batch_size, 

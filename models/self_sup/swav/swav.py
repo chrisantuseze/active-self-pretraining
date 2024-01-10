@@ -134,6 +134,27 @@ class SwAVTrainer():
             loss /= len(self.args.crops_for_assign)
 
             # ============ backward and optim step ... ============
+
+            #########################################################
+            # compute output
+            # y_t, _ = trg_model(images)
+            # p_t = F.softmax(y_t, dim=1)
+
+            # cls_loss = F.cross_entropy(y_t, pseudo_labels)
+            # ent_loss = entropy_loss(p_t)
+            # vat_loss = virt_adv_loss(trg_model, images)
+
+            # if args.wr_model == "cls":
+            #     wr_loss = weight_reg_loss(src_model.head, trg_model.head)
+            # elif args.wr_model == "model":
+            #     wr_loss = weight_reg_loss(src_model, trg_model)
+            # elif args.wr_model == "none":
+            #     wr_loss = torch.tensor(0.0).cuda()
+            
+            # loss = cls_loss * args.cls_param + (ent_loss + vat_loss) * args.ent_param + wr_loss * args.wr_param
+
+            #########################################################
+
             self.optimizer.zero_grad()
             loss.backward()
             # cancel gradients for the prototypes

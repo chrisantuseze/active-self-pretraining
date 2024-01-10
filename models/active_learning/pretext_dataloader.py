@@ -158,9 +158,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
 
         self.is_train = is_train
         self.is_tnse = is_tsne
-
         self.img_path = path_list if path_list is not None else get_images_pathlist(self.dir, with_train)
-
         self.transform = transform
 
     def __len__(self):
@@ -173,27 +171,18 @@ class MakeBatchDataset(torch.utils.data.Dataset):
         label = path.split('/')[-2]
 
         if self.is_tnse:
-            return self.transform.__call__(img), torch.tensor(0)
+            return self.transform(img), torch.tensor(0)
         
         save_class_names(self.args, label)
         
+        img = self.transform(img)
+        img1 = torch.rot90(img, 1, [1,2])
+        img2 = torch.rot90(img, 2, [1,2])
+        img3 = torch.rot90(img, 3, [1,2])
+        imgs = [img, img1, img2, img3]
+        rotations = [0, 1, 2, 3]
+        random.shuffle(rotations)
         if self.is_train:
-            img = self.transform.__call__(img)
-            img1 = torch.rot90(img, 1, [1,2])
-            img2 = torch.rot90(img, 2, [1,2])
-            img3 = torch.rot90(img, 3, [1,2])
-            imgs = [img, img1, img2, img3]
-            rotations = [0, 1, 2, 3]
-            random.shuffle(rotations)
-
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3]
         else:
-            img = self.transform.__call__(img, False)
-            img1 = torch.rot90(img, 1, [1,2])
-            img2 = torch.rot90(img, 2, [1,2])
-            img3 = torch.rot90(img, 3, [1,2])
-            imgs = [img, img1, img2, img3]
-            rotations = [0, 1, 2, 3]
-            random.shuffle(rotations)
-
             return imgs[rotations[0]], imgs[rotations[1]], imgs[rotations[2]], imgs[rotations[3]], rotations[0], rotations[1], rotations[2], rotations[3], path

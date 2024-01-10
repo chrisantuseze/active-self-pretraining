@@ -378,15 +378,10 @@ class PretextTrainer():
     def finetuner_new(self, model, prefix, path_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING):
         if path_list is not None:
             path_list = [path.path for path in path_list]
-
-            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
-                train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100, path_list=path_list
-            )
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
 
         else:
-            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(
-                train_batch_size=self.args.al_finetune_batch_size, val_batch_size=100
-            )
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
         model = model.to(self.args.device)
@@ -420,11 +415,7 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
 
     def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
-        train_loader, test_loader = get_pretrain_ds(
-            self.args, training_type=training_type).get_finetuner_loaders(
-                train_batch_size=self.args.al_finetune_batch_size,
-                val_batch_size=100
-            )
+        train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
 
