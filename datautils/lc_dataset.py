@@ -51,7 +51,7 @@ class LCDataset():
         train_transform, val_transform = get_train_val_transforms()
 
         dataset = get_dataset(self.dir)
-        split_index = int(len(self.path_loss_list)* 0.9)
+        split_index = int(len(dataset)* 0.8)
 
         train_dataset = PretextDataset(self.args, dataset[:split_index], train_transform)
         val_dataset = PretextDataset(self.args, dataset[split_index:], val_transform)
