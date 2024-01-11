@@ -180,7 +180,7 @@ def get_accuracy_file_ext(args):
     return ''
 
 def get_dataset(data_dir):
-    samples = glob.glob(f'{data_dir}/*')
+    samples = glob.glob(f'{data_dir}/*/*')
 
     labels = [path.split('/')[-2] for path in samples]
     unique_labels = set(labels)
