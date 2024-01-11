@@ -73,7 +73,7 @@ class VirtualAdversarialLoss(nn.Module):
         :param ip: iteration times of computing adv noise (default: 1)
         """
         super(VirtualAdversarialLoss, self).__init__()
-        self.xi = xi #torch.full((64, 3, 224, 224), xi)
+        self.xi = xi
         self.eps = eps
         self.ip = ip
 
@@ -89,7 +89,9 @@ class VirtualAdversarialLoss(nn.Module):
         for _ in range(self.ip):
             d.requires_grad_()
 
-            _, pred_hat = model(x + [self.xi * d])
+            ad = d * self.xi
+            print(x[0].shape, ad.shape)
+            _, pred_hat = model(x + [ad])
             logp_hat = F.log_softmax(pred_hat, dim=1)
             adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
             adv_distance.backward()
@@ -97,7 +99,9 @@ class VirtualAdversarialLoss(nn.Module):
             model.zero_grad()
     
         # calc VAT loss
-        _, pred_hat = model(x + [d * self.eps])
+        r_adv = d * self.eps
+        print(r_adv.shape)
+        _, pred_hat = model(x + [r_adv])
         logp_hat = F.log_softmax(pred_hat, dim=1)
         loss = F.kl_div(logp_hat, pred, reduction='batchmean')
 
