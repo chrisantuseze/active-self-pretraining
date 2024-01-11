@@ -90,7 +90,7 @@ class VirtualAdversarialLoss(nn.Module):
         for _ in range(self.ip):
             d.requires_grad_()
 
-            print(x[0].shape, self.xi, d.shape)
+            print(len(x), x[0].shape, self.xi, d.shape)
             inputs = x + [self.xi * d]
             print(len(inputs), inputs[0].shape)
             _, pred_hat = model(inputs)
