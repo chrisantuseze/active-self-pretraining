@@ -82,6 +82,7 @@ class Classifier:
         total_loss, corrects = 0.0, 0
         for step, (images, targets) in enumerate(train_loader):
             images, targets = images.to(self.args.device), targets.to(self.args.device)
+            print("Train targets:", targets)
 
             self.optimizer.zero_grad()
             outputs = self.model(images)
@@ -98,7 +99,6 @@ class Classifier:
             total_loss += loss.item() * images.size(0)
             corrects += torch.sum(preds == targets.data)
 
-        print("corrects", corrects)
         epoch_loss, epoch_acc = accuracy(total_loss, corrects, train_loader)
         epoch_acc = epoch_acc * 100.0
         logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
@@ -112,8 +112,8 @@ class Classifier:
         total_loss, corrects = 0.0, 0
         with torch.no_grad():
             for step, (images, targets) in enumerate(val_loader):
-                images = images.to(self.args.device)
-                targets = targets.to(self.args.device)
+                images, targets = images.to(self.args.device), targets.to(self.args.device)
+                print("Val targets:", targets)
 
                 # compute output
                 outputs = self.model(images)

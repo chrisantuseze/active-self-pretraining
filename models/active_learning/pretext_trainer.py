@@ -472,7 +472,7 @@ class PretextTrainer():
     def active_learning_new(self, path_loss, encoder):
         pretraining_sample_pool = []
 
-        gen_filename = get_dataset_info(self.args.target_dataset)[1] #f'{self.args.gen_images_path}_{get_dataset_info(self.args.target_dataset)[1]}'
+        gen_filename = f'{self.args.gen_images_path}_{get_dataset_info(self.args.target_dataset)[1]}'
         data_dir = os.path.join(self.args.dataset_dir, gen_filename)
         gen_images = glob.glob(f'{data_dir}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
