@@ -61,8 +61,7 @@ def entropy_loss(p_t):
 
 def _l2_normalize(d):
     d_reshaped = d.view(d.shape[0], -1, *(1 for _ in range(d.dim() - 2)))
-    d /= torch.norm(d_reshaped, dim=1, keepdim=True) + 1e-8
-    return d
+    return d / torch.norm(d_reshaped, dim=1, keepdim=True) + 1e-8
 
 
 class VirtualAdversarialLoss(nn.Module):
