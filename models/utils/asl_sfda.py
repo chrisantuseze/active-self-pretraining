@@ -91,7 +91,7 @@ class VirtualAdversarialLoss(nn.Module):
             d.requires_grad_()
 
             print(len(x), x[0].shape, self.xi, d.shape)
-            inputs = x + [self.xi * d]
+            inputs = x# + [self.xi * d]
             print(len(inputs), inputs[0].shape)
             _, pred_hat = model(inputs)
             logp_hat = F.log_softmax(pred_hat, dim=1)
