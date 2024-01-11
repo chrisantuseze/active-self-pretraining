@@ -151,6 +151,7 @@ class SwAVTrainer():
                 p_t = loss
 
                 # cls_loss = F.cross_entropy(y_t, pseudo_labels)
+                print(p_t)
                 ent_loss = entropy_loss(p_t)
                 vat_loss = self.virt_adv_loss(self.model, inputs)
                 wr_loss = weight_reg_loss(self.source_model, self.model)
