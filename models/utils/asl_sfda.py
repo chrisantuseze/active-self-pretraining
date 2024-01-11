@@ -56,7 +56,7 @@ class LabelOptimizer():
 
 def entropy_loss(p_t):
     # return - (p_t * torch.log(p_t + 1e-5)).sum() / p_t.size(0)
-    return (- (p_t * torch.log(p_t + 1e-5)).sum(dim=1)).mean()
+    return (- (p_t * torch.log(p_t + 1e-5)).sum(dim=0)).mean()
 
 
 def _l2_normalize(d):
@@ -80,7 +80,7 @@ class VirtualAdversarialLoss(nn.Module):
 
     def forward(self, model, x):
         with torch.no_grad():
-            pred = F.softmax(model(x)[0], dim=1)
+            pred = F.softmax(model(x)[1], dim=1)
 
         # prepare random unit tensor
         d = torch.randn(x.shape).to(x.device)
@@ -89,7 +89,7 @@ class VirtualAdversarialLoss(nn.Module):
         # calc adversarial direction
         for _ in range(self.ip):
             d.requires_grad_()
-            pred_hat, _ = model(x + self.xi * d)
+            _, pred_hat = model(x + self.xi * d)
             logp_hat = F.log_softmax(pred_hat, dim=1)
             adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
             adv_distance.backward()
@@ -98,7 +98,7 @@ class VirtualAdversarialLoss(nn.Module):
     
         # calc VAT loss
         r_adv = d * self.eps
-        pred_hat, _ = model(x + r_adv)
+        _, pred_hat = model(x + r_adv)
         logp_hat = F.log_softmax(pred_hat, dim=1)
         loss = F.kl_div(logp_hat, pred, reduction='batchmean')
 
