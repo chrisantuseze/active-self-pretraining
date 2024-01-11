@@ -423,13 +423,6 @@ class PretextTrainer():
         if self.args.al_pretext_from_pretrain:
             state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
-
-            # if self.args.backbone == "resnet50" and self.args.method is SSL_Method.SWAV.value:
-            #     model = load_chkpts(self.args, "swav_800ep_pretrain.pth.tar", model)
-            # else:
-            #     state = load_saved_state(self.args, pretrain_level="1")
-            #     model.load_state_dict(state['model'], strict=False)
-        
         model = model.to(self.args.device)
 
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
@@ -515,7 +508,7 @@ class PretextTrainer():
             pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.BASE_PRETRAIN)
+                self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return pretraining_sample_pool

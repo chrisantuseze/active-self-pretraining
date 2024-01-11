@@ -1,3 +1,4 @@
+from datautils.dataset_enum import get_dataset_info
 from models.utils.asl_sfda import VirtualAdversarialLoss, entropy_loss, weight_reg_loss
 import torch
 import torch.nn as nn
@@ -14,21 +15,22 @@ from models.self_sup.swav.utils import initialize_exp
 from models.utils.commons import get_params, AverageMeter, prepare_model
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
+from utils.commons import load_saved_state
 import utils.logger as logging
 import models.self_sup.swav.backbone.resnet50 as resnet_models
 
 class SwAVTrainer():
     def __init__(self, args, dataloader, pretrain_level, training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
-        
         self.args = args
         self.train_loader = dataloader
         self.log_step = log_step
+        self.training_type = training_type
 
         self.training_stats = initialize_exp(args, "epoch", "loss")
 
         # build model
         zero_init_residual = True #This improves the network by 0.2-0.3%
-        self.model = resnet_models.__dict__[args.backbone](
+        encoder = resnet_models.__dict__[args.backbone](
             zero_init_residual=zero_init_residual,
             normalize=True,
             hidden_mlp=args.hidden_mlp,
@@ -38,7 +40,7 @@ class SwAVTrainer():
 
         # load weights
 
-        self.model, params_to_update = prepare_model(self.args, training_type, pretrain_level, self.model) 
+        self.model, params_to_update = prepare_model(self.args, training_type, pretrain_level, encoder) 
         self.model = self.model.to(self.args.device)
 
         self.train_params = get_params(self.args, training_type)
@@ -58,7 +60,12 @@ class SwAVTrainer():
 
         cudnn.benchmark = True
 
-        self.virt_adv_loss = VirtualAdversarialLoss()
+        if training_type == TrainingType.TARGET_AL:
+            self.virt_adv_loss = VirtualAdversarialLoss()
+
+            self.source_model = encoder
+            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+            self.source_model.load_state_dict(state['model'], strict=False)
 
     def train_epoch(self, epoch):
 
@@ -139,17 +146,18 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
-            # compute output
-            # p_t = loss
+            if self.training_type == TrainingType.TARGET_AL:
+                # compute output
+                p_t = loss
 
-            # # cls_loss = F.cross_entropy(y_t, pseudo_labels)
-            # ent_loss = entropy_loss(p_t)
-            # vat_loss = self.virt_adv_loss(self.model, inputs)
-            # wr_loss = weight_reg_loss(src_model, trg_model)
+                # cls_loss = F.cross_entropy(y_t, pseudo_labels)
+                ent_loss = entropy_loss(p_t)
+                vat_loss = self.virt_adv_loss(self.model, inputs)
+                wr_loss = weight_reg_loss(self.source_model, self.model)
 
-            # wr_param = 0.1
-            # ent_param = 1.0
-            # loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
+                wr_param = 0.1
+                ent_param = 1.0
+                loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
 
             #########################################################
 
