@@ -82,7 +82,7 @@ class VirtualAdversarialLoss(nn.Module):
             pred = F.softmax(model(x)[1], dim=1)
 
         # prepare random unit tensor
-        d = torch.randn(x[0].shape).to(x[0].device)
+        d = torch.randn(x.shape).to(x.device)
         d = _l2_normalize(d)
 
         # calc adversarial direction
@@ -90,8 +90,8 @@ class VirtualAdversarialLoss(nn.Module):
             d.requires_grad_()
 
             ad = d * self.xi
-            print(x[0].shape, ad.shape)
-            _, pred_hat = model(x + [ad])
+            print(x.shape, ad.shape)
+            _, pred_hat = model(x + ad)
             logp_hat = F.log_softmax(pred_hat, dim=1)
             adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
             adv_distance.backward()
@@ -101,7 +101,7 @@ class VirtualAdversarialLoss(nn.Module):
         # calc VAT loss
         r_adv = d * self.eps
         print(r_adv.shape)
-        _, pred_hat = model(x + [r_adv])
+        _, pred_hat = model(x + r_adv)
         logp_hat = F.log_softmax(pred_hat, dim=1)
         loss = F.kl_div(logp_hat, pred, reduction='batchmean')
 
