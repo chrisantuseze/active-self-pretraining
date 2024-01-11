@@ -82,7 +82,6 @@ class Classifier:
         total_loss, corrects = 0.0, 0
         for step, (images, targets) in enumerate(train_loader):
             images, targets = images.to(self.args.device), targets.to(self.args.device)
-            print("Train targets:", targets)
 
             self.optimizer.zero_grad()
             outputs = self.model(images)
@@ -113,7 +112,6 @@ class Classifier:
         with torch.no_grad():
             for step, (images, targets) in enumerate(val_loader):
                 images, targets = images.to(self.args.device), targets.to(self.args.device)
-                print("Val targets:", targets)
 
                 # compute output
                 outputs = self.model(images)
