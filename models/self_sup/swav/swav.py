@@ -60,12 +60,12 @@ class SwAVTrainer():
 
         cudnn.benchmark = True
 
-        if training_type == TrainingType.TARGET_AL:
-            self.virt_adv_loss = VirtualAdversarialLoss()
+        # if training_type == TrainingType.TARGET_AL:
+        #     self.virt_adv_loss = VirtualAdversarialLoss()
 
-            self.source_model = encoder
-            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
-            self.source_model.load_state_dict(state['model'], strict=False)
+        #     self.source_model = encoder
+        #     state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+        #     self.source_model.load_state_dict(state['model'], strict=False)
 
     def train_epoch(self, epoch):
 
@@ -146,18 +146,18 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
-            if self.training_type == TrainingType.TARGET_AL:
-                # compute output
-                p_t = loss
+            # if self.training_type == TrainingType.TARGET_AL:
+            #     # compute output
+            #     p_t = loss
 
-                # cls_loss = F.cross_entropy(y_t, pseudo_labels)
-                ent_loss = entropy_loss(p_t)
-                vat_loss = self.virt_adv_loss(self.model, inputs[0])
-                wr_loss = weight_reg_loss(self.source_model, self.model)
+            #     # cls_loss = F.cross_entropy(y_t, pseudo_labels)
+            #     ent_loss = entropy_loss(p_t)
+            #     vat_loss = self.virt_adv_loss(self.model, inputs[0])
+            #     wr_loss = weight_reg_loss(self.source_model, self.model)
 
-                wr_param = 0.1
-                ent_param = 1.0
-                loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
+            #     wr_param = 0.1
+            #     ent_param = 1.0
+            #     loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
 
             #########################################################
 

@@ -21,15 +21,10 @@ def office_dataset(args, writer):
     args.base_pretrain = True
     args.target_pretrain = True
 
-    args.base_dataset = 5 #7
-    args.target_dataset = 6 #8
-    args.lc_dataset = 6 #8
-
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
-    # do_gen_ai(args)
-    # pretrainer.second_pretrain()
+    do_gen_ai(args)
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
