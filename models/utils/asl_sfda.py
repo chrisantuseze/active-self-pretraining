@@ -89,9 +89,7 @@ class VirtualAdversarialLoss(nn.Module):
         for _ in range(self.ip):
             d.requires_grad_()
 
-            inputs = x# + [self.xi * d]
-            print(len(inputs), inputs[0].shape)
-            _, pred_hat = model(inputs)
+            _, pred_hat = model(x + [self.xi * d])
             logp_hat = F.log_softmax(pred_hat, dim=1)
             adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
             adv_distance.backward()
@@ -99,9 +97,7 @@ class VirtualAdversarialLoss(nn.Module):
             model.zero_grad()
     
         # calc VAT loss
-        r_adv = d * self.eps
-        print(r_adv.shape)
-        _, pred_hat = model(x + [r_adv])
+        _, pred_hat = model(x + [d * self.eps])
         logp_hat = F.log_softmax(pred_hat, dim=1)
         loss = F.kl_div(logp_hat, pred, reduction='batchmean')
 
