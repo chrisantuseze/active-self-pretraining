@@ -1,3 +1,4 @@
+from models.utils.asl_sfda import VirtualAdversarialLoss, entropy_loss, weight_reg_loss
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -56,6 +57,8 @@ class SwAVTrainer():
         self.args.queue_length -= args.queue_length % (args.swav_batch_size * args.world_size)
 
         cudnn.benchmark = True
+
+        self.virt_adv_loss = VirtualAdversarialLoss()
 
     def train_epoch(self, epoch):
 
@@ -137,21 +140,16 @@ class SwAVTrainer():
 
             #########################################################
             # compute output
-            # y_t, _ = trg_model(images)
-            # p_t = F.softmax(y_t, dim=1)
+            # p_t = loss
 
-            # cls_loss = F.cross_entropy(y_t, pseudo_labels)
+            # # cls_loss = F.cross_entropy(y_t, pseudo_labels)
             # ent_loss = entropy_loss(p_t)
-            # vat_loss = virt_adv_loss(trg_model, images)
+            # vat_loss = self.virt_adv_loss(self.model, inputs)
+            # wr_loss = weight_reg_loss(src_model, trg_model)
 
-            # if args.wr_model == "cls":
-            #     wr_loss = weight_reg_loss(src_model.head, trg_model.head)
-            # elif args.wr_model == "model":
-            #     wr_loss = weight_reg_loss(src_model, trg_model)
-            # elif args.wr_model == "none":
-            #     wr_loss = torch.tensor(0.0).cuda()
-            
-            # loss = cls_loss * args.cls_param + (ent_loss + vat_loss) * args.ent_param + wr_loss * args.wr_param
+            # wr_param = 0.1
+            # ent_param = 1.0
+            # loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
 
             #########################################################
 
