@@ -27,7 +27,7 @@ def office_dataset(args, writer):
     # do_gen_ai(args)
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()

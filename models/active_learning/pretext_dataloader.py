@@ -42,44 +42,24 @@ class PretextDataLoader():
         self.batch_size = params.batch_size if not batch_size else batch_size
 
     def get_loader(self):
-        if self.training_type == TrainingType.ACTIVE_LEARNING:
-            transforms = Transforms(self.image_size)
-            dataset = PretextDataset(self.args, self.path_loss_list, transforms, self.is_val)
-            loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=self.batch_size,
-                shuffle=not self.is_val,
-                num_workers=self.args.workers,
-                pin_memory=True,
-            )
-        else:
-            dataset = PretextMultiCropDataset(self.args, self.path_loss_list)
-            loader = torch.utils.data.DataLoader(
-                dataset,
-                batch_size=self.batch_size,
-                num_workers=self.args.workers,
-                pin_memory=True,
-            )
+        dataset = PretextMultiCropDataset(self.args, self.path_loss_list)
+        loader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=self.batch_size,
+            num_workers=self.args.workers,
+            pin_memory=True,
+        )
 
         print(f"The size of the dataset is {len(dataset)} and the number of batches is {loader.__len__()} for a batch size of {self.batch_size}")
         return loader
 
 
+# @DeprecationWarning("This has been deprecated")
 class PretextDataset(torch.utils.data.Dataset):
-    def __init__(self, args, pathloss_list: List[PathLoss], transform, is_val=False) -> None:
+    def __init__(self, args, pathloss_list: List[PathLoss], transform) -> None:
         self.args = args
         self.pathloss_list = pathloss_list
         self.transform = transform
-        self.is_val = is_val
-
-        labels = set(load_class_names(self.args))
-        index = 0
-        self.label_dic = {}
-        for label in labels:
-            label = label.replace("\n", "")
-            if label not in self.label_dic:
-                self.label_dic[label] = index
-                index += 1
 
     def __len__(self):
         return len(self.pathloss_list)
@@ -93,12 +73,9 @@ class PretextDataset(torch.utils.data.Dataset):
             path = path_loss.path
 
         img = Image.open(path)
+        image = self.transform(img)
 
-        label = path.split('/')[-2]
-
-        image = self.transform.__call__(img, not self.is_val)
-
-        return image, torch.tensor(self.label_dic[label])
+        return image, torch.tensor(path_loss.label)
 
 class PretextMultiCropDataset(torch.utils.data.Dataset):
     def __init__(

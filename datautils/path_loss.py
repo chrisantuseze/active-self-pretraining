@@ -7,6 +7,7 @@ class PathLoss:
 
     path: str
     loss: int
+    label: int = 0
 
     def __post_init__(self):
         self.sort_index = self.loss

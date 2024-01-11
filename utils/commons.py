@@ -1,5 +1,7 @@
+import glob
 import os
 from sys import prefix
+from datautils.path_loss import PathLoss
 import torch
 
 import pickle
@@ -176,3 +178,17 @@ def get_accuracy_file_ext(args):
         return f'_{args.al_trainer_sample_size}'
 
     return ''
+
+def get_dataset(data_dir):
+    samples = glob.glob(f'{data_dir}/*')
+
+    labels = [path.split('/')[-2] for path in samples]
+    unique_labels = set(labels)
+    labels_mapper = {label: index for index, label in enumerate(unique_labels)}
+
+    dataset = []
+    for path in samples:
+        label = path.split('/')[-2]
+        dataset.append(PathLoss(path=path, loss=0, label=labels_mapper[label]))
+
+    return dataset
