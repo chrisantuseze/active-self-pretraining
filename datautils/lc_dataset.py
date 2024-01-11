@@ -1,3 +1,4 @@
+import numpy as np
 from models.active_learning.pretext_dataloader import PretextDataset
 from models.utils.transformations import get_train_val_transforms
 import torch
@@ -51,6 +52,7 @@ class LCDataset():
         train_transform, val_transform = get_train_val_transforms()
 
         dataset = get_dataset(self.dir)
+        np.random.shuffle(dataset)
         split_index = int(len(dataset)* 0.8)
 
         train_dataset = PretextDataset(self.args, dataset[:split_index], train_transform)
