@@ -91,7 +91,9 @@ class VirtualAdversarialLoss(nn.Module):
             d.requires_grad_()
 
             print(x[0].shape, self.xi, d.shape)
-            _, pred_hat = model(x + [self.xi * d])
+            inputs = x + [self.xi * d]
+            print(len(inputs), inputs.shape)
+            _, pred_hat = model(inputs)
             logp_hat = F.log_softmax(pred_hat, dim=1)
             adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
             adv_distance.backward()
