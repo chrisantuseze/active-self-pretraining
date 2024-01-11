@@ -22,9 +22,9 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
+    # pretrainer.first_pretrain()
 
-    do_gen_ai(args)
+    # do_gen_ai(args)
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()

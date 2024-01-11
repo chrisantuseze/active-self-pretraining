@@ -471,10 +471,10 @@ class PretextTrainer():
     def active_learning_new(self, path_loss, encoder):
         pretraining_sample_pool = []
 
-        gen_filename = f'generated_{get_dataset_info(self.args.target_dataset)[1]}'
+        gen_filename = get_dataset_info(self.args.target_dataset)[1] #f'generated_{get_dataset_info(self.args.target_dataset)[1]}'
         gen_images = glob.glob(f'{self.args.dataset_dir}/{gen_filename}/*')
         pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
-        # pretraining_sample_pool.extend(pretraining_gen_images)
+        pretraining_sample_pool.extend(pretraining_gen_images)
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
         logging.info(f"The size of gen images is {len(pretraining_sample_pool)} while the size of the original data is {len(path_loss)}")
