@@ -74,7 +74,7 @@ class VirtualAdversarialLoss(nn.Module):
         :param ip: iteration times of computing adv noise (default: 1)
         """
         super(VirtualAdversarialLoss, self).__init__()
-        self.xi = xi
+        self.xi = torch.FloatTensor([xi])
         self.eps = eps
         self.ip = ip
 
@@ -85,6 +85,8 @@ class VirtualAdversarialLoss(nn.Module):
         # prepare random unit tensor
         d = torch.randn(x[0].shape).to(x[0].device)
         d = _l2_normalize(d)
+
+        self.xi = self.xi.to(x[0].device)
 
         # calc adversarial direction
         for _ in range(self.ip):
