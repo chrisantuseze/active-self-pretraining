@@ -83,7 +83,7 @@ class VirtualAdversarialLoss(nn.Module):
             pred = F.softmax(model(x)[1], dim=1)
 
         # prepare random unit tensor
-        d = torch.randn(x.shape).to(x.device)
+        d = torch.randn(x[0].shape).to(x[0].device)
         d = _l2_normalize(d)
 
         # calc adversarial direction
