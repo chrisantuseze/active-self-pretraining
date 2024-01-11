@@ -98,6 +98,7 @@ class Classifier:
             total_loss += loss.item() * images.size(0)
             corrects += torch.sum(preds == targets.data)
 
+        print("corrects", corrects)
         epoch_loss, epoch_acc = accuracy(total_loss, corrects, train_loader)
         epoch_acc = epoch_acc * 100.0
         logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
