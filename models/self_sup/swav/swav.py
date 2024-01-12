@@ -164,18 +164,19 @@ class SwAVTrainer():
             #     ent_param = 1.0
             #     loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
                 
-                s_embedding, _ = self.source_model(inputs)
-                # print("s_embedding.shape", s_embedding.shape)
+                # s_embedding, _ = self.source_model(inputs)
+                # # print("s_embedding.shape", s_embedding.shape)
 
-                t_domain = self.domain_classifier(embedding_)
-                # print("t_domain", t_domain)
+                # t_domain = self.domain_classifier(embedding_)
+                # # print("t_domain", t_domain)
 
-                s_domain = self.domain_classifier(s_embedding)
+                # s_domain = self.domain_classifier(s_embedding)
 
-                domain_loss = F.binary_cross_entropy(t_domain, torch.zeros_like(t_domain)) + F.binary_cross_entropy(s_domain, torch.ones_like(s_domain))
-                # print("domain_loss", domain_loss)
+                # domain_loss = F.binary_cross_entropy(t_domain, torch.zeros_like(t_domain)) + F.binary_cross_entropy(s_domain, torch.ones_like(s_domain))
+                # # print("domain_loss", domain_loss)
 
-                loss += domain_loss
+                # loss += domain_loss
+                pass
 
             #########################################################
 
