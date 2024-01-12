@@ -174,10 +174,10 @@ class SwAVTrainer():
                 # print("s_domain", t_domain)
 
                 s_loss = F.binary_cross_entropy(s_domain, torch.zeros_like(s_domain))
-                print("s_loss", s_loss)
+                print("s_loss", s_loss.item())
 
                 t_loss = F.binary_cross_entropy(t_domain, torch.ones_like(t_domain))
-                print("t_loss", t_loss)
+                print("t_loss", t_loss.item())
 
                 domain_loss = (s_loss + t_loss)/2
                 
