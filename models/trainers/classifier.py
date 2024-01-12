@@ -27,7 +27,7 @@ class Classifier:
             state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
 
         self.model.load_state_dict(state['model'], strict=False)
-        num_classes, self.dataset, self.dir = get_dataset_info(self.args.lc_dataset)
+        num_classes, self.dataset, self.dir = get_dataset_info(5)#self.args.lc_dataset)
 
         set_parameter_requires_grad(self.model, feature_extract=True)
         self.model, self.criterion = get_model_criterion(self.args, self.model, TrainingType.LINEAR_CLASSIFIER, num_classes=num_classes)
