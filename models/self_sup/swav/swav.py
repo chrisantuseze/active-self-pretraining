@@ -70,7 +70,7 @@ class SwAVTrainer():
             self.source_model = self.source_model.to(args.device)
             self.source_model.eval()
 
-            self.domain_classifier = DomainClassifier(in_feature=128)
+            self.domain_classifier = DomainClassifier(in_feature=128).to(args.device)
 
     def train_epoch(self, epoch):
 
