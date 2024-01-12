@@ -52,10 +52,11 @@ class DomainClassifier(nn.Module):
         )
         self.domain_discriminator = DomainDiscriminator(in_feature=bottleneck_dim, hidden_size=1024)
         self.grad_reversal = GradientReverseLayer()
+        self.coeff = 1.0
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """"""
-        reversed_x = self.grad_reversal(x)
+        reversed_x = self.grad_reversal(x, self.coeff)
 
         f = self.bottleneck(reversed_x)
         predictions = self.domain_discriminator(f)
@@ -75,13 +76,16 @@ class GradientReverseFunction(Function):
 
     @staticmethod
     def forward(ctx: Any, input: torch.Tensor, coeff: Optional[float] = 1.) -> torch.Tensor:
-        ctx.coeff = coeff
-        output = input * 1.0
-        return output
+        # ctx.coeff = coeff
+        # output = input * 1.0
+        # return output
+        ctx.lambda_ = coeff
+        return input.view_as(input)
 
     @staticmethod
     def backward(ctx: Any, grad_output: torch.Tensor) -> Tuple[torch.Tensor, Any]:
-        return grad_output.neg() * ctx.coeff, None
+        # return grad_output.neg() * ctx.coeff, None
+        return (grad_output * -ctx.lambda_), None
 
 
 class GradientReverseLayer(nn.Module):

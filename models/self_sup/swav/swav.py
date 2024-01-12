@@ -163,7 +163,7 @@ class SwAVTrainer():
             #     wr_param = 0.1
             #     ent_param = 1.0
             #     loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
-                
+                                
                 s_embedding, _ = self.source_model(inputs)
                 # print("s_embedding.shape", s_embedding.shape)
 
@@ -193,6 +193,10 @@ class SwAVTrainer():
                     if "prototypes" in name:
                         p.grad = None
             self.optimizer.step()
+
+            if self.training_type == TrainingType.TARGET_AL:
+                # Adjust lambda
+                self.domain_classifier.coeff += 0.001
 
             # ============ misc ... ============
             losses.update(loss.item(), inputs[0].size(0))
