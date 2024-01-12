@@ -1,4 +1,5 @@
 from datautils.dataset_enum import get_dataset_info
+from models.active_learning.domain_discriminator import DomainClassifier
 from models.utils.asl_sfda import VirtualAdversarialLoss, entropy_loss, weight_reg_loss
 import torch
 import torch.nn as nn
@@ -60,12 +61,16 @@ class SwAVTrainer():
 
         cudnn.benchmark = True
 
-        # if training_type == TrainingType.TARGET_AL:
-        #     self.virt_adv_loss = VirtualAdversarialLoss()
+        if training_type == TrainingType.TARGET_AL:
+            # self.virt_adv_loss = VirtualAdversarialLoss()
 
-        #     self.source_model = encoder
-        #     state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
-        #     self.source_model.load_state_dict(state['model'], strict=False)
+            self.source_model = encoder
+            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+            self.source_model.load_state_dict(state['model'], strict=False)
+            self.source_model = self.source_model.to(args.device)
+            self.source_model.eval()
+
+            self.domain_classifier = DomainClassifier(in_feature=256)
 
     def train_epoch(self, epoch):
 
@@ -146,7 +151,7 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
-            # if self.training_type == TrainingType.TARGET_AL:
+            if self.training_type == TrainingType.TARGET_AL:
             #     # compute output
             #     p_t = loss
 
@@ -158,6 +163,19 @@ class SwAVTrainer():
             #     wr_param = 0.1
             #     ent_param = 1.0
             #     loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
+                
+                s_embedding, _ = self.source_model(inputs)
+                print("s_embedding.shape", s_embedding.shape)
+
+                t_domain = self.domain_classifier(embedding)
+                print("t_domain", t_domain)
+
+                s_domain = self.domain_classifier(s_embedding)
+
+                domain_loss = F.binary_cross_entropy(t_domain, torch.zeros_like(t_domain)) + F.binary_cross_entropy(s_domain, torch.ones_like(s_domain))
+                print("domain_loss", domain_loss)
+
+                loss += domain_loss
 
             #########################################################
 

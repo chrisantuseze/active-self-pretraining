@@ -191,8 +191,7 @@ def visualize_features_both(args, source_model, adapted_model, source_data, targ
 
 def viz(args):
     os.makedirs('models/utils/visualizations/plots/', exist_ok=True)
-    args.source_batch_size = 256
-    args.target_batch_size = 256
+    args.swav_batch_size = 256
     encoder = resnet_backbone(args.backbone, pretrained=False)
 
     # encoder = resnet_models.__dict__[args.backbone](
@@ -202,6 +201,9 @@ def viz(args):
     #         output_dim=args.feat_dim,
     #         nmb_prototypes=args.nmb_prototypes,
     #     )
+
+    args.base_dataset = 5
+    args.target_dataset = 6
 
     source_loader = get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN).get_loader() 
     target_loader = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN).get_loader() 
@@ -215,7 +217,7 @@ def viz(args):
 
     # visualize_source_model_features(args, source_model, source_loader, target_loader)
 
-    num_classes, target_ds_name, dir = get_dataset_info(args.target_dataset)
+    _, target_ds_name, _ = get_dataset_info(args.target_dataset)
     for batch in range(args.al_batches):
         target_model = encoder
         # state = simple_load_model(args, "1_finetuner_dslr.pth")
