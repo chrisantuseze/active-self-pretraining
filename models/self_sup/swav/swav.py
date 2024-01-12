@@ -70,7 +70,7 @@ class SwAVTrainer():
             self.source_model = self.source_model.to(args.device)
             self.source_model.eval()
 
-            self.domain_classifier = DomainClassifier(in_feature=256)
+            self.domain_classifier = DomainClassifier(in_feature=128)
 
     def train_epoch(self, epoch):
 
@@ -115,8 +115,8 @@ class SwAVTrainer():
                 self.model.prototypes.weight.copy_(w)
 
             # ============ multi-res forward passes ... ============
-            embedding, output = self.model(inputs)
-            embedding = embedding.detach()
+            embedding_, output = self.model(inputs)
+            embedding = embedding_.detach()
             bs = inputs[0].size(0)
 
             # ============ swav loss ... ============
@@ -167,7 +167,7 @@ class SwAVTrainer():
                 s_embedding, _ = self.source_model(inputs)
                 print("s_embedding.shape", s_embedding.shape)
 
-                t_domain = self.domain_classifier(embedding)
+                t_domain = self.domain_classifier(embedding_)
                 print("t_domain", t_domain)
 
                 s_domain = self.domain_classifier(s_embedding)
