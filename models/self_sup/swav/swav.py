@@ -151,6 +151,7 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
+            print("loss", loss.item())
             if self.training_type == TrainingType.TARGET_AL:
                 s_embedding, _ = self.source_model(inputs)
                 src_domain_out = self.domain_classifier(s_embedding)
@@ -164,6 +165,7 @@ class SwAVTrainer():
                 # domain_adv_loss = (s_loss + t_loss)/2
                 domain_adv_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
                 domain_adv_loss *= 0.6 * 0.5
+                print("domain_adv_loss", domain_adv_loss.item())
 
                 # domain confusion loss
                 conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
