@@ -151,7 +151,6 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
-            print("loss", loss.item())
             if self.training_type == TrainingType.TARGET_AL:
                 s_embedding, _ = self.source_model(inputs)
                 src_domain_out = self.domain_classifier(s_embedding)
@@ -170,17 +169,18 @@ class SwAVTrainer():
                 # domain confusion loss
                 conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
                 # print("conf_loss", conf_loss.item())
-                conf_loss *= 0.15 * 0.5
+                conf_loss *= 0.1 * 0.5
                 print("conf_loss", conf_loss.item())
 
                 # Option 2: Entropy maximization  
                 s_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0))
                 t_loss = -torch.sum(F.log_softmax(tgt_domain_out, dim=0))
                 # print("s_loss", s_loss.item(), "t_loss", t_loss.item())
-                entropy_conf_loss = 0.5 * (s_loss + t_loss)  #-torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
+                entropy_conf_loss = 5e-4 * 0.5 * (s_loss + t_loss)  #-torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
                 print("entropy_conf_loss", entropy_conf_loss.item())
 
                 domain_conf_loss = 0.5 * (conf_loss + entropy_conf_loss)
+                print("domain_conf_loss", domain_conf_loss.item())
 
 
                 loss += domain_adv_loss + domain_conf_loss
