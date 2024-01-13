@@ -173,7 +173,7 @@ class SwAVTrainer():
                 # Option 2: Entropy maximization  
                 s_loss = F.log_softmax(src_domain_out, dim=1) #-torch.sum(F.log_softmax(src_domain_out, dim=1))
                 t_loss = tgt_domain_out #-torch.sum(F.log_softmax(tgt_domain_out, dim=1))
-                print("s_loss", s_loss.item(), "t_loss", t_loss.item())
+                print("s_loss", s_loss, "t_loss", t_loss)
                 entropy_conf_loss = 0.5 * (s_loss + t_loss)  #-torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
                 # print("entropy_conf_loss", entropy_conf_loss.item())
 
