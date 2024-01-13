@@ -152,27 +152,11 @@ class SwAVTrainer():
 
             #########################################################
             if self.training_type == TrainingType.TARGET_AL:
-            #     # compute output
-            #     p_t = loss
-
-            #     # cls_loss = F.cross_entropy(y_t, pseudo_labels)
-            #     ent_loss = entropy_loss(p_t)
-            #     vat_loss = self.virt_adv_loss(self.model, inputs[0])
-            #     wr_loss = weight_reg_loss(self.source_model, self.model)
-
-            #     wr_param = 0.1
-            #     ent_param = 1.0
-            #     loss = (ent_loss + vat_loss) * ent_param + wr_loss * wr_param
-                                
                 s_embedding, _ = self.source_model(inputs)
-                # print("s_embedding.shape", s_embedding.shape)
+                s_domain = self.domain_classifier(s_embedding)
 
                 t_domain = self.domain_classifier(embedding_)
-                # print("t_domain", t_domain)
-
-                s_domain = self.domain_classifier(s_embedding)
-                # print("s_domain", t_domain)
-
+                
                 s_loss = F.binary_cross_entropy(s_domain, torch.zeros_like(s_domain))
                 print("s_loss", s_loss.item())
 

@@ -208,26 +208,26 @@ def viz(args):
     source_loader = get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN).get_loader() 
     target_loader = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN).get_loader() 
 
-    # num_classes, source_ds_name, dir = get_dataset_info(args.base_dataset)
-    # source_model = encoder
-    # state = load_saved_state(args, dataset=source_ds_name, pretrain_level="1")
-    # source_model.load_state_dict(state['model'], strict=False)
-    # source_model = source_model.to(args.device)
-    # source_model.eval()
+    _, source_ds_name, _ = get_dataset_info(args.base_dataset)
+    source_model = encoder
+    state = load_saved_state(args, dataset=source_ds_name, pretrain_level="1")
+    source_model.load_state_dict(state['model'], strict=False)
+    source_model = source_model.to(args.device)
+    source_model.eval()
 
-    # visualize_source_model_features(args, source_model, source_loader, target_loader)
+    visualize_source_model_features(args, source_model, source_loader, target_loader)
 
-    _, target_ds_name, _ = get_dataset_info(args.target_dataset)
-    for batch in range(args.al_batches):
-        target_model = encoder
-        # state = simple_load_model(args, "1_finetuner_dslr.pth")
+    # _, target_ds_name, _ = get_dataset_info(args.target_dataset)
+    # for batch in range(args.al_batches):
+    #     target_model = encoder
+    #     # state = simple_load_model(args, "1_finetuner_dslr.pth")
 
-        state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
-        target_model.load_state_dict(state['model'], strict=False)
-        target_model = target_model.to(args.device)
-        target_model.eval()
+    #     state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
+    #     target_model.load_state_dict(state['model'], strict=False)
+    #     target_model = target_model.to(args.device)
+    #     target_model.eval()
 
-        visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
+    #     visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
 
     # Ensure that figures are closed at the end of the loop
     plt.close('all')
