@@ -158,30 +158,18 @@ class SwAVTrainer():
                 tgt_domain_out = self.domain_classifier(embedding_)
 
                 # domain adversarial loss
-                # s_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out))
-                # t_loss = F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
-                # print("s_loss", s_loss.item(), "t_loss", t_loss.item())
-                # domain_adv_loss = (s_loss + t_loss)/2
                 domain_adv_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
                 domain_adv_loss *= 0.6 * 0.5
-                print("domain_adv_loss", domain_adv_loss.item())
 
                 # domain confusion loss
                 conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
-                # print("conf_loss", conf_loss.item())
                 conf_loss *= 0.1 * 0.5
-                print("conf_loss", conf_loss.item())
 
                 # Option 2: Entropy maximization  
-                s_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0))
-                t_loss = -torch.sum(F.log_softmax(tgt_domain_out, dim=0))
-                # print("s_loss", s_loss.item(), "t_loss", t_loss.item())
-                entropy_conf_loss = 5e-4 * 0.5 * (s_loss + t_loss)  #-torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
-                print("entropy_conf_loss", entropy_conf_loss.item())
+                entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
+                entropy_conf_loss *= 5e-4 * 0.5
 
                 domain_conf_loss = 0.5 * (conf_loss + entropy_conf_loss)
-                print("domain_conf_loss", domain_conf_loss.item())
-
 
                 loss += domain_adv_loss + domain_conf_loss
 
