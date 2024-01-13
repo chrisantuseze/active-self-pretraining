@@ -153,19 +153,31 @@ class SwAVTrainer():
             #########################################################
             if self.training_type == TrainingType.TARGET_AL:
                 s_embedding, _ = self.source_model(inputs)
-                s_domain = self.domain_classifier(s_embedding)
+                src_domain_out = self.domain_classifier(s_embedding)
 
-                t_domain = self.domain_classifier(embedding_)
-                
-                s_loss = F.binary_cross_entropy(s_domain, torch.zeros_like(s_domain))
-                print("s_loss", s_loss.item())
+                tgt_domain_out = self.domain_classifier(embedding_)
 
-                t_loss = F.binary_cross_entropy(t_domain, torch.ones_like(t_domain))
-                print("t_loss", t_loss.item())
+                # domain adversarial loss
+                # s_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out))
+                # t_loss = F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
+                # print("s_loss", s_loss.item(), "t_loss", t_loss.item())
+                # domain_adv_loss = (s_loss + t_loss)/2
+                domain_adv_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
+                domain_adv_loss *= 0.6 * 0.5
 
-                domain_loss = (s_loss + t_loss)/2
-                
-                loss += 0.6 * domain_loss
+                # domain confusion loss
+                conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
+                print("conf_loss", conf_loss.item())
+                conf_loss *= 0.15
+
+                # Option 2: Entropy maximization  
+                entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
+                print("entropy_conf_loss", entropy_conf_loss.item())
+
+                domain_conf_loss = 0.5 * (conf_loss + entropy_conf_loss)
+
+
+                loss += domain_adv_loss + domain_conf_loss
 
             #########################################################
 

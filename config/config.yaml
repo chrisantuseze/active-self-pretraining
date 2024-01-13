@@ -85,7 +85,7 @@ checkpoint_freq: 25
 seed: 42                                      # sacred handles automatic seeding when passed in the config
 base_epochs: 75
 base_image_size: 256 #40
-base_dataset: 5 #7                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+base_dataset: 6 #7                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
 
 do_gradual_base_pretrain: True
