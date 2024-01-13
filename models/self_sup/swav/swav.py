@@ -169,11 +169,12 @@ class SwAVTrainer():
                 conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
                 # print("conf_loss", conf_loss.item())
                 conf_loss *= 0.15 * 0.5
+                print("conf_loss", conf_loss.item())
 
                 # Option 2: Entropy maximization  
                 s_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0))
                 t_loss = -torch.sum(F.log_softmax(tgt_domain_out, dim=0))
-                print("s_loss", s_loss.item(), "t_loss", t_loss.item())
+                # print("s_loss", s_loss.item(), "t_loss", t_loss.item())
                 entropy_conf_loss = 0.5 * (s_loss + t_loss)  #-torch.sum(F.log_softmax(src_domain_out, dim=1)) - torch.sum(F.log_softmax(tgt_domain_out, dim=1))
                 print("entropy_conf_loss", entropy_conf_loss.item())
 
