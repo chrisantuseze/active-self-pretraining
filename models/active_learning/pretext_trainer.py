@@ -502,7 +502,7 @@ class PretextTrainer():
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
             state = load_saved_state(self.args, dataset=get_dataset_info(self.args.target_dataset)[1], pretrain_level=f"2_{batch}")
-            if state:
+            if not state:
                 loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
                 pretrainer = SelfSupPretrainer(self.args, self.writer)
                 pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
