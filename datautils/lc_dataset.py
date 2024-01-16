@@ -10,6 +10,7 @@ from models.utils.commons import get_params, split_dataset
 from models.utils.training_type_enum import TrainingType
 from utils.commons import get_dataset
 import utils.logger as logging
+from utils.random_split import random_split
 
 class LCDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
@@ -43,7 +44,6 @@ class LCDataset():
         
         val_dataset = torchvision.datasets.ImageFolder(self.dir, transform=val_transform)    
         if self.args.lc_dataset in [DatasetType.CLIPART.value, DatasetType.SKETCH.value, DatasetType.REAL.value, DatasetType.PAINTING.value]:
-            from torch.utils.data import random_split
             _, val_dataset = random_split(val_dataset, [0.8, 0.2])
 
         val_loader = torch.utils.data.DataLoader(
