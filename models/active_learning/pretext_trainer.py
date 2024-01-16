@@ -487,7 +487,7 @@ class PretextTrainer():
         sample_per_batch = len(path_loss)//self.args.al_batches
         batch_sampler_encoder = encoder
 
-        for batch in range(self.args.al_batches):
+        for batch in range(2, self.args.al_batches):
             logging.info(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
