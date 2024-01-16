@@ -480,17 +480,18 @@ class PretextTrainer():
         sample_per_batch = len(path_loss)//self.args.al_batches
         batch_sampler_encoder = encoder
 
-        for batch in range(2, self.args.al_batches):
+        for batch in range(3, self.args.al_batches):
             logging.info(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             if batch > 0:
-                state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
+                # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
+                state = simple_load_model(self.args, path=f'2_finetuner_{self.dataset}.pth')
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                if batch == 2:
-                    samplek = sampled_data[:self.args.al_trainer_sample_size * 3]
+                if batch == 3:
+                    samplek = sampled_data[:self.args.al_trainer_sample_size * 4]
                 else:
                     samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
@@ -501,14 +502,12 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
-            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.target_dataset)[1], pretrain_level=f"2_{batch}")
-            if not state:
-                loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
-                pretrainer = SelfSupPretrainer(self.args, self.writer)
-                pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
+            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
+            pretrainer = SelfSupPretrainer(self.args, self.writer)
+            pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
+            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+            #     self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return pretraining_sample_pool
