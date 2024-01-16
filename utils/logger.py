@@ -8,10 +8,7 @@ def init():
     handler = logging.StreamHandler(stream=sys.stdout)
     logger.addHandler(handler)
 
-    if not os.path.isdir("save/misc"):
-        os.makedirs("save/misc")
-
-    logging.basicConfig(filename="save/misc/gasp.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
+    logging.basicConfig(filename="gasp.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
     logging.info("GASP started...")
 
     def handle_exception(exc_type, exc_value, exc_traceback):
