@@ -88,9 +88,9 @@ def get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=Tru
         print("using the SKETCH dataset")
         return TargetDataset(args, "/sketch", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
-    elif dataset_type == dataset_enum.DatasetType.QUICKDRAW.value:
-        print("using the QUICKDRAW dataset")
-        return TargetDataset(args, "/quickdraw", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
+    elif dataset_type == dataset_enum.DatasetType.REAL.value:
+        print("using the REAL dataset")
+        return TargetDataset(args, "/real", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     elif dataset_type == dataset_enum.DatasetType.AMAZON.value:
         print("using the Office-31 AMAZON dataset")

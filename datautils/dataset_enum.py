@@ -3,7 +3,7 @@ from enum import Enum
 class DatasetType(Enum):
     CLIPART = 0
     SKETCH = 1
-    QUICKDRAW = 2
+    REAL = 2
     PAINTING = 3
 
     AMAZON = 4
@@ -19,7 +19,7 @@ def get_dataset_info(value: int):
     dataset = {
         DatasetType.CLIPART.value: [345, "clipart", "/clipart"],
         DatasetType.SKETCH.value: [345, "sketch", "/sketch"],
-        DatasetType.QUICKDRAW.value: [345, "quickdraw", "/quickdraw"],
+        DatasetType.REAL.value: [345, "real", "/real"],
         DatasetType.PAINTING.value: [345, "painting", "/painting"],
         DatasetType.AMAZON.value: [31, "amazon", "/office-31/amazon/images"],
         DatasetType.WEBCAM.value: [31, "webcam", "/office-31/webcam/images"],
