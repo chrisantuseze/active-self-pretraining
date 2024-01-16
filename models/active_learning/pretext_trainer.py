@@ -485,14 +485,14 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             if batch > 0:
-                # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
-                state = simple_load_model(self.args, path=f'2_finetuner_{self.dataset}.pth')
-                batch_sampler_encoder.load_state_dict(state['model'], strict=False)
-
                 # sampling
                 if batch == 3:
                     samplek = sampled_data[:self.args.al_trainer_sample_size * 4]
                 else:
+                    # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
+                    state = simple_load_model(self.args, path=f'1_finetuner_{self.dataset}.pth')
+                    batch_sampler_encoder.load_state_dict(state['model'], strict=False)
+
                     samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
