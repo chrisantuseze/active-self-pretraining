@@ -37,7 +37,7 @@ def main(args):
     office_dataset(args, writer)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GASP")
+    parser = argparse.ArgumentParser(description="A3")
     config = yaml_config_hook("./config/config.yaml")
     for k, v in config.items():
         parser.add_argument(f"--{k}", default=v, type=type(v))
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     main(args)
     # viz(args)
 
-    logging.info("GASP ended.")
+    logging.info("A3 ended.")
 
