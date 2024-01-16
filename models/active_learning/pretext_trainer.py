@@ -213,7 +213,8 @@ class PretextTrainer():
         loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        state = simple_load_model(self.args, path=f'{prefix}_finetuner_{self.dataset}.pth')
+        # state = simple_load_model(self.args, path=f'{prefix}_finetuner_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -416,13 +417,15 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
+        # simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
+        simple_save_model(self.args, self.best_model, f'finetuner_{self.dataset}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
         logging.info(f"Base = {get_dataset_info(self.args.base_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
+        # state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
         if not state:
             self.finetuner(encoder, prefix='first')
 
@@ -448,16 +451,13 @@ class PretextTrainer():
             logging.info(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
-            if batch > 0:
-                # sampling
-                state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
-                batch_sampler_encoder.load_state_dict(state['model'], strict=False)
+            # sampling
+            # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
+            state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
+            batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
-                samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
-                batch_sampler_encoder = encoder
-            else:
-                # first iteration: sample k at even intervals
-                samplek = sampled_data[:self.args.al_trainer_sample_size]
+            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
+            batch_sampler_encoder = encoder
 
             pretraining_sample_pool.extend(samplek)
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
@@ -466,8 +466,8 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                self.finetuner(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
+            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+            #     self.finetuner(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return pretraining_sample_pool

@@ -40,7 +40,11 @@ class LCDataset():
                 shuffle=True, pin_memory=True, drop_last=True
         )
         
-        val_dataset = torchvision.datasets.ImageFolder(self.dir, transform=val_transform)        
+        val_dataset = torchvision.datasets.ImageFolder(self.dir, transform=val_transform)    
+        if self.args.lc_dataset in []:
+            from torch.utils.data import random_split
+            _, val_dataset = random_split(val_dataset, [0.8, 0.2])
+
         val_loader = torch.utils.data.DataLoader(
             val_dataset, batch_size=self.batch_size, 
             num_workers=self.args.workers, shuffle=False
