@@ -59,7 +59,7 @@ if __name__ == "__main__":
     assert args.target_dataset == args.lc_dataset
 
     if args.lc_dataset in [DatasetType.CLIPART.value, DatasetType.SKETCH.value, DatasetType.REAL.value, DatasetType.PAINTING.value]:
-        args.lc_batch_size = 128
+        args.lc_batch_size = 256
         args.lc_lr = 0.5
         args.al_batches = 3
 
