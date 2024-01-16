@@ -8,7 +8,7 @@ def init():
     handler = logging.StreamHandler(stream=sys.stdout)
     logger.addHandler(handler)
 
-    logging.basicConfig(filename="A3.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
+    logging.basicConfig(filename="a3.log", format="%(asctime)s %(levelname)s %(message)s", datefmt="%m-%d-%Y %I:%M:%S %p", level=logging.INFO)
     logging.info("A3 started...")
 
     def handle_exception(exc_type, exc_value, exc_traceback):

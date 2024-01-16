@@ -496,7 +496,10 @@ class PretextTrainer():
                 batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
                 # sampling
-                samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
+                if batch == 2:
+                    samplek = sampled_data[:self.args.al_trainer_sample_size * 3]
+                else:
+                    samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
                 # first iteration: sample k at even intervals
