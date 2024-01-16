@@ -1,4 +1,5 @@
 import numpy as np
+from datautils.dataset_enum import DatasetType
 from models.active_learning.pretext_dataloader import PretextDataset
 from models.utils.transformations import get_train_val_transforms
 import torch
@@ -41,7 +42,7 @@ class LCDataset():
         )
         
         val_dataset = torchvision.datasets.ImageFolder(self.dir, transform=val_transform)    
-        if self.args.lc_dataset in []:
+        if self.args.lc_dataset in [DatasetType.CLIPART.value, DatasetType.SKETCH.value, DatasetType.REAL.value, DatasetType.PAINTING.value]:
             from torch.utils.data import random_split
             _, val_dataset = random_split(val_dataset, [0.8, 0.2])
 
