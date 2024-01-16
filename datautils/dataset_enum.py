@@ -30,3 +30,6 @@ def get_dataset_info(value: int):
         DatasetType.REAL_WORLD.value:  [65, "real_world", "/officehome/real_world"]
     }
     return dataset[value]
+
+def in_domainnet(value: int):
+    return value in [DatasetType.CLIPART.value, DatasetType.SKETCH.value, DatasetType.REAL.value, DatasetType.PAINTING.value]

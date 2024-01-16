@@ -11,7 +11,7 @@ from utils.yaml_config_hook import yaml_config_hook
 from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from models.trainers.classifier import Classifier
 import utils.logger as logging
-from datautils.dataset_enum import DatasetType
+from datautils import dataset_enum
 
 from models.gan.train import do_gen_ai
 
@@ -28,10 +28,10 @@ def office_dataset(args, writer):
     # do_gen_ai(args)
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
-    # classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
-    classifier = Classifier(args, pretrain_level=f"2_2")
+    classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
+    # classifier = Classifier(args, pretrain_level=f"2_2")
     classifier.train_and_eval()
 
 def main(args):
@@ -58,10 +58,10 @@ if __name__ == "__main__":
 
     assert args.target_dataset == args.lc_dataset
 
-    if args.lc_dataset in [DatasetType.CLIPART.value, DatasetType.SKETCH.value, DatasetType.REAL.value, DatasetType.PAINTING.value]:
+    if dataset_enum.in_domainnet(args.lc_dataset):
         args.lc_batch_size = 256
         args.lc_lr = 0.5
-        args.al_batches = 3
+        args.al_batches = 1
 
     main(args)
     # viz(args)
