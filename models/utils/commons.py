@@ -57,9 +57,6 @@ def get_params_to_update(model, feature_extract):
     return params_to_update
 
 def get_params(args, training_type):
-    base_image_size = args.base_image_size
-    target_image_size = args.target_image_size
-
     batch_size = args.swav_batch_size
     epochs = args.base_epochs
     temperature = args.swav_temperature
@@ -70,7 +67,7 @@ def get_params(args, training_type):
     params = {
         TrainingType.ACTIVE_LEARNING: Params(
             batch_size=args.al_finetune_batch_size, 
-            image_size=target_image_size, 
+            image_size=128, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
             optimizer=args.al_optimizer,
@@ -79,7 +76,7 @@ def get_params(args, training_type):
             ),
         TrainingType.BASE_PRETRAIN: Params(
             batch_size= batch_size, #16,
-            image_size=base_image_size, 
+            image_size=args.base_image_size, 
             lr=base_lr, 
             epochs=epochs,
             optimizer=optimizer,
@@ -88,7 +85,7 @@ def get_params(args, training_type):
             ),
         TrainingType.TARGET_PRETRAIN: Params(
             batch_size=batch_size, 
-            image_size=target_image_size, 
+            image_size=args.target_image_size, 
             lr=target_lr, 
             epochs=args.target_epochs,
             optimizer=optimizer,
