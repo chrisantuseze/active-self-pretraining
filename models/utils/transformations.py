@@ -29,7 +29,7 @@ def get_train_val_transforms():
             transforms.Resize((256, 256)),
             transforms.RandomResizedCrop(224),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAutocontrast(0.5),
+            # transforms.RandomAutocontrast(0.5),
             transforms.ToTensor(),
             normalize
     ])  

@@ -9,7 +9,7 @@ from datautils.dataset_enum import get_dataset_info
 from datautils.target_dataset import get_pretrain_ds
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_chkpts, load_saved_state, simple_load_model
-import models.self_sup.swav.backbone.resnet50 as resnet_models
+import models.trainers.backbone.resnet50 as resnet_models
 
 
 def visualize_features_(args, model, source_data, target_data):

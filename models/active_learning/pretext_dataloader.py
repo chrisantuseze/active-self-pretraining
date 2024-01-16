@@ -6,7 +6,7 @@ from PIL import Image
 import random
 import glob
 from datautils.path_loss import PathLoss
-from models.self_sup.swav.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
+from models.trainers.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
 from models.utils.commons import get_images_pathlist, get_params
 from models.utils.transformations import Transforms
 from utils.commons import load_class_names, save_class_names

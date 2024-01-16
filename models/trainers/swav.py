@@ -12,13 +12,13 @@ import os
 import time
 
 import numpy as np
-from models.self_sup.swav.utils import initialize_exp
+from models.trainers.utils import initialize_exp
 from models.utils.commons import get_params, AverageMeter, prepare_model
 from models.utils.training_type_enum import TrainingType
 from optim.optimizer import load_optimizer
 from utils.commons import load_saved_state
 import utils.logger as logging
-import models.self_sup.swav.backbone.resnet50 as resnet_models
+import models.trainers.backbone.resnet50 as resnet_models
 
 class SwAVTrainer():
     def __init__(self, args, dataloader, pretrain_level, training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:

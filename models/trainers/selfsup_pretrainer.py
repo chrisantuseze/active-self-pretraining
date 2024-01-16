@@ -1,15 +1,10 @@
-import glob
 from datautils.dataset_enum import get_dataset_info
-from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_pretrain_ds
 from models.active_learning.pretext_dataloader import PretextDataLoader
-# from models.active_learning.pretext_trainer import PretextTrainer
-from models.self_sup.swav.swav import SwAVTrainer
-from models.utils.commons import get_params
+from models.trainers.swav import SwAVTrainer
 import utils.logger as logging
 from models.utils.training_type_enum import TrainingType
 from utils.commons import load_path_loss, save_state
-from models.utils.ssl_method_enum import SSL_Method
 
 
 class SelfSupPretrainer:
@@ -49,10 +44,6 @@ class SelfSupPretrainer:
             epoch_loss = trainer.train_epoch(epoch)
 
             # Decay Learning Rate
-            if self.args.method is not SSL_Method.SWAV.value and trainer.scheduler:
-                trainer.scheduler.step()
-                lr = trainer.scheduler.get_last_lr()
-
             if epoch > 1 and epoch % epochs//2 == 0:
                 save_state(self.args, model, dataset_type, pretrain_level)
 

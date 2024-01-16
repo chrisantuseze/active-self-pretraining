@@ -11,19 +11,10 @@ import utils.logger as logging
 def load_optimizer(args, params, state=None, train_params: Params=None, train_loader=None):
     scheduler = None
     
-    if train_params.optimizer == "SimCLR":
-        optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
-
-    elif train_params.optimizer == "Adam-Cosine":
+    if train_params.optimizer == "Adam-Cosine":
         optimizer = Adam(params, lr=train_params.lr, weight_decay=train_params.weight_decay)
         # this could be implemented to allow for a restart of the learning rate after a certain number of epochs. To do this, simply call
         # line 34 in the check for the number of epochs
-        scheduler = CosineAnnealingLR(optimizer, train_params.epochs, eta_min=0, T_max=200)
-
-    elif train_params.optimizer == "DCL":
-        lr = train_params.lr * train_params.batch_size/256
-        optimizer = SGD(params, lr=lr, momentum=args.momentum, nesterov=True)
-    
         scheduler = CosineAnnealingLR(optimizer, train_params.epochs, eta_min=0, T_max=200)
 
     elif train_params.optimizer == "SGD-MultiStep":

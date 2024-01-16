@@ -7,7 +7,6 @@ import time
 import numpy as np
 from datautils.dataset_enum import get_dataset_info
 from models.trainers.selfsup_pretrainer import SelfSupPretrainer
-from models.utils.ssl_method_enum import SSL_Method
 from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
@@ -472,12 +471,6 @@ class PretextTrainer():
     def active_learning_new(self, path_loss, encoder):
         pretraining_sample_pool = []
 
-        gen_filename = f'{self.args.gen_images_path}_{get_dataset_info(self.args.target_dataset)[1]}'
-        data_dir = os.path.join(self.args.dataset_dir, gen_filename)
-        gen_images = glob.glob(f'{data_dir}/*')
-        pretraining_gen_images = [PathLoss(path, 0) for path in gen_images]
-        # pretraining_sample_pool.extend(pretraining_gen_images)
-
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
         logging.info(f"The size of gen images is {len(pretraining_sample_pool)} while the size of the original data is {len(path_loss)}")
 
@@ -508,9 +501,11 @@ class PretextTrainer():
             pretraining_sample_pool.extend(samplek)
             logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
 
-            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
-            pretrainer = SelfSupPretrainer(self.args, self.writer)
-            pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
+            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.target_dataset)[1], pretrain_level=f"2_{batch}")
+            if state:
+                loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
+                pretrainer = SelfSupPretrainer(self.args, self.writer)
+                pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
             if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)

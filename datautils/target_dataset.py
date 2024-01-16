@@ -1,18 +1,11 @@
-import glob
 import torch
 import torchvision
-from torchvision.transforms import ToTensor, Compose
-import random
 
-from datautils.path_loss import PathLoss
 
-from models.active_learning.pretext_dataloader import MakeBatchDataset, PretextMultiCropDataset
-from models.self_sup.simclr.transformation import TransformsSimCLR
-from models.self_sup.simclr.transformation.dcl_transformations import TransformsDCL
-from models.self_sup.swav.transformation.swav_transformation import TransformsSwAV
-from models.utils.commons import get_images_pathlist, get_params, split_dataset2
+from models.active_learning.pretext_dataloader import MakeBatchDataset
+from models.trainers.transformation.swav_transformation import TransformsSwAV
+from models.utils.commons import get_params
 from models.utils.training_type_enum import TrainingType
-from models.utils.ssl_method_enum import SSL_Method
 
 from datautils import dataset_enum
 from models.utils.transformations import Transforms, get_train_val_transforms
@@ -23,7 +16,6 @@ class TargetDataset():
     def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
-        self.method = args.method
         self.training_type = training_type
         self.with_train = with_train
         self.is_train = is_train
@@ -63,22 +55,9 @@ class TargetDataset():
         return train_loader, val_loader
 
     def get_loader(self):
-        if self.method is not SSL_Method.SWAV.value or self.training_type in [TrainingType.ACTIVE_LEARNING]:
-            if self.training_type == TrainingType.ACTIVE_LEARNING:
-                transforms = Transforms(self.image_size)
-                dataset = self.get_dataset(transforms)
-
-            else:
-                if self.method == SSL_Method.SIMCLR.value:
-                    transforms = TransformsSimCLR(self.image_size)
-
-                if self.method == SSL_Method.DCL.value:
-                    transforms = TransformsDCL(self.image_size)
-
-                else:
-                    ValueError
-
-                dataset = self.get_dataset(transforms)
+        if self.training_type == TrainingType.ACTIVE_LEARNING:
+            transforms = Transforms(self.image_size)
+            dataset = self.get_dataset(transforms)
 
             loader = torch.utils.data.DataLoader(
                 dataset,

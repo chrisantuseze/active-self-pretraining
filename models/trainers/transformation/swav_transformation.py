@@ -3,7 +3,7 @@ Adapted from the SwAV repo
 '''
 
 import torch
-from models.self_sup.swav.transformation.multicropdataset import MultiCropDataset
+from models.trainers.transformation.multicropdataset import MultiCropDataset
 
 class TransformsSwAV():
     def __init__(self, args, batch_size, dir):

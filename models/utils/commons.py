@@ -5,12 +5,6 @@ import torch
 import torchvision
 from torch.utils.data import random_split
 import gc
-
-from models.self_sup.simclr.loss.dcl_loss import DCL
-from models.self_sup.simclr.loss.nt_xent_loss import NTXentLoss
-from models.self_sup.simclr.simclr import SimCLR
-from models.self_sup.simclr.simclr_v2 import SimCLRV2
-from models.utils.ssl_method_enum import SSL_Method
 from models.utils.training_type_enum import Params, TrainingType
 from utils.commons import load_chkpts, load_saved_state
 import utils.logger as logging
@@ -32,17 +26,6 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
         print("using Regular model for LC")
-
-    else:
-        if args.method == SSL_Method.SIMCLR.value:
-            criterion = NTXentLoss(args)
-            model = SimCLR(encoder, args.projection_dim, n_features)
-            print("using SIMCLR")
-
-        elif args.method == SSL_Method.DCL.value:
-            criterion = DCL(args)
-            model = SimCLRV2(n_features)
-            print("using SIMCLRv2")
 
     return model, criterion
 

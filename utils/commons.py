@@ -8,7 +8,6 @@ import pickle
 from PIL import Image
 from models.active_learning.al_method_enum import get_al_method_enum
 
-from models.utils.ssl_method_enum import get_ssl_method
 from datautils.dataset_enum import get_dataset_info
 import utils.logger as logging
 
@@ -26,7 +25,7 @@ def load_saved_state(args, dataset, pretrain_level="1"):
 
 def load_classifier_chkpts(args, model, pretrain_level="1"):
     dataset = get_dataset_info(args.target_dataset)[1]
-    filename = "sawv_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
+    filename = "swav_{}_checkpoint_{}.tar".format(pretrain_level, dataset)
     return load_chkpts(args, filename, model)
 
 def load_chkpts(args, filename, model):
