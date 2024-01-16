@@ -23,12 +23,12 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
+    # pretrainer.first_pretrain()
 
     # do_gen_ai(args)
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     # classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier = Classifier(args, pretrain_level=f"2_2")
