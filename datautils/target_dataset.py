@@ -34,18 +34,16 @@ class TargetDataset():
     def get_finetuner_loaders(self, path_list=None):
         train_transform, val_transform = get_train_val_transforms()
         
-        train_dataset = MakeBatchDataset(
-            self.args, self.dir, self.with_train, self.is_train, 
-            is_tsne=False, transform=train_transform, path_list=path_list)
+        train_dataset = MakeBatchDataset(self.args, self.dir, self.with_train, self.is_train, 
+                                         is_tsne=False, transform=train_transform, path_list=path_list)
         train_loader = torch.utils.data.DataLoader(
             train_dataset, batch_size=self.batch_size,
             num_workers=self.args.workers,
             shuffle=True, pin_memory=True, drop_last=True
         )
         
-        val_dataset = MakeBatchDataset(
-            self.args, self.dir, self.with_train, self.is_train, 
-            is_tsne=False, transform=val_transform, path_list=path_list)
+        val_dataset = MakeBatchDataset(self.args, self.dir, self.with_train, self.is_train, 
+                                       is_tsne=False, transform=val_transform, path_list=path_list)
         val_loader = torch.utils.data.DataLoader(
             val_dataset, batch_size=self.batch_size, 
             num_workers=self.args.workers, shuffle=False

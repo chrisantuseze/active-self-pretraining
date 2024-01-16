@@ -8,7 +8,7 @@ from models.utils.training_type_enum import Params
 import utils.logger as logging
 
 
-def load_optimizer(args, params, state=None, train_params: Params=None, train_loader=None):
+def load_optimizer(args, params, train_params: Params=None, train_loader=None):
     scheduler = None
     
     if train_params.optimizer == "Adam-Cosine":

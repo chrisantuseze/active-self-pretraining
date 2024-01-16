@@ -35,7 +35,7 @@ class Classifier:
 
         params_to_update = get_params_to_update(self.model, feature_extract=True)
         train_params = get_params(self.args, TrainingType.LINEAR_CLASSIFIER)
-        self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, state, train_params)
+        self.optimizer, self.scheduler = load_optimizer(self.args, params_to_update, train_params)
 
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0

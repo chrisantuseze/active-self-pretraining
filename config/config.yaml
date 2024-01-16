@@ -69,7 +69,7 @@ checkpoint_freq: 25
 seed: 42                                      # sacred handles automatic seeding when passed in the config
 base_epochs: 75
 base_image_size: 256 #40
-base_dataset: 0                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+base_dataset: 1 #0                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 base_pretrain: True
 
 do_gradual_base_pretrain: True
@@ -81,7 +81,7 @@ current_epoch: 0
 log_step: 1000
 
 ######################## target pretraining options
-target_dataset: 1                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+target_dataset: 2 #1                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 75 #200                            # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 256 #80
 target_lr: 1.0e-3                             # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
@@ -91,7 +91,7 @@ pretrain_path_loss_file: "pretrain_path_loss.pkl"
 
 
 ################################## LINEAR CLASSIFIER ###########################################
-lc_dataset: 1                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+lc_dataset: 2 #1                                 # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 lc_image_size: 256 #64                             # this depends on the dataset used
 
 #########################
@@ -119,7 +119,7 @@ lc_final_lr: 0
 
 ################################### AL ###########################################################
 al_method: 0                                 # 0 for least confidence, 1 for entropy, 2 for both
-al_finetune_trainer_epochs: 25
+al_finetune_trainer_epochs: 20
 al_epochs: 20                                 # the default should be kept at 10, however due to compute limitations, I would use 3
 al_batches: 5 #10                                # the default should be kept at 10, however due to compute limitations, I would use 20
 al_finetune_batch_size: 64 #256                   # I would like to keep the default at 32 or 64, but I made the current value 8 due to the cuda issue I am having. This seems to be the value that didn't produce an error

@@ -135,7 +135,7 @@ class PretextTrainer():
         
         model = model.to(self.args.device)
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-        optimizer, scheduler = load_optimizer(self.args, model.parameters(), state, train_params)
+        optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params)
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
 
         self.val_acc_history = []
@@ -375,15 +375,19 @@ class PretextTrainer():
         logging.info("Train Loss: {:.4f}".format(avg_loss))
         return avg_loss
 
-    def finetuner_new(self, model, prefix, path_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING):
+    def finetuner(self, model, prefix, path_list: List[PathLoss]=None, training_type=TrainingType.ACTIVE_LEARNING):
         if path_list is not None:
             path_list = [path.path for path in path_list]
-            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(path_list)
 
         else:
             train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
+        state = None
+        if prefix == "first":
+            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level="1")
+            model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
         train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
@@ -394,46 +398,6 @@ class PretextTrainer():
         logging.info("Running finetuner")
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
-            logging.info('-' * 20)
-
-            train_loss = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
-            epoch_acc, eval_loss = self.eval_finetuner(model, criterion, test_loader)
-
-            # update learning rate
-            if self.args.al_optimizer != "SwAV":
-                scheduler.step()
-
-            if epoch_acc <= self.best_trainer_acc:
-                counter += 1
-            else:
-                counter = 0
-
-            if counter > 20:
-                logging.info("Early stopped at epoch {}:".format(epoch))
-                break
-
-        simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
-
-    def finetuner(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
-        train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
-
-        model, criterion = get_model_criterion(self.args, model, num_classes=4)
-
-        state = None
-        if self.args.al_pretext_from_pretrain:
-            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level="1")
-            model.load_state_dict(state['model'], strict=False)
-        model = model.to(self.args.device)
-
-        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-        optimizer, scheduler = load_optimizer(
-            self.args, model.parameters(), 
-            state, train_params,
-            train_loader=train_loader)
-
-        counter = 0
-        for epoch in range(self.args.al_finetune_trainer_epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_finetune_trainer_epochs))
             logging.info('-' * 20)
 
             train_loss = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
@@ -466,9 +430,9 @@ class PretextTrainer():
         if path_loss is None:
             path_loss = self.make_batches(encoder, prefix='first')
 
-        return self.active_learning_new(path_loss, encoder)
+        return self.active_learning(path_loss, encoder)
 
-    def active_learning_new(self, path_loss, encoder):
+    def active_learning(self, path_loss, encoder):
         pretraining_sample_pool = []
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
@@ -480,20 +444,16 @@ class PretextTrainer():
         sample_per_batch = len(path_loss)//self.args.al_batches
         batch_sampler_encoder = encoder
 
-        for batch in range(3, self.args.al_batches):
+        for batch in range(self.args.al_batches):
             logging.info(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             if batch > 0:
                 # sampling
-                if batch == 3:
-                    samplek = sampled_data[:self.args.al_trainer_sample_size * 4]
-                else:
-                    # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
-                    state = simple_load_model(self.args, path=f'1_finetuner_{self.dataset}.pth')
-                    batch_sampler_encoder.load_state_dict(state['model'], strict=False)
+                state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
+                batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
-                    samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
+                samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
                 batch_sampler_encoder = encoder
             else:
                 # first iteration: sample k at even intervals
@@ -506,8 +466,8 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-            #     self.finetuner_new(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                self.finetuner(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return pretraining_sample_pool
