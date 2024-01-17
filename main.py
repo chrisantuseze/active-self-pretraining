@@ -23,7 +23,7 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     # do_gen_ai(args)
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     # You can change dataset from here for ease
-    args.base_dataset = 0
+    args.base_dataset = 3
     args.target_dataset = 1
     args.lc_dataset = args.target_dataset
 
