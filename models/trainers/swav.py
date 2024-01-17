@@ -61,7 +61,7 @@ class SwAVTrainer():
 
         cudnn.benchmark = True
 
-        if training_type == TrainingType.TARGET_AL: #and not in_domainnet(self.args.lc_dataset):
+        if training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
             self.source_model = encoder
             state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
             self.source_model.load_state_dict(state['model'], strict=False)
@@ -149,7 +149,7 @@ class SwAVTrainer():
             # ============ backward and optim step ... ============
 
             #########################################################
-            if self.training_type == TrainingType.TARGET_AL: #and not in_domainnet(self.args.lc_dataset):
+            if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
                 s_embedding, _ = self.source_model(inputs)
                 src_domain_out = self.domain_classifier(s_embedding)
 
@@ -182,7 +182,7 @@ class SwAVTrainer():
                         p.grad = None
             self.optimizer.step()
 
-            if self.training_type == TrainingType.TARGET_AL: #and not in_domainnet(self.args.lc_dataset):
+            if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
                 # Adjust lambda
                 self.domain_classifier.coeff += 0.001
 
