@@ -37,125 +37,10 @@ class PretextTrainer():
         self.n_features = get_feature_dimensions_backbone(self.args)
         self.num_classes, self.dataset, self.dir = get_dataset_info(self.args.target_dataset)
 
-    def eval_main_task(self, model, epoch, criterion, batch, test_loader):
-        batch_time = AverageMeter()
-        losses = AverageMeter()
-
-        model.eval()
-        correct, total = 0, 0
-
-        end = time.time()
-        with torch.no_grad():
-            for step, (inputs, targets) in enumerate(test_loader):
-                inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
-                outputs = model(inputs)
-                loss = criterion(outputs, targets)
-
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-
-                losses.update(loss.item(), inputs[0].size(0))
-                
-                # measure elapsed time
-                batch_time.update(time.perf_counter() - end)
-                end = time.perf_counter()
-
-        epoch_acc = 100. * correct / total
-        
-        # Save checkpoint.
-        self.val_acc_history.append(str(epoch_acc))
-        if epoch_acc > self.best_proxy_acc:
-            simple_save_model(self.args, model, f'proxy_{batch}.pth')
-            self.best_proxy_acc = epoch_acc
-            self.best_batch = batch
-
-        logging.info(
-            "Test:\t"
-            "Time {batch_time.avg:.3f}\t"
-            "Loss {loss.avg:.4f}\t"
-            "Acc@1 {top1.avg:.3f}\t"
-            "Best Acc@1 so far {acc:.1f}".format(
-                batch_time=batch_time, loss=losses, top1=epoch_acc, acc=self.best_proxy_acc))
-
-    def train_main_task(self, model, epoch, criterion, optimizer, train_params, train_loader):
-        batch_time = AverageMeter()
-        data_time = AverageMeter()
-        losses = AverageMeter()
-
-        model.train()
-        end = time.time()
-
-        total_loss, total_num = 0.0, 0
-        for step, (inputs, targets) in enumerate(train_loader):
-            inputs, targets = inputs.to(self.args.device), targets.to(self.args.device)
-            
-            optimizer.zero_grad()
-            outputs = model(inputs)
-
-            loss = criterion(outputs, targets)
-            
-            loss.backward()
-            optimizer.step()
-
-            total_num += train_params.batch_size
-            total_loss += loss.item() * train_params.batch_size
-
-            losses.update(loss.item(), inputs[0].size(0))
-            batch_time.update(time.time() - end)
-            end = time.time()
-
-            if step % self.args.log_step == 0:
-                logging.info(
-                    "Epoch: [{0}][{1}]\t"
-                    "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
-                    "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
-                    "Loss {loss.val:.4f} ({loss.avg:.4f})\t"
-                    "Lr: {lr:.4f}".format(
-                        epoch,
-                        step,
-                        batch_time=batch_time,
-                        data_time=data_time,
-                        loss=losses,
-                        lr=optimizer.param_groups[0]["lr"],
-                    )
-                )
-
-    def main_task(self, samples, model, batch, rebuild_al_model=False):
-        train_loader = PretextDataLoader(self.args, samples, is_val=False, batch_size=self.args.al_maintask_batch_size).get_loader()
-        test_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=100).get_loader()
-
-        state = None
-        criterion = nn.CrossEntropyLoss()
-        if rebuild_al_model:
-            state = simple_load_model(self.args, path='finetuner.pth')
-            model.load_state_dict(state['model'], strict=False)
-
-            model.linear = nn.Linear(self.n_features, self.num_classes) # TODO this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
-        
-        model = model.to(self.args.device)
-        train_params = get_params(self.args, TrainingType.ACTIVE_LEARNING)
-        optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params)
-        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[160])
-
-        self.val_acc_history = []
-
-        for epoch in range(self.args.al_epochs):
-            logging.info('\nEpoch {}/{}'.format(epoch, self.args.al_epochs))
-            logging.info('-' * 20)
-
-            self.train_main_task(model, epoch, criterion, optimizer, train_params, train_loader)
-            self.eval_main_task(model, epoch, criterion, batch, test_loader)
-
-            # Decay Learning Rate
-            scheduler.step()
-
-        return model
-
     def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
-        logging.info(f"Generating the top1 scores using {get_al_method_enum(self.args.al_method)}")
+        logging.info(f"Generating the top1 scores using")
         _preds = []
 
         model = model.to(self.args.device)
@@ -181,27 +66,8 @@ class PretextTrainer():
         return preds
 
     def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        if self.args.al_method == AL_Method.LEAST_CONFIDENCE.value:
-            probs = preds.max(axis=1)
-            indices = probs.argsort(axis=0)
-
-        elif self.args.al_method == AL_Method.ENTROPY.value:
-            entropy = (np.log(preds) * preds).sum(axis=1) * -1.
-            indices = entropy.argsort(axis=0)[::-1]
-
-        elif self.args.al_method == AL_Method.BOTH.value:
-            probs = preds.max(axis=1)
-            indices1 = probs.argsort(axis=0)
-
-            entropy = (np.log(preds) * preds).sum(axis=1) * -1.
-            indices2 = entropy.argsort(axis=0)[::-1]
-
-            indices = np.concatenate((indices1, indices2)) 
-            random.shuffle(indices)
-            indices = indices[: (len(indices)//2)]
-
-        else:
-            raise ValueError(f"'{self.args.al_method}' method doesn't exist")
+        entropy = (np.log(preds) * preds).sum(axis=1) * -1.
+        indices = entropy.argsort(axis=0)[::-1]
 
         new_samples = []
         for item in indices:
