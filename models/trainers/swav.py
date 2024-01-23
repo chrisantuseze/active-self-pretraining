@@ -163,6 +163,7 @@ class SwAVTrainer():
                 # vat_loss = self.virtual_adv_loss(self.model, inputs[0])
 
                 # entropy minimization loss
+                print("output", output)
                 ent_loss = entropy_loss(output)
                 print("ent_loss", ent_loss)
 
