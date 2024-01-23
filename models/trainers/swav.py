@@ -69,6 +69,7 @@ class SwAVTrainer():
             self.source_model.eval()
 
             self.domain_classifier = DomainClassifier(in_feature=128).to(args.device)
+            self.domain_classifier.train()
             self.virtual_adv_loss = VirtualAdversarialLoss().to(args.device)
 
     def train_epoch(self, epoch):
@@ -151,12 +152,12 @@ class SwAVTrainer():
 
             #########################################################
             if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
-                s_embedding, _ = self.source_model(inputs)
-                src_domain_out = self.domain_classifier(s_embedding)
-                tgt_domain_out = self.domain_classifier(embedding_)
+                # s_embedding, _ = self.source_model(inputs)
+                # src_domain_out = self.domain_classifier(s_embedding)
+                # tgt_domain_out = self.domain_classifier(embedding_)
 
                 # domain adversarial loss
-                domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
+                # domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
 
                 # virtual adversarial loss
                 vat_loss = self.virtual_adv_loss(self.model, inputs[0])
@@ -172,7 +173,8 @@ class SwAVTrainer():
                 # entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
                 # entropy_conf_loss *= 5e-4 * 0.5
 
-                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss)
+                # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss)
+                loss += 0.1 * (ent_loss + vat_loss)
 
             #########################################################
 

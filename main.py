@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('--gpus', default=1, type=int, help='')
 
     parser.add_argument('--source_batch_size', default=16, type=int, help='')
-    parser.add_argument('--source_image_size', default=128, type=int, help='')#default=256, type=int, help='')
+    parser.add_argument('--source_image_size', default=256, type=int, help='')
     parser.add_argument('--source_lr', default=1e-3, type=float, help='')
     parser.add_argument('--source_epochs', default=75, type=int, help='') #600
     parser.add_argument('--source_weight_decay', default=1.0e-4, type=float, help='')
