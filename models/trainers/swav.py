@@ -160,7 +160,7 @@ class SwAVTrainer():
                 # domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
 
                 # virtual adversarial loss
-                vat_loss = self.virtual_adv_loss(self.model, inputs[0])
+                # vat_loss = self.virtual_adv_loss(self.model, inputs[0])
 
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)
@@ -173,8 +173,10 @@ class SwAVTrainer():
                 # entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
                 # entropy_conf_loss *= 5e-4 * 0.5
 
-                # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss)
-                loss += 0.1 * (ent_loss + vat_loss)
+                wr_loss = weight_reg_loss(self.source_model, self.model)
+
+                # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss) + 0.1 * wr_loss
+                loss += 0.1 * (ent_loss) + 0.1 * wr_loss
 
             #########################################################
 
