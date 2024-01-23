@@ -165,7 +165,6 @@ class SwAVTrainer():
 
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)
-                print("ent_loss", ent_loss)
 
                 # # domain confusion loss
                 # conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
