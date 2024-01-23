@@ -315,7 +315,6 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
-            # state = simple_load_model(self.args, path=f'{batch-1}_bayesian_model_{self.dataset}.pth')
             state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
             batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
@@ -329,8 +328,8 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.source_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-            #     self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return core_set

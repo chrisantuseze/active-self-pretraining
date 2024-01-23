@@ -63,14 +63,14 @@ class SwAVTrainer():
 
         if training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
             self.source_model = encoder
-            # state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level="1")
-            # self.source_model.load_state_dict(state['model'], strict=False)
-            # self.source_model = self.source_model.to(args.device)
-            # self.source_model.eval()
+            state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level="1")
+            self.source_model.load_state_dict(state['model'], strict=False)
+            self.source_model = self.source_model.to(args.device)
+            self.source_model.eval()
 
-            # self.domain_classifier = DomainClassifier(in_feature=128).to(args.device)
-            # self.domain_classifier.train()
-            # self.virtual_adv_loss = VirtualAdversarialLoss().to(args.device)
+            self.domain_classifier = DomainClassifier(in_feature=128).to(args.device)
+            self.domain_classifier.train()
+            self.virtual_adv_loss = VirtualAdversarialLoss().to(args.device)
 
     def train_epoch(self, epoch):
 
@@ -164,7 +164,7 @@ class SwAVTrainer():
                 # print("vat_loss", vat_loss)
 
                 # entropy minimization loss
-                # ent_loss = entropy_loss(output)
+                ent_loss = entropy_loss(output)
 
                 # # domain confusion loss
                 # conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
@@ -177,8 +177,7 @@ class SwAVTrainer():
 
                 # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss) + 0.1 * wr_loss
 
-                # loss += 1 * ent_loss
-                pass
+                loss += 1 * ent_loss
 
             #########################################################
 
@@ -191,9 +190,9 @@ class SwAVTrainer():
                         p.grad = None
             self.optimizer.step()
 
-            # if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
-            #     # Adjust lambda
-            #     self.domain_classifier.coeff += 0.001
+            if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
+                # Adjust lambda
+                self.domain_classifier.coeff += 0.001
 
             # ============ misc ... ============
             losses.update(loss.item(), inputs[0].size(0))
