@@ -18,11 +18,11 @@ class Classifier:
         self.model = resnet_backbone(self.args.backbone, pretrained=False)
 
         if pretrain_level == "1":
-            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level=pretrain_level)
+            state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level=pretrain_level)
 
         elif pretrain_level == "AL":
             logging.info("Using pretext task weights")
-            state = simple_load_model(self.args, path='finetuner.pth')
+            state = simple_load_model(self.args, path='bayesian_model.pth')
         else:
             state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
 

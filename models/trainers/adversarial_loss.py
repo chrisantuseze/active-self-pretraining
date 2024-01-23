@@ -3,6 +3,7 @@ import numpy as np
 import torch.nn as nn
 from torch.autograd import Function
 import torch
+import torch.nn.functional as F
 
 class DomainDiscriminator(nn.Module):
     r"""Domain discriminator model from
@@ -70,6 +71,10 @@ class DomainClassifier(nn.Module):
             {"params": self.bottleneck.parameters(), "lr_mult": 1.},
         ] + self.domain_discriminator.get_parameters()
         return params
+    
+    def get_loss(self, src_output, trg_output):
+        loss = F.binary_cross_entropy(src_output, torch.zeros_like(src_output)) + F.binary_cross_entropy(trg_output, torch.ones_like(trg_output))
+        return 0.5 * loss
 
 
 class GradientReverseFunction(Function):
@@ -94,3 +99,60 @@ class GradientReverseLayer(nn.Module):
 
     def forward(self, *input):
         return GradientReverseFunction.apply(*input)
+
+
+class VirtualAdversarialLoss(nn.Module):
+
+    def __init__(self, xi=10.0, eps=1.0, ip=1):
+        """VAT loss
+        :param xi: hyperparameter of VAT (default: 10.0)
+        :param eps: hyperparameter of VAT (default: 1.0)
+        :param ip: iteration times of computing adv noise (default: 1)
+        """
+        super(VirtualAdversarialLoss, self).__init__()
+        self.xi = xi
+        self.eps = eps
+        self.ip = ip
+
+    def forward(self, model, x):
+        with torch.no_grad():
+            pred = F.softmax(model(x)[1], dim=1)
+
+        # prepare random unit tensor
+        d = torch.randn(x.shape).to(x.device)
+        d = _l2_normalize(d)
+
+        # calc adversarial direction
+        for _ in range(self.ip):
+            d.requires_grad_()
+
+            ad = d * self.xi
+            _, pred_hat = model(x + ad)
+            logp_hat = F.log_softmax(pred_hat, dim=1)
+            adv_distance = F.kl_div(logp_hat, pred, reduction='batchmean')
+            adv_distance.backward()
+            d = _l2_normalize(d)
+            model.zero_grad()
+    
+        # calc VAT loss
+        r_adv = d * self.eps
+        _, pred_hat = model(x + r_adv)
+        logp_hat = F.log_softmax(pred_hat, dim=1)
+        loss = F.kl_div(logp_hat, pred, reduction='batchmean')
+
+        return loss
+    
+def entropy_loss(out):
+    # return - (p_t * torch.log(p_t + 1e-5)).sum() / p_t.size(0)
+    return (- (out * torch.log(out + 1e-5)).sum(dim=0)).mean()
+    
+def _l2_normalize(d):
+    d_reshaped = d.view(d.shape[0], -1, *(1 for _ in range(d.dim() - 2)))
+    d /= torch.norm(d_reshaped, dim=1, keepdim=True) + 1e-8
+    return d
+
+def weight_reg_loss(src_model, trg_model):
+    weight_loss = 0
+    for src_param, trg_param in zip(src_model.parameters(), trg_model.parameters()):
+        weight_loss += ((src_param - trg_param) ** 2).sum()
+    return weight_loss

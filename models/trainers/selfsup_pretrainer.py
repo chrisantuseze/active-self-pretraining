@@ -16,9 +16,9 @@ class SelfSupPretrainer:
         self.writer = writer
 
     def base_pretrain(self, train_loader, epochs, batch, trainingType) -> None:        
-        if trainingType == TrainingType.BASE_PRETRAIN:
+        if trainingType == TrainingType.SOURCE_PRETRAIN:
             pretrain_level, plevel = "1", "1"
-            dataset_type = get_dataset_info(self.args.base_dataset)[1]
+            dataset_type = get_dataset_info(self.args.source_dataset)[1]
         else:
             pretrain_level, plevel = "2", "2"
             if trainingType == TrainingType.TARGET_AL:
@@ -53,8 +53,8 @@ class SelfSupPretrainer:
 
 
     def first_pretrain(self) -> None:
-        loader = self.get_loader(do_al=False, training_type=TrainingType.BASE_PRETRAIN)
-        self.base_pretrain(loader, self.args.base_epochs, batch=0, trainingType=TrainingType.BASE_PRETRAIN)
+        loader = self.get_loader(do_al=False, training_type=TrainingType.SOURCE_PRETRAIN)
+        self.base_pretrain(loader, self.args.source_epochs, batch=0, trainingType=TrainingType.SOURCE_PRETRAIN)
 
     def second_pretrain(self) -> None:
         distilled_ds = load_path_loss(self.args, self.args.pretrain_path_loss_file)

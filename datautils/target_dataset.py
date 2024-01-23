@@ -13,7 +13,7 @@ from models.utils.transformations import Transforms, get_train_val_transforms
 import utils.logger as logging
 
 class TargetDataset():
-    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.SOURCE_PRETRAIN, with_train=False, is_train=True, batch_size=None) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
         self.training_type = training_type
@@ -31,7 +31,7 @@ class TargetDataset():
             self.is_train, is_tsne, transforms) if self.training_type == TrainingType.ACTIVE_LEARNING else torchvision.datasets.ImageFolder(
                                                                                                 self.dir, transform=transforms)
 
-    def get_finetuner_loaders(self, path_list=None):
+    def get_bm_loaders(self, path_list=None):
         train_transform, val_transform = get_train_val_transforms()
         
         train_dataset = MakeBatchDataset(self.args, self.dir, self.with_train, self.is_train, 
@@ -74,9 +74,9 @@ class TargetDataset():
         return loader
     
 
-def get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
-    if training_type == TrainingType.BASE_PRETRAIN:
-        dataset_type = args.base_dataset
+def get_pretrain_ds(args, training_type=TrainingType.SOURCE_PRETRAIN, is_train=True, batch_size=None) -> TargetDataset:
+    if training_type == TrainingType.SOURCE_PRETRAIN:
+        dataset_type = args.source_dataset
     else:
         dataset_type = args.target_dataset
 

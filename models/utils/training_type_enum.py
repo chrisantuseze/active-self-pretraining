@@ -13,7 +13,7 @@ class Params:
     temperature: float
 
 class TrainingType(Enum):
-    BASE_PRETRAIN = "Base"
+    SOURCE_PRETRAIN = "Source"
     TARGET_AL = "Target AL"
     TARGET_PRETRAIN = "Target"
     ACTIVE_LEARNING = "Active Learning"

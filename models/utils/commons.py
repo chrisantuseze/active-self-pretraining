@@ -58,8 +58,8 @@ def get_params_to_update(model, feature_extract):
 
 def get_params(args, training_type):
     batch_size = args.swav_batch_size
-    epochs = args.base_epochs
-    temperature = args.swav_temperature
+    epochs = args.source_epochs
+    temperature = args.temperature
     optimizer = args.swav_optimizer
     base_lr = 0.01
     target_lr = args.swav_base_lr
@@ -74,9 +74,9 @@ def get_params(args, training_type):
             weight_decay=args.al_weight_decay,
             temperature=temperature
             ),
-        TrainingType.BASE_PRETRAIN: Params(
+        TrainingType.SOURCE_PRETRAIN: Params(
             batch_size= batch_size, #16,
-            image_size=args.base_image_size, 
+            image_size=args.source_image_size, 
             lr=base_lr, 
             epochs=epochs,
             optimizer=optimizer,
@@ -132,12 +132,12 @@ def split_dataset2(dataset, ratio=0.6, is_classifier=False):
 def prepare_model(args, trainingType, pretrain_level, model):
     params_to_update = model.parameters()
             
-    if trainingType == TrainingType.BASE_PRETRAIN:
+    if trainingType == TrainingType.SOURCE_PRETRAIN:
         logging.info("Using downloaded swav pretrained model")
         model = load_chkpts(args, "swav_800ep_pretrain.pth.tar", model)
 
     elif trainingType == TrainingType.TARGET_PRETRAIN:
-        state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level=pretrain_level)
+        state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level=pretrain_level)
         model.load_state_dict(state['model'], strict=False)
 
     elif trainingType == TrainingType.TARGET_AL:
@@ -145,7 +145,7 @@ def prepare_model(args, trainingType, pretrain_level, model):
 
         # This is the first AL cycle
         if state is None:
-            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+            state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level="1")
 
         model.load_state_dict(state['model'], strict=False)
 

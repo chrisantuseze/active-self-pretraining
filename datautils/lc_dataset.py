@@ -13,7 +13,7 @@ import utils.logger as logging
 from utils.random_split import random_split
 
 class LCDataset():
-    def __init__(self, args, dir, training_type=TrainingType.BASE_PRETRAIN) -> None:
+    def __init__(self, args, dir, training_type=TrainingType.SOURCE_PRETRAIN) -> None:
         self.args = args
         self.dir = args.dataset_dir + dir
         params = get_params(args, training_type)

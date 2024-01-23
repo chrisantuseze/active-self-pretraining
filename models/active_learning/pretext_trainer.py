@@ -20,7 +20,6 @@ from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import AverageMeter, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
-from models.active_learning.al_method_enum import AL_Method, get_al_method_enum
 from utils.commons import load_chkpts, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
@@ -79,8 +78,8 @@ class PretextTrainer():
         loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        # state = simple_load_model(self.args, path=f'{prefix}_finetuner_{self.dataset}.pth')
-        state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
+        # state = simple_load_model(self.args, path=f'{prefix}_bayesian_model_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -125,7 +124,7 @@ class PretextTrainer():
 
         return sorted_samples
 
-    def eval_finetuner(self, model, criterion, test_loader):
+    def eval_bm(self, model, criterion, test_loader):
         batch_time = AverageMeter()
         losses = AverageMeter()
 
@@ -188,7 +187,7 @@ class PretextTrainer():
         return epoch_acc, avg_loss
 
 
-    def train_finetuner(self, model, epoch, criterion, optimizer, scheduler, train_loader):
+    def train_bm(self, model, epoch, criterion, optimizer, scheduler, train_loader):
         batch_time = AverageMeter()
         data_time = AverageMeter()
         losses = AverageMeter()
@@ -242,18 +241,17 @@ class PretextTrainer():
         logging.info("Train Loss: {:.4f}".format(avg_loss))
         return avg_loss
 
-    def finetuner(self, model, prefix, path_list: List[PathLoss]=None, training_type=TrainingType.ACTIVE_LEARNING):
+    def bayesian_model(self, model, prefix, path_list: List[PathLoss]=None, training_type=TrainingType.ACTIVE_LEARNING):
         if path_list is not None:
             path_list = [path.path for path in path_list]
-            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders(path_list)
-
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_bm_loaders(path_list)
         else:
-            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_finetuner_loaders()
+            train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_bm_loaders()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=4)
         state = None
         if prefix == "first":
-            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.base_dataset)[1], pretrain_level="1")
+            state = load_saved_state(self.args, dataset=get_dataset_info(self.args.source_dataset)[1], pretrain_level="1")
             model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -261,14 +259,14 @@ class PretextTrainer():
         optimizer, scheduler = load_optimizer(self.args, model.parameters(), train_params=train_params, train_loader=train_loader)
 
         counter = 0
-        epochs = self.args.al_finetune_trainer_epochs
-        logging.info("Running finetuner")
+        epochs = train_params.epochs
+        logging.info("Running bayesian model")
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
-            train_loss = self.train_finetuner(model, epoch, criterion, optimizer, scheduler, train_loader)
-            epoch_acc, eval_loss = self.eval_finetuner(model, criterion, test_loader)
+            _ = self.train_bm(model, epoch, criterion, optimizer, scheduler, train_loader)
+            epoch_acc, _ = self.eval_bm(model, criterion, test_loader)
 
             # update learning rate
             if self.args.al_optimizer != "SwAV":
@@ -283,17 +281,17 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        # simple_save_model(self.args, self.best_model, f'{prefix}_finetuner_{self.dataset}.pth')
-        simple_save_model(self.args, self.best_model, f'finetuner_{self.dataset}.pth')
+        # simple_save_model(self.args, self.best_model, f'{prefix}_bayesian_model_{self.dataset}.pth')
+        simple_save_model(self.args, self.best_model, f'bayesian_model_{self.dataset}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
-        logging.info(f"Base = {get_dataset_info(self.args.base_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
+        logging.info(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        # state = simple_load_model(self.args, path=f'first_finetuner_{self.dataset}.pth')
-        state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
+        # state = simple_load_model(self.args, path=f'first_bayesian_model_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         if not state:
-            self.finetuner(encoder, prefix='first')
+            self.bayesian_model(encoder, prefix='first')
 
         path_loss = load_path_loss(self.args, self.args.al_path_loss_file)
         if path_loss is None:
@@ -302,10 +300,9 @@ class PretextTrainer():
         return self.active_learning(path_loss, encoder)
 
     def active_learning(self, path_loss, encoder):
-        pretraining_sample_pool = []
+        core_set = []
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
-        logging.info(f"The size of gen images is {len(pretraining_sample_pool)} while the size of the original data is {len(path_loss)}")
 
         self.args.al_trainer_sample_size = int(0.75 * (len(path_loss))//self.args.al_batches)
         logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
@@ -318,22 +315,22 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
-            # state = simple_load_model(self.args, path=f'{batch-1}_finetuner_{self.dataset}.pth')
-            state = simple_load_model(self.args, path=f'finetuner_{self.dataset}.pth')
+            # state = simple_load_model(self.args, path=f'{batch-1}_bayesian_model_{self.dataset}.pth')
+            state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
             batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
             samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
             batch_sampler_encoder = encoder
 
-            pretraining_sample_pool.extend(samplek)
-            logging.info(f"Size of pretraining_sample_pool is {len(pretraining_sample_pool)}")
+            core_set.extend(samplek)
+            logging.info(f"Size of core-set is {len(core_set)}")
 
-            loader = PretextDataLoader(self.args, pretraining_sample_pool, training_type=TrainingType.TARGET_AL).get_loader()
+            loader = PretextDataLoader(self.args, core_set, training_type=TrainingType.TARGET_AL).get_loader()
             pretrainer = SelfSupPretrainer(self.args, self.writer)
-            pretrainer.base_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
+            pretrainer.source_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-            #     self.finetuner(encoder, prefix=str(batch), path_list=pretraining_sample_pool, training_type=TrainingType.ACTIVE_LEARNING)
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+                self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
 
         
-        return pretraining_sample_pool
+        return core_set

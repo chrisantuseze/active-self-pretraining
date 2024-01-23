@@ -1,6 +1,3 @@
-from datautils.dataset_enum import in_domainnet, get_dataset_info
-from models.active_learning.domain_discriminator import DomainClassifier
-from models.utils.asl_sfda import VirtualAdversarialLoss, entropy_loss, weight_reg_loss
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,8 +17,11 @@ from utils.commons import load_saved_state
 import utils.logger as logging
 import models.trainers.backbone.resnet50 as resnet_models
 
+from datautils.dataset_enum import in_domainnet, get_dataset_info
+from models.trainers.adversarial_loss import VirtualAdversarialLoss, DomainClassifier, entropy_loss, weight_reg_loss
+
 class SwAVTrainer():
-    def __init__(self, args, dataloader, pretrain_level, training_type=TrainingType.BASE_PRETRAIN, log_step=500) -> None:
+    def __init__(self, args, dataloader, pretrain_level, training_type=TrainingType.SOURCE_PRETRAIN, log_step=500) -> None:
         self.args = args
         self.train_loader = dataloader
         self.log_step = log_step
@@ -63,12 +63,13 @@ class SwAVTrainer():
 
         if training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
             self.source_model = encoder
-            state = load_saved_state(args, dataset=get_dataset_info(args.base_dataset)[1], pretrain_level="1")
+            state = load_saved_state(args, dataset=get_dataset_info(args.source_dataset)[1], pretrain_level="1")
             self.source_model.load_state_dict(state['model'], strict=False)
             self.source_model = self.source_model.to(args.device)
             self.source_model.eval()
 
             self.domain_classifier = DomainClassifier(in_feature=128).to(args.device)
+            self.virtual_adv_loss = VirtualAdversarialLoss().to(args.device)
 
     def train_epoch(self, epoch):
 
@@ -152,24 +153,26 @@ class SwAVTrainer():
             if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
                 s_embedding, _ = self.source_model(inputs)
                 src_domain_out = self.domain_classifier(s_embedding)
-
                 tgt_domain_out = self.domain_classifier(embedding_)
 
                 # domain adversarial loss
-                domain_adv_loss = F.binary_cross_entropy(src_domain_out, torch.zeros_like(src_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.ones_like(tgt_domain_out))
-                domain_adv_loss *= 0.6 * 0.5
+                domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
 
-                # domain confusion loss
-                conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
-                conf_loss *= 0.1 * 0.5
+                # virtual adversarial loss
+                vat_loss = self.virtual_adv_loss(self.model, inputs[0])
 
-                # Option 2: Entropy maximization  
-                entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
-                entropy_conf_loss *= 5e-4 * 0.5
+                # entropy minimization loss
+                ent_loss = entropy_loss(output)
 
-                domain_conf_loss = 0.5 * (conf_loss + entropy_conf_loss)
+                # # domain confusion loss
+                # conf_loss = F.binary_cross_entropy(src_domain_out, torch.ones_like(tgt_domain_out)) + F.binary_cross_entropy(tgt_domain_out, torch.zeros_like(src_domain_out)) 
+                # conf_loss *= 0.1 * 0.5
 
-                loss += domain_adv_loss + domain_conf_loss
+                # # Option 2: Entropy maximization  
+                # entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
+                # entropy_conf_loss *= 5e-4 * 0.5
+
+                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss)
 
             #########################################################
 

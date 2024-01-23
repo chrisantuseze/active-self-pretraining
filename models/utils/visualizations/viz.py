@@ -202,13 +202,13 @@ def viz(args):
     #         nmb_prototypes=args.nmb_prototypes,
     #     )
 
-    args.base_dataset = 5
+    args.source_dataset = 5
     args.target_dataset = 6
 
-    source_loader = get_pretrain_ds(args, training_type=TrainingType.BASE_PRETRAIN).get_loader() 
+    source_loader = get_pretrain_ds(args, training_type=TrainingType.SOURCE_PRETRAIN).get_loader() 
     target_loader = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN).get_loader() 
 
-    _, source_ds_name, _ = get_dataset_info(args.base_dataset)
+    _, source_ds_name, _ = get_dataset_info(args.source_dataset)
     source_model = encoder
     state = load_saved_state(args, dataset=source_ds_name, pretrain_level="1")
     source_model.load_state_dict(state['model'], strict=False)
