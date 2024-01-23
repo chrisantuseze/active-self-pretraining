@@ -105,7 +105,7 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
