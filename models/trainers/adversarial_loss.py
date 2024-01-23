@@ -142,9 +142,9 @@ class VirtualAdversarialLoss(nn.Module):
 
         return loss
     
-def entropy_loss(out):
+def entropy_loss(output):
     # return - (p_t * torch.log(p_t + 1e-5)).sum() / p_t.size(0)
-    return (- (out * torch.log(out + 1e-5)).sum(dim=0)).mean()
+    return - (output * torch.log(F.softplus(output))).sum(dim=1).mean()
     
 def _l2_normalize(d):
     d_reshaped = d.view(d.shape[0], -1, *(1 for _ in range(d.dim() - 2)))
