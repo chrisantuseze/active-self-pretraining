@@ -329,8 +329,8 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.source_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
-                self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
+            # if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+            #     self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
 
         
         return core_set
