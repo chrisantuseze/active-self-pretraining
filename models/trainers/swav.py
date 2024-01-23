@@ -160,7 +160,8 @@ class SwAVTrainer():
                 # domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
 
                 # virtual adversarial loss
-                # vat_loss = self.virtual_adv_loss(self.model, inputs[0])
+                vat_loss = self.virtual_adv_loss(self.model, inputs[0])
+                print("vat_loss", vat_loss)
 
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)

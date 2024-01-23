@@ -113,7 +113,7 @@ def office_dataset(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     # classifier = Classifier(args, pretrain_level=f"2_2")
