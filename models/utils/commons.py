@@ -62,7 +62,7 @@ def get_params(args, training_type):
     temperature = args.temperature
     optimizer = args.swav_optimizer
     base_lr = 0.01
-    target_lr = args.swav_base_lr
+    target_lr = args.swav_source_lr
 
     params = {
         TrainingType.ACTIVE_LEARNING: Params(

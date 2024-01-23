@@ -80,7 +80,7 @@ def parse_args():
 
     # swav
     parser.add_argument('--swav_batch_size', default=64, type=int, help='')
-    parser.add_argument('--swav_base_lr', default=2.4, type=int, help='')
+    parser.add_argument('--swav_source_lr', default=2.4, type=int, help='')
     parser.add_argument('--swav_optimizer', default="SwAV", type=str, help='')
 
     parser.add_argument('--crops_for_assign', default=[0, 1], type=int, help='')

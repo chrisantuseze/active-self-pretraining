@@ -13,7 +13,7 @@ temperature: 0.1                              # see appendix B.7.: Optimal tempe
 model_checkpoint_path: "save/checkpoints"     # directory where all checkpoints would be saved
 model_misc_path: "save/misc"                  # directory where all misc files would be saved
 gen_images_path: "generated"
-epoch_num: 50                                 # use to determine the base checkpoint to be used for the AL cycle
+epoch_num: 50                                 # use to determine the source checkpoint to be used for the AL cycle
 reload: False                                 # indicates whether to start the training from the checkpoint or not
 
 # pretrain options
@@ -44,7 +44,7 @@ epoch_queue_starts: 15
 #### optim parameters ###
 #########################
 swav_batch_size: 64
-swav_base_lr: 2.4 #4.8
+swav_source_lr: 2.4 #4.8
 final_lr: 0
 swav_optimizer: "SwAV"
 freeze_prototypes_niters: 313
@@ -67,12 +67,12 @@ checkpoint_freq: 25
 
 ################################ GENERAL ######################################
 seed: 42                                      # sacred handles automatic seeding when passed in the config
-base_epochs: 75
-base_image_size: 256 #40
-base_dataset: 0                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
-base_pretrain: True
+source_epochs: 75
+source_image_size: 256 #40
+source_dataset: 0                               # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
+source_pretrain: True
 
-do_gradual_base_pretrain: True
+do_gradual_source_pretrain: True
 
 momentum: 0.9                                 # momentum of SGD solver
 resume: ""                                    # path to latest checkpoint (default: none)
@@ -84,7 +84,7 @@ log_step: 1000
 target_dataset: 1                             # dataset type. 0 for IMAGENET, 1 for CIFAR10, 2 for CHEST_XRAY, 3 for REAL
 target_epochs: 75 #200                            # this needs to be increased to about 800?? The experiment should start at 100 and then  vary it at an interval of 50
 target_image_size: 256 #80
-target_lr: 1.0e-3                             # we expect the weights from the base pretraining to be good, so we don't want to distort them too quickly and too much.
+target_lr: 1.0e-3                             # we expect the weights from the source pretraining to be good, so we don't want to distort them too quickly and too much.
 target_pretrain: False 
 target_epoch_num: 40
 pretrain_path_loss_file: "pretrain_path_loss.pkl"
