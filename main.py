@@ -45,6 +45,8 @@ def parse_args():
     parser.add_argument('--lc_epochs', default=100, type=int, help='')
     parser.add_argument('--lc_dataset', default=8, type=int, help='')
     parser.add_argument('--lc_optimizer', default="Classifier", type=str, help='')
+    parser.add_argument('--lc_gamma', type=int, default=0.1, help='')
+    parser.add_argument('--lc_final_lr', type=int, default=0, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
@@ -68,6 +70,9 @@ def parse_args():
     parser.add_argument('--momentum', type=float, default=0.9, help='Momentum for SGD')
     parser.add_argument('--weight_decay', type=float, default=1e-6, help='Weight decay for optimizer')
     parser.add_argument('--workers', type=int, default=8, help='')
+    parser.add_argument('--nesterov', type=int, default=False, help='')
+    parser.add_argument('--scheduler_type', type=str, default="cosine", help='')
+    parser.add_argument('--decay_epochs', type=int, default=[60, 80], help='')
     
     parser.add_argument('--log_step', default=200, type=int, help='')
     parser.add_argument('--seed', default=1, type=int, help='')
@@ -108,7 +113,7 @@ def office_dataset(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     # classifier = Classifier(args, pretrain_level=f"2_2")

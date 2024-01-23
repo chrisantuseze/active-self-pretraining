@@ -53,7 +53,7 @@ def load_optimizer(args, params, train_params: Params=None, train_loader=None):
         # set scheduler
         if args.scheduler_type == "step":
             scheduler = torch.optim.lr_scheduler.MultiStepLR(
-                optimizer, args.decay_epochs, gamma=args.gamma
+                optimizer, args.decay_epochs, gamma=args.lc_gamma
             )
         elif args.scheduler_type == "cosine":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
