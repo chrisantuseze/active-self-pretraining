@@ -14,6 +14,7 @@ import utils.logger as logging
 from datautils import dataset_enum
 
 from models.gan.train import do_gen_ai
+from utils.yaml_config_hook import yaml_config_hook
 
 logging.init()
 
@@ -124,7 +125,14 @@ def main(args):
     office_dataset(args, writer)
 
 if __name__ == "__main__":
-    args = parse_args()
+    # args = parse_args()
+
+    parser = argparse.ArgumentParser(description="A3")
+    config = yaml_config_hook("./config/config.yaml")
+    for k, v in config.items():
+        parser.add_argument(f"--{k}", default=v, type=type(v))
+
+    args = parser.parse_args()
     
     os.makedirs(args.model_checkpoint_path, exist_ok=True)
     os.makedirs(args.model_misc_path, exist_ok=True)
