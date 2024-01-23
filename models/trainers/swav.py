@@ -178,6 +178,8 @@ class SwAVTrainer():
                 # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss) + 0.1 * wr_loss
                 loss += 0.1 * (ent_loss) + 0.1 * wr_loss
 
+                print(loss.item())
+
             #########################################################
 
             self.optimizer.zero_grad()
