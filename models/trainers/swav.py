@@ -152,16 +152,16 @@ class SwAVTrainer():
 
             #########################################################
             if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
-                # s_embedding, _ = self.source_model(inputs)
-                # src_domain_out = self.domain_classifier(s_embedding)
-                # tgt_domain_out = self.domain_classifier(embedding_)
+                s_embedding, _ = self.source_model(inputs)
+                src_domain_out = self.domain_classifier(s_embedding)
+                tgt_domain_out = self.domain_classifier(embedding_)
 
                 # domain adversarial loss
-                # domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
+                domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
 
                 # virtual adversarial loss
-                # vat_loss = self.virtual_adv_loss(self.model, inputs[0])
-                # print("vat_loss", vat_loss)
+                vat_loss = self.virtual_adv_loss(self.model, inputs[0])
+                print("vat_loss", vat_loss)
 
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)
@@ -175,9 +175,9 @@ class SwAVTrainer():
                 # entropy_conf_loss *= 5e-4 * 0.5
 
 
-                # loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss) + 0.1 * wr_loss
+                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss + vat_loss) #+ 0.1 * wr_loss
 
-                loss += 1 * ent_loss
+                # loss += 1 * ent_loss
 
             #########################################################
 
