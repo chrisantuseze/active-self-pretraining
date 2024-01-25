@@ -148,8 +148,8 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     # You can change dataset from here for ease
-    args.source_dataset = 4
-    args.target_dataset = 5
+    args.source_dataset = 5
+    args.target_dataset = 6
     args.lc_dataset = args.target_dataset
 
     assert args.target_dataset == args.lc_dataset

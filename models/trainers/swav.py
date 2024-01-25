@@ -174,8 +174,11 @@ class SwAVTrainer():
                 # entropy_conf_loss = -torch.sum(F.log_softmax(src_domain_out, dim=0)) - torch.sum(F.log_softmax(tgt_domain_out, dim=0))
                 # entropy_conf_loss *= 5e-4 * 0.5
 
+                # 
+                wr_loss = weight_reg_loss(self.source_model, self.model)
 
-                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss) #+ vat_loss) #+ 0.1 * wr_loss
+
+                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss) + 0.1 * wr_loss #+ vat_loss) #+ 0.1 * wr_loss
 
                 # loss += 1 * ent_loss
 
