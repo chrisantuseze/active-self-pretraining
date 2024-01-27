@@ -58,7 +58,7 @@ def simple_save_model(args, model, path):
     }
     out = os.path.join(args.model_checkpoint_path, path)
     torch.save(state, out)
-    logging.info("checkpoint saved at {}".format(out))
+    logging.debug("checkpoint saved at {}".format(out))
 
 def simple_load_model(args, path):
     try:

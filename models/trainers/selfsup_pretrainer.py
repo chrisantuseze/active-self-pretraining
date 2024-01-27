@@ -25,7 +25,7 @@ class SelfSupPretrainer:
                 pretrain_level, plevel = f"2_{batch-1}", f"2_{batch}"
             dataset_type = get_dataset_info(self.args.target_dataset)[1]
 
-        logging.info(f"{trainingType.value} pretraining in progress, please wait...")
+        logging.debug(f"{trainingType.value} pretraining in progress, please wait...")
 
         log_step = self.args.log_step
         trainer = SwAVTrainer(
@@ -36,18 +36,11 @@ class SelfSupPretrainer:
         )
 
         model = trainer.model
-        self.args.current_epoch = 0
         for epoch in range(epochs):
             logging.info('\nEpoch {}/{}'.format(epoch, epochs))
             logging.info('-' * 20)
 
             epoch_loss = trainer.train_epoch(epoch)
-
-            # Decay Learning Rate
-            if epoch > 1 and epoch % epochs//2 == 0:
-                save_state(self.args, model, dataset_type, pretrain_level)
-
-            self.args.current_epoch += 1
 
         save_state(self.args, model, dataset_type, pretrain_level=plevel)
 
