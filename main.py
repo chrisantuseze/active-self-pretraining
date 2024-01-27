@@ -111,13 +111,12 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
+    # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
-    # classifier = Classifier(args, pretrain_level=f"2_2")
     classifier.train_and_eval()
 
 def main(args):
@@ -143,7 +142,7 @@ def regular():
     main(args)
 
 def iterative_training(data_type):
-    args.size_crops = [128]
+    # args.size_crops = [128]
     for item in data_type:
         args.source_dataset = item[0]
         args.target_dataset = item[1]
@@ -185,7 +184,7 @@ if __name__ == "__main__":
     office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
 
     # regular()
-    iterative_training(office_home)
+    iterative_training(domain_net)
     # viz(args)
 
     logging.info("A3 ended.")
