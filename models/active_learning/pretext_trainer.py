@@ -85,32 +85,6 @@ class PretextTrainer():
        
         return self.get_new_samples(preds, samples, embeds)
     
-    def get_embeddings(self, model, target_loader, core_set_loader):
-        # get target data embeddings
-        target_embeds = []
-        _preds = []
-        with torch.no_grad():
-            for step, (inputs, _) in enumerate(target_loader):
-                inputs = inputs.to(self.args.device)
-                outputs = model(inputs)
-                target_embeds.append(outputs.detach().cpu())
-                _preds.append(self.get_predictions(outputs))
-
-        preds = torch.cat(_preds).numpy()
-        target_embeds = np.concatenate(target_embeds)
-
-        # get coreset embeddings
-        core_set_embeds = []
-        with torch.no_grad():
-            for step, (inputs, _) in enumerate(core_set_loader):
-                inputs = inputs.to(self.args.device)
-                outputs = model(inputs)
-                core_set_embeds.append(outputs.detach().cpu())
-
-        core_set_embeds = np.concatenate(core_set_embeds)
-
-        return preds, target_embeds, core_set_embeds
-    
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
         preds = dist1.detach().cpu()
@@ -133,9 +107,6 @@ class PretextTrainer():
         indices = self.get_diverse(entropy, embeds)
 
         new_samples = [samples[i] for i in indices]
-
-        logging.info("Size of new samples", len(new_samples))
-
         return new_samples
     
     def get_diverse(self, entropy, embeds):
