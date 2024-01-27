@@ -64,6 +64,8 @@ class PretextTrainer():
         logging.info(f"Generating the sample weights")
 
         model, _ = get_model_criterion(self.args, model, num_classes=4)
+        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
+        model.load_state_dict(state['model'], strict=False)
 
         model = model.to(self.args.device)
         model.eval()
@@ -416,9 +418,6 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
-            state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
-            batch_sampler_encoder.load_state_dict(state['model'], strict=False)
-
             if len(core_set) == 0:
                 core_set = sampled_data
 
