@@ -120,22 +120,23 @@ class PretextTrainer():
         entropy = -(preds * np.log(preds)).sum(axis=1)
         cluster_dists = self.get_diverse(k=self.num_classes + 10, target_embeds=target_embeds, core_set_embeds=core_set_embeds)
 
-        # print("entropy", entropy)
-        # print("cluster_dists", cluster_dists)
-
         # Find indices with small values in entropy
-        threshold_ent = np.mean(entropy)
-        entropy_indices = np.where(entropy < threshold_ent)[0]  # Replace 'threshold_A' with your desired threshold
-
+        mean_value = np.mean(entropy)
+        std_dev = np.std(entropy)
+        threshold_ent = mean_value + std_dev
+        entropy_indices = np.where(entropy < threshold_ent)[0]
+        
         # Find indices with large values in cluster_dists
-        beta = 0.5 
+        mean_value = np.mean(cluster_dists)
+        std_dev = np.std(cluster_dists)
+        threshold_dists = mean_value + std_dev
+        # print("threshold_dists", threshold_dists)
+
+        beta = 2.5
         cluster_dists *= beta
-        threshold_dists = np.mean(cluster_dists)
         dists_indices = np.where(cluster_dists > threshold_dists)[0]
 
-        # Find the intersection of indices -> Combine BALD and distance
         bald_div_scores = np.intersect1d(entropy_indices, dists_indices)
-
         indices = bald_div_scores.argsort(axis=0)[::-1]
 
         new_samples = []
@@ -418,12 +419,14 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
-            if len(core_set) == 0:
+            if batch == 0:
                 core_set = sampled_data
 
             samplek = self.batch_sampler(batch_sampler_encoder, sampled_data, core_set)
             batch_sampler_encoder = encoder
 
+            if batch == 0:
+                core_set = []
             core_set.extend(samplek)
             logging.info(f"Size of core-set is {len(core_set)}")
 
