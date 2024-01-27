@@ -172,12 +172,6 @@ def pil_loader(path):
             img = Image.open(f)
             return img.convert('RGB')
 
-def get_accuracy_file_ext(args):
-    if args.do_gradual_base_pretrain and args.base_pretrain:
-        return f'_{args.al_trainer_sample_size}'
-
-    return ''
-
 def get_dataset(data_dir):
     samples = glob.glob(f'{data_dir}/*/*')
 

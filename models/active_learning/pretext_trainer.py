@@ -408,7 +408,7 @@ class PretextTrainer():
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
 
         self.args.al_trainer_sample_size = int(0.75 * (len(path_loss))//self.args.al_batches)
-        logging.info(f"Using a pretrain size of {self.args.al_trainer_sample_size} per AL batch.")
+        logging.info(f"Total size of target dataset is ", len(path_loss))
 
         sample_per_batch = len(path_loss)//self.args.al_batches
         batch_sampler_encoder = encoder
