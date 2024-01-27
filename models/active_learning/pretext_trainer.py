@@ -8,6 +8,7 @@ from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
 from sklearn.cluster import KMeans
+from sklearn.metrics.pairwise import euclidean_distances
 import copy
 
 from datautils.path_loss import PathLoss
@@ -120,35 +121,35 @@ class PretextTrainer():
     def get_new_samples(self, preds, samples, target_embeds, core_set_embeds) -> List[PathLoss]:
         preds += 3
         entropy = -(preds * np.log(preds)).sum(axis=1)        
-        cluster_dists = self.get_diverse(entropy, target_embeds, core_set_embeds)
+        indices = self.get_diverse(entropy, target_embeds)
 
-        # # Find indices with small values in entropy
-        # mean_value = np.mean(entropy)
-        # std_dev = np.std(entropy)
-        # threshold_ent = mean_value + 2 * std_dev
-        # entropy_indices = np.where(entropy < threshold_ent)[0]
-        
-        # Find indices with large values in cluster_dists
-        mean_value = np.mean(cluster_dists)
-        std_dev = np.std(cluster_dists)
-        threshold_dists = mean_value - std_dev
-        # print("threshold_dists", threshold_dists)
-
-        bald_div_scores = np.where(cluster_dists > threshold_dists)[0]
-
-        # bald_div_scores = np.intersect1d(entropy_indices, dists_indices)
-        
-        indices = bald_div_scores.argsort(axis=0)[::-1]
-
-        new_samples = []
-        for item in indices:
-            new_samples.append(samples[item]) # Map back to original indices
+        new_samples = [samples[i] for i in indices]
 
         logging.info("Size of new samples", len(new_samples))
 
         return new_samples
     
-    def get_diverse(self, entropy, target_embeds, core_set_embeds):
+    def get_diverse(self, entropy, target_embeds):
+        # Cluster coreset into k clusters 
+        k = self.args.sampling_size
+        kmeans = KMeans(n_clusters=k)  
+        kmeans.fit(target_embeds, sample_weight=entropy)
+
+        # Find nearest neighbors to inferred centroids
+        dists = euclidean_distances(kmeans.cluster_centers_, target_embeds)
+        sort_idxs = dists.argsort(axis=1)
+
+        q_idxs = []
+        ax, rem = 0, k
+        while rem > 0:
+            q_idxs.extend(list(sort_idxs[:, ax][:rem]))
+            q_idxs = list(set(q_idxs))
+            rem = k-len(q_idxs)
+            ax += 1
+
+        return q_idxs
+    
+    def get_diverse_old(self, entropy, target_embeds, core_set_embeds):
         # Cluster coreset into k clusters 
         kmeans = KMeans(n_clusters=self.n_pretext_classes+2)  
         kmeans.fit(target_embeds, sample_weight=entropy)
@@ -409,7 +410,7 @@ class PretextTrainer():
 
         path_loss = path_loss[::-1] # this does a reverse active learning to pick only the most certain data
 
-        self.args.al_trainer_sample_size = int(0.75 * (len(path_loss))//self.args.al_batches)
+        self.args.sampling_size = int(0.75 * (len(path_loss))//self.args.al_batches)
         logging.info(f"Total size of target dataset is ", len(path_loss))
 
         sample_per_batch = len(path_loss)//self.args.al_batches

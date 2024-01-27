@@ -54,7 +54,7 @@ def parse_args():
     parser.add_argument('--al_lr', default=0.1, type=float, help='')
     parser.add_argument('--al_epochs', default=25, type=int, help='')
     parser.add_argument('--al_weight_decay', default=5.0e-4, type=float, help='')
-    parser.add_argument('--al_trainer_sample_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
+    parser.add_argument('--sampling_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
     parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
     parser.add_argument('--al_batches', default=5, type=int, help='specifies the number of AL iterations')
     parser.add_argument('--al_bayesian_model_batch_size', default=64, type=int, help='')
@@ -162,6 +162,7 @@ if __name__ == "__main__":
         args.lc_batch_size = 256
         args.lc_lr = 0.5
         args.al_batches = 2
+        args.lc_epochs = 120
 
     main(args)
     # viz(args)
