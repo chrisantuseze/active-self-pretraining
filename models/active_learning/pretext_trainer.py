@@ -1,7 +1,4 @@
-import glob
-import os
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import time
 import numpy as np
@@ -10,8 +7,8 @@ from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from optim.optimizer import load_optimizer
 import utils.logger as logging
 from typing import List
+from sklearn.cluster import KMeans
 import copy
-import random
 
 from datautils.path_loss import PathLoss
 from datautils.target_dataset import get_pretrain_ds
@@ -20,7 +17,7 @@ from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import AverageMeter, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_chkpts, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
+from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
@@ -36,11 +33,13 @@ class PretextTrainer():
         self.n_features = get_feature_dimensions_backbone(self.args)
         self.num_classes, self.dataset, self.dir = get_dataset_info(self.args.target_dataset)
 
-    def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
+    def batch_sampler_entropy_only(self, model, samples: List[PathLoss]) -> List[PathLoss]:
         loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
         logging.info(f"Generating the top1 scores using")
         _preds = []
+
+        model, _ = get_model_criterion(self.args, model, num_classes=4)
 
         model = model.to(self.args.device)
         model.eval()
@@ -56,16 +55,58 @@ class PretextTrainer():
 
         preds = torch.cat(_preds).numpy()
        
-        return self.get_new_samples(preds, samples)
+        return self.get_new_samples_entropy_only(preds, samples)
 
+    def batch_sampler(self, model, samples: List[PathLoss], coreset: List[PathLoss]) -> List[PathLoss]:
+        target_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
+        core_set_loader = PretextDataLoader(self.args, coreset, is_val=True, batch_size=1).get_loader()
+
+        logging.info(f"Generating the sample weights")
+
+        model, _ = get_model_criterion(self.args, model, num_classes=4)
+
+        model = model.to(self.args.device)
+        model.eval()
+
+        preds, target_embeds, core_set_embeds = self.get_embeddings(model, target_loader, core_set_loader)
+       
+        return self.get_new_samples(preds, samples, target_embeds, core_set_embeds)
+    
+    def get_embeddings(self, model, target_loader, core_set_loader):
+
+        # get target data embeddings
+        target_embeds = []
+        _preds = []
+        with torch.no_grad():
+            for step, (inputs, _) in enumerate(target_loader):
+                inputs = inputs.to(self.args.device)
+                outputs = model(inputs)
+                target_embeds.append(outputs)
+                _preds.append(self.get_predictions(outputs))
+
+        preds = torch.cat(_preds).numpy()
+        target_embeds = np.concatenate(target_embeds)
+
+        # get coreset embeddings
+        core_set_embeds = []
+        with torch.no_grad():
+            for step, (inputs, _) in enumerate(core_set_loader):
+                inputs = inputs.to(self.args.device)
+                outputs = model(inputs)
+                core_set_embeds.append(outputs)
+
+        core_set_embeds = np.concatenate(core_set_embeds)
+
+        return preds, target_embeds, core_set_embeds
+    
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
         preds = dist1.detach().cpu()
 
         return preds
 
-    def get_new_samples(self, preds, samples) -> List[PathLoss]:
-        entropy = (np.log(preds) * preds).sum(axis=1) * -1.
+    def get_new_samples_entropy_only(self, preds, samples) -> List[PathLoss]:
+        entropy = -(preds * np.log(preds)).sum(axis=1)
         indices = entropy.argsort(axis=0)[::-1]
 
         new_samples = []
@@ -73,6 +114,67 @@ class PretextTrainer():
             new_samples.append(samples[item]) # Map back to original indices
 
         return new_samples
+
+    def get_new_samples(self, preds, samples, target_embeds, core_set_embeds) -> List[PathLoss]:
+        entropy = -(preds * np.log(preds)).sum(axis=1)
+        cluster_dists = self.get_diverse(k=self.num_classes + 10, target_embeds=target_embeds, core_set_embeds=core_set_embeds)
+
+        # print("entropy", entropy)
+        # print("cluster_dists", cluster_dists)
+
+        # Find indices with small values in entropy
+        threshold_ent = np.mean(entropy)
+        entropy_indices = np.where(entropy < threshold_ent)[0]  # Replace 'threshold_A' with your desired threshold
+
+        # Find indices with large values in cluster_dists
+        beta = 0.5 
+        cluster_dists *= beta
+        threshold_dists = np.mean(cluster_dists)
+        dists_indices = np.where(cluster_dists > threshold_dists)[0]
+
+        # Find the intersection of indices -> Combine BALD and distance
+        bald_div_scores = np.intersect1d(entropy_indices, dists_indices)
+
+        indices = bald_div_scores.argsort(axis=0)[::-1]
+
+        new_samples = []
+        for item in indices:
+            new_samples.append(samples[item]) # Map back to original indices
+
+        logging.info("Size of new samples", len(new_samples))
+
+        return new_samples
+    
+    def get_diverse(self, k, target_embeds, core_set_embeds):
+        # Cluster coreset into k clusters 
+        kmeans = KMeans(n_clusters=k)  
+        kmeans.fit(core_set_embeds)
+
+        # Get cluster assignment for each coreset point
+        coreset_clusters = kmeans.predict(core_set_embeds)
+
+        # Get cluster assignment for each target point
+        x_clusters = kmeans.predict(target_embeds)
+
+        # Distances to cluster centroids
+        cluster_dists = [] 
+
+        # Distances from target x to coreset
+        for i, x in enumerate(target_embeds):
+            min_dist = float('inf')
+        
+            # Get assigned cluster for x
+            x_cluster = x_clusters[i]
+            
+            # Compute distance to closest point in assigned coreset cluster
+            for c in core_set_embeds[coreset_clusters == x_cluster]:  
+                min_dist = min(min_dist, np.linalg.norm(x - c))
+
+            cluster_dists.append(min_dist) 
+
+        cluster_dists = np.array(cluster_dists)
+
+        return cluster_dists
 
     def make_batches(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
         loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
@@ -318,7 +420,10 @@ class PretextTrainer():
             state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
             batch_sampler_encoder.load_state_dict(state['model'], strict=False)
 
-            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)[:self.args.al_trainer_sample_size]
+            if len(core_set) == 0:
+                core_set = sampled_data
+                
+            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data, core_set)
             batch_sampler_encoder = encoder
 
             core_set.extend(samplek)

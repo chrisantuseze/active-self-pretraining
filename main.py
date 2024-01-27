@@ -147,9 +147,11 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
+    domain_net = [(0, 2), (0, 3),  (1, 0), (1, 2), (1, 3),  (2, 0), (2, 1), (2, 3),  (3, 0), (3, 2)]
+
     # You can change dataset from here for ease
-    args.source_dataset = 3
-    args.target_dataset = 1
+    args.source_dataset = 4 #3
+    args.target_dataset = 5 #1
     args.lc_dataset = args.target_dataset
 
     assert args.target_dataset == args.lc_dataset
