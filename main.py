@@ -143,6 +143,7 @@ def regular():
     main(args)
 
 def iterative_training(data_type):
+    args.size_crops = [128]
     for item in data_type:
         args.source_dataset = item[0]
         args.target_dataset = item[1]
