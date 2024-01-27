@@ -67,7 +67,7 @@ def get_params(args, training_type):
     params = {
         TrainingType.ACTIVE_LEARNING: Params(
             batch_size=32, #args.al_finetune_batch_size, 
-            image_size=64, 
+            image_size=args.target_image_size, 
             lr=args.al_lr, 
             epochs=args.al_epochs,
             optimizer=args.al_optimizer,
