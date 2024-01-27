@@ -20,18 +20,22 @@ def init():
 
     sys.excepthook = handle_exception
     
-def debug(message: str):
-    print(message)
-    logging.debug(message)
+def debug(*args):
+    result = ' '.join(map(str, args))
+    print(result)
+    logging.debug(result)
 
-def info(message: str):
-    print(message)
-    logging.info(message)
+def info(*args):
+    result = ' '.join(map(str, args))
+    print(result)
+    logging.info(result)
 
-def warn(message: str):
-    print(message)
-    logging.warn(message)
+def warn(*args):
+    result = ' '.join(map(str, args))
+    print(result)
+    logging.warn(result)
 
-def error(message: str):
-    print(message)
-    logging.error(message)
+def error(*args):
+    result = ' '.join(map(str, args))
+    print(result)
+    logging.error(result)
