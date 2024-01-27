@@ -154,6 +154,8 @@ if __name__ == "__main__":
     args.target_dataset = 5 #1
     args.lc_dataset = args.target_dataset
 
+    args.size_crops = [128]
+
     assert args.target_dataset == args.lc_dataset
 
     if dataset_enum.in_domainnet(args.lc_dataset):
