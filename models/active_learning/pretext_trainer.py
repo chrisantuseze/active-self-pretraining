@@ -129,10 +129,10 @@ class PretextTrainer():
         # Find indices with large values in cluster_dists
         mean_value = np.mean(cluster_dists)
         std_dev = np.std(cluster_dists)
-        threshold_dists = mean_value + std_dev
+        threshold_dists = mean_value - std_dev
         # print("threshold_dists", threshold_dists)
 
-        beta = 2.5
+        beta = 0.5
         cluster_dists *= beta
         dists_indices = np.where(cluster_dists > threshold_dists)[0]
 
