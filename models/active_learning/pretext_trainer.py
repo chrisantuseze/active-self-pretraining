@@ -116,7 +116,7 @@ class PretextTrainer():
 
         # Find nearest neighbors to inferred centroids
         dists = euclidean_distances(kmeans.cluster_centers_, embeds)
-        sort_idxs = dists.argsort(axis=1)
+        sort_idxs = dists.argsort(axis=1)[::-1]
 
         q_idxs = []
         ax, rem = 0, k
