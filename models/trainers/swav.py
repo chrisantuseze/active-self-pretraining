@@ -166,10 +166,7 @@ class SwAVTrainer():
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)
 
-                # 
-                wr_loss = weight_reg_loss(self.source_model, self.model)
-
-                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss) + 0.1 * wr_loss #+ vat_loss) #+ 0.1 * wr_loss
+                loss += 0.6 * domain_adv_loss + 0.1 * (ent_loss) #+ vat_loss)
 
             #########################################################
 

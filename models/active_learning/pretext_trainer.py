@@ -93,7 +93,7 @@ class PretextTrainer():
 
     def get_new_samples_entropy_only(self, preds, samples) -> List[PathLoss]:
         entropy = -(preds * np.log(preds)).sum(axis=1)
-        indices = entropy.argsort(axis=0)[::-1]
+        indices = entropy.argsort(axis=0)[::-1] # sort in descending order
 
         new_samples = []
         for item in indices:
@@ -366,11 +366,10 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        # simple_save_model(self.args, self.best_model, f'{prefix}_bayesian_model_{self.dataset}.pth')
         simple_save_model(self.args, self.best_model, f'bayesian_model_{self.dataset}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
-        logging.info(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
+        logging.debug(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
         # state = simple_load_model(self.args, path=f'first_bayesian_model_{self.dataset}.pth')
@@ -396,7 +395,7 @@ class PretextTrainer():
         batch_sampler_encoder = encoder
 
         for batch in range(self.args.al_batches):
-            logging.info(f'>> Batch {batch}')
+            logging.debug(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling

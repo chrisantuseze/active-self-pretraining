@@ -111,7 +111,7 @@ def office_dataset(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
@@ -123,6 +123,38 @@ def office_dataset(args, writer):
 def main(args):
     writer = None
     office_dataset(args, writer)
+
+def regular():
+    if dataset_enum.in_domainnet(args.lc_dataset):
+        args.lc_batch_size = 256
+        args.lc_lr = 0.5
+        args.al_batches = 2
+        args.lc_epochs = 170
+
+    # You can change dataset from here for ease
+    args.source_dataset = 4 #3
+    args.target_dataset = 5 #1
+    args.lc_dataset = args.target_dataset
+
+    args.size_crops = [128]
+
+    assert args.target_dataset == args.lc_dataset
+
+    main(args)
+
+def iterative_training(data_type):
+    for item in data_type:
+        args.source_dataset = item[0]
+        args.target_dataset = item[1]
+        args.lc_dataset = args.target_dataset
+
+        if dataset_enum.in_domainnet(args.lc_dataset):
+            args.lc_batch_size = 256
+            args.lc_lr = 0.5
+            args.al_batches = 2
+            args.lc_epochs = 160
+
+        main(args)
 
 if __name__ == "__main__":
     # args = parse_args()
@@ -147,25 +179,12 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
-    domain_net = [(0, 2), (0, 3),  (1, 0), (1, 2), (1, 3),  (2, 0), (2, 1), (2, 3),  (3, 0), (3, 2)]
+    domain_net  = [(0, 2),(0, 3),  (1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3),  (3, 0),(3, 2)]
+    office_31   = [(4, 5),(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
+    office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
 
-    # You can change dataset from here for ease
-    args.source_dataset = 4 #3
-    args.target_dataset = 5 #1
-    args.lc_dataset = args.target_dataset
-
-    args.size_crops = [128]
-
-    assert args.target_dataset == args.lc_dataset
-
-    if dataset_enum.in_domainnet(args.lc_dataset):
-        args.lc_batch_size = 256
-        args.lc_lr = 0.5
-        args.al_batches = 2
-        args.lc_epochs = 120
-
-    main(args)
+    # regular()
+    iterative_training(office_home)
     # viz(args)
 
     logging.info("A3 ended.")
-

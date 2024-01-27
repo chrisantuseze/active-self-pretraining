@@ -64,8 +64,8 @@ class Classifier:
                 self.scheduler.step()
 
         time_elapsed = time.time() - since
-        logging.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        logging.info('Best val accuracy: {:3f}'.format(self.best_acc))
+        logging.debug('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        logging.debug('Best val accuracy: {:3f}'.format(self.best_acc))
 
         simple_save_model(self.args, self.best_model, 'classifier_{:4f}_acc.pth'.format(self.best_acc))
 

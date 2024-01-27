@@ -81,47 +81,47 @@ def get_pretrain_ds(args, training_type=TrainingType.SOURCE_PRETRAIN, is_train=T
         dataset_type = args.target_dataset
 
     if dataset_type == dataset_enum.DatasetType.CLIPART.value:
-        print("using the CLIPART dataset")
+        logging.debug("using the CLIPART dataset")
         return TargetDataset(args, "/clipart", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.SKETCH.value:
-        print("using the SKETCH dataset")
+        logging.debug("using the SKETCH dataset")
         return TargetDataset(args, "/sketch", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     elif dataset_type == dataset_enum.DatasetType.REAL.value:
-        print("using the REAL dataset")
+        logging.debug("using the REAL dataset")
         return TargetDataset(args, "/real", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     elif dataset_type == dataset_enum.DatasetType.AMAZON.value:
-        print("using the Office-31 AMAZON dataset")
+        logging.debug("using the Office-31 AMAZON dataset")
         return TargetDataset(args, "/office-31/amazon/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.WEBCAM.value:
-        print("using the Office-31 WEBCAM dataset")
+        logging.debug("using the Office-31 WEBCAM dataset")
         return TargetDataset(args, "/office-31/webcam/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.DSLR.value:
-        print("using the Office-31 DSLR dataset")
+        logging.debug("using the Office-31 DSLR dataset")
         return TargetDataset(args, "/office-31/dslr/images", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.PAINTING.value:
-        print("using the PAINTING dataset")
+        logging.debug("using the PAINTING dataset")
         return TargetDataset(args, "/painting", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.ARTISTIC.value:
-        print("using the OfficeHome ARTISTIC dataset")
+        logging.debug("using the OfficeHome ARTISTIC dataset")
         return TargetDataset(args, "/officehome/artistic", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.CLIP_ART.value:
-        print("using the OfficeHome CLIP_ART dataset")
+        logging.debug("using the OfficeHome CLIP_ART dataset")
         return TargetDataset(args, "/officehome/clip_art", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.PRODUCT.value:
-        print("using the OfficeHome PRODUCT dataset")
+        logging.debug("using the OfficeHome PRODUCT dataset")
         return TargetDataset(args, "/officehome/product", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
 
     elif dataset_type == dataset_enum.DatasetType.REAL_WORLD.value:
-        print("using the OfficeHome REAL_WORLD dataset")
+        logging.debug("using the OfficeHome REAL_WORLD dataset")
         return TargetDataset(args, "/officehome/real_world", training_type, with_train=False, is_train=is_train, batch_size=batch_size)
     
     else:
