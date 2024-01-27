@@ -121,7 +121,6 @@ class PretextTrainer():
         preds += 3
         entropy = -(preds * np.log(preds)).sum(axis=1)        
         cluster_dists = self.get_diverse(entropy, target_embeds, core_set_embeds)
-        print("cluster_dists", cluster_dists)
 
         # # Find indices with small values in entropy
         # mean_value = np.mean(entropy)
@@ -133,7 +132,7 @@ class PretextTrainer():
         mean_value = np.mean(cluster_dists)
         std_dev = np.std(cluster_dists)
         threshold_dists = mean_value - std_dev
-        print("threshold_dists", threshold_dists)
+        # print("threshold_dists", threshold_dists)
 
         bald_div_scores = np.where(cluster_dists > threshold_dists)[0]
 
@@ -156,11 +155,9 @@ class PretextTrainer():
 
         # Get cluster assignment for each coreset point
         coreset_clusters = kmeans.predict(core_set_embeds)
-        print("coreset_clusters", coreset_clusters[:5])
 
         # Get cluster assignment for each target point
         x_clusters = kmeans.predict(target_embeds)
-        print("x_clusters", x_clusters[:5])
 
         # Distances to cluster centroids
         cluster_dists = [] 
