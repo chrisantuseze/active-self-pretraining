@@ -73,7 +73,6 @@ class PretextTrainer():
         return self.get_new_samples(preds, samples, target_embeds, core_set_embeds)
     
     def get_embeddings(self, model, target_loader, core_set_loader):
-
         # get target data embeddings
         target_embeds = []
         _preds = []
@@ -81,7 +80,7 @@ class PretextTrainer():
             for step, (inputs, _) in enumerate(target_loader):
                 inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
-                target_embeds.append(outputs)
+                target_embeds.append(outputs.detach().cpu())
                 _preds.append(self.get_predictions(outputs))
 
         preds = torch.cat(_preds).numpy()
@@ -93,7 +92,7 @@ class PretextTrainer():
             for step, (inputs, _) in enumerate(core_set_loader):
                 inputs = inputs.to(self.args.device)
                 outputs = model(inputs)
-                core_set_embeds.append(outputs)
+                core_set_embeds.append(outputs.detach().cpu())
 
         core_set_embeds = np.concatenate(core_set_embeds)
 
@@ -422,7 +421,7 @@ class PretextTrainer():
 
             if len(core_set) == 0:
                 core_set = sampled_data
-                
+
             samplek = self.batch_sampler(batch_sampler_encoder, sampled_data, core_set)
             batch_sampler_encoder = encoder
 
