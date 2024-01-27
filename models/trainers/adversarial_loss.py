@@ -147,6 +147,7 @@ def entropy_loss(output):
     # return - (output * torch.log(F.softplus(output))).sum(dim=1).mean()
     
     return - (output * torch.log(output + 3)).sum(dim=1).mean()
+
 def _l2_normalize(d):
     d_reshaped = d.view(d.shape[0], -1, *(1 for _ in range(d.dim() - 2)))
     d /= torch.norm(d_reshaped, dim=1, keepdim=True) + 1e-8

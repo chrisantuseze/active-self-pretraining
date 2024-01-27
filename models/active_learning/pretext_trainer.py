@@ -29,6 +29,7 @@ class PretextTrainer():
         self.best_trainer_acc = 0
         self.val_acc_history = []
         self.best_model = None
+        self.n_pretext_classes = 4
 
         self.n_features = get_feature_dimensions_backbone(self.args)
         self.num_classes, self.dataset, self.dir = get_dataset_info(self.args.target_dataset)
@@ -39,7 +40,7 @@ class PretextTrainer():
         logging.info(f"Generating the top1 scores using")
         _preds = []
 
-        model, _ = get_model_criterion(self.args, model, num_classes=4)
+        model, _ = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
 
         model = model.to(self.args.device)
         model.eval()
@@ -63,7 +64,7 @@ class PretextTrainer():
 
         logging.info(f"Generating the sample weights")
 
-        model, _ = get_model_criterion(self.args, model, num_classes=4)
+        model, _ = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
         state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
 
@@ -117,26 +118,27 @@ class PretextTrainer():
         return new_samples
 
     def get_new_samples(self, preds, samples, target_embeds, core_set_embeds) -> List[PathLoss]:
-        entropy = -(preds * np.log(preds)).sum(axis=1)
-        cluster_dists = self.get_diverse(k=self.num_classes + 10, target_embeds=target_embeds, core_set_embeds=core_set_embeds)
+        preds += 3
+        entropy = -(preds * np.log(preds)).sum(axis=1)        
+        cluster_dists = self.get_diverse(entropy, target_embeds, core_set_embeds)
+        print("cluster_dists", cluster_dists)
 
-        # Find indices with small values in entropy
-        mean_value = np.mean(entropy)
-        std_dev = np.std(entropy)
-        threshold_ent = mean_value + std_dev
-        entropy_indices = np.where(entropy < threshold_ent)[0]
+        # # Find indices with small values in entropy
+        # mean_value = np.mean(entropy)
+        # std_dev = np.std(entropy)
+        # threshold_ent = mean_value + 2 * std_dev
+        # entropy_indices = np.where(entropy < threshold_ent)[0]
         
         # Find indices with large values in cluster_dists
         mean_value = np.mean(cluster_dists)
         std_dev = np.std(cluster_dists)
         threshold_dists = mean_value - std_dev
-        # print("threshold_dists", threshold_dists)
+        print("threshold_dists", threshold_dists)
 
-        beta = 0.5
-        cluster_dists *= beta
-        dists_indices = np.where(cluster_dists > threshold_dists)[0]
+        bald_div_scores = np.where(cluster_dists > threshold_dists)[0]
 
-        bald_div_scores = np.intersect1d(entropy_indices, dists_indices)
+        # bald_div_scores = np.intersect1d(entropy_indices, dists_indices)
+        
         indices = bald_div_scores.argsort(axis=0)[::-1]
 
         new_samples = []
@@ -147,16 +149,18 @@ class PretextTrainer():
 
         return new_samples
     
-    def get_diverse(self, k, target_embeds, core_set_embeds):
+    def get_diverse(self, entropy, target_embeds, core_set_embeds):
         # Cluster coreset into k clusters 
-        kmeans = KMeans(n_clusters=k)  
-        kmeans.fit(core_set_embeds)
+        kmeans = KMeans(n_clusters=self.n_pretext_classes+2)  
+        kmeans.fit(target_embeds, sample_weight=entropy)
 
         # Get cluster assignment for each coreset point
         coreset_clusters = kmeans.predict(core_set_embeds)
+        print("coreset_clusters", coreset_clusters[:5])
 
         # Get cluster assignment for each target point
         x_clusters = kmeans.predict(target_embeds)
+        print("x_clusters", x_clusters[:5])
 
         # Distances to cluster centroids
         cluster_dists = [] 
@@ -172,6 +176,7 @@ class PretextTrainer():
             for c in core_set_embeds[coreset_clusters == x_cluster]:  
                 min_dist = min(min_dist, np.linalg.norm(x - c))
 
+
             cluster_dists.append(min_dist) 
 
         cluster_dists = np.array(cluster_dists)
@@ -181,8 +186,7 @@ class PretextTrainer():
     def make_batches(self, model, prefix, training_type=TrainingType.ACTIVE_LEARNING):
         loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
-        model, criterion = get_model_criterion(self.args, model, num_classes=4)
-        # state = simple_load_model(self.args, path=f'{prefix}_bayesian_model_{self.dataset}.pth')
+        model, criterion = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
         state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
@@ -352,7 +356,7 @@ class PretextTrainer():
         else:
             train_loader, test_loader = get_pretrain_ds(self.args, training_type=training_type).get_bm_loaders()
 
-        model, criterion = get_model_criterion(self.args, model, num_classes=4)
+        model, criterion = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
         state = None
         if prefix == "first":
             state = load_saved_state(self.args, dataset=get_dataset_info(self.args.source_dataset)[1], pretrain_level="1")
