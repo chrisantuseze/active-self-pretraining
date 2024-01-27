@@ -59,22 +59,31 @@ class PretextTrainer():
        
         return self.get_new_samples_entropy_only(preds, samples)
 
-    def batch_sampler(self, model, samples: List[PathLoss], coreset: List[PathLoss]) -> List[PathLoss]:
-        target_loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
-        core_set_loader = PretextDataLoader(self.args, coreset, is_val=True, batch_size=1).get_loader()
+    def batch_sampler(self, model, samples: List[PathLoss]) -> List[PathLoss]:
+        loader = PretextDataLoader(self.args, samples, is_val=True, batch_size=1).get_loader()
 
         logging.info(f"Generating the sample weights")
 
         model, _ = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
         state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         model.load_state_dict(state['model'], strict=False)
-
         model = model.to(self.args.device)
         model.eval()
 
-        preds, target_embeds, core_set_embeds = self.get_embeddings(model, target_loader, core_set_loader)
+        # get data embeddings
+        embeds = []
+        _preds = []
+        with torch.no_grad():
+            for step, (inputs, _) in enumerate(loader):
+                inputs = inputs.to(self.args.device)
+                outputs = model(inputs)
+                embeds.append(outputs.detach().cpu())
+                _preds.append(self.get_predictions(outputs))
+
+        preds = torch.cat(_preds).numpy()
+        embeds = np.concatenate(embeds)
        
-        return self.get_new_samples(preds, samples, target_embeds, core_set_embeds)
+        return self.get_new_samples(preds, samples, embeds)
     
     def get_embeddings(self, model, target_loader, core_set_loader):
         # get target data embeddings
@@ -118,10 +127,10 @@ class PretextTrainer():
 
         return new_samples
 
-    def get_new_samples(self, preds, samples, target_embeds, core_set_embeds) -> List[PathLoss]:
+    def get_new_samples(self, preds, samples, embeds) -> List[PathLoss]:
         preds += 3
         entropy = -(preds * np.log(preds)).sum(axis=1)        
-        indices = self.get_diverse(entropy, target_embeds)
+        indices = self.get_diverse(entropy, embeds)
 
         new_samples = [samples[i] for i in indices]
 
@@ -129,14 +138,13 @@ class PretextTrainer():
 
         return new_samples
     
-    def get_diverse(self, entropy, target_embeds):
-        # Cluster coreset into k clusters 
+    def get_diverse(self, entropy, embeds):
         k = self.args.sampling_size
         kmeans = KMeans(n_clusters=k)  
-        kmeans.fit(target_embeds, sample_weight=entropy)
+        kmeans.fit(embeds, sample_weight=entropy)
 
         # Find nearest neighbors to inferred centroids
-        dists = euclidean_distances(kmeans.cluster_centers_, target_embeds)
+        dists = euclidean_distances(kmeans.cluster_centers_, embeds)
         sort_idxs = dists.argsort(axis=1)
 
         q_idxs = []
@@ -421,14 +429,9 @@ class PretextTrainer():
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
-            if batch == 0:
-                core_set = sampled_data
-
-            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data, core_set)
+            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)
             batch_sampler_encoder = encoder
 
-            if batch == 0:
-                core_set = []
             core_set.extend(samplek)
             logging.info(f"Size of core-set is {len(core_set)}")
 
