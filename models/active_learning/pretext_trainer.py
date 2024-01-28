@@ -83,7 +83,7 @@ class PretextTrainer():
         preds = torch.cat(_preds).numpy()
         embeds = np.concatenate(embeds)
        
-        return self.get_new_samples_entropy_only(preds, samples, embeds)
+        return self.get_new_samples_entropy_only(preds, samples)
     
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
