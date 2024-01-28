@@ -83,7 +83,7 @@ class PretextTrainer():
         preds = torch.cat(_preds).numpy()
         embeds = np.concatenate(embeds)
        
-        return self.get_new_samples(preds, samples, embeds)
+        return self.get_new_samples_entropy_only(preds, samples, embeds)
     
     def get_predictions(self, outputs):
         dist1 = F.softmax(outputs, dim=1)
@@ -99,7 +99,7 @@ class PretextTrainer():
         for item in indices:
             new_samples.append(samples[item]) # Map back to original indices
 
-        return new_samples
+        return new_samples[-self.args.sampling_size:]
 
     def get_new_samples(self, preds, samples, embeds) -> List[PathLoss]:
         preds += 3
@@ -369,10 +369,9 @@ class PretextTrainer():
         simple_save_model(self.args, self.best_model, f'bayesian_model_{self.dataset}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
-        logging.debug(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
+        logging.info_x(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        # state = simple_load_model(self.args, path=f'first_bayesian_model_{self.dataset}.pth')
         state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
         if not state:
             self.bayesian_model(encoder, prefix='first')
@@ -395,7 +394,7 @@ class PretextTrainer():
         batch_sampler_encoder = encoder
 
         for batch in range(self.args.al_batches):
-            logging.debug(f'>> Batch {batch}')
+            logging.info_x(f'>> Batch {batch}')
 
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling

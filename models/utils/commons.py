@@ -17,15 +17,13 @@ def get_model_criterion(args, encoder, training_type=TrainingType.ACTIVE_LEARNIN
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
-        print("using Regular model for AL ")
-
-    # this is a tech debt to figure out why AL complains when we do model.fc instead of model.linear
+        logging.info("using Regular model for AL ")
 
     elif training_type == TrainingType.LINEAR_CLASSIFIER:
         criterion = nn.CrossEntropyLoss()
         model = encoder
         model.fc = nn.Linear(n_features, num_classes)
-        print("using Regular model for LC")
+        logging.info("using Regular model for LC")
 
     return model, criterion
 
