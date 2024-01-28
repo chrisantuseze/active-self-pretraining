@@ -183,7 +183,7 @@ if __name__ == "__main__":
     office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
 
     # regular()
-    iterative_training(domain_net)
+    iterative_training(office_home)
     # viz(args)
 
     logging.info("A3 ended.")
