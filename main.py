@@ -114,7 +114,7 @@ def office_dataset(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
@@ -131,12 +131,9 @@ def regular():
         args.lc_epochs = 170
 
     # You can change dataset from here for ease
-    args.source_dataset = 4 #3
-    args.target_dataset = 5 #1
+    args.source_dataset = 0
+    args.target_dataset = 2
     args.lc_dataset = args.target_dataset
-
-    args.size_crops = [128]
-
     assert args.target_dataset == args.lc_dataset
 
     main(args)
@@ -182,8 +179,8 @@ if __name__ == "__main__":
     office_31   = [(4, 5),(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
     office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
 
-    # regular()
-    iterative_training(office_home)
+    regular()
+    # iterative_training(office_home)
     # viz(args)
 
     logging.info("A3 ended.")
