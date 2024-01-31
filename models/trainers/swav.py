@@ -161,7 +161,6 @@ class SwAVTrainer():
 
                 # # virtual adversarial loss
                 vat_loss = self.virtual_adv_loss(self.model, inputs[0])
-                print("vat_loss", vat_loss)
 
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)

@@ -40,6 +40,8 @@ class Classifier:
         self.best_model = copy.deepcopy(self.model)
         self.best_acc = 0
 
+        self.best_train_acc = 0
+
     def train_and_eval(self) -> None:
         train_loader, val_loader = LCDataset(self.args, dir=self.dir, training_type=TrainingType.LINEAR_CLASSIFIER).get_loader()
 
@@ -64,8 +66,9 @@ class Classifier:
                 self.scheduler.step()
 
         time_elapsed = time.time() - since
-        logging.info_x('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        logging.info_x('Best val accuracy: {:3f}'.format(self.best_acc))
+        logging.info_x(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
+        logging.info_x('Training complete for in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        logging.info_x('Best val accuracy: {:3f}, and train accuracy: {:3f}'.format(self.best_acc, self.best_train_acc))
 
         simple_save_model(self.args, self.best_model, 'classifier_{:4f}_acc.pth'.format(self.best_acc))
 
@@ -99,6 +102,11 @@ class Classifier:
 
         epoch_loss, epoch_acc = accuracy(total_loss, corrects, train_loader)
         epoch_acc = epoch_acc * 100.0
+
+        # deep copy the model
+        if epoch_acc > self.best_train_acc:
+            self.best_train_acc = epoch_acc
+            
         logging.info('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
 
         return epoch_loss, epoch_acc
