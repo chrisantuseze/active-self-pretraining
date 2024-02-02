@@ -178,7 +178,13 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     # domain_net  = [(0, 3),  (1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3),  (3, 0),(3, 2)]
-    domain_net  = [(1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3),  (3, 0),(3, 2)]
+
+    # uc
+    # domain_net  = [(1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3)]
+
+    # tacc
+    domain_net  = [(3, 0),(3, 2)]
+
     office_31   = [(4, 5),(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
     # office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
     # office_home = [(8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
@@ -187,7 +193,7 @@ if __name__ == "__main__":
     # reduced the image size 
     args.size_crops = [112]
 
-    regular()
+    # regular()
     iterative_training(domain_net)
     # viz(args)
 
