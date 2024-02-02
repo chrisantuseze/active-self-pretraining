@@ -47,7 +47,7 @@ class Classifier:
 
         since = time.time()
         val_acc_history = []
-        logging.info(f"Performing linear eval on {self.dataset}")
+        logging.info_x(f"Performing linear eval on {self.dataset}")
 
         for epoch in range(self.args.lc_epochs):
             lr = 0
