@@ -282,9 +282,6 @@ class PretextTrainer():
         end = time.time()
         total_steps = 0
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
-            
-            # update learning rate
-            scheduler.step(epoch, step)
 
             inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
             targets, targets1 = targets.to(self.args.device), targets1.to(self.args.device)
