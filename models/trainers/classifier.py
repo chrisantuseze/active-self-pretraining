@@ -47,7 +47,7 @@ class Classifier:
 
         since = time.time()
         val_acc_history = []
-        logging.info_x(f"Performing linear eval on {self.dataset}")
+        logging.info(f"Performing linear eval on {self.dataset}")
 
         for epoch in range(self.args.lc_epochs):
             lr = 0
@@ -66,9 +66,9 @@ class Classifier:
                 self.scheduler.step()
 
         time_elapsed = time.time() - since
-        logging.info_x(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
-        logging.info_x('Training complete for in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-        logging.info_x('Best val accuracy: {:3f}, and train accuracy: {:3f}'.format(self.best_acc, self.best_train_acc))
+        logging.info(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
+        logging.info('Training complete for in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+        logging.info('Best val accuracy: {:3f}, and train accuracy: {:3f}'.format(self.best_acc, self.best_train_acc))
 
         simple_save_model(self.args, self.best_model, 'classifier_{:4f}_acc.pth'.format(self.best_acc))
 

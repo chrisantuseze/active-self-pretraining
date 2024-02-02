@@ -25,7 +25,7 @@ class SelfSupPretrainer:
                 pretrain_level, plevel = f"2_{batch-1}", f"2_{batch}"
             dataset_type = get_dataset_info(self.args.target_dataset)[1]
 
-        logging.info_x(f"{trainingType.value} pretraining in progress, please wait...")
+        logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 
         log_step = self.args.log_step
         trainer = SwAVTrainer(
