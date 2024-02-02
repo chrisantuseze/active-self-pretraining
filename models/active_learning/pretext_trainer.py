@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import time
 import numpy as np
-from datautils.dataset_enum import get_dataset_info
+from datautils.dataset_enum import get_dataset_info, in_domainnet
 from models.trainers.selfsup_pretrainer import SelfSupPretrainer
 from optim.optimizer import load_optimizer
 import utils.logger as logging
@@ -407,7 +407,8 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.source_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
+            # TODO: Consider removing the check for domainnet
+            if batch < self.args.al_batches - 1 and not in_domainnet(self.args.lc_dataset): # I want this not to happen for the last iteration since it would be needless
                 self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
 
         
