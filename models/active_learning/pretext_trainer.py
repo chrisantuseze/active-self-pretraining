@@ -284,8 +284,7 @@ class PretextTrainer():
         for step, (inputs, inputs1, inputs2, inputs3, targets, targets1, targets2, targets3) in enumerate(train_loader):
             
             # update learning rate
-            if self.args.al_optimizer == "SwAV":
-                scheduler.step(epoch, step)
+            scheduler.step(epoch, step)
 
             inputs, inputs1 = inputs.to(self.args.device), inputs1.to(self.args.device)
             targets, targets1 = targets.to(self.args.device), targets1.to(self.args.device)
@@ -355,8 +354,7 @@ class PretextTrainer():
             epoch_acc, _ = self.eval_bm(model, criterion, test_loader)
 
             # update learning rate
-            if self.args.al_optimizer != "SwAV":
-                scheduler.step()
+            scheduler.step()
 
             if epoch_acc <= self.best_trainer_acc:
                 counter += 1
