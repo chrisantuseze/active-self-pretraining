@@ -136,9 +136,7 @@ def regular():
     args.lc_dataset = args.target_dataset
     assert args.target_dataset == args.lc_dataset
 
-    # main(args)
-    classifier = Classifier(args, pretrain_level=f"2_0")
-    classifier.train_and_eval()
+    main(args)
 
 def iterative_training(data_type):
     for item in data_type:
@@ -149,8 +147,9 @@ def iterative_training(data_type):
         if dataset_enum.in_domainnet(args.lc_dataset):
             args.lc_batch_size = 256
             args.lc_lr = 0.5
-            args.al_batches = 2
+            args.al_batches = 1
             args.lc_epochs = 160
+            args.target_epochs: 150 
 
         main(args)
 
@@ -180,10 +179,13 @@ if __name__ == "__main__":
     # domain_net  = [(0, 3),  (1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3),  (3, 0),(3, 2)]
 
     # uc
-    domain_net  = [(1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3)]
+    # domain_net  = [(1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3)]
 
     # tacc
     # domain_net  = [(3, 0),(3, 2)]
+
+    # pete
+    domain_net  = [(2, 0),(2, 1),(2, 3)]
 
     office_31   = [(4, 5),(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
     # office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
