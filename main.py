@@ -147,9 +147,9 @@ def iterative_training(data_type):
         if dataset_enum.in_domainnet(args.lc_dataset):
             args.lc_batch_size = 256
             args.lc_lr = 0.5
-            args.al_batches = 2
+            args.al_batches = 1
             args.lc_epochs = 120
-            args.target_epochs: 75 
+            args.target_epochs: 150 
 
         main(args)
 
