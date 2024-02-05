@@ -80,6 +80,9 @@ class PretextTrainer():
                 embeds.append(outputs.detach().cpu())
                 _preds.append(self.get_predictions(outputs))
 
+                # if step % self.args.log_step == 0:
+                logging.info(f"Step {step}")
+
         preds = torch.cat(_preds).numpy()
         embeds = np.concatenate(embeds)
        
