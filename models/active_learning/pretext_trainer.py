@@ -106,8 +106,10 @@ class PretextTrainer():
         return new_samples[-self.args.sampling_size:]
 
     def get_new_samples(self, preds, samples, embeds) -> List[PathLoss]:
+        logging.info("Getting new samples")
         preds += 3
-        entropy = -(preds * np.log(preds)).sum(axis=1)        
+        entropy = -(preds * np.log(preds)).sum(axis=1)  
+        
         indices = self.get_diverse(entropy, embeds)
 
         new_samples = [samples[i] for i in indices]
