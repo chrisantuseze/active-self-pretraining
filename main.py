@@ -182,19 +182,19 @@ if __name__ == "__main__":
     # domain_net  = [(1, 2),(1, 3)]
 
     # tacc
-    domain_net  = [(3, 2)]
+    # domain_net  = [(3, 2)]
 
     # pete
     # domain_net  = [(2, 0),(2, 1),(2, 3)]
 
-    office_31   = [(4, 5),(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
+    office_31   = [(4, 6),  (5, 4),  (6, 4),(6, 5)]
     # office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
 
     # reduced the image size 
-    args.size_crops = [112]
+    # args.size_crops = [112]
 
     # regular()
-    iterative_training(domain_net)
+    iterative_training(office_31)
     # viz(args)
 
     logging.info("A3 ended.")
