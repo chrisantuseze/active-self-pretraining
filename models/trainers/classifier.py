@@ -70,7 +70,7 @@ class Classifier:
         logging.info('Training complete for in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
         logging.info('Best val accuracy: {:3f}, and train accuracy: {:3f}'.format(self.best_acc, self.best_train_acc))
 
-        simple_save_model(self.args, self.best_model, 'classifier_{:4f}_acc.pth'.format(self.best_acc))
+        simple_save_model(self.args, self.best_model, f'classifier_{get_suffix(self.args)}.pth')
 
         save_accuracy_to_file(
             self.args, accuracies=val_acc_history, best_accuracy=self.best_acc, 
