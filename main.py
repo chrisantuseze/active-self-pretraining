@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument('--lc_batch_size', default=32, type=int, help='')
     parser.add_argument('--lc_image_size', default=256, type=int, help='')
     parser.add_argument('--lc_lr', default=0.3, type=float, help='') #1e-3
-    parser.add_argument('--lc_epochs', default=100, type=int, help='')
+    parser.add_argument('--lc_epochs', default=150, type=int, help='')
     parser.add_argument('--lc_dataset', default=8, type=int, help='')
     parser.add_argument('--lc_optimizer', default="Classifier", type=str, help='')
     parser.add_argument('--lc_gamma', type=int, default=0.1, help='')
@@ -56,8 +56,8 @@ def parse_args():
     parser.add_argument('--al_weight_decay', default=5.0e-4, type=float, help='')
     parser.add_argument('--sampling_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
     parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
-    parser.add_argument('--al_batches', default=5, type=int, help='specifies the number of AL iterations')
-    parser.add_argument('--al_bayesian_model_batch_size', default=64, type=int, help='')
+    parser.add_argument('--al_batches', default=8, type=int, help='specifies the number of AL iterations')
+    parser.add_argument('--al_finetune_batch_size', default=64, type=int, help='')
     parser.add_argument('--al_optimizer', default="SGD-MultiStepV2", type=str, help='')
     parser.add_argument('--al_path_loss_file', default="al_path_loss.pkl", type=str, help='')
 
@@ -154,14 +154,14 @@ def iterative_training(data_type):
         main(args)
 
 if __name__ == "__main__":
-    # args = parse_args()
+    args = parse_args()
 
-    parser = argparse.ArgumentParser(description="A3")
-    config = yaml_config_hook("./config/config.yaml")
-    for k, v in config.items():
-        parser.add_argument(f"--{k}", default=v, type=type(v))
+    # parser = argparse.ArgumentParser(description="A3")
+    # config = yaml_config_hook("./config/config.yaml")
+    # for k, v in config.items():
+    #     parser.add_argument(f"--{k}", default=v, type=type(v))
 
-    args = parser.parse_args()
+    # args = parser.parse_args()
     
     os.makedirs(args.model_checkpoint_path, exist_ok=True)
     os.makedirs(args.model_misc_path, exist_ok=True)
