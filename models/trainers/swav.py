@@ -152,12 +152,13 @@ class SwAVTrainer():
 
             #########################################################
             if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
-                # s_embedding, _ = self.source_model(inputs)
-                # src_domain_out = self.domain_classifier(s_embedding)
-                # tgt_domain_out = self.domain_classifier(embedding_)
+                s_embedding, _ = self.source_model(inputs)
+                src_domain_out = self.domain_classifier(s_embedding)
+                tgt_domain_out = self.domain_classifier(embedding_)
 
                 # # domain adversarial loss
-                # domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
+                domain_adv_loss = self.domain_classifier.get_loss(src_domain_out, tgt_domain_out)
+                print(domain_adv_loss)
 
                 # virtual adversarial loss
                 vat_loss = self.virtual_adv_loss(self.model, inputs[0])

@@ -61,7 +61,7 @@ class DomainClassifier(nn.Module):
 
         f = self.bottleneck(reversed_x)
         predictions = self.domain_discriminator(f)
-        return predictions#, f
+        return predictions
 
     def get_parameters(self) -> List[Dict]:
         """A parameter list which decides optimization hyper-parameters,

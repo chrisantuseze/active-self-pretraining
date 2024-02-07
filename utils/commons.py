@@ -90,7 +90,7 @@ def accuracy(pred, target, topk=1):
 
 
 def save_path_loss(args, filename, image_loss_list):
-    filename = "{}_{}".format(get_dataset_info(args.target_dataset)[1], filename)
+    filename = "{}_{}".format(get_suffix(args), filename)
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -104,7 +104,7 @@ def save_path_loss(args, filename, image_loss_list):
 
 
 def load_path_loss(args, filename):
-    filename = "{}_{}".format(get_dataset_info(args.target_dataset)[1], filename)
+    filename = "{}_{}".format(get_suffix(args), filename)
     out = os.path.join(args.model_misc_path, filename)
 
     try:
@@ -131,10 +131,7 @@ def save_accuracy_to_file(args, accuracies, best_accuracy, filename):
         None
 
 def load_accuracy_file(args):
-    dataset = f"{get_dataset_info(args.base_dataset)[1]}-{get_dataset_info(args.target_dataset)[1]}-{get_dataset_info(args.finetune_dataset)[1]}"
-    filename = "{}_{}_batch_{}.txt".format(dataset, get_al_method_enum(args.al_method), args.finetune_epochs)
-    out = os.path.join(args.model_misc_path, filename)
-
+    out = os.path.join(args.model_misc_path, f"classifier_{get_suffix(args)}.txt")
     try:
         with open(out, "a") as file:
             return file.readlines()
@@ -185,3 +182,6 @@ def get_dataset(data_dir):
         dataset.append(PathLoss(path=path, loss=0, label=labels_mapper[label]))
 
     return dataset
+
+def get_suffix(args):
+    return f"{get_dataset_info(args.source_dataset)[1]}_{get_dataset_info(args.target_dataset)[1]}"

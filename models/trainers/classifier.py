@@ -9,7 +9,7 @@ from models.backbones.resnet import resnet_backbone
 from optim.optimizer import load_optimizer
 from models.utils.commons import accuracy, get_model_criterion, get_params, get_params_to_update, set_parameter_requires_grad
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
+from utils.commons import get_suffix, load_saved_state, save_accuracy_to_file, simple_save_model, simple_load_model
 
 
 class Classifier:
@@ -74,7 +74,7 @@ class Classifier:
 
         save_accuracy_to_file(
             self.args, accuracies=val_acc_history, best_accuracy=self.best_acc, 
-            filename=f"classifier_{self.dataset}_batch_{self.args.lc_epochs}.txt")
+            filename=f"classifier_{get_suffix(self.args)}.txt")
 
         return self.model, val_acc_history
 

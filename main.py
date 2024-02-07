@@ -111,7 +111,7 @@ def train(args, writer):
     args.target_pretrain = True
 
     pretrainer = SelfSupPretrainer(args, writer)
-    pretrainer.first_pretrain()
+    # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
@@ -125,8 +125,8 @@ def main(args):
 
 def regular():
     # You can change dataset from here for ease
-    args.source_dataset = 4
-    args.target_dataset = 5
+    args.source_dataset = 8
+    args.target_dataset = 10
     args.lc_dataset = args.target_dataset
     assert args.target_dataset == args.lc_dataset
 
@@ -134,7 +134,7 @@ def regular():
         args.lc_batch_size = 256
         args.lc_lr = 0.5
         args.al_batches = 2
-        args.lc_epochs = 170
+        args.lc_epochs = 120
 
     main(args)
 
@@ -176,25 +176,10 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
-    # domain_net  = [(0, 3),  (1, 0),(1, 2),(1, 3),  (2, 0),(2, 1),(2, 3),  (3, 0),(3, 2)]
-
-    # uc
-    # domain_net  = [(1, 2),(1, 3)]
-
-    # tacc
-    # domain_net  = [(3, 2)]
-
-    # pete
-    # domain_net  = [(2, 0),(2, 1),(2, 3)]
-
-    office_31   = [(4, 6),  (5, 4),(5, 6),  (6, 4),(6, 5)]
-    # office_home = [(7, 8),(7, 9),(7, 10),  (8, 7),(8, 9),(8, 10),  (9, 7),(9, 8),(9, 10),  (10, 7),(10, 8),(10, 9)]
-
     # reduced the image size 
-    # args.size_crops = [112]
+    args.size_crops = [112]
 
-    # regular()
-    iterative_training(office_31)
+    regular()
     # viz(args)
 
     logging.info("A3 ended.")

@@ -19,7 +19,7 @@ from models.backbones.resnet import resnet_backbone
 
 from models.utils.commons import AverageMeter, get_feature_dimensions_backbone, get_model_criterion, get_params
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
+from utils.commons import get_suffix, load_path_loss, load_saved_state, save_path_loss, simple_load_model, simple_save_model
 
 class PretextTrainer():
     def __init__(self, args, writer) -> None:
@@ -66,7 +66,7 @@ class PretextTrainer():
         logging.info(f"Generating the sample weights")
 
         model, _ = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
-        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'bayesian_model_{get_suffix(self.args)}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
         model.eval()
@@ -168,7 +168,7 @@ class PretextTrainer():
         loader = get_pretrain_ds(self.args, training_type=training_type, is_train=False, batch_size=1).get_loader()
 
         model, criterion = get_model_criterion(self.args, model, num_classes=self.n_pretext_classes)
-        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'bayesian_model_{get_suffix(self.args)}.pth')
         model.load_state_dict(state['model'], strict=False)
         model = model.to(self.args.device)
 
@@ -365,13 +365,13 @@ class PretextTrainer():
                 logging.info("Early stopped at epoch {}:".format(epoch))
                 break
 
-        simple_save_model(self.args, self.best_model, f'bayesian_model_{self.dataset}.pth')
+        simple_save_model(self.args, self.best_model, f'bayesian_model_{get_suffix(self.args)}.pth')
 
     def do_active_learning(self) -> List[PathLoss]:
         logging.info(f"Base = {get_dataset_info(self.args.source_dataset)[1]}, Target = {get_dataset_info(self.args.target_dataset)[1]}")
         encoder = resnet_backbone(self.args.backbone, pretrained=False)
         
-        state = simple_load_model(self.args, path=f'bayesian_model_{self.dataset}.pth')
+        state = simple_load_model(self.args, path=f'bayesian_model_{get_suffix(self.args)}.pth')
         if not state:
             self.bayesian_model(encoder, prefix='first')
 
