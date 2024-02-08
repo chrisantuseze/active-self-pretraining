@@ -40,7 +40,7 @@ def parse_args():
 
     parser.add_argument('--lc_batch_size', default=32, type=int, help='')
     parser.add_argument('--lc_image_size', default=256, type=int, help='')
-    parser.add_argument('--lc_lr', default=0.3, type=float, help='') #1e-3
+    parser.add_argument('--lc_lr', default=0.1, type=float, help='') #1e-3
     parser.add_argument('--lc_epochs', default=200, type=int, help='')
     parser.add_argument('--lc_dataset', default=8, type=int, help='')
     parser.add_argument('--lc_optimizer', default="Classifier", type=str, help='')
