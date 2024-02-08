@@ -30,7 +30,6 @@ def parse_args():
     parser.add_argument('--source_epochs', default=75, type=int, help='') #600
     parser.add_argument('--source_weight_decay', default=1.0e-4, type=float, help='')
     parser.add_argument('--source_dataset', default=7, type=int, help='')
-    parser.add_argument('--source_pretrain', default=True, type=int, help='')
 
     parser.add_argument('--target_batch_size', default=4, type=int, help='')
     parser.add_argument('--target_image_size', default=256, type=int, help='')
@@ -38,7 +37,6 @@ def parse_args():
     parser.add_argument('--target_epochs', default=75, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-4, type=float, help='')
     parser.add_argument('--target_dataset', default=8, type=int, help='')
-    parser.add_argument('--target_pretrain', default=True, type=int, help='')
 
     parser.add_argument('--lc_batch_size', default=32, type=int, help='')
     parser.add_argument('--lc_image_size', default=256, type=int, help='')
@@ -107,14 +105,11 @@ def parse_args():
     return parser.parse_args()
 
 def train(args, writer):
-    args.source_pretrain = True
-    args.target_pretrain = True
-
     pretrainer = SelfSupPretrainer(args, writer)
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
@@ -176,8 +171,8 @@ if __name__ == "__main__":
 
     set_random_seeds(random_seed=args.seed)
 
-    # reduced the image size 
-    args.size_crops = [112]
+    # reduces the image size 
+    # args.size_crops = [112]
 
     regular()
     # viz(args)
