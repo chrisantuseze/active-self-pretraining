@@ -398,8 +398,8 @@ class PretextTrainer():
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
             # sampling
 
-            # samplek = random.sample(sampled_data, self.args.sampling_size)
-            samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)
+            samplek = random.sample(sampled_data, self.args.sampling_size)
+            # samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)
             batch_sampler_encoder = encoder
 
             core_set.extend(samplek)
