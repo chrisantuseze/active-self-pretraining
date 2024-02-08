@@ -78,9 +78,9 @@ class DomainClassifier(nn.Module):
         trg_domain_labels = torch.ones_like(trg_output)
 
         domain_loss = F.binary_cross_entropy(src_output, src_domain_labels) + F.binary_cross_entropy(trg_output, trg_domain_labels)
-        conf_loss = F.binary_cross_entropy(src_output, trg_domain_labels) + F.binary_cross_entropy(trg_output,src_domain_labels)
+        conf_loss = F.binary_cross_entropy(src_output, trg_domain_labels) + F.binary_cross_entropy(trg_output, src_domain_labels)
 
-        return domain_loss + 0.2 * conf_loss
+        return domain_loss + 0.5 * conf_loss
 
 
 class GradientReverseFunction(Function):
