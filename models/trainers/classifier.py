@@ -24,7 +24,10 @@ class Classifier:
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='bayesian_model.pth')
         else:
-            state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
+            out = "swav_{}_checkpoint_{}_cons.tar".format(pretrain_level, get_suffix(args))
+            state = simple_load_model(args, out)
+
+            # state = load_saved_state(args, dataset=get_suffix(args), pretrain_level=pretrain_level)
 
         self.model.load_state_dict(state['model'], strict=False)
         num_classes, self.dataset, self.dir = get_dataset_info(self.args.lc_dataset)

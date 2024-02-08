@@ -4,7 +4,7 @@ from models.active_learning.pretext_dataloader import PretextDataLoader
 from models.trainers.swav import SwAVTrainer
 import utils.logger as logging
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_path_loss, save_state
+from utils.commons import get_suffix, load_path_loss, save_state
 
 
 class SelfSupPretrainer:
@@ -23,7 +23,7 @@ class SelfSupPretrainer:
             pretrain_level, plevel = "2", "2"
             if trainingType == TrainingType.TARGET_AL:
                 pretrain_level, plevel = f"2_{batch-1}", f"2_{batch}"
-            dataset_type = get_dataset_info(self.args.target_dataset)[1]
+            dataset_type = get_suffix(self.args)
 
         logging.info(f"{trainingType.value} pretraining in progress, please wait...")
 

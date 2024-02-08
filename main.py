@@ -109,7 +109,7 @@ def train(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
@@ -122,8 +122,10 @@ def regular():
     # You can change dataset from here for ease
     args.source_dataset = 4
     args.target_dataset = 5
-    args.lc_dataset = args.target_dataset
-    assert args.target_dataset == args.lc_dataset
+    # args.lc_dataset = args.target_dataset
+    # assert args.target_dataset == args.lc_dataset
+
+    args.lc_dataset = args.source_dataset
 
     if dataset_enum.in_domainnet(args.lc_dataset):
         args.lc_batch_size = 256

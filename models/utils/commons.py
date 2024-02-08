@@ -6,7 +6,7 @@ import torchvision
 from torch.utils.data import random_split
 import gc
 from models.utils.training_type_enum import Params, TrainingType
-from utils.commons import load_chkpts, load_saved_state
+from utils.commons import get_suffix, load_chkpts, load_saved_state
 import utils.logger as logging
 
 
@@ -139,7 +139,7 @@ def prepare_model(args, trainingType, pretrain_level, model):
         model.load_state_dict(state['model'], strict=False)
 
     elif trainingType == TrainingType.TARGET_AL:
-        state = load_saved_state(args, dataset=get_dataset_info(args.target_dataset)[1], pretrain_level=pretrain_level)
+        state = load_saved_state(args, dataset=get_suffix(args), pretrain_level=pretrain_level)
 
         # This is the first AL cycle
         if state is None:
