@@ -4,18 +4,11 @@ import torchvision.transforms as transforms
 from typing import List
 from PIL import Image
 import random
-import glob
 from datautils.path_loss import PathLoss
 from models.trainers.transformation.multicropdataset import PILRandomGaussianBlur, get_color_distortion
 from models.utils.commons import get_images_pathlist, get_params
-from models.utils.transformations import Transforms
-from utils.commons import load_class_names, save_class_names
 from models.utils.training_type_enum import TrainingType
-from datautils.dataset_enum import DatasetType, get_dataset_info
-# import cv2
-
-labels = {}
-index = 0
+from datautils.dataset_enum import get_dataset_info
 
 class PretextDataLoader():
     def __init__(self, args, path_loss_list: List[PathLoss], training_type=TrainingType.ACTIVE_LEARNING, is_val=False, batch_size=None) -> None:
@@ -26,16 +19,6 @@ class PretextDataLoader():
         self.is_val = is_val
 
         self.dir = self.args.dataset_dir + "/" + get_dataset_info(self.args.target_dataset)[2]
-
-        # This is done to ensure that the dataset used for validation is only a subset of the entire datasets used for training
-        # if is_val:
-        #     val_path_loss_list = []
-
-        #     img_paths = glob.glob(self.dir + '/*/*')
-        #     for path in img_paths[0:len(path_loss_list)]:
-        #         val_path_loss_list.append(PathLoss(path, 0))     
-
-        #     self.path_loss_list = val_path_loss_list 
 
         params = get_params(args, training_type)
         self.image_size = params.image_size
@@ -149,9 +132,7 @@ class MakeBatchDataset(torch.utils.data.Dataset):
 
         if self.is_tnse:
             return self.transform(img), torch.tensor(0)
-        
-        save_class_names(self.args, label)
-        
+                
         img = self.transform(img)
         img1 = torch.rot90(img, 1, [1,2])
         img2 = torch.rot90(img, 2, [1,2])

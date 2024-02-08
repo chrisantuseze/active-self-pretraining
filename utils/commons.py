@@ -1,12 +1,10 @@
 import glob
 import os
-from sys import prefix
 from datautils.path_loss import PathLoss
 import torch
 
 import pickle
 from PIL import Image
-from models.active_learning.al_method_enum import get_al_method_enum
 
 from datautils.dataset_enum import get_dataset_info
 import utils.logger as logging
@@ -137,30 +135,6 @@ def load_accuracy_file(args):
             return file.readlines()
 
     except IOError as er:
-        return None
-
-def save_class_names(args, label):
-    filename = f"{get_dataset_info(args.target_dataset)[1]}.txt"
-    out = os.path.join(args.model_misc_path, filename)
-
-    try:
-        with open(out, "a") as file:
-            file.write(f"{str(label)}\n")
-
-    except IOError as er:
-        logging.error(er)
-        None
-
-def load_class_names(args):
-    filename = f"{get_dataset_info(args.target_dataset)[1]}.txt"
-    out = os.path.join(args.model_misc_path, filename)
-
-    try:
-        with open(out) as file:
-            return file.readlines()
-
-    except IOError as er:
-        logging.error(er)
         return None
 
 def pil_loader(path):

@@ -198,9 +198,3 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-        
-def free_mem(X, y):
-    del X
-    del y
-    gc.collect()
-    torch.cuda.empty_cache()

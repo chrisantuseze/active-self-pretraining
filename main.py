@@ -4,7 +4,6 @@ import os
 import torch
 import argparse
 
-from models.utils.visualizations.viz import viz
 from models.active_learning.pretext_trainer import PretextTrainer
 from utils.random_seeders import set_random_seeds
 
@@ -13,8 +12,6 @@ from models.trainers.classifier import Classifier
 import utils.logger as logging
 from datautils import dataset_enum
 
-from models.gan.train import do_gen_ai
-from utils.yaml_config_hook import yaml_config_hook
 
 logging.init()
 
@@ -102,6 +99,9 @@ def parse_args():
     parser.add_argument('--warmup_epochs', default=10, type=int, help='')
     parser.add_argument('--start_warmup', default=0, type=int, help='')
 
+    parser.add_argument('--lambda1', default=0.001, type=int, help='')
+    parser.add_argument('--lambda2', default=0.1, type=int, help='')
+
     return parser.parse_args()
 
 def train(args, writer):
@@ -151,13 +151,6 @@ def iterative_training(data_type):
 if __name__ == "__main__":
     args = parse_args()
 
-    # parser = argparse.ArgumentParser(description="A3")
-    # config = yaml_config_hook("./config/config.yaml")
-    # for k, v in config.items():
-    #     parser.add_argument(f"--{k}", default=v, type=type(v))
-
-    # args = parser.parse_args()
-    
     os.makedirs(args.model_checkpoint_path, exist_ok=True)
     os.makedirs(args.model_misc_path, exist_ok=True)
     os.makedirs(args.dataset_dir, exist_ok=True)

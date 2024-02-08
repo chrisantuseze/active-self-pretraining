@@ -165,11 +165,11 @@ class SwAVTrainer():
                 # entropy minimization loss
                 ent_loss = entropy_loss(output)
 
-                loss += 0.001 * domain_adv_loss + 0.1 * (ent_loss + vat_loss)
+                # loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * (ent_loss + vat_loss)
 
-                # loss += 0.1 * (ent_loss + vat_loss)
+                # loss += self.args.lambda2 * (ent_loss + vat_loss)
 
-                # loss += 0.6 * domain_adv_loss + 0.1 * vat_loss
+                loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * vat_loss
 
                 # loss += 0.1 * ent_loss
 
