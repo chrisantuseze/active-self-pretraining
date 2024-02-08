@@ -163,7 +163,7 @@ class SwAVTrainer():
                 vat_loss = self.virtual_adv_loss(self.model, inputs[0])
 
                 # entropy minimization loss
-                ent_loss = entropy_loss(output)
+                # ent_loss = entropy_loss(output)
 
                 # loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * (ent_loss + vat_loss)
 
@@ -186,7 +186,7 @@ class SwAVTrainer():
 
             if self.training_type == TrainingType.TARGET_AL and not in_domainnet(self.args.lc_dataset):
                 # Adjust lambda
-                self.domain_classifier.coeff += 0.001
+                self.domain_classifier.coeff += self.args.lambda1
 
             # ============ misc ... ============
             losses.update(loss.item(), inputs[0].size(0))
