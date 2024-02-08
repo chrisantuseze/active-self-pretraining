@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument('--lc_batch_size', default=32, type=int, help='')
     parser.add_argument('--lc_image_size', default=256, type=int, help='')
     parser.add_argument('--lc_lr', default=0.3, type=float, help='') #1e-3
-    parser.add_argument('--lc_epochs', default=150, type=int, help='')
+    parser.add_argument('--lc_epochs', default=200, type=int, help='')
     parser.add_argument('--lc_dataset', default=8, type=int, help='')
     parser.add_argument('--lc_optimizer', default="Classifier", type=str, help='')
     parser.add_argument('--lc_gamma', type=int, default=0.1, help='')
@@ -52,7 +52,7 @@ def parse_args():
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
     parser.add_argument('--al_lr', default=0.1, type=float, help='')
-    parser.add_argument('--al_epochs', default=25, type=int, help='')
+    parser.add_argument('--al_epochs', default=20, type=int, help='')
     parser.add_argument('--al_weight_decay', default=5.0e-4, type=float, help='')
     parser.add_argument('--sampling_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
     parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
@@ -114,7 +114,7 @@ def train(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    pretext.do_active_learning()
+    # pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
