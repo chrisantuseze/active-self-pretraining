@@ -163,13 +163,13 @@ class SwAVTrainer():
                 vat_loss = self.virtual_adv_loss(self.model, inputs[0])
 
                 # entropy minimization loss
-                # ent_loss = entropy_loss(output)
+                ent_loss = entropy_loss(output)
 
-                # loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * (ent_loss + vat_loss)
+                loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * (ent_loss + vat_loss)
 
                 # loss += self.args.lambda2 * (ent_loss + vat_loss)
 
-                loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * vat_loss
+                # loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * vat_loss
 
                 # loss += 0.1 * ent_loss
 
