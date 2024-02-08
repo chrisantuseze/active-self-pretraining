@@ -172,7 +172,7 @@ if __name__ == "__main__":
     set_random_seeds(random_seed=args.seed)
 
     # reduces the image size 
-    # args.size_crops = [112]
+    args.size_crops = [128]
 
     regular()
     # viz(args)
