@@ -20,14 +20,14 @@ def parse_args():
     parser.add_argument('--source_lr', default=1e-3, type=float, help='')
     parser.add_argument('--source_epochs', default=400, type=int, help='') #600
     parser.add_argument('--source_weight_decay', default=1.0e-4, type=float, help='')
-    parser.add_argument('--source_dataset', default=7, type=int, help='')
+    parser.add_argument('--source_dataset', default=4, type=int, help='')
 
     parser.add_argument('--target_batch_size', default=4, type=int, help='')
     parser.add_argument('--target_image_size', default=64, type=int, help='')
     parser.add_argument('--target_lr', default=1.0e-4, type=float, help='')
     parser.add_argument('--target_epochs', default=50, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-4, type=float, help='')
-    parser.add_argument('--target_dataset', default=8, type=int, help='')
+    parser.add_argument('--target_dataset', default=5, type=int, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
@@ -60,7 +60,11 @@ def parse_args():
     parser.add_argument('--seed', default=1, type=int, help='')
 
     # swav
-    parser.add_argument('--crops_for_assign', default=[0, 1], type=int, help='')
+    parser.add_argument('--swav_batch_size', default=64, type=int, help='')
+    parser.add_argument('--swav_source_lr', default=2.4, type=int, help='')
+    parser.add_argument('--swav_optimizer', default="SwAV", type=str, help='')
+
+    parser.add_argument('--crops_for_assign', default=[0, 1], type=int, nargs='+', help='')
     parser.add_argument('--temperature', default=0.1, type=float, help='')
     parser.add_argument('--epsilon', default=0.05, type=float, help='')
     parser.add_argument('--sinkhorn_iterations', default=3, type=int, help='')
@@ -69,10 +73,10 @@ def parse_args():
     parser.add_argument('--queue_length', default=0, type=int, help='')
     parser.add_argument('--epoch_queue_starts', default=15, type=int, help='')
     parser.add_argument('--hidden_mlp', default=1024, type=int, help='')
-    parser.add_argument('--nmb_crops', default=[2], type=int, help='')
-    parser.add_argument('--size_crops', default=[224], type=int, help='')
-    parser.add_argument('--min_scale_crops', default=[0.14], type=float, help='')
-    parser.add_argument('--max_scale_crops', default=[1], type=int, help='')
+    parser.add_argument('--nmb_crops', default=[2], type=int, nargs='+', help='')
+    parser.add_argument('--size_crops', default=[224], type=int, nargs='+', help='')
+    parser.add_argument('--min_scale_crops', default=[0.14], type=float,  nargs='+',help='')
+    parser.add_argument('--max_scale_crops', default=[1], type=int, nargs='+', help='')
     parser.add_argument('--world_size', default=-1, type=int, help='')
     parser.add_argument('--rank', default=0, type=int, help='')
     parser.add_argument('--local_rank', default=0, type=int, help='')
@@ -80,6 +84,9 @@ def parse_args():
     parser.add_argument('--freeze_prototypes_niters', default=313, type=int, help='')
     parser.add_argument('--warmup_epochs', default=10, type=int, help='')
     parser.add_argument('--start_warmup', default=0, type=int, help='')
+
+    parser.add_argument('--lambda1', default=0.001, type=int, help='')
+    parser.add_argument('--lambda2', default=0.1, type=int, help='')
 
     return parser.parse_args()
 
