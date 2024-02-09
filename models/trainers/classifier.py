@@ -24,7 +24,8 @@ class Classifier:
             logging.info("Using pretext task weights")
             state = simple_load_model(self.args, path='bayesian_model.pth')
         else:
-            out = "swav_{}_checkpoint_{}_uncertain.tar".format(pretrain_level, get_suffix(args))
+            # out = "swav_{}_checkpoint_{}_uncertain.tar".format(pretrain_level, get_suffix(args))
+            out = "swav_1_checkpoint_amazon.tar"
             print(out)
             state = simple_load_model(args, out)
 
