@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from models.utils.visualizations.viz import viz
 import torch
 import argparse
 
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     # reduces the image size 
     args.size_crops = [128]
 
-    regular()
-    # viz(args)
+    # regular()
+    viz(args)
 
     logging.info("A3 ended.")

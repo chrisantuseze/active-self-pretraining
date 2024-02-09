@@ -8,7 +8,7 @@ from models.backbones.resnet import resnet_backbone
 from datautils.dataset_enum import get_dataset_info
 from datautils.target_dataset import get_pretrain_ds
 from models.utils.training_type_enum import TrainingType
-from utils.commons import load_chkpts, load_saved_state, simple_load_model
+from utils.commons import get_suffix, load_chkpts, load_saved_state, simple_load_model
 import models.trainers.backbone.resnet50 as resnet_models
 
 
@@ -202,8 +202,8 @@ def viz(args):
     #         nmb_prototypes=args.nmb_prototypes,
     #     )
 
-    args.source_dataset = 5
-    args.target_dataset = 6
+    args.source_dataset = 4
+    args.target_dataset = 5
 
     source_loader = get_pretrain_ds(args, training_type=TrainingType.SOURCE_PRETRAIN).get_loader() 
     target_loader = get_pretrain_ds(args, training_type=TrainingType.TARGET_PRETRAIN).get_loader() 
@@ -217,17 +217,17 @@ def viz(args):
 
     visualize_source_model_features(args, source_model, source_loader, target_loader)
 
-    # _, target_ds_name, _ = get_dataset_info(args.target_dataset)
-    # for batch in range(args.al_batches):
-    #     target_model = encoder
-    #     # state = simple_load_model(args, "1_finetuner_dslr.pth")
+    suffix = get_suffix(args)
+    for batch in range(args.al_batches):
+        target_model = encoder
+        # state = simple_load_model(args, "1_finetuner_dslr.pth")
 
-    #     state = load_saved_state(args, dataset=target_ds_name, pretrain_level=f"2_{batch}")
-    #     target_model.load_state_dict(state['model'], strict=False)
-    #     target_model = target_model.to(args.device)
-    #     target_model.eval()
+        state = load_saved_state(args, dataset=suffix, pretrain_level=f"2_{batch}")
+        target_model.load_state_dict(state['model'], strict=False)
+        target_model = target_model.to(args.device)
+        target_model.eval()
 
-    #     visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
+        visualize_adapted_model_features(args, target_model, source_loader, target_loader, batch)
 
     # Ensure that figures are closed at the end of the loop
     plt.close('all')
