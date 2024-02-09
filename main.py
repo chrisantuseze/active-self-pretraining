@@ -27,7 +27,7 @@ def parse_args():
     parser.add_argument('--target_lr', default=1.0e-4, type=float, help='')
     parser.add_argument('--target_epochs', default=50, type=int, help='')
     parser.add_argument('--target_weight_decay', default=1.0e-4, type=float, help='')
-    parser.add_argument('--target_dataset', default=5, type=int, help='')
+    parser.add_argument('--target_dataset', default=6, type=int, help='')
 
     parser.add_argument('--al_batch_size', default=256, type=int, help='')
     parser.add_argument('--al_image_size', default=256, type=int, help='')
@@ -95,7 +95,7 @@ def main(args):
     writer = None #SummaryWriter()
 
     adapter = DomainAdapter(args, writer)
-    adapter.train_source()
+    # adapter.train_source()
 
     # adapter.generate_data()
 
@@ -114,5 +114,5 @@ if __name__ == "__main__":
 
     # viz(args)
 
-    logging.info("GASP ended.")
+    logging.info("A3 ended.")
 
