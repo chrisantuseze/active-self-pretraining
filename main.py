@@ -122,10 +122,10 @@ def regular():
     # You can change dataset from here for ease
     args.source_dataset = 4
     args.target_dataset = 5
-    # args.lc_dataset = args.target_dataset
-    # assert args.target_dataset == args.lc_dataset
+    args.lc_dataset = args.target_dataset
+    assert args.target_dataset == args.lc_dataset
 
-    args.lc_dataset = args.source_dataset
+    # args.lc_dataset = args.source_dataset
 
     if dataset_enum.in_domainnet(args.lc_dataset):
         args.lc_batch_size = 256
