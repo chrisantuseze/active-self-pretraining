@@ -51,7 +51,7 @@ def parse_args():
     parser.add_argument('--al_weight_decay', default=5.0e-4, type=float, help='')
     parser.add_argument('--sampling_size', default=400, type=int, help='specifies the amount of samples to be added to the training pool after each AL iteration')
     parser.add_argument('--al_sample_percentage', default=0.95, type=float, help='specifies the percentage of the samples to be used for the target pretraining')
-    parser.add_argument('--al_batches', default=8, type=int, help='specifies the number of AL iterations')
+    parser.add_argument('--al_batches', default=5, type=int, help='specifies the number of AL iterations')
     parser.add_argument('--al_finetune_batch_size', default=64, type=int, help='')
     parser.add_argument('--al_optimizer', default="SGD-MultiStepV2", type=str, help='')
     parser.add_argument('--al_path_loss_file', default="al_path_loss.pkl", type=str, help='')
@@ -109,7 +109,7 @@ def train(args, writer):
     # pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
-    # pretext.do_active_learning()
+    pretext.do_active_learning()
 
     classifier = Classifier(args, pretrain_level=f"2_{args.al_batches-1}")
     classifier.train_and_eval()
@@ -120,12 +120,10 @@ def main(args):
 
 def regular():
     # You can change dataset from here for ease
-    args.source_dataset = 4
-    args.target_dataset = 5
+    args.source_dataset = 8
+    args.target_dataset = 10
     args.lc_dataset = args.target_dataset
     assert args.target_dataset == args.lc_dataset
-
-    # args.lc_dataset = args.source_dataset
 
     if dataset_enum.in_domainnet(args.lc_dataset):
         args.lc_batch_size = 256
@@ -134,21 +132,6 @@ def regular():
         args.lc_epochs = 120
 
     main(args)
-
-def iterative_training(data_type):
-    for item in data_type:
-        args.source_dataset = item[0]
-        args.target_dataset = item[1]
-        args.lc_dataset = args.target_dataset
-
-        if dataset_enum.in_domainnet(args.lc_dataset):
-            args.lc_batch_size = 256
-            args.lc_lr = 0.5
-            args.al_batches = 1
-            args.lc_epochs = 120
-            args.target_epochs: 150 
-
-        main(args)
 
 if __name__ == "__main__":
     args = parse_args()
