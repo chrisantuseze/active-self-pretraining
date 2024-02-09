@@ -107,7 +107,7 @@ def parse_args():
 
 def train(args, writer):
     pretrainer = SelfSupPretrainer(args, writer)
-    # pretrainer.first_pretrain()
+    pretrainer.first_pretrain()
 
     pretext = PretextTrainer(args, writer)
     pretext.do_active_learning()
@@ -120,9 +120,6 @@ def main(args):
     train(args, writer)
 
 def regular():
-    # You can change dataset from here for ease
-    args.source_dataset = 4
-    args.target_dataset = 5
     args.lc_dataset = args.target_dataset
     assert args.target_dataset == args.lc_dataset
 
@@ -153,7 +150,9 @@ if __name__ == "__main__":
     # reduces the image size 
     args.size_crops = [128]
 
-    # regular()
-    viz(args)
+    regular()
+
+    # run to generate visualizations
+    # viz(args)
 
     logging.info("A3 ended.")

@@ -37,7 +37,6 @@ class PretextDataLoader():
         return loader
 
 
-# @DeprecationWarning("This has been deprecated")
 class PretextDataset(torch.utils.data.Dataset):
     def __init__(self, args, pathloss_list: List[PathLoss], transform) -> None:
         self.args = args

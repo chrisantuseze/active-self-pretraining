@@ -13,7 +13,7 @@ from utils.commons import get_suffix, load_saved_state, save_accuracy_to_file, s
 
 
 class Classifier:
-    def __init__(self, args, pretrain_level="2") -> None: # this can also be called after the base pretraining to evaluate the performance
+    def __init__(self, args, pretrain_level="2") -> None:
         self.args = args
         self.model = resnet_backbone(self.args.backbone, pretrained=False)
 

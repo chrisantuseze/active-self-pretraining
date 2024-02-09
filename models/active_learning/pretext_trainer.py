@@ -394,11 +394,11 @@ class PretextTrainer():
 
         for batch in range(self.args.al_batches):
             logging.info(f'>> Batch {batch}')
-
             sampled_data = path_loss[batch * sample_per_batch : (batch + 1) * sample_per_batch]
-            # sampling
 
+            # for random sapling
             # samplek = random.sample(sampled_data, self.args.sampling_size)
+
             samplek = self.batch_sampler(batch_sampler_encoder, sampled_data)
             batch_sampler_encoder = encoder
 
@@ -409,8 +409,7 @@ class PretextTrainer():
             pretrainer = SelfSupPretrainer(self.args, self.writer)
             pretrainer.source_pretrain(loader, self.args.target_epochs, batch, trainingType=TrainingType.TARGET_AL)
 
-            # TODO: Consider removing the check for domainnet
-            if batch < self.args.al_batches - 1 and not in_domainnet(self.args.lc_dataset): # I want this not to happen for the last iteration since it would be needless
+            if batch < self.args.al_batches - 1: # I want this not to happen for the last iteration since it would be needless
                 self.bayesian_model(encoder, prefix=str(batch), path_list=core_set, training_type=TrainingType.ACTIVE_LEARNING)
 
         

@@ -167,12 +167,6 @@ class SwAVTrainer():
 
                 loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * (ent_loss + vat_loss)
 
-                # loss += self.args.lambda2 * (ent_loss + vat_loss)
-
-                # loss += self.args.lambda1 * domain_adv_loss + self.args.lambda2 * vat_loss
-
-                # loss += 0.1 * ent_loss
-
             #########################################################
 
             self.optimizer.zero_grad()
