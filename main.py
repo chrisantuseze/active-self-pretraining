@@ -120,8 +120,8 @@ def main(args):
 
 def regular():
     # You can change dataset from here for ease
-    args.source_dataset = 8
-    args.target_dataset = 10
+    args.source_dataset = 4
+    args.target_dataset = 5
     args.lc_dataset = args.target_dataset
     assert args.target_dataset == args.lc_dataset
 
