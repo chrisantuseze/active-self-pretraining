@@ -82,11 +82,15 @@ def visualize_source_model_features(args, source_model, source_data, target_data
     source_emb = tsne.fit_transform(source_features) 
     target_emb = tsne.fit_transform(target_features)
 
+    # Create a new figure for each iteration
+    plt.figure()
+
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
     plt.title('Before Adaptation')
-    plt.show()
+    plt.savefig('models/utils/visualizations/plots/source_model_plot.png')
+    # plt.show()
 
 def visualize_adapted_model_features(args, adapted_model, source_data, target_data, batch):
     for _, (images, _) in enumerate(source_data):
@@ -112,19 +116,23 @@ def visualize_adapted_model_features(args, adapted_model, source_data, target_da
 
     # Extract features after adaptation
     source_emb = tsne.fit_transform(adapted_source_features)
-    target_emb = tsne.fit_transform(adapted_target_features) 
+    target_emb = tsne.fit_transform(adapted_target_features)
+
+    # Create a new figure for each iteration
+    plt.figure() 
 
     plt.scatter(source_emb[:,0], source_emb[:,1], c='b', label='Source')
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
     plt.title(f'After Adaptation -> batch {batch}')
+    plt.savefig(f'models/utils/visualizations/plots/adapted_model_plot_{batch}.png')
 
     # Save figure to image file
     # plt.savefig('embeddings_plot.png')
 
-    plt.show()
+    # plt.show()
 
-def visualize_features_both(args, source_model, adapted_model, source_data, target_data):
+def visualize_features_both(args, batch, source_model, adapted_model, source_data, target_data):
 
     for _, (images, _) in enumerate(source_data):
         with torch.no_grad():
@@ -168,7 +176,8 @@ def visualize_features_both(args, source_model, adapted_model, source_data, targ
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
     plt.title('Before Adaptation')
-    plt.show()
+    plt.savefig('models/utils/visualizations/plots/source_model_plot.png')
+    # plt.show()
 
     # Extract features after adaptation
     source_emb = tsne.fit_transform(adapted_source_features)
@@ -178,7 +187,8 @@ def visualize_features_both(args, source_model, adapted_model, source_data, targ
     plt.scatter(target_emb[:,0], target_emb[:,1], c='r', label='Target')
     plt.legend()
     plt.title('After Adaptation')
-    plt.show()
+    plt.savefig(f'models/utils/visualizations/plots/adapted_model_plot_{batch}.png')
+    # plt.show()
 
 def viz(args):
     args.source_batch_size = 128
@@ -205,3 +215,7 @@ def viz(args):
         target_model.eval()
 
         visualize_adapted_model_features(args, target_model, source_train_loader, target_train_loader, batch-1)
+
+
+    # Ensure that figures are closed at the end of the loop
+    plt.close('all')
