@@ -7,7 +7,6 @@ build/
 dist/
 simclr.egg-info
 lightning_logs/
-.chrisantuseze/
 .DS_Store
 main.sublime-workspace
 *.log
